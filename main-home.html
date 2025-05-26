@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Hub - Adventure & Community Platform</title>
+    <link rel="stylesheet" href="main-home-styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Merriweather:wght@300;400;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-globe"></i>
+                <span>Social Hub</span>
+            </div>
+            <div class="nav-links">
+                <a href="#about" class="nav-link">About</a>
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#contact" class="nav-link">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Welcome to Social Hub</h1>
+            <p class="hero-subtitle">Connect, Adventure, and Socialize in Virtual Spaces</p>
+            <div class="hero-stats">
+                <div class="stat">
+                    <span id="totalUsers">0</span>
+                    <span>Users Online</span>
+                </div>
+                <div class="stat">
+                    <span id="activeRooms">0</span>
+                    <span>Active Rooms</span>
+                </div>
+                <div class="stat">
+                    <span id="liveStreams">0</span>
+                    <span>Live Streams</span>
+                </div>
+            </div>
+        </div>
+        <div class="hero-background"></div>
+    </section>
+
+    <!-- Main Sections -->
+    <main class="main-content">
+        <div class="container">
+            <div class="sections-grid">
+                <!-- Questing IRL Section -->
+                <div class="section-card questing" onclick="navigateToSection('questing')">
+                    <div class="section-background">
+                        <div class="section-overlay"></div>
+                    </div>
+                    <div class="section-content">
+                        <div class="section-icon">
+                            <i class="fas fa-map-marked-alt"></i>
+                        </div>
+                        <h2 class="section-title">Questing IRL</h2>
+                        <p class="section-description">
+                            Join real-world adventures across the British countryside. 
+                            Stream your quests, explore historic locations, and share 
+                            your journey with fellow adventurers.
+                        </p>
+                        <div class="section-stats">
+                            <div class="stat-item">
+                                <i class="fas fa-users"></i>
+                                <span id="questingUsers">0</span>
+                                <span>Questers</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-video"></i>
+                                <span id="questingRooms">0</span>
+                                <span>Adventures</span>
+                            </div>
+                        </div>
+                        <button class="section-btn">
+                            <i class="fas fa-compass"></i>
+                            Start Adventure
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Virtual Pub Section -->
+                <div class="section-card pub" onclick="navigateToSection('pub')">
+                    <div class="section-background">
+                        <div class="section-overlay"></div>
+                    </div>
+                    <div class="section-content">
+                        <div class="section-icon">
+                            <i class="fas fa-beer"></i>
+                        </div>
+                        <h2 class="section-title">Virtual Pub</h2>
+                        <p class="section-description">
+                            Relax and socialize in our cozy virtual pub. 
+                            Chat with friends, share stories, play games, 
+                            and enjoy the warm atmosphere of community.
+                        </p>
+                        <div class="section-stats">
+                            <div class="stat-item">
+                                <i class="fas fa-users"></i>
+                                <span id="pubUsers">0</span>
+                                <span>Patrons</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-video"></i>
+                                <span id="pubRooms">0</span>
+                                <span>Tables</span>
+                            </div>
+                        </div>
+                        <button class="section-btn">
+                            <i class="fas fa-door-open"></i>
+                            Enter Pub
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features Section -->
+            <section id="features" class="features-section">
+                <div class="section-header">
+                    <h2>Platform Features</h2>
+                    <p>Everything you need for social streaming and community building</p>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <i class="fas fa-video"></i>
+                        <h3>Live Streaming</h3>
+                        <p>High-quality video streaming with multiple participant support</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-comments"></i>
+                        <h3>Real-time Chat</h3>
+                        <p>Interactive chat system for seamless communication</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-users"></i>
+                        <h3>Community Rooms</h3>
+                        <p>Create and join themed rooms for different activities</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-mobile-alt"></i>
+                        <h3>Mobile Friendly</h3>
+                        <p>Fully responsive design that works on all devices</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Social Hub</h3>
+                    <p>Connecting people through shared experiences and virtual adventures.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="/questing">Questing IRL</a></li>
+                        <li><a href="/pub">Virtual Pub</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Connect</h3>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-discord"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Social Hub. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="main-home.js"></script>
+</body>
+</html> 
