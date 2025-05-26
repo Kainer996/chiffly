@@ -255,7 +255,7 @@ function handleJoinRoom(e) {
         host: isHost ? '1' : '0'
     });
     
-    window.location.href = `/pub-stream?${params.toString()}`;
+            window.location.href = `pub-stream.html?${params.toString()}`;
 }
 
 // Connection status

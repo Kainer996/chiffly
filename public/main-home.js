@@ -101,12 +101,12 @@ function navigateToSection(section) {
     console.log('Navigating to section:', section);
     switch(section) {
         case 'questing':
-            console.log('Redirecting to /questing');
-            window.location.href = '/questing';
+            console.log('Redirecting to questing.html');
+            window.location.href = 'questing.html';
             break;
         case 'pub':
-            console.log('Redirecting to /pub');
-            window.location.href = '/pub';
+            console.log('Redirecting to pub.html');
+            window.location.href = 'pub.html';
             break;
         default:
             console.log('Unknown section:', section);
