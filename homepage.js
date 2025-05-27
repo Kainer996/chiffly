@@ -284,7 +284,7 @@ function handleJoinRoom(e) {
         isStreamer: isStreamer.toString()
     });
     
-            window.location.href = `/stream.html?${params.toString()}`;
+            window.location.href = `stream.html?${params.toString()}`;
 }
 
 // Utility functions
