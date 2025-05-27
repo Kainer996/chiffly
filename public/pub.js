@@ -255,7 +255,7 @@ function handleJoinRoom(e) {
         host: isHost ? '1' : '0'
     });
     
-            window.location.href = `/chiffly/pub-stream.html?${params.toString()}`;
+            window.location.href = `/pub-stream.html?${params.toString()}`;
 }
 
 // Connection status

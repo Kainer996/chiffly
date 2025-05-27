@@ -31,12 +31,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Socket event handlers
 socket.on('connect', () => {
-    console.log('Connected to Social Hub');
+    console.log('Connected to Chiffy');
     requestPlatformStats();
 });
 
 socket.on('disconnect', () => {
-    console.log('Disconnected from Social Hub');
+    console.log('Disconnected from Chiffy');
 });
 
 socket.on('platform-stats', (stats) => {
@@ -101,12 +101,12 @@ function navigateToSection(section) {
     console.log('Navigating to section:', section);
     switch(section) {
         case 'questing':
-            console.log('Redirecting to /chiffly/questing.html');
-            window.location.href = '/chiffly/questing.html';
+                    console.log('Redirecting to /questing.html');
+        window.location.href = '/questing.html';
             break;
         case 'pub':
-            console.log('Redirecting to /chiffly/pub.html');
-            window.location.href = '/chiffly/pub.html';
+                    console.log('Redirecting to /pub.html');
+        window.location.href = '/pub.html';
             break;
         default:
             console.log('Unknown section:', section);
@@ -271,7 +271,7 @@ function showLoadingAnimation() {
     loadingOverlay.innerHTML = `
         <div style="text-align: center; color: white;">
             <div style="width: 50px; height: 50px; border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid white; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem;"></div>
-            <p style="font-family: 'Cinzel', serif; font-size: 1.2rem;">Loading Social Hub...</p>
+            <p style="font-family: 'Cinzel', serif; font-size: 1.2rem;">Loading Chiffy...</p>
         </div>
     `;
     
