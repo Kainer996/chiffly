@@ -3,193 +3,399 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Virtual Pub - Cozy Community Hub</title>
-    <link rel="stylesheet" href="pub-styles.css">
+    <title>Virtual Pub - Chiffly</title>
+    <link rel="stylesheet" href="main-home-styles.css?v=5">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Merriweather:wght@300;400;700&family=Roboto+Slab:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        .pub-hero {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+            min-height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pub-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%"><stop offset="0%" stop-color="%23ffffff" stop-opacity="0.1"/><stop offset="100%" stop-color="%23ffffff" stop-opacity="0"/></radialGradient></defs><circle cx="200" cy="200" r="100" fill="url(%23a)"/><circle cx="800" cy="300" r="150" fill="url(%23a)"/><circle cx="400" cy="700" r="120" fill="url(%23a)"/></svg>');
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .pub-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            padding: 0 2rem;
+        }
+
+        .pub-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .pub-subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .pub-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .pub-btn {
+            background: linear-gradient(135deg, #ed8936, #dd6b20);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            box-shadow: 0 5px 15px rgba(237, 137, 54, 0.3);
+        }
+
+        .pub-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(237, 137, 54, 0.4);
+        }
+
+        .pub-btn.secondary {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .pub-section {
+            padding: 4rem 0;
+            background: #f8fafc;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .stat-card i {
+            font-size: 2.5rem;
+            color: #ed8936;
+            margin-bottom: 1rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-weight: 500;
+        }
+
+        .pubs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .pub-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .pub-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .pub-card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .pub-card-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #ed8936, #dd6b20);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .pub-card-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin: 0;
+        }
+
+        .pub-card-description {
+            color: #718096;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .pub-card-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .pub-card-stat {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #718096;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #ed8936;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 100px;
+            left: 2rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        @media (max-width: 768px) {
+            .pub-title {
+                font-size: 2.5rem;
+            }
+            
+            .pub-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .back-btn {
+                left: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-logo">
-                <a href="index.html" style="color: inherit; text-decoration: none; display: flex; align-items: center; gap: 0.75rem;">
-                    <i class="fas fa-beer"></i>
-                    <span>Virtual Pub</span>
-                </a>
+                <i class="fas fa-cube"></i>
+                <span>Chiffly</span>
             </div>
-            <div class="nav-actions">
-                <button id="createTableBtn" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> Reserve Table
-                </button>
-                <button id="refreshBtn" class="btn btn-secondary">
-                    <i class="fas fa-sync-alt"></i> Refresh
-                </button>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="#about" class="nav-link">About</a>
+                <a href="#contact" class="nav-link">Contact</a>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1 class="hero-title">Welcome to the Virtual Pub</h1>
-            <p class="hero-subtitle">Pull up a chair, grab a drink, and enjoy good company in our cozy digital tavern</p>
+    <!-- Back Button -->
+    <button class="back-btn" onclick="window.location.href='index.html'">
+        <i class="fas fa-arrow-left"></i>
+    </button>
+
+    <!-- Pub Hero Section -->
+    <section class="pub-hero">
+        <div class="pub-content">
+            <h1 class="pub-title">
+                <i class="fas fa-wine-glass"></i>
+                Virtual Pub
+            </h1>
+            <p class="pub-subtitle">Connect with friends over drinks and good conversation</p>
+            
+            <div class="pub-actions">
+                <button class="pub-btn" onclick="createPub()">
+                    <i class="fas fa-plus"></i>
+                    Create Pub
+                </button>
+                <button class="pub-btn secondary" onclick="refreshPubs()">
+                    <i class="fas fa-sync-alt"></i>
+                    Refresh Pubs
+                </button>
+            </div>
         </div>
     </section>
 
-    <!-- Main Content -->
-    <main class="main-content">
+    <!-- Pub Section -->
+    <section class="pub-section">
         <div class="container">
-            <!-- Stats Bar -->
-            <div class="stats-bar">
-                <div class="stat-item">
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
                     <i class="fas fa-users"></i>
-                    <span id="totalUsers">0</span>
-                    <span>Patrons Online</span>
+                    <div class="stat-number" id="totalUsers">0</div>
+                    <div class="stat-label">Patrons Online</div>
                 </div>
-                <div class="stat-item">
-                    <i class="fas fa-table"></i>
-                    <span id="activeRooms">0</span>
-                    <span>Active Tables</span>
+                <div class="stat-card">
+                    <i class="fas fa-wine-glass"></i>
+                    <div class="stat-number" id="activePubs">0</div>
+                    <div class="stat-label">Active Pubs</div>
                 </div>
-                <div class="stat-item">
+                <div class="stat-card">
                     <i class="fas fa-video"></i>
-                    <span id="liveStreams">0</span>
-                    <span>Live Conversations</span>
+                    <div class="stat-number" id="liveStreams">0</div>
+                    <div class="stat-label">Live Conversations</div>
                 </div>
             </div>
 
-            <!-- Content Grid -->
-            <div class="content-grid">
-                <!-- Active Tables Section -->
-                <section class="rooms-section">
-                    <div class="section-header">
-                        <h2><i class="fas fa-table"></i> Available Tables</h2>
-                        <p>Join a conversation or reserve your own table for friends</p>
-                    </div>
-                    
-                    <div id="roomsList" class="rooms-grid">
-                        <!-- Tables will be populated here -->
-                    </div>
-
-                    <div id="noRooms" class="empty-state">
-                        <i class="fas fa-chair"></i>
-                        <h3>No Tables Available</h3>
-                        <p>Be the first to reserve a table! Start a conversation and invite others to join.</p>
-                        <button class="btn btn-primary" onclick="showCreateRoomModal()">
-                            <i class="fas fa-plus"></i> Reserve Table
-                        </button>
-                    </div>
-                </section>
-
-                <!-- Online Patrons Section -->
-                <section class="users-section">
-                    <div class="section-header">
-                        <h2><i class="fas fa-users"></i> Fellow Patrons</h2>
-                        <p>Friendly faces currently in the pub</p>
-                    </div>
-                    
-                    <div id="usersList" class="users-list">
-                        <!-- Users will be populated here -->
-                    </div>
-
-                    <div id="noUsers" class="empty-state">
-                        <i class="fas fa-user-friends"></i>
-                        <h3>Empty Pub</h3>
-                        <p>You're the first patron here! Others will join soon for good conversation.</p>
-                    </div>
-                </section>
+            <!-- Active Pubs -->
+            <div class="section-header">
+                <h2>Active Pubs</h2>
+                <p>Join a conversation or create your own pub</p>
             </div>
-        </div>
-    </main>
 
-    <!-- Reserve Table Modal -->
-    <div id="createRoomModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-table"></i> Reserve a Table</h2>
-                <button class="close-btn" onclick="hideCreateRoomModal()">
-                    <i class="fas fa-times"></i>
+            <div id="pubsList" class="pubs-grid">
+                <!-- Pubs will be populated here -->
+            </div>
+
+            <div id="noPubs" class="empty-state">
+                <i class="fas fa-wine-glass"></i>
+                <h3>No Active Pubs</h3>
+                <p>Be the first to create a pub! Start a conversation and invite others to join.</p>
+                <button class="pub-btn" onclick="createPub()">
+                    <i class="fas fa-plus"></i>
+                    Create Pub
                 </button>
             </div>
-            <form id="createRoomForm">
-                <div class="form-group">
-                    <label for="tableName">Table Name:</label>
-                    <input type="text" id="tableName" required placeholder="e.g., Cozy Corner Chat">
-                </div>
-                <div class="form-group">
-                    <label for="tableDescription">Description:</label>
-                    <textarea id="tableDescription" placeholder="What's the conversation about?"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="maxPatrons">Max Patrons:</label>
-                    <select id="maxPatrons">
-                        <option value="4">4 People</option>
-                        <option value="6">6 People</option>
-                        <option value="8" selected>8 People</option>
-                        <option value="12">12 People</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="isPrivate">
-                        <span class="checkmark"></span>
-                        Private Table (invite only)
-                    </label>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" onclick="hideCreateRoomModal()">
-                        Cancel
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-chair"></i> Reserve Table
-                    </button>
-                </div>
-            </form>
         </div>
-    </div>
+    </section>
 
-    <!-- Join Table Modal -->
-    <div id="joinRoomModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-sign-in-alt"></i> Join Table</h2>
-                <button class="close-btn" onclick="hideJoinRoomModal()">
-                    <i class="fas fa-times"></i>
-                </button>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Chiffly Pub</h3>
+                    <p>Your virtual space for drinks and conversation.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Features</h3>
+                    <ul>
+                        <li><a href="#">Video Chat</a></li>
+                        <li><a href="#">Group Conversations</a></li>
+                        <li><a href="#">Private Rooms</a></li>
+                        <li><a href="#">Real-time Chat</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Connect</h3>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-discord"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
             </div>
-            <form id="joinRoomForm">
-                <div class="form-group">
-                    <label for="username">Your Name:</label>
-                    <input type="text" id="username" required placeholder="Enter your name">
-                </div>
-                <div class="form-group">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="joinAsHost">
-                        <span class="checkmark"></span>
-                        Join as Table Host (with video)
-                    </label>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" onclick="hideJoinRoomModal()">
-                        Cancel
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-chair"></i> Take a Seat
-                    </button>
-                </div>
-            </form>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Chiffly Pub. All rights reserved.</p>
+            </div>
         </div>
-    </div>
-
-    <!-- Status Indicator -->
-    <div id="statusIndicator" class="status-indicator">
-        <i class="fas fa-circle"></i>
-        <span>Connecting...</span>
-    </div>
+    </footer>
 
     <!-- Scripts -->
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-    <script src="pub.js"></script>
+    <script>
+        // Pub functionality
+        function createPub() {
+            // Redirect to pub creation/streaming page
+            window.location.href = 'pub-stream.html';
+        }
+
+        function refreshPubs() {
+            // Refresh the pubs list
+            loadPubs();
+        }
+
+        function loadPubs() {
+            // This will be implemented with Socket.IO
+            console.log('Loading pubs...');
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPubs();
+        });
+    </script>
 </body>
 </html> 
