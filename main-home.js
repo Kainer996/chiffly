@@ -179,4 +179,4 @@ const optimizedScrollHandler = debounce(() => {
 
 window.addEventListener('scroll', optimizedScrollHandler);
 
-console.log('Chiffy Modern Homepage loaded successfully!'); 
+console.log('Chiffly Modern Homepage loaded successfully!'); 

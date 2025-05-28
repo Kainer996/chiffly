@@ -309,6 +309,6 @@ io.on('connection', (socket) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`CVLog Streaming Platform running on port ${PORT}`);
+  console.log(`Chiffly Streaming Platform running on port ${PORT}`);
   console.log(`Visit http://localhost:${PORT} to access the platform`);
 }); 
