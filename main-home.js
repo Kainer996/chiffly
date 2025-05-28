@@ -1,5 +1,5 @@
 // Socket.IO connection
-console.log('Main home script loading...');
+console.log('Town Square script loading...');
 const socket = io();
 
 // DOM elements
@@ -27,16 +27,18 @@ document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
     requestPlatformStats();
     startStatsUpdater();
+    setupScrollAnimations();
+    createParticleEffect();
 });
 
 // Socket event handlers
 socket.on('connect', () => {
-    console.log('Connected to Chiffy');
+    console.log('Connected to Chiffy Town Square');
     requestPlatformStats();
 });
 
 socket.on('disconnect', () => {
-    console.log('Disconnected from Chiffy');
+    console.log('Disconnected from Chiffy Town Square');
 });
 
 socket.on('platform-stats', (stats) => {
@@ -64,36 +66,67 @@ function setupEventListeners() {
         });
     });
 
-    // Navigation for section cards
-    document.querySelectorAll('.section-card').forEach(card => {
-        card.addEventListener('click', (e) => {
-            const href = card.getAttribute('data-href');
+    // Navigation for building cards
+    document.querySelectorAll('.building').forEach(building => {
+        building.addEventListener('click', (e) => {
+            const href = building.getAttribute('data-href');
             if (href) {
                 console.log('Navigating to:', href);
-                window.location.href = href;
+                // Add a nice transition effect
+                building.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    window.location.href = href;
+                }, 150);
             }
         });
     });
 
-    // Section card hover effects
-    document.querySelectorAll('.section-card').forEach(card => {
-        card.addEventListener('mouseenter', () => {
-            card.style.transform = 'translateY(-10px) scale(1.02)';
+    // Building hover effects with enhanced animations
+    document.querySelectorAll('.building').forEach(building => {
+        building.addEventListener('mouseenter', () => {
+            building.style.transform = 'translateY(-10px) scale(1.02)';
+            // Add glow effect
+            const glow = building.querySelector('.building-glow');
+            if (glow) {
+                glow.style.opacity = '1';
+            }
         });
         
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = 'translateY(0) scale(1)';
+        building.addEventListener('mouseleave', () => {
+            building.style.transform = 'translateY(0) scale(1)';
+            // Remove glow effect
+            const glow = building.querySelector('.building-glow');
+            if (glow) {
+                glow.style.opacity = '0';
+            }
         });
     });
 
-    // Parallax effect for hero background
+    // Parallax effect for town square background
     window.addEventListener('scroll', () => {
         const scrolled = window.pageYOffset;
-        const heroBackground = document.querySelector('.hero-background');
-        if (heroBackground) {
-            heroBackground.style.transform = `translateY(${scrolled * 0.5}px)`;
+        const townBackground = document.querySelector('.town-square-background');
+        if (townBackground) {
+            townBackground.style.transform = `translateY(${scrolled * 0.5}px)`;
+        }
+        
+        // Animate fountain based on scroll
+        const fountain = document.querySelector('.fountain');
+        if (fountain) {
+            const rotation = scrolled * 0.1;
+            fountain.style.transform = `rotate(${rotation}deg)`;
         }
     });
+
+    // Add click effect to fountain
+    const fountain = document.querySelector('.fountain');
+    if (fountain) {
+        fountain.addEventListener('click', () => {
+            fountain.style.animation = 'none';
+            fountain.offsetHeight; // Trigger reflow
+            fountain.style.animation = 'fountainGlow 1s ease-in-out';
+        });
+    }
 }
 
 // Navigation functions
@@ -101,12 +134,14 @@ function navigateToSection(section) {
     console.log('Navigating to section:', section);
     switch(section) {
         case 'questing':
-                    console.log('Redirecting to questing.html');
-        window.location.href = 'questing.html';
+        case 'adventure':
+            console.log('Redirecting to questing.html');
+            window.location.href = 'questing.html';
             break;
         case 'pub':
-                    console.log('Redirecting to pub.html');
-        window.location.href = 'pub.html';
+        case 'tavern':
+            console.log('Redirecting to pub.html');
+            window.location.href = 'pub.html';
             break;
         default:
             console.log('Unknown section:', section);
@@ -126,7 +161,7 @@ function updatePlatformStats(stats) {
     animateCounter(activeRoomsSpan, platformStats.activeRooms);
     animateCounter(liveStreamsSpan, platformStats.liveStreams);
     
-    // Update section-specific stats
+    // Update building-specific stats
     animateCounter(questingUsersSpan, platformStats.questingUsers);
     animateCounter(questingRoomsSpan, platformStats.questingRooms);
     animateCounter(pubUsersSpan, platformStats.pubUsers);
@@ -195,46 +230,77 @@ function setupScrollAnimations() {
         card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
         observer.observe(card);
     });
+
+    // Observe buildings
+    document.querySelectorAll('.building').forEach(building => {
+        building.style.opacity = '0';
+        building.style.transform = 'translateY(50px)';
+        building.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+        observer.observe(building);
+    });
 }
 
-// Initialize scroll animations when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    setupScrollAnimations();
-});
-
-// Particle effect for hero section
+// Enhanced particle effect for town atmosphere
 function createParticleEffect() {
-    const hero = document.querySelector('.hero');
-    if (!hero) return;
-    
-    for (let i = 0; i < 50; i++) {
+    const particleContainer = document.createElement('div');
+    particleContainer.style.position = 'fixed';
+    particleContainer.style.top = '0';
+    particleContainer.style.left = '0';
+    particleContainer.style.width = '100%';
+    particleContainer.style.height = '100%';
+    particleContainer.style.pointerEvents = 'none';
+    particleContainer.style.zIndex = '1';
+    document.body.appendChild(particleContainer);
+
+    function createParticle() {
         const particle = document.createElement('div');
-        particle.style.cssText = `
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 50%;
-            pointer-events: none;
-            animation: float ${Math.random() * 3 + 2}s ease-in-out infinite;
-            left: ${Math.random() * 100}%;
-            top: ${Math.random() * 100}%;
-            animation-delay: ${Math.random() * 2}s;
+        particle.style.position = 'absolute';
+        particle.style.width = Math.random() * 4 + 2 + 'px';
+        particle.style.height = particle.style.width;
+        particle.style.background = `rgba(255, 215, 0, ${Math.random() * 0.3 + 0.1})`;
+        particle.style.borderRadius = '50%';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = '100%';
+        particle.style.animation = `floatUp ${Math.random() * 10 + 15}s linear infinite`;
+        
+        particleContainer.appendChild(particle);
+        
+        setTimeout(() => {
+            if (particle.parentNode) {
+                particle.parentNode.removeChild(particle);
+            }
+        }, 25000);
+    }
+
+    // Create particles periodically
+    setInterval(createParticle, 3000);
+    
+    // Add CSS animation for particles
+    if (!document.getElementById('particle-styles')) {
+        const style = document.createElement('style');
+        style.id = 'particle-styles';
+        style.textContent = `
+            @keyframes floatUp {
+                0% {
+                    transform: translateY(0) rotate(0deg);
+                    opacity: 0;
+                }
+                10% {
+                    opacity: 1;
+                }
+                90% {
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateY(-100vh) rotate(360deg);
+                    opacity: 0;
+                }
+            }
         `;
-        hero.appendChild(particle);
+        document.head.appendChild(style);
     }
 }
 
-// Add particle effect
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(createParticleEffect, 1000);
-});
-
-// Global navigation function for onclick handlers
-window.navigateToSection = navigateToSection;
-console.log('Navigation function set globally:', typeof window.navigateToSection);
-
-// Smooth scroll to top function
 function scrollToTop() {
     window.scrollTo({
         top: 0,
@@ -242,61 +308,61 @@ function scrollToTop() {
     });
 }
 
-// Add scroll to top functionality to logo
-document.addEventListener('DOMContentLoaded', () => {
-    const logo = document.querySelector('.nav-logo');
-    if (logo) {
-        logo.addEventListener('click', scrollToTop);
-        logo.style.cursor = 'pointer';
-    }
-});
+// Add some town square specific interactions
+function addTownSquareInteractions() {
+    // Make lamp posts glow on hover
+    document.querySelectorAll('.lamp-post').forEach(lamp => {
+        lamp.addEventListener('mouseenter', () => {
+            lamp.style.boxShadow = '0 0 20px rgba(255, 215, 0, 0.8)';
+        });
+        
+        lamp.addEventListener('mouseleave', () => {
+            lamp.style.boxShadow = '0 3px 10px rgba(0, 0, 0, 0.3)';
+        });
+    });
 
-// Loading animation
-function showLoadingAnimation() {
-    const loadingOverlay = document.createElement('div');
-    loadingOverlay.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-        transition: opacity 0.5s ease;
-    `;
-    
-    loadingOverlay.innerHTML = `
-        <div style="text-align: center; color: white;">
-            <div style="width: 50px; height: 50px; border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid white; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem;"></div>
-            <p style="font-family: 'Cinzel', serif; font-size: 1.2rem;">Loading Chiffy...</p>
-        </div>
-    `;
-    
-    // Add spin animation
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    `;
-    document.head.appendChild(style);
-    
-    document.body.appendChild(loadingOverlay);
-    
-    // Remove loading overlay after page loads
-    window.addEventListener('load', () => {
-        setTimeout(() => {
-            loadingOverlay.style.opacity = '0';
+    // Add bench sitting animation
+    document.querySelectorAll('.bench').forEach(bench => {
+        bench.addEventListener('click', () => {
+            bench.style.transform = 'scale(0.9)';
             setTimeout(() => {
-                loadingOverlay.remove();
-            }, 500);
-        }, 1000);
+                bench.style.transform = 'scale(1)';
+            }, 200);
+        });
     });
 }
 
-// Show loading animation
-document.addEventListener('DOMContentLoaded', showLoadingAnimation); 
+// Initialize town square interactions when DOM is loaded
+document.addEventListener('DOMContentLoaded', addTownSquareInteractions);
+
+function showLoadingAnimation() {
+    // Create a simple loading overlay
+    const overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.background = 'rgba(139, 69, 19, 0.9)';
+    overlay.style.display = 'flex';
+    overlay.style.alignItems = 'center';
+    overlay.style.justifyContent = 'center';
+    overlay.style.zIndex = '9999';
+    overlay.style.color = '#FFD700';
+    overlay.style.fontSize = '1.5rem';
+    overlay.style.fontFamily = 'Cinzel, serif';
+    overlay.innerHTML = '<div><i class="fas fa-castle fa-spin"></i><br>Loading Town Square...</div>';
+    
+    document.body.appendChild(overlay);
+    
+    // Remove after 2 seconds or when page loads
+    setTimeout(() => {
+        if (overlay.parentNode) {
+            overlay.style.opacity = '0';
+            overlay.style.transition = 'opacity 0.5s ease';
+            setTimeout(() => {
+                overlay.parentNode.removeChild(overlay);
+            }, 500);
+        }
+    }, 2000);
+} 

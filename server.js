@@ -29,7 +29,7 @@ const io = socketIo(server, {
 // Middleware
 app.use(cors(corsOptions));
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.static('.'));
 
 // Store active rooms and users
 const rooms = new Map();
@@ -37,27 +37,27 @@ const users = new Map();
 
 // Serve the main homepage
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Serve the Questing IRL section
 app.get('/questing', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'questing.html'));
+  res.sendFile(path.join(__dirname, 'questing.html'));
 });
 
 // Serve the Virtual Pub section
 app.get('/pub', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'pub.html'));
+  res.sendFile(path.join(__dirname, 'pub.html'));
 });
 
 // Serve the streaming page
 app.get('/stream', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'stream.html'));
+  res.sendFile(path.join(__dirname, 'stream.html'));
 });
 
 // Serve the pub streaming page
 app.get('/pub-stream', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'pub-stream.html'));
+  res.sendFile(path.join(__dirname, 'pub-stream.html'));
 });
 
 // Socket.IO connection handling

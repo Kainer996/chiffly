@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chiffy - Adventure & Community Platform</title>
-    <link rel="stylesheet" href="main-home-styles.css?v=2">
+    <title>Chiffy Town Square - Adventure & Community Platform</title>
+    <link rel="stylesheet" href="main-home-styles.css?v=3">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Merriweather:wght@300;400;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
@@ -13,8 +13,8 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-logo">
-                <i class="fas fa-globe"></i>
-                <span>Chiffy</span>
+                <i class="fas fa-castle"></i>
+                <span>Chiffy Town</span>
             </div>
             <div class="nav-links">
                 <a href="#about" class="nav-link">About</a>
@@ -24,128 +24,135 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1 class="hero-title">Welcome to Chiffy</h1>
-            <p class="hero-subtitle">Connect, Adventure, and Socialize in Virtual Spaces</p>
-            <div class="hero-stats">
+    <!-- Town Square Hero Section -->
+    <section class="town-square-hero">
+        <div class="town-square-content">
+            <h1 class="town-title">Welcome to Chiffy Town Square</h1>
+            <p class="town-subtitle">Where Adventures Begin and Stories Are Shared</p>
+            <div class="town-stats">
                 <div class="stat">
                     <span id="totalUsers">0</span>
-                    <span>Users Online</span>
+                    <span>Citizens Online</span>
                 </div>
                 <div class="stat">
                     <span id="activeRooms">0</span>
-                    <span>Active Rooms</span>
+                    <span>Active Gatherings</span>
                 </div>
                 <div class="stat">
                     <span id="liveStreams">0</span>
-                    <span>Live Streams</span>
+                    <span>Live Adventures</span>
                 </div>
             </div>
         </div>
-        <div class="hero-background"></div>
+        <div class="town-square-background"></div>
     </section>
 
-    <!-- Main Sections -->
-    <main class="main-content">
-        <div class="container">
-            <div class="sections-grid">
-                <!-- Questing IRL Section -->
-                <div class="section-card questing" data-href="questing.html">
-                    <div class="section-background">
-                        <div class="section-overlay"></div>
-                    </div>
-                    <div class="section-content">
-                        <div class="section-icon">
-                            <i class="fas fa-map-marked-alt"></i>
-                        </div>
-                        <h2 class="section-title">Questing IRL</h2>
-                        <p class="section-description">
-                            Join real-world adventures across the British countryside. 
-                            Stream your quests, explore historic locations, and share 
-                            your journey with fellow adventurers.
-                        </p>
-                        <div class="section-stats">
-                            <div class="stat-item">
-                                <i class="fas fa-users"></i>
-                                <span id="questingUsers">0</span>
-                                <span>Questers</span>
-                            </div>
-                            <div class="stat-item">
-                                <i class="fas fa-video"></i>
-                                <span id="questingRooms">0</span>
-                                <span>Adventures</span>
-                            </div>
-                        </div>
-                        <a href="questing.html" class="section-btn">
-                            <i class="fas fa-compass"></i>
-                            Start Adventure
-                        </a>
-                    </div>
+    <!-- Town Square Main Area -->
+    <main class="town-square-main">
+        <div class="town-square-container">
+            <!-- Central Town Square -->
+            <div class="central-square">
+                <div class="fountain">
+                    <i class="fas fa-fountain"></i>
+                    <div class="fountain-water"></div>
                 </div>
+                <div class="square-decorations">
+                    <div class="lamp-post lamp-1"><i class="fas fa-lightbulb"></i></div>
+                    <div class="lamp-post lamp-2"><i class="fas fa-lightbulb"></i></div>
+                    <div class="bench bench-1"><i class="fas fa-chair"></i></div>
+                    <div class="bench bench-2"><i class="fas fa-chair"></i></div>
+                </div>
+            </div>
 
-                <!-- Virtual Pub Section -->
-                <div class="section-card pub" data-href="pub.html">
-                    <div class="section-background">
-                        <div class="section-overlay"></div>
+            <!-- Town Buildings/Destinations -->
+            <div class="town-buildings">
+                <!-- The Pub -->
+                <div class="building pub-building" data-href="pub.html">
+                    <div class="building-icon">
+                        <i class="fas fa-beer"></i>
                     </div>
-                    <div class="section-content">
-                        <div class="section-icon">
-                            <i class="fas fa-beer"></i>
-                        </div>
-                        <h2 class="section-title">Virtual Pub</h2>
-                        <p class="section-description">
-                            Relax and socialize in our cozy virtual pub. 
-                            Chat with friends, share stories, play games, 
-                            and enjoy the warm atmosphere of community.
+                    <div class="building-content">
+                        <h3 class="building-title">The Cozy Tavern</h3>
+                        <p class="building-description">
+                            Gather 'round for tales, drinks, and merry company
                         </p>
-                        <div class="section-stats">
-                            <div class="stat-item">
+                        <div class="building-stats">
+                            <div class="building-stat">
                                 <i class="fas fa-users"></i>
                                 <span id="pubUsers">0</span>
                                 <span>Patrons</span>
                             </div>
-                            <div class="stat-item">
-                                <i class="fas fa-video"></i>
+                            <div class="building-stat">
+                                <i class="fas fa-comments"></i>
                                 <span id="pubRooms">0</span>
                                 <span>Tables</span>
                             </div>
                         </div>
-                        <a href="pub.html" class="section-btn">
+                        <div class="building-entrance">
                             <i class="fas fa-door-open"></i>
-                            Enter Pub
-                        </a>
+                            <span>Enter Tavern</span>
+                        </div>
                     </div>
+                    <div class="building-glow"></div>
+                </div>
+
+                <!-- Adventure Path to Mountains -->
+                <div class="building adventure-path" data-href="questing.html">
+                    <div class="building-icon">
+                        <i class="fas fa-mountain"></i>
+                    </div>
+                    <div class="building-content">
+                        <h3 class="building-title">Mountain Trail</h3>
+                        <p class="building-description">
+                            Follow the winding path to epic adventures beyond
+                        </p>
+                        <div class="building-stats">
+                            <div class="building-stat">
+                                <i class="fas fa-hiking"></i>
+                                <span id="questingUsers">0</span>
+                                <span>Adventurers</span>
+                            </div>
+                            <div class="building-stat">
+                                <i class="fas fa-map-marked-alt"></i>
+                                <span id="questingRooms">0</span>
+                                <span>Expeditions</span>
+                            </div>
+                        </div>
+                        <div class="building-entrance">
+                            <i class="fas fa-compass"></i>
+                            <span>Begin Adventure</span>
+                        </div>
+                    </div>
+                    <div class="building-glow"></div>
                 </div>
             </div>
 
-            <!-- Features Section -->
-            <section id="features" class="features-section">
+            <!-- Town Features Section -->
+            <section id="features" class="town-features">
                 <div class="section-header">
-                    <h2>Platform Features</h2>
-                    <p>Everything you need for social streaming and community building</p>
+                    <h2>Town Square Features</h2>
+                    <p>Everything you need for community adventures and social gatherings</p>
                 </div>
                 <div class="features-grid">
                     <div class="feature-card">
                         <i class="fas fa-video"></i>
-                        <h3>Live Streaming</h3>
-                        <p>High-quality video streaming with multiple participant support</p>
+                        <h3>Live Adventures</h3>
+                        <p>Stream your real-world quests and share the journey</p>
                     </div>
                     <div class="feature-card">
                         <i class="fas fa-comments"></i>
-                        <h3>Real-time Chat</h3>
-                        <p>Interactive chat system for seamless communication</p>
+                        <h3>Town Chat</h3>
+                        <p>Connect with fellow citizens in real-time</p>
                     </div>
                     <div class="feature-card">
                         <i class="fas fa-users"></i>
-                        <h3>Community Rooms</h3>
-                        <p>Create and join themed rooms for different activities</p>
+                        <h3>Community Spaces</h3>
+                        <p>Join themed gatherings and make new friends</p>
                     </div>
                     <div class="feature-card">
                         <i class="fas fa-mobile-alt"></i>
-                        <h3>Mobile Friendly</h3>
-                        <p>Fully responsive design that works on all devices</p>
+                        <h3>Mobile Ready</h3>
+                        <p>Take the town square with you wherever you go</p>
                     </div>
                 </div>
             </section>
@@ -157,15 +164,15 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h3>Chiffy</h3>
-                    <p>Connecting people through shared experiences and virtual adventures.</p>
+                    <h3>Chiffy Town</h3>
+                    <p>Where every citizen has a story and every adventure begins.</p>
                 </div>
                 <div class="footer-section">
-                    <h3>Quick Links</h3>
+                    <h3>Destinations</h3>
                     <ul>
-                        <li><a href="questing.html">Questing IRL</a></li>
-                        <li><a href="pub.html">Virtual Pub</a></li>
-                        <li><a href="#about">About</a></li>
+                        <li><a href="questing.html">Mountain Trail</a></li>
+                        <li><a href="pub.html">The Cozy Tavern</a></li>
+                        <li><a href="#about">About Our Town</a></li>
                         <li><a href="#contact">Contact</a></li>
                     </ul>
                 </div>
@@ -179,13 +186,13 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 Chiffy. All rights reserved.</p>
+                <p>&copy; 2024 Chiffy Town Square. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
     <!-- Scripts -->
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-    <script src="main-home.js?v=2"></script>
+    <script src="main-home.js?v=3"></script>
 </body>
 </html> 
