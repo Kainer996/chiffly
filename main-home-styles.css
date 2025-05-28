@@ -286,6 +286,10 @@ body {
     background: linear-gradient(135deg, #48bb78, #38a169);
 }
 
+.lounge-room .room-icon {
+    background: linear-gradient(135deg, #9f7aea, #805ad5);
+}
+
 /* Features Section */
 .features-section {
     margin-top: 5rem;

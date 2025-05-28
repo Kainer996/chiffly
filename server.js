@@ -75,6 +75,11 @@ app.get('/cinema', (req, res) => {
   res.sendFile(path.join(__dirname, 'cinema.html'));
 });
 
+// Serve the lounge section
+app.get('/lounge', (req, res) => {
+  res.sendFile(path.join(__dirname, 'lounge.html'));
+});
+
 // Socket.IO connection handling
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
