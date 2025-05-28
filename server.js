@@ -60,6 +60,16 @@ app.get('/pub-stream', (req, res) => {
   res.sendFile(path.join(__dirname, 'pub-stream.html'));
 });
 
+// Serve the nightclub section
+app.get('/nightclub', (req, res) => {
+  res.sendFile(path.join(__dirname, 'nightclub.html'));
+});
+
+// Serve the games room section
+app.get('/games', (req, res) => {
+  res.sendFile(path.join(__dirname, 'games.html'));
+});
+
 // Socket.IO connection handling
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);

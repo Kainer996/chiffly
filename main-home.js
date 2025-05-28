@@ -2,51 +2,21 @@
 console.log('Town Square script loading...');
 const socket = io();
 
-// DOM elements
-const totalUsersSpan = document.getElementById('totalUsers');
-const activeRoomsSpan = document.getElementById('activeRooms');
-const liveStreamsSpan = document.getElementById('liveStreams');
-const questingUsersSpan = document.getElementById('questingUsers');
-const questingRoomsSpan = document.getElementById('questingRooms');
-const pubUsersSpan = document.getElementById('pubUsers');
-const pubRoomsSpan = document.getElementById('pubRooms');
-
-// Data storage
-let platformStats = {
-    totalUsers: 0,
-    activeRooms: 0,
-    liveStreams: 0,
-    questingUsers: 0,
-    questingRooms: 0,
-    pubUsers: 0,
-    pubRooms: 0
-};
-
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
-    requestPlatformStats();
-    startStatsUpdater();
     setupScrollAnimations();
     createParticleEffect();
+    addTownSquareInteractions();
 });
 
 // Socket event handlers
 socket.on('connect', () => {
     console.log('Connected to Chiffy Town Square');
-    requestPlatformStats();
 });
 
 socket.on('disconnect', () => {
     console.log('Disconnected from Chiffy Town Square');
-});
-
-socket.on('platform-stats', (stats) => {
-    updatePlatformStats(stats);
-});
-
-socket.on('stats-update', (stats) => {
-    updatePlatformStats(stats);
 });
 
 // Event listeners
@@ -66,14 +36,16 @@ function setupEventListeners() {
         });
     });
 
-    // Navigation for building cards
-    document.querySelectorAll('.building').forEach(building => {
-        building.addEventListener('click', (e) => {
-            const href = building.getAttribute('data-href');
+    // Navigation for destination cards
+    document.querySelectorAll('.destination').forEach(destination => {
+        destination.addEventListener('click', (e) => {
+            const href = destination.getAttribute('data-href');
             if (href) {
                 console.log('Navigating to:', href);
                 // Add a nice transition effect
-                building.style.transform = 'scale(0.95)';
+                destination.style.transform = destination.style.transform.includes('scale') 
+                    ? destination.style.transform.replace(/scale\([^)]*\)/, 'scale(0.9)')
+                    : 'scale(0.9)';
                 setTimeout(() => {
                     window.location.href = href;
                 }, 150);
@@ -81,24 +53,23 @@ function setupEventListeners() {
         });
     });
 
-    // Building hover effects with enhanced animations
-    document.querySelectorAll('.building').forEach(building => {
-        building.addEventListener('mouseenter', () => {
-            building.style.transform = 'translateY(-10px) scale(1.02)';
-            // Add glow effect
-            const glow = building.querySelector('.building-glow');
-            if (glow) {
-                glow.style.opacity = '1';
-            }
+    // Destination hover effects with enhanced animations
+    document.querySelectorAll('.destination').forEach(destination => {
+        destination.addEventListener('mouseenter', () => {
+            destination.style.transform = 'scale(1.1)';
+            destination.style.boxShadow = '0 15px 40px rgba(0, 0, 0, 0.4)';
         });
         
-        building.addEventListener('mouseleave', () => {
-            building.style.transform = 'translateY(0) scale(1)';
-            // Remove glow effect
-            const glow = building.querySelector('.building-glow');
-            if (glow) {
-                glow.style.opacity = '0';
+        destination.addEventListener('mouseleave', () => {
+            // Reset based on position class
+            if (destination.classList.contains('north-dest') || destination.classList.contains('south-dest')) {
+                destination.style.transform = destination.classList.contains('north-dest') 
+                    ? 'translateX(-50%) scale(1)' 
+                    : 'translateX(-50%) scale(1)';
+            } else {
+                destination.style.transform = 'translateY(-50%) scale(1)';
             }
+            destination.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.3)';
         });
     });
 
@@ -110,21 +81,30 @@ function setupEventListeners() {
             townBackground.style.transform = `translateY(${scrolled * 0.5}px)`;
         }
         
-        // Animate fountain based on scroll
-        const fountain = document.querySelector('.fountain');
-        if (fountain) {
-            const rotation = scrolled * 0.1;
-            fountain.style.transform = `rotate(${rotation}deg)`;
+        // Animate compass based on scroll
+        const compass = document.querySelector('.compass-face');
+        if (compass) {
+            const rotation = scrolled * 0.2;
+            compass.style.transform = `rotate(${rotation}deg)`;
         }
     });
 
-    // Add click effect to fountain
-    const fountain = document.querySelector('.fountain');
-    if (fountain) {
-        fountain.addEventListener('click', () => {
-            fountain.style.animation = 'none';
-            fountain.offsetHeight; // Trigger reflow
-            fountain.style.animation = 'fountainGlow 1s ease-in-out';
+    // Add click effect to compass
+    const compass = document.querySelector('.compass');
+    if (compass) {
+        compass.addEventListener('click', () => {
+            compass.style.animation = 'none';
+            compass.offsetHeight; // Trigger reflow
+            compass.style.animation = 'compassGlow 1s ease-in-out';
+            
+            // Spin the compass face faster temporarily
+            const compassFace = compass.querySelector('.compass-face i');
+            if (compassFace) {
+                compassFace.style.animation = 'compassSpin 2s linear';
+                setTimeout(() => {
+                    compassFace.style.animation = 'compassSpin 20s linear infinite';
+                }, 2000);
+            }
         });
     }
 }
@@ -143,68 +123,19 @@ function navigateToSection(section) {
             console.log('Redirecting to pub.html');
             window.location.href = 'pub.html';
             break;
+        case 'nightclub':
+        case 'club':
+            console.log('Redirecting to nightclub.html');
+            window.location.href = 'nightclub.html';
+            break;
+        case 'games':
+        case 'gaming':
+            console.log('Redirecting to games.html');
+            window.location.href = 'games.html';
+            break;
         default:
             console.log('Unknown section:', section);
     }
-}
-
-// Stats management
-function requestPlatformStats() {
-    socket.emit('get-platform-stats');
-}
-
-function updatePlatformStats(stats) {
-    platformStats = { ...platformStats, ...stats };
-    
-    // Update main stats with animation
-    animateCounter(totalUsersSpan, platformStats.totalUsers);
-    animateCounter(activeRoomsSpan, platformStats.activeRooms);
-    animateCounter(liveStreamsSpan, platformStats.liveStreams);
-    
-    // Update building-specific stats
-    animateCounter(questingUsersSpan, platformStats.questingUsers);
-    animateCounter(questingRoomsSpan, platformStats.questingRooms);
-    animateCounter(pubUsersSpan, platformStats.pubUsers);
-    animateCounter(pubRoomsSpan, platformStats.pubRooms);
-}
-
-function animateCounter(element, targetValue) {
-    if (!element) return;
-    
-    const currentValue = parseInt(element.textContent) || 0;
-    const increment = targetValue > currentValue ? 1 : -1;
-    const duration = 1000; // 1 second
-    const steps = Math.abs(targetValue - currentValue);
-    const stepDuration = steps > 0 ? duration / steps : 0;
-    
-    if (steps === 0) return;
-    
-    let current = currentValue;
-    const timer = setInterval(() => {
-        current += increment;
-        element.textContent = current;
-        
-        if (current === targetValue) {
-            clearInterval(timer);
-        }
-    }, stepDuration);
-}
-
-// Auto-refresh stats
-function startStatsUpdater() {
-    // Update stats every 30 seconds
-    setInterval(() => {
-        if (socket.connected) {
-            requestPlatformStats();
-        }
-    }, 30000);
-    
-    // Update stats when page becomes visible
-    document.addEventListener('visibilitychange', () => {
-        if (!document.hidden && socket.connected) {
-            requestPlatformStats();
-        }
-    });
 }
 
 // Intersection Observer for animations
@@ -231,12 +162,12 @@ function setupScrollAnimations() {
         observer.observe(card);
     });
 
-    // Observe buildings
-    document.querySelectorAll('.building').forEach(building => {
-        building.style.opacity = '0';
-        building.style.transform = 'translateY(50px)';
-        building.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-        observer.observe(building);
+    // Observe destinations
+    document.querySelectorAll('.destination').forEach(destination => {
+        destination.style.opacity = '0';
+        destination.style.transform = 'translateY(50px)';
+        destination.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+        observer.observe(destination);
     });
 }
 
@@ -310,30 +241,43 @@ function scrollToTop() {
 
 // Add some town square specific interactions
 function addTownSquareInteractions() {
-    // Make lamp posts glow on hover
-    document.querySelectorAll('.lamp-post').forEach(lamp => {
-        lamp.addEventListener('mouseenter', () => {
-            lamp.style.boxShadow = '0 0 20px rgba(255, 215, 0, 0.8)';
+    // Make compass directions glow on hover
+    document.querySelectorAll('.direction').forEach(direction => {
+        direction.addEventListener('mouseenter', () => {
+            direction.style.boxShadow = '0 0 20px rgba(255, 215, 0, 0.8)';
+            direction.style.transform = direction.style.transform + ' scale(1.2)';
         });
         
-        lamp.addEventListener('mouseleave', () => {
-            lamp.style.boxShadow = '0 3px 10px rgba(0, 0, 0, 0.3)';
+        direction.addEventListener('mouseleave', () => {
+            direction.style.boxShadow = '0 3px 10px rgba(0, 0, 0, 0.3)';
+            direction.style.transform = direction.style.transform.replace(' scale(1.2)', '');
         });
     });
 
-    // Add bench sitting animation
-    document.querySelectorAll('.bench').forEach(bench => {
-        bench.addEventListener('click', () => {
-            bench.style.transform = 'scale(0.9)';
+    // Add compass needle interaction
+    const needle = document.querySelector('.compass-needle');
+    if (needle) {
+        needle.addEventListener('click', () => {
+            needle.style.animation = 'none';
+            needle.offsetHeight; // Trigger reflow
+            needle.style.animation = 'needlePoint 1s ease-in-out';
             setTimeout(() => {
-                bench.style.transform = 'scale(1)';
-            }, 200);
+                needle.style.animation = 'needlePoint 4s ease-in-out infinite';
+            }, 1000);
+        });
+    }
+
+    // Add destination icon rotation on click
+    document.querySelectorAll('.destination-icon').forEach(icon => {
+        icon.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent destination click
+            icon.style.transform = 'scale(1.2) rotate(360deg)';
+            setTimeout(() => {
+                icon.style.transform = 'scale(1.2) rotate(10deg)';
+            }, 300);
         });
     });
 }
-
-// Initialize town square interactions when DOM is loaded
-document.addEventListener('DOMContentLoaded', addTownSquareInteractions);
 
 function showLoadingAnimation() {
     // Create a simple loading overlay
@@ -351,7 +295,7 @@ function showLoadingAnimation() {
     overlay.style.color = '#FFD700';
     overlay.style.fontSize = '1.5rem';
     overlay.style.fontFamily = 'Cinzel, serif';
-    overlay.innerHTML = '<div><i class="fas fa-castle fa-spin"></i><br>Loading Town Square...</div>';
+    overlay.innerHTML = '<div><i class="fas fa-compass fa-spin"></i><br>Loading Town Square...</div>';
     
     document.body.appendChild(overlay);
     
