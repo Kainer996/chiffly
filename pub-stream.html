@@ -73,6 +73,35 @@
             align-items: center;
         }
 
+        .theme-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-right: 1rem;
+            padding-right: 1rem;
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .theme-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .theme-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .theme-btn.active {
+            background: linear-gradient(135deg, #ed8936, #dd6b20);
+            border-color: #ed8936;
+        }
+
         .control-btn {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -406,6 +435,261 @@
                 grid-template-columns: repeat(2, 1fr);
             }
         }
+
+        /* Cyberpunk Theme */
+        body.cyberpunk {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0033 50%, #000a1a 100%);
+        }
+
+        body.cyberpunk .stream-header {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+        }
+
+        body.cyberpunk .pub-icon {
+            background: linear-gradient(135deg, #00ffff, #ff00ff);
+        }
+
+        body.cyberpunk .control-btn.active {
+            background: linear-gradient(135deg, #00ffff, #ff00ff);
+        }
+
+        body.cyberpunk .theme-btn.active {
+            background: linear-gradient(135deg, #00ffff, #ff00ff);
+        }
+
+        body.cyberpunk .main-video-area {
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+        }
+
+        body.cyberpunk .video-placeholder {
+            background: linear-gradient(135deg, #001122, #002244);
+        }
+
+        body.cyberpunk .chat-area {
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        body.cyberpunk .chat-message {
+            background: rgba(0, 255, 255, 0.1);
+            border-left: 3px solid #00ffff;
+        }
+
+        body.cyberpunk .message-author {
+            color: #00ffff;
+        }
+
+        body.cyberpunk .chat-send-btn {
+            background: linear-gradient(135deg, #00ffff, #ff00ff);
+        }
+
+        body.cyberpunk .participants-area {
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        body.cyberpunk .participant-slot {
+            border: 2px solid rgba(0, 255, 255, 0.2);
+        }
+
+        body.cyberpunk .participant-slot:hover {
+            border-color: #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+
+        body.cyberpunk .participant-placeholder {
+            background: linear-gradient(135deg, #001122, #002244);
+        }
+
+        /* Medieval Theme */
+        body.medieval {
+            background: linear-gradient(135deg, #2d1810 0%, #4a2c17 50%, #1a0f08 100%);
+        }
+
+        body.medieval .stream-header {
+            background: rgba(139, 69, 19, 0.3);
+            border: 1px solid rgba(218, 165, 32, 0.5);
+            box-shadow: 0 0 20px rgba(218, 165, 32, 0.2);
+        }
+
+        body.medieval .pub-icon {
+            background: linear-gradient(135deg, #daa520, #b8860b);
+        }
+
+        body.medieval .control-btn.active {
+            background: linear-gradient(135deg, #daa520, #b8860b);
+        }
+
+        body.medieval .theme-btn.active {
+            background: linear-gradient(135deg, #daa520, #b8860b);
+        }
+
+        body.medieval .main-video-area {
+            border: 2px solid rgba(218, 165, 32, 0.4);
+            box-shadow: 0 0 30px rgba(218, 165, 32, 0.2);
+        }
+
+        body.medieval .video-placeholder {
+            background: linear-gradient(135deg, #3d2817, #2d1810);
+        }
+
+        body.medieval .chat-area {
+            background: rgba(139, 69, 19, 0.2);
+            border: 1px solid rgba(218, 165, 32, 0.3);
+        }
+
+        body.medieval .chat-message {
+            background: rgba(139, 69, 19, 0.3);
+            border-left: 3px solid #daa520;
+        }
+
+        body.medieval .message-author {
+            color: #daa520;
+        }
+
+        body.medieval .chat-send-btn {
+            background: linear-gradient(135deg, #daa520, #b8860b);
+        }
+
+        body.medieval .participants-area {
+            background: rgba(139, 69, 19, 0.2);
+            border: 1px solid rgba(218, 165, 32, 0.3);
+        }
+
+        body.medieval .participant-slot {
+            border: 2px solid rgba(218, 165, 32, 0.3);
+        }
+
+        body.medieval .participant-slot:hover {
+            border-color: #daa520;
+            box-shadow: 0 0 15px rgba(218, 165, 32, 0.3);
+        }
+
+        body.medieval .participant-placeholder {
+            background: linear-gradient(135deg, #3d2817, #2d1810);
+        }
+
+        /* Beach Bar Theme */
+        body.beach {
+            background: linear-gradient(135deg, #87ceeb 0%, #20b2aa 30%, #f0e68c 70%, #daa520 100%);
+        }
+
+        body.beach .stream-header {
+            background: rgba(32, 178, 170, 0.3);
+            border: 1px solid rgba(135, 206, 235, 0.5);
+            box-shadow: 0 0 20px rgba(135, 206, 235, 0.3);
+        }
+
+        body.beach .pub-icon {
+            background: linear-gradient(135deg, #20b2aa, #87ceeb);
+        }
+
+        body.beach .control-btn.active {
+            background: linear-gradient(135deg, #20b2aa, #87ceeb);
+        }
+
+        body.beach .theme-btn.active {
+            background: linear-gradient(135deg, #20b2aa, #87ceeb);
+        }
+
+        body.beach .main-video-area {
+            border: 2px solid rgba(135, 206, 235, 0.5);
+            box-shadow: 0 0 30px rgba(135, 206, 235, 0.3);
+        }
+
+        body.beach .video-placeholder {
+            background: linear-gradient(135deg, #4682b4, #20b2aa);
+        }
+
+        body.beach .chat-area {
+            background: rgba(135, 206, 235, 0.2);
+            border: 1px solid rgba(32, 178, 170, 0.4);
+        }
+
+        body.beach .chat-message {
+            background: rgba(135, 206, 235, 0.3);
+            border-left: 3px solid #20b2aa;
+        }
+
+        body.beach .message-author {
+            color: #20b2aa;
+        }
+
+        body.beach .chat-send-btn {
+            background: linear-gradient(135deg, #20b2aa, #87ceeb);
+        }
+
+        body.beach .participants-area {
+            background: rgba(135, 206, 235, 0.2);
+            border: 1px solid rgba(32, 178, 170, 0.4);
+        }
+
+        body.beach .participant-slot {
+            border: 2px solid rgba(135, 206, 235, 0.4);
+        }
+
+        body.beach .participant-slot:hover {
+            border-color: #20b2aa;
+            box-shadow: 0 0 15px rgba(32, 178, 170, 0.4);
+        }
+
+        body.beach .participant-placeholder {
+            background: linear-gradient(135deg, #4682b4, #20b2aa);
+        }
+
+        /* Beach theme decorative elements */
+        body.beach::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="sun" cx="80%" cy="20%"><stop offset="0%" stop-color="%23ffd700" stop-opacity="0.3"/><stop offset="100%" stop-color="%23ffd700" stop-opacity="0"/></radialGradient></defs><circle cx="800" cy="200" r="100" fill="url(%23sun)"/></svg>');
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Cyberpunk decorative elements */
+        body.cyberpunk::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><linearGradient id="neon" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%2300ffff" stop-opacity="0.1"/><stop offset="50%" stop-color="%23ff00ff" stop-opacity="0.1"/><stop offset="100%" stop-color="%2300ffff" stop-opacity="0.1"/></linearGradient></defs><rect x="0" y="0" width="100" height="1000" fill="url(%23neon)"/><rect x="200" y="0" width="50" height="1000" fill="url(%23neon)"/><rect x="400" y="0" width="75" height="1000" fill="url(%23neon)"/></svg>');
+            pointer-events: none;
+            z-index: -1;
+            animation: cyberpunkGlow 3s ease-in-out infinite alternate;
+        }
+
+        /* Medieval decorative elements */
+        body.medieval::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="torch" cx="50%" cy="50%"><stop offset="0%" stop-color="%23daa520" stop-opacity="0.2"/><stop offset="100%" stop-color="%23daa520" stop-opacity="0"/></radialGradient></defs><circle cx="100" cy="100" r="80" fill="url(%23torch)"/><circle cx="900" cy="200" r="60" fill="url(%23torch)"/><circle cx="200" cy="800" r="70" fill="url(%23torch)"/></svg>');
+            pointer-events: none;
+            z-index: -1;
+            animation: torchFlicker 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes cyberpunkGlow {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes torchFlicker {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -427,6 +711,12 @@
                 </div>
             </div>
             <div class="stream-controls">
+                <div class="theme-selector">
+                    <button class="theme-btn active" onclick="setTheme('default')">Default</button>
+                    <button class="theme-btn" onclick="setTheme('cyberpunk')">Cyberpunk</button>
+                    <button class="theme-btn" onclick="setTheme('medieval')">Medieval</button>
+                    <button class="theme-btn" onclick="setTheme('beach')">Beach Bar</button>
+                </div>
                 <button class="control-btn" id="micBtn" onclick="toggleMic()">
                     <i class="fas fa-microphone"></i>
                     <span>Mic</span>
@@ -539,11 +829,86 @@
         let isStreaming = false;
         let isMicOn = false;
         let isCameraOn = false;
+        let currentTheme = 'default';
 
         // Initialize the pub stream
         document.addEventListener('DOMContentLoaded', function() {
             initializePubStream();
+            initializeTheme();
         });
+
+        function initializeTheme() {
+            // Set default theme or load saved theme
+            const savedTheme = localStorage.getItem('pubTheme') || 'default';
+            setTheme(savedTheme, true); // true = silent initialization
+        }
+
+        function setTheme(theme, silent = false) {
+            // Remove all theme classes
+            document.body.classList.remove('cyberpunk', 'medieval', 'beach');
+            
+            // Remove active class from all theme buttons
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Apply new theme
+            if (theme !== 'default') {
+                document.body.classList.add(theme);
+            }
+            
+            // Set active button
+            const activeBtn = Array.from(document.querySelectorAll('.theme-btn')).find(btn => 
+                btn.textContent.toLowerCase().includes(theme) || 
+                (theme === 'default' && btn.textContent === 'Default')
+            );
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+            
+            // Update pub name and description based on theme
+            const pubName = document.getElementById('pubName');
+            const pubDescription = document.getElementById('pubDescription');
+            
+            const themeData = {
+                'default': {
+                    name: 'My Cozy Pub',
+                    description: 'Welcome to our virtual pub! Grab a drink and chat.',
+                    displayName: 'Default'
+                },
+                'cyberpunk': {
+                    name: 'Neon Nexus Bar',
+                    description: 'Welcome to the future! Jack in and connect with fellow netrunners.',
+                    displayName: 'Cyberpunk'
+                },
+                'medieval': {
+                    name: 'The Dragon\'s Tavern',
+                    description: 'Gather \'round the hearth, brave adventurers! Share tales of your quests.',
+                    displayName: 'Medieval'
+                },
+                'beach': {
+                    name: 'Paradise Tiki Bar',
+                    description: 'Aloha! Relax with tropical drinks and ocean vibes. 🌺🏖️',
+                    displayName: 'Beach Bar'
+                }
+            };
+            
+            const currentThemeData = themeData[theme];
+            pubName.textContent = currentThemeData.name;
+            pubDescription.textContent = currentThemeData.description;
+            
+            currentTheme = theme;
+            
+            // Save theme preference
+            localStorage.setItem('pubTheme', theme);
+            
+            // Add theme change message to chat (only if not silent initialization)
+            if (!silent) {
+                addChatMessage('System', `Pub theme changed to ${currentThemeData.displayName}! Welcome to ${currentThemeData.name}!`, true);
+            }
+            
+            console.log(`Theme changed to: ${theme}`);
+        }
 
         async function initializePubStream() {
             try {
