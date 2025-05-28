@@ -284,11 +284,11 @@ body {
 /* Town Destinations */
 .town-destinations {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 600px;
-    height: 600px;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
 }
 
 .destination {
@@ -307,6 +307,7 @@ body {
     justify-content: center;
     text-align: center;
     padding: 1rem;
+    pointer-events: auto;
 }
 
 .destination:hover {
@@ -358,25 +359,25 @@ body {
 
 /* Positioning destinations around compass */
 .north-dest {
-    top: 0;
+    top: -60px;
     left: 50%;
     transform: translateX(-50%);
 }
 
 .south-dest {
-    bottom: 0;
+    bottom: -60px;
     left: 50%;
     transform: translateX(-50%);
 }
 
 .east-dest {
-    right: 0;
+    right: -60px;
     top: 50%;
     transform: translateY(-50%);
 }
 
 .west-dest {
-    left: 0;
+    left: -60px;
     top: 50%;
     transform: translateY(-50%);
 }
@@ -568,8 +569,8 @@ body {
 
 @media (max-width: 1024px) {
     .town-destinations {
-        width: 500px;
-        height: 500px;
+        width: 100%;
+        height: 100%;
     }
 
     .destination {
@@ -589,6 +590,23 @@ body {
 
     .destination-description {
         font-size: 0.7rem;
+    }
+
+    /* Adjust positioning for smaller screens */
+    .north-dest {
+        top: -50px;
+    }
+
+    .south-dest {
+        bottom: -50px;
+    }
+
+    .east-dest {
+        right: -50px;
+    }
+
+    .west-dest {
+        left: -50px;
     }
 }
 
@@ -632,11 +650,6 @@ body {
         font-size: 2rem;
     }
 
-    .town-destinations {
-        width: 400px;
-        height: 400px;
-    }
-
     .destination {
         width: 80px;
         height: 80px;
@@ -660,6 +673,23 @@ body {
         font-size: 0.6rem;
     }
 
+    /* Adjust positioning for mobile */
+    .north-dest {
+        top: -40px;
+    }
+
+    .south-dest {
+        bottom: -40px;
+    }
+
+    .east-dest {
+        right: -40px;
+    }
+
+    .west-dest {
+        left: -40px;
+    }
+
     .features-grid {
         grid-template-columns: 1fr;
     }
@@ -679,11 +709,6 @@ body {
         height: 250px;
     }
 
-    .town-destinations {
-        width: 300px;
-        height: 300px;
-    }
-
     .destination {
         width: 70px;
         height: 70px;
@@ -695,5 +720,22 @@ body {
 
     .destination-description {
         display: none;
+    }
+
+    /* Adjust positioning for small mobile */
+    .north-dest {
+        top: -35px;
+    }
+
+    .south-dest {
+        bottom: -35px;
+    }
+
+    .east-dest {
+        right: -35px;
+    }
+
+    .west-dest {
+        left: -35px;
     }
 } 

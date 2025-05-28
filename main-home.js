@@ -56,19 +56,12 @@ function setupEventListeners() {
     // Destination hover effects with enhanced animations
     document.querySelectorAll('.destination').forEach(destination => {
         destination.addEventListener('mouseenter', () => {
-            destination.style.transform = 'scale(1.1)';
+            destination.style.transform = getDestinationTransform(destination, 1.1);
             destination.style.boxShadow = '0 15px 40px rgba(0, 0, 0, 0.4)';
         });
         
         destination.addEventListener('mouseleave', () => {
-            // Reset based on position class
-            if (destination.classList.contains('north-dest') || destination.classList.contains('south-dest')) {
-                destination.style.transform = destination.classList.contains('north-dest') 
-                    ? 'translateX(-50%) scale(1)' 
-                    : 'translateX(-50%) scale(1)';
-            } else {
-                destination.style.transform = 'translateY(-50%) scale(1)';
-            }
+            destination.style.transform = getDestinationTransform(destination, 1);
             destination.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.3)';
         });
     });
@@ -309,4 +302,13 @@ function showLoadingAnimation() {
             }, 500);
         }
     }, 2000);
+}
+
+// Helper function to get correct transform based on destination position
+function getDestinationTransform(destination, scale) {
+    if (destination.classList.contains('north-dest') || destination.classList.contains('south-dest')) {
+        return `translateX(-50%) scale(${scale})`;
+    } else {
+        return `translateY(-50%) scale(${scale})`;
+    }
 } 
