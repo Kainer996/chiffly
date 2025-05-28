@@ -274,6 +274,10 @@ body {
     background: linear-gradient(135deg, #ed8936, #dd6b20);
 }
 
+.cinema-room .room-icon {
+    background: linear-gradient(135deg, #e53e3e, #c53030);
+}
+
 .club-room .room-icon {
     background: linear-gradient(135deg, #ed64a6, #d53f8c);
 }

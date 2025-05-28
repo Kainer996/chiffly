@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cinema - Live Streaming | Chiffy</title>
+    <link rel="stylesheet" href="main-home-styles.css?v=5">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        .cinema-hero {
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+            min-height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cinema-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%"><stop offset="0%" stop-color="%23ffffff" stop-opacity="0.1"/><stop offset="100%" stop-color="%23ffffff" stop-opacity="0"/></radialGradient></defs><circle cx="200" cy="200" r="100" fill="url(%23a)"/><circle cx="800" cy="300" r="150" fill="url(%23a)"/><circle cx="400" cy="700" r="120" fill="url(%23a)"/></svg>');
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .cinema-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            padding: 0 2rem;
+        }
+
+        .cinema-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .cinema-subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .streaming-section {
+            padding: 4rem 0;
+            background: #f8fafc;
+        }
+
+        .video-container {
+            background: #1a1a1a;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .video-placeholder {
+            background: linear-gradient(135deg, #2d3748, #1a202c);
+            border-radius: 10px;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .video-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: linear-gradient(135deg, #e53e3e, #c53030);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(229, 62, 62, 0.4);
+        }
+
+        .streaming-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .info-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+
+        .info-card i {
+            font-size: 2.5rem;
+            color: #e53e3e;
+            margin-bottom: 1rem;
+        }
+
+        .info-card h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-card p {
+            color: #718096;
+            line-height: 1.6;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 100px;
+            left: 2rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        @media (max-width: 768px) {
+            .cinema-title {
+                font-size: 2.5rem;
+            }
+            
+            .video-placeholder {
+                height: 250px;
+            }
+            
+            .back-btn {
+                left: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-cube"></i>
+                <span>Chiffy</span>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="#about" class="nav-link">About</a>
+                <a href="#contact" class="nav-link">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Back Button -->
+    <button class="back-btn" onclick="window.location.href='index.html'">
+        <i class="fas fa-arrow-left"></i>
+    </button>
+
+    <!-- Cinema Hero Section -->
+    <section class="cinema-hero">
+        <div class="cinema-content">
+            <h1 class="cinema-title">
+                <i class="fas fa-film"></i>
+                Cinema
+            </h1>
+            <p class="cinema-subtitle">Live Video Streaming & Movie Theater</p>
+        </div>
+    </section>
+
+    <!-- Streaming Section -->
+    <section class="streaming-section">
+        <div class="container">
+            <div class="video-container">
+                <div class="video-placeholder">
+                    <div>
+                        <i class="fas fa-play-circle" style="font-size: 4rem; margin-bottom: 1rem; display: block;"></i>
+                        <p>Live Stream Will Appear Here</p>
+                        <p style="font-size: 0.9rem; opacity: 0.7; margin-top: 0.5rem;">Click "Start Stream" to begin broadcasting</p>
+                    </div>
+                </div>
+                
+                <div class="video-controls">
+                    <button class="control-btn" id="startStream">
+                        <i class="fas fa-video"></i>
+                        Start Stream
+                    </button>
+                    <button class="control-btn" id="stopStream" style="display: none;">
+                        <i class="fas fa-stop"></i>
+                        Stop Stream
+                    </button>
+                    <button class="control-btn">
+                        <i class="fas fa-microphone"></i>
+                        Audio
+                    </button>
+                    <button class="control-btn">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </button>
+                    <button class="control-btn">
+                        <i class="fas fa-expand"></i>
+                        Fullscreen
+                    </button>
+                </div>
+            </div>
+
+            <div class="streaming-info">
+                <div class="info-card">
+                    <i class="fas fa-broadcast-tower"></i>
+                    <h3>Live Streaming</h3>
+                    <p>Broadcast your content in real-time with high-quality video and audio streaming capabilities.</p>
+                </div>
+                
+                <div class="info-card">
+                    <i class="fas fa-users"></i>
+                    <h3>Interactive Chat</h3>
+                    <p>Engage with your audience through real-time chat and interactive features during your streams.</p>
+                </div>
+                
+                <div class="info-card">
+                    <i class="fas fa-film"></i>
+                    <h3>Movie Theater</h3>
+                    <p>Watch movies together with friends in synchronized viewing sessions with shared chat.</p>
+                </div>
+                
+                <div class="info-card">
+                    <i class="fas fa-mobile-alt"></i>
+                    <h3>Multi-Device</h3>
+                    <p>Stream and watch from any device - desktop, tablet, or mobile with seamless quality adaptation.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Chiffy Cinema</h3>
+                    <p>Your destination for live streaming and movie experiences.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Features</h3>
+                    <ul>
+                        <li><a href="#">Live Streaming</a></li>
+                        <li><a href="#">Movie Theater</a></li>
+                        <li><a href="#">Interactive Chat</a></li>
+                        <li><a href="#">HD Quality</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Connect</h3>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="#"><i class="fab fa-twitch"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Chiffy Cinema. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const startBtn = document.getElementById('startStream');
+            const stopBtn = document.getElementById('stopStream');
+            const videoPlaceholder = document.querySelector('.video-placeholder');
+
+            startBtn.addEventListener('click', function() {
+                // Simulate starting a stream
+                videoPlaceholder.innerHTML = `
+                    <div>
+                        <i class="fas fa-circle" style="color: #e53e3e; font-size: 1rem; margin-right: 0.5rem; animation: pulse 2s infinite;"></i>
+                        <span style="color: #e53e3e; font-weight: bold;">LIVE</span>
+                        <p style="margin-top: 1rem;">Stream is now active!</p>
+                        <p style="font-size: 0.9rem; opacity: 0.7; margin-top: 0.5rem;">Broadcasting in HD quality</p>
+                    </div>
+                `;
+                startBtn.style.display = 'none';
+                stopBtn.style.display = 'flex';
+            });
+
+            stopBtn.addEventListener('click', function() {
+                // Simulate stopping a stream
+                videoPlaceholder.innerHTML = `
+                    <div>
+                        <i class="fas fa-play-circle" style="font-size: 4rem; margin-bottom: 1rem; display: block;"></i>
+                        <p>Live Stream Will Appear Here</p>
+                        <p style="font-size: 0.9rem; opacity: 0.7; margin-top: 0.5rem;">Click "Start Stream" to begin broadcasting</p>
+                    </div>
+                `;
+                startBtn.style.display = 'flex';
+                stopBtn.style.display = 'none';
+            });
+        });
+
+        // Add pulse animation for live indicator
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0% { opacity: 1; }
+                50% { opacity: 0.5; }
+                100% { opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html> 

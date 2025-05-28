@@ -70,6 +70,11 @@ app.get('/games', (req, res) => {
   res.sendFile(path.join(__dirname, 'games.html'));
 });
 
+// Serve the cinema section
+app.get('/cinema', (req, res) => {
+  res.sendFile(path.join(__dirname, 'cinema.html'));
+});
+
 // Socket.IO connection handling
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
