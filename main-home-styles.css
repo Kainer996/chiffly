@@ -359,25 +359,25 @@ body {
 
 /* Positioning destinations around compass */
 .north-dest {
-    top: -60px;
+    top: -140px;
     left: 50%;
     transform: translateX(-50%);
 }
 
 .south-dest {
-    bottom: -60px;
+    bottom: -140px;
     left: 50%;
     transform: translateX(-50%);
 }
 
 .east-dest {
-    right: -60px;
+    right: -140px;
     top: 50%;
     transform: translateY(-50%);
 }
 
 .west-dest {
-    left: -60px;
+    left: -140px;
     top: 50%;
     transform: translateY(-50%);
 }
@@ -594,19 +594,19 @@ body {
 
     /* Adjust positioning for smaller screens */
     .north-dest {
-        top: -50px;
+        top: -110px;
     }
 
     .south-dest {
-        bottom: -50px;
+        bottom: -110px;
     }
 
     .east-dest {
-        right: -50px;
+        right: -110px;
     }
 
     .west-dest {
-        left: -50px;
+        left: -110px;
     }
 }
 
@@ -675,19 +675,19 @@ body {
 
     /* Adjust positioning for mobile */
     .north-dest {
-        top: -40px;
+        top: -90px;
     }
 
     .south-dest {
-        bottom: -40px;
+        bottom: -90px;
     }
 
     .east-dest {
-        right: -40px;
+        right: -90px;
     }
 
     .west-dest {
-        left: -40px;
+        left: -90px;
     }
 
     .features-grid {
@@ -724,18 +724,18 @@ body {
 
     /* Adjust positioning for small mobile */
     .north-dest {
-        top: -35px;
+        top: -75px;
     }
 
     .south-dest {
-        bottom: -35px;
+        bottom: -75px;
     }
 
     .east-dest {
-        right: -35px;
+        right: -75px;
     }
 
     .west-dest {
-        left: -35px;
+        left: -75px;
     }
 } 
