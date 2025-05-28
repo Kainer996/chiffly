@@ -1,143 +1,67 @@
-// Socket.IO connection
-console.log('Town Square script loading...');
-const socket = io();
-
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-    setupEventListeners();
-    setupScrollAnimations();
-    createParticleEffect();
-    addTownSquareInteractions();
+// Modern Home Page JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize page
+    initializeRoomCards();
+    initializeAnimations();
+    initializeNavigation();
 });
 
-// Socket event handlers
-socket.on('connect', () => {
-    console.log('Connected to Chiffy Town Square');
-});
-
-socket.on('disconnect', () => {
-    console.log('Disconnected from Chiffy Town Square');
-});
-
-// Event listeners
-function setupEventListeners() {
-    // Smooth scrolling for navigation links
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const targetId = link.getAttribute('href').substring(1);
-            const targetElement = document.getElementById(targetId);
-            if (targetElement) {
-                targetElement.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        });
-    });
-
-    // Navigation for destination cards
-    document.querySelectorAll('.destination').forEach(destination => {
-        destination.addEventListener('click', (e) => {
-            const href = destination.getAttribute('data-href');
+// Room Cards Functionality
+function initializeRoomCards() {
+    const roomCards = document.querySelectorAll('.room-card');
+    
+    roomCards.forEach(card => {
+        // Add click handler for navigation
+        card.addEventListener('click', function() {
+            const href = this.getAttribute('data-href');
             if (href) {
-                console.log('Navigating to:', href);
-                // Add a nice transition effect
-                destination.style.transform = destination.style.transform.includes('scale') 
-                    ? destination.style.transform.replace(/scale\([^)]*\)/, 'scale(0.9)')
-                    : 'scale(0.9)';
+                // Add loading animation
+                this.style.transform = 'scale(0.95)';
+                this.style.opacity = '0.8';
+                
                 setTimeout(() => {
                     window.location.href = href;
-                }, 150);
+                }, 200);
             }
         });
-    });
 
-    // Destination hover effects with enhanced animations
-    document.querySelectorAll('.destination').forEach(destination => {
-        destination.addEventListener('mouseenter', () => {
-            destination.style.transform = getDestinationTransform(destination, 1.1);
-            destination.style.boxShadow = '0 15px 40px rgba(0, 0, 0, 0.4)';
-        });
-        
-        destination.addEventListener('mouseleave', () => {
-            destination.style.transform = getDestinationTransform(destination, 1);
-            destination.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.3)';
-        });
-    });
-
-    // Parallax effect for town square background
-    window.addEventListener('scroll', () => {
-        const scrolled = window.pageYOffset;
-        const townBackground = document.querySelector('.town-square-background');
-        if (townBackground) {
-            townBackground.style.transform = `translateY(${scrolled * 0.5}px)`;
-        }
-        
-        // Animate compass based on scroll
-        const compass = document.querySelector('.compass-face');
-        if (compass) {
-            const rotation = scrolled * 0.2;
-            compass.style.transform = `rotate(${rotation}deg)`;
-        }
-    });
-
-    // Add click effect to compass
-    const compass = document.querySelector('.compass');
-    if (compass) {
-        compass.addEventListener('click', () => {
-            compass.style.animation = 'none';
-            compass.offsetHeight; // Trigger reflow
-            compass.style.animation = 'compassGlow 1s ease-in-out';
+        // Enhanced hover effects
+        card.addEventListener('mouseenter', function() {
+            const icon = this.querySelector('.room-icon');
+            const overlay = this.querySelector('.room-overlay');
             
-            // Spin the compass face faster temporarily
-            const compassFace = compass.querySelector('.compass-face i');
-            if (compassFace) {
-                compassFace.style.animation = 'compassSpin 2s linear';
-                setTimeout(() => {
-                    compassFace.style.animation = 'compassSpin 20s linear infinite';
-                }, 2000);
+            if (icon) {
+                icon.style.transform = 'scale(1.1) rotate(5deg)';
+            }
+            
+            if (overlay) {
+                overlay.style.opacity = '1';
             }
         });
-    }
+
+        card.addEventListener('mouseleave', function() {
+            const icon = this.querySelector('.room-icon');
+            const overlay = this.querySelector('.room-overlay');
+            
+            if (icon) {
+                icon.style.transform = 'scale(1) rotate(0deg)';
+            }
+            
+            if (overlay) {
+                overlay.style.opacity = '0';
+            }
+        });
+    });
 }
 
-// Navigation functions
-function navigateToSection(section) {
-    console.log('Navigating to section:', section);
-    switch(section) {
-        case 'questing':
-        case 'adventure':
-            console.log('Redirecting to questing.html');
-            window.location.href = 'questing.html';
-            break;
-        case 'pub':
-        case 'tavern':
-            console.log('Redirecting to pub.html');
-            window.location.href = 'pub.html';
-            break;
-        case 'nightclub':
-        case 'club':
-            console.log('Redirecting to nightclub.html');
-            window.location.href = 'nightclub.html';
-            break;
-        case 'games':
-        case 'gaming':
-            console.log('Redirecting to games.html');
-            window.location.href = 'games.html';
-            break;
-        default:
-            console.log('Unknown section:', section);
-    }
-}
-
-// Intersection Observer for animations
-function setupScrollAnimations() {
+// Page Animations
+function initializeAnimations() {
+    // Animate room cards on scroll
     const observerOptions = {
         threshold: 0.1,
         rootMargin: '0px 0px -50px 0px'
     };
-    
+
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -146,169 +70,113 @@ function setupScrollAnimations() {
             }
         });
     }, observerOptions);
-    
-    // Observe feature cards
-    document.querySelectorAll('.feature-card').forEach(card => {
+
+    // Observe room cards
+    const roomCards = document.querySelectorAll('.room-card');
+    roomCards.forEach((card, index) => {
         card.style.opacity = '0';
         card.style.transform = 'translateY(30px)';
-        card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        card.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
         observer.observe(card);
     });
 
-    // Observe destinations
-    document.querySelectorAll('.destination').forEach(destination => {
-        destination.style.opacity = '0';
-        destination.style.transform = 'translateY(50px)';
-        destination.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-        observer.observe(destination);
+    // Observe feature cards
+    const featureCards = document.querySelectorAll('.feature-card');
+    featureCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        card.style.transition = `opacity 0.6s ease ${index * 0.1 + 0.3}s, transform 0.6s ease ${index * 0.1 + 0.3}s`;
+        observer.observe(card);
     });
 }
 
-// Enhanced particle effect for town atmosphere
-function createParticleEffect() {
-    const particleContainer = document.createElement('div');
-    particleContainer.style.position = 'fixed';
-    particleContainer.style.top = '0';
-    particleContainer.style.left = '0';
-    particleContainer.style.width = '100%';
-    particleContainer.style.height = '100%';
-    particleContainer.style.pointerEvents = 'none';
-    particleContainer.style.zIndex = '1';
-    document.body.appendChild(particleContainer);
+// Navigation
+function initializeNavigation() {
+    const navbar = document.querySelector('.navbar');
+    let lastScrollY = window.scrollY;
 
-    function createParticle() {
-        const particle = document.createElement('div');
-        particle.style.position = 'absolute';
-        particle.style.width = Math.random() * 4 + 2 + 'px';
-        particle.style.height = particle.style.width;
-        particle.style.background = `rgba(255, 215, 0, ${Math.random() * 0.3 + 0.1})`;
-        particle.style.borderRadius = '50%';
-        particle.style.left = Math.random() * 100 + '%';
-        particle.style.top = '100%';
-        particle.style.animation = `floatUp ${Math.random() * 10 + 15}s linear infinite`;
+    // Navbar scroll effect
+    window.addEventListener('scroll', () => {
+        const currentScrollY = window.scrollY;
         
-        particleContainer.appendChild(particle);
-        
-        setTimeout(() => {
-            if (particle.parentNode) {
-                particle.parentNode.removeChild(particle);
-            }
-        }, 25000);
-    }
-
-    // Create particles periodically
-    setInterval(createParticle, 3000);
-    
-    // Add CSS animation for particles
-    if (!document.getElementById('particle-styles')) {
-        const style = document.createElement('style');
-        style.id = 'particle-styles';
-        style.textContent = `
-            @keyframes floatUp {
-                0% {
-                    transform: translateY(0) rotate(0deg);
-                    opacity: 0;
-                }
-                10% {
-                    opacity: 1;
-                }
-                90% {
-                    opacity: 1;
-                }
-                100% {
-                    transform: translateY(-100vh) rotate(360deg);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(style);
-    }
-}
-
-function scrollToTop() {
-    window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-    });
-}
-
-// Add some town square specific interactions
-function addTownSquareInteractions() {
-    // Make compass directions glow on hover
-    document.querySelectorAll('.direction').forEach(direction => {
-        direction.addEventListener('mouseenter', () => {
-            direction.style.boxShadow = '0 0 20px rgba(255, 215, 0, 0.8)';
-            direction.style.transform = direction.style.transform + ' scale(1.2)';
-        });
-        
-        direction.addEventListener('mouseleave', () => {
-            direction.style.boxShadow = '0 3px 10px rgba(0, 0, 0, 0.3)';
-            direction.style.transform = direction.style.transform.replace(' scale(1.2)', '');
-        });
-    });
-
-    // Add compass needle interaction
-    const needle = document.querySelector('.compass-needle');
-    if (needle) {
-        needle.addEventListener('click', () => {
-            needle.style.animation = 'none';
-            needle.offsetHeight; // Trigger reflow
-            needle.style.animation = 'needlePoint 1s ease-in-out';
-            setTimeout(() => {
-                needle.style.animation = 'needlePoint 4s ease-in-out infinite';
-            }, 1000);
-        });
-    }
-
-    // Add destination icon rotation on click
-    document.querySelectorAll('.destination-icon').forEach(icon => {
-        icon.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent destination click
-            icon.style.transform = 'scale(1.2) rotate(360deg)';
-            setTimeout(() => {
-                icon.style.transform = 'scale(1.2) rotate(10deg)';
-            }, 300);
-        });
-    });
-}
-
-function showLoadingAnimation() {
-    // Create a simple loading overlay
-    const overlay = document.createElement('div');
-    overlay.style.position = 'fixed';
-    overlay.style.top = '0';
-    overlay.style.left = '0';
-    overlay.style.width = '100%';
-    overlay.style.height = '100%';
-    overlay.style.background = 'rgba(139, 69, 19, 0.9)';
-    overlay.style.display = 'flex';
-    overlay.style.alignItems = 'center';
-    overlay.style.justifyContent = 'center';
-    overlay.style.zIndex = '9999';
-    overlay.style.color = '#FFD700';
-    overlay.style.fontSize = '1.5rem';
-    overlay.style.fontFamily = 'Cinzel, serif';
-    overlay.innerHTML = '<div><i class="fas fa-compass fa-spin"></i><br>Loading Town Square...</div>';
-    
-    document.body.appendChild(overlay);
-    
-    // Remove after 2 seconds or when page loads
-    setTimeout(() => {
-        if (overlay.parentNode) {
-            overlay.style.opacity = '0';
-            overlay.style.transition = 'opacity 0.5s ease';
-            setTimeout(() => {
-                overlay.parentNode.removeChild(overlay);
-            }, 500);
+        if (currentScrollY > 100) {
+            navbar.style.background = 'rgba(255, 255, 255, 0.98)';
+            navbar.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.15)';
+        } else {
+            navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+            navbar.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.1)';
         }
-    }, 2000);
+
+        lastScrollY = currentScrollY;
+    });
+
+    // Smooth scroll for navigation links
+    const navLinks = document.querySelectorAll('.nav-link[href^="#"]');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetElement = document.querySelector(targetId);
+            
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
 }
 
-// Helper function to get correct transform based on destination position
-function getDestinationTransform(destination, scale) {
-    if (destination.classList.contains('north-dest') || destination.classList.contains('south-dest')) {
-        return `translateX(-50%) scale(${scale})`;
-    } else {
-        return `translateY(-50%) scale(${scale})`;
-    }
-} 
+// Utility Functions
+function addRippleEffect(element, event) {
+    const ripple = document.createElement('span');
+    const rect = element.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    const x = event.clientX - rect.left - size / 2;
+    const y = event.clientY - rect.top - size / 2;
+    
+    ripple.style.width = ripple.style.height = size + 'px';
+    ripple.style.left = x + 'px';
+    ripple.style.top = y + 'px';
+    ripple.classList.add('ripple');
+    
+    element.appendChild(ripple);
+    
+    setTimeout(() => {
+        ripple.remove();
+    }, 600);
+}
+
+// Add ripple effect to room cards
+document.addEventListener('DOMContentLoaded', function() {
+    const roomCards = document.querySelectorAll('.room-card');
+    
+    roomCards.forEach(card => {
+        card.addEventListener('click', function(e) {
+            addRippleEffect(this, e);
+        });
+    });
+});
+
+// Performance optimization
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Optimized scroll handler
+const optimizedScrollHandler = debounce(() => {
+    // Handle scroll-based animations here if needed
+}, 16); // ~60fps
+
+window.addEventListener('scroll', optimizedScrollHandler);
+
+console.log('Chiffy Modern Homepage loaded successfully!'); 

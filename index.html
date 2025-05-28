@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chiffy Town Square - Adventure & Community Platform</title>
-    <link rel="stylesheet" href="main-home-styles.css?v=4">
+    <title>Chiffy - Modern Social Platform</title>
+    <link rel="stylesheet" href="main-home-styles.css?v=5">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Merriweather:wght@300;400;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-logo">
-                <i class="fas fa-castle"></i>
-                <span>Chiffy Town</span>
+                <i class="fas fa-cube"></i>
+                <span>Chiffy</span>
             </div>
             <div class="nav-links">
                 <a href="#about" class="nav-link">About</a>
@@ -24,111 +24,95 @@
         </div>
     </nav>
 
-    <!-- Town Square Hero Section -->
-    <section class="town-square-hero">
-        <div class="town-square-content">
-            <h1 class="town-title">Welcome to Chiffy Town Square</h1>
-            <p class="town-subtitle">Where Adventures Begin and Stories Are Shared</p>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Welcome to Chiffy</h1>
+            <p class="hero-subtitle">Connect, Create, and Explore in Style</p>
         </div>
-        <div class="town-square-background"></div>
+        <div class="hero-background"></div>
     </section>
 
-    <!-- Town Square Main Area -->
-    <main class="town-square-main">
-        <div class="town-square-container">
-            <!-- Central Compass -->
-            <div class="central-compass">
-                <div class="compass">
-                    <div class="compass-face">
-                        <i class="fas fa-compass"></i>
-                        <div class="compass-needle"></div>
-                    </div>
-                    <div class="compass-directions">
-                        <div class="direction north">N</div>
-                        <div class="direction south">S</div>
-                        <div class="direction east">E</div>
-                        <div class="direction west">W</div>
-                        <div class="direction northeast">NE</div>
-                        <div class="direction northwest">NW</div>
-                        <div class="direction southeast">SE</div>
-                        <div class="direction southwest">SW</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Town Buildings/Destinations -->
-            <div class="town-destinations">
-                <!-- North: Adventure/Questing -->
-                <div class="destination north-dest" data-href="questing.html">
-                    <div class="destination-icon">
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Rooms Grid -->
+            <div class="rooms-grid">
+                <!-- Adventure Room -->
+                <div class="room-card adventure-room" data-href="questing.html">
+                    <div class="room-icon">
                         <i class="fas fa-mountain"></i>
                     </div>
-                    <div class="destination-content">
-                        <h3 class="destination-title">Adventure Trail</h3>
-                        <p class="destination-description">Epic quests await</p>
+                    <div class="room-content">
+                        <h3 class="room-title">Adventure</h3>
+                        <p class="room-description">Epic quests and outdoor exploration</p>
                     </div>
+                    <div class="room-overlay"></div>
                 </div>
 
-                <!-- South: The Pub -->
-                <div class="destination south-dest" data-href="pub.html">
-                    <div class="destination-icon">
-                        <i class="fas fa-beer"></i>
+                <!-- Tavern Room -->
+                <div class="room-card tavern-room" data-href="pub.html">
+                    <div class="room-icon">
+                        <i class="fas fa-wine-glass"></i>
                     </div>
-                    <div class="destination-content">
-                        <h3 class="destination-title">The Tavern</h3>
-                        <p class="destination-description">Drinks & tales</p>
+                    <div class="room-content">
+                        <h3 class="room-title">Tavern</h3>
+                        <p class="room-description">Social drinks and conversations</p>
                     </div>
+                    <div class="room-overlay"></div>
                 </div>
 
-                <!-- East: Nightclub -->
-                <div class="destination east-dest" data-href="nightclub.html">
-                    <div class="destination-icon">
+                <!-- Night Club Room -->
+                <div class="room-card club-room" data-href="nightclub.html">
+                    <div class="room-icon">
                         <i class="fas fa-music"></i>
                     </div>
-                    <div class="destination-content">
-                        <h3 class="destination-title">Night Club</h3>
-                        <p class="destination-description">Dance & party</p>
+                    <div class="room-content">
+                        <h3 class="room-title">Night Club</h3>
+                        <p class="room-description">Dance, music, and nightlife</p>
                     </div>
+                    <div class="room-overlay"></div>
                 </div>
 
-                <!-- West: Games Room -->
-                <div class="destination west-dest" data-href="games.html">
-                    <div class="destination-icon">
+                <!-- Games Room -->
+                <div class="room-card games-room" data-href="games.html">
+                    <div class="room-icon">
                         <i class="fas fa-gamepad"></i>
                     </div>
-                    <div class="destination-content">
-                        <h3 class="destination-title">Games Room</h3>
-                        <p class="destination-description">Play & compete</p>
+                    <div class="room-content">
+                        <h3 class="room-title">Games</h3>
+                        <p class="room-description">Gaming and competitions</p>
                     </div>
+                    <div class="room-overlay"></div>
                 </div>
             </div>
 
-            <!-- Town Features Section -->
-            <section id="features" class="town-features">
+            <!-- Features Section -->
+            <section id="features" class="features-section">
                 <div class="section-header">
-                    <h2>Town Square Features</h2>
-                    <p>Everything you need for community adventures and social gatherings</p>
+                    <h2>Platform Features</h2>
+                    <p>Everything you need for modern social experiences</p>
                 </div>
                 <div class="features-grid">
                     <div class="feature-card">
                         <i class="fas fa-video"></i>
-                        <h3>Live Adventures</h3>
-                        <p>Stream your real-world quests and share the journey</p>
+                        <h3>Live Streaming</h3>
+                        <p>High-quality video streaming with real-time interaction</p>
                     </div>
                     <div class="feature-card">
                         <i class="fas fa-comments"></i>
-                        <h3>Town Chat</h3>
-                        <p>Connect with fellow citizens in real-time</p>
+                        <h3>Real-time Chat</h3>
+                        <p>Instant messaging and community discussions</p>
                     </div>
                     <div class="feature-card">
                         <i class="fas fa-users"></i>
-                        <h3>Community Spaces</h3>
-                        <p>Join themed gatherings and make new friends</p>
+                        <h3>Social Spaces</h3>
+                        <p>Connect with like-minded people in themed rooms</p>
                     </div>
                     <div class="feature-card">
                         <i class="fas fa-mobile-alt"></i>
-                        <h3>Mobile Ready</h3>
-                        <p>Take the town square with you wherever you go</p>
+                        <h3>Mobile First</h3>
+                        <p>Seamless experience across all your devices</p>
                     </div>
                 </div>
             </section>
@@ -140,17 +124,17 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h3>Chiffy Town</h3>
-                    <p>Where every citizen has a story and every adventure begins.</p>
+                    <h3>Chiffy</h3>
+                    <p>The modern platform for social connection and entertainment.</p>
                 </div>
                 <div class="footer-section">
-                    <h3>Destinations</h3>
+                    <h3>Explore</h3>
                     <ul>
-                        <li><a href="questing.html">Adventure Trail</a></li>
-                        <li><a href="pub.html">The Tavern</a></li>
+                        <li><a href="questing.html">Adventure</a></li>
+                        <li><a href="pub.html">Tavern</a></li>
                         <li><a href="nightclub.html">Night Club</a></li>
-                        <li><a href="games.html">Games Room</a></li>
-                        <li><a href="#about">About Our Town</a></li>
+                        <li><a href="games.html">Games</a></li>
+                        <li><a href="#about">About</a></li>
                         <li><a href="#contact">Contact</a></li>
                     </ul>
                 </div>
@@ -164,13 +148,13 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 Chiffy Town Square. All rights reserved.</p>
+                <p>&copy; 2024 Chiffy. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
     <!-- Scripts -->
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-    <script src="main-home.js?v=4"></script>
+    <script src="main-home.js?v=5"></script>
 </body>
 </html> 

@@ -6,36 +6,36 @@
 }
 
 body {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Inter', sans-serif;
     line-height: 1.6;
-    color: #2c3e50;
-    background: linear-gradient(135deg, #8B4513 0%, #D2691E 20%, #228B22 40%, #87CEEB 100%);
+    color: #1a1a1a;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     overflow-x: hidden;
 }
 
 .container {
-    max-width: 1400px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 0 2rem;
 }
 
 /* Navigation */
 .navbar {
-    background: rgba(139, 69, 19, 0.95);
-    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
     padding: 1rem 0;
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     z-index: 1000;
-    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
-    border-bottom: 3px solid #8B4513;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .nav-container {
-    max-width: 1400px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 0 2rem;
     display: flex;
@@ -47,18 +47,24 @@ body {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    font-family: 'Cinzel', serif;
+    font-family: 'Poppins', sans-serif;
     font-size: 1.8rem;
     font-weight: 700;
-    color: #FFD700;
+    color: #667eea;
     text-decoration: none;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+}
+
+.nav-logo:hover {
+    transform: scale(1.05);
 }
 
 .nav-logo i {
     font-size: 2rem;
-    color: #FFD700;
-    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5));
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .nav-links {
@@ -68,36 +74,22 @@ body {
 }
 
 .nav-link {
-    color: #F5DEB3;
+    color: #4a5568;
     text-decoration: none;
     font-weight: 500;
     transition: all 0.3s ease;
     position: relative;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
 }
 
 .nav-link:hover {
-    color: #FFD700;
-    transform: translateY(-2px);
+    color: #667eea;
+    background: rgba(102, 126, 234, 0.1);
 }
 
-.nav-link::after {
-    content: '';
-    position: absolute;
-    bottom: -5px;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: linear-gradient(45deg, #FFD700, #FFA500);
-    transition: width 0.3s ease;
-}
-
-.nav-link:hover::after {
-    width: 100%;
-}
-
-/* Town Square Hero Section */
-.town-square-hero {
+/* Hero Section */
+.hero {
     position: relative;
     min-height: 100vh;
     display: flex;
@@ -108,22 +100,17 @@ body {
     overflow: hidden;
 }
 
-.town-square-background {
+.hero-background {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(
-        135deg,
-        rgba(139, 69, 19, 0.7) 0%,
-        rgba(34, 139, 34, 0.6) 40%,
-        rgba(135, 206, 235, 0.5) 100%
-    );
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     z-index: -1;
 }
 
-.town-square-background::before {
+.hero-background::before {
     content: '';
     position: absolute;
     top: 0;
@@ -139,277 +126,165 @@ body {
     50% { transform: translateY(-20px) rotate(180deg); }
 }
 
-.town-square-content {
+.hero-content {
     position: relative;
     z-index: 2;
     max-width: 800px;
     padding: 0 2rem;
 }
 
-.town-title {
-    font-family: 'Cinzel', serif;
-    font-size: 3.5rem;
+.hero-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 4rem;
     font-weight: 700;
-    margin-bottom: 1rem;
-    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, #ffffff, #f0f0f0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     animation: fadeInUp 1s ease;
-    color: #FFD700;
 }
 
-.town-subtitle {
-    font-size: 1.3rem;
+.hero-subtitle {
+    font-size: 1.4rem;
     margin-bottom: 3rem;
     opacity: 0.9;
     font-weight: 300;
     animation: fadeInUp 1s ease 0.2s both;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-/* Town Square Main Content */
-.town-square-main {
+/* Main Content */
+.main-content {
     padding: 5rem 0;
-    background: linear-gradient(135deg, #228B22 0%, #32CD32 50%, #90EE90 100%);
+    background: #f8fafc;
     position: relative;
 }
 
-.town-square-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 2rem;
+/* Rooms Grid */
+.rooms-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-bottom: 5rem;
+}
+
+.room-card {
     position: relative;
-}
-
-/* Central Compass */
-.central-compass {
-    position: relative;
-    width: 400px;
-    height: 400px;
-    margin: 0 auto 5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.compass {
-    position: relative;
-    width: 200px;
-    height: 200px;
-    background: radial-gradient(circle, #8FBC8F 0%, #556B2F 100%);
-    border-radius: 50%;
-    border: 8px solid #8B4513;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.compass-face {
-    position: relative;
-    width: 120px;
-    height: 120px;
-    background: linear-gradient(135deg, #4682B4 0%, #87CEEB 100%);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    animation: compassGlow 3s ease-in-out infinite alternate;
-}
-
-.compass-face i {
-    font-size: 3rem;
-    color: #F0F8FF;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
-    animation: compassSpin 20s linear infinite;
-}
-
-.compass-needle {
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 4px;
-    height: 50px;
-    background: linear-gradient(to top, #8B4513, #FFD700);
-    border-radius: 2px;
-    animation: needlePoint 4s ease-in-out infinite;
-}
-
-.compass-directions {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-}
-
-.direction {
-    position: absolute;
-    width: 30px;
-    height: 30px;
-    background: #8B4513;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #FFD700;
-    font-weight: bold;
-    font-family: 'Cinzel', serif;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
-    border: 2px solid #FFD700;
-}
-
-.direction.north { top: -15px; left: 50%; transform: translateX(-50%); }
-.direction.south { bottom: -15px; left: 50%; transform: translateX(-50%); }
-.direction.east { right: -15px; top: 50%; transform: translateY(-50%); }
-.direction.west { left: -15px; top: 50%; transform: translateY(-50%); }
-.direction.northeast { top: 15px; right: 15px; font-size: 0.8rem; }
-.direction.northwest { top: 15px; left: 15px; font-size: 0.8rem; }
-.direction.southeast { bottom: 15px; right: 15px; font-size: 0.8rem; }
-.direction.southwest { bottom: 15px; left: 15px; font-size: 0.8rem; }
-
-@keyframes compassGlow {
-    0% { box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 20px rgba(135, 206, 235, 0.3); }
-    100% { box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 30px rgba(135, 206, 235, 0.6); }
-}
-
-@keyframes compassSpin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-@keyframes needlePoint {
-    0%, 100% { transform: translateX(-50%) rotate(-5deg); }
-    50% { transform: translateX(-50%) rotate(5deg); }
-}
-
-/* Town Destinations */
-.town-destinations {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-}
-
-.destination {
-    position: absolute;
-    width: 120px;
-    height: 120px;
-    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    background: white;
     border-radius: 20px;
+    padding: 2.5rem;
     cursor: pointer;
     transition: all 0.4s ease;
-    border: 3px solid #654321;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+    min-height: 300px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 1rem;
-    pointer-events: auto;
 }
 
-.destination:hover {
-    transform: scale(1.1);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+.room-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.1) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
-.destination-icon {
-    width: 50px;
-    height: 50px;
-    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-    border-radius: 50%;
+.room-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.room-card:hover::before {
+    opacity: 1;
+}
+
+.room-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.05));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 20px;
+}
+
+.room-card:hover .room-overlay {
+    opacity: 1;
+}
+
+.room-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 0.5rem;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+    margin-bottom: 1.5rem;
     transition: all 0.3s ease;
+    position: relative;
+    z-index: 2;
 }
 
-.destination:hover .destination-icon {
-    transform: scale(1.2) rotate(10deg);
+.room-card:hover .room-icon {
+    transform: scale(1.1) rotate(5deg);
 }
 
-.destination-icon i {
+.room-icon i {
+    font-size: 2.5rem;
+    color: white;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.room-content {
+    position: relative;
+    z-index: 2;
+}
+
+.room-title {
+    font-family: 'Poppins', sans-serif;
     font-size: 1.5rem;
-    color: #8B4513;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-}
-
-.destination-content {
-    color: #F5DEB3;
-}
-
-.destination-title {
-    font-family: 'Cinzel', serif;
-    font-size: 1rem;
     font-weight: 600;
-    margin-bottom: 0.25rem;
-    color: #FFD700;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    margin-bottom: 0.75rem;
+    color: #2d3748;
 }
 
-.destination-description {
-    font-size: 0.8rem;
-    opacity: 0.9;
-    line-height: 1.2;
+.room-description {
+    font-size: 1rem;
+    color: #718096;
+    line-height: 1.6;
 }
 
-/* Positioning destinations around compass */
-.north-dest {
-    top: -140px;
-    left: 50%;
-    transform: translateX(-50%);
+/* Specific room styling */
+.adventure-room .room-icon {
+    background: linear-gradient(135deg, #4299e1, #3182ce);
 }
 
-.south-dest {
-    bottom: -140px;
-    left: 50%;
-    transform: translateX(-50%);
+.tavern-room .room-icon {
+    background: linear-gradient(135deg, #ed8936, #dd6b20);
 }
 
-.east-dest {
-    right: -140px;
-    top: 50%;
-    transform: translateY(-50%);
+.club-room .room-icon {
+    background: linear-gradient(135deg, #ed64a6, #d53f8c);
 }
 
-.west-dest {
-    left: -140px;
-    top: 50%;
-    transform: translateY(-50%);
+.games-room .room-icon {
+    background: linear-gradient(135deg, #48bb78, #38a169);
 }
 
-/* Specific destination styling */
-.north-dest .destination-icon {
-    background: linear-gradient(135deg, #87CEEB 0%, #4682B4 100%);
-}
-
-.north-dest .destination-icon i {
-    color: #2F4F4F;
-}
-
-.east-dest .destination-icon {
-    background: linear-gradient(135deg, #FF69B4 0%, #FF1493 100%);
-}
-
-.east-dest .destination-icon i {
-    color: #8B008B;
-}
-
-.west-dest .destination-icon {
-    background: linear-gradient(135deg, #32CD32 0%, #228B22 100%);
-}
-
-.west-dest .destination-icon i {
-    color: #006400;
-}
-
-/* Town Features Section */
-.town-features {
-    margin-top: 8rem;
+/* Features Section */
+.features-section {
+    margin-top: 5rem;
 }
 
 .section-header {
@@ -418,18 +293,16 @@ body {
 }
 
 .section-header h2 {
-    font-family: 'Cinzel', serif;
+    font-family: 'Poppins', sans-serif;
     font-size: 2.5rem;
     font-weight: 600;
-    color: #8B4513;
+    color: #2d3748;
     margin-bottom: 1rem;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .section-header p {
     font-size: 1.1rem;
-    color: #2F4F4F;
-    opacity: 0.8;
+    color: #718096;
     max-width: 600px;
     margin: 0 auto;
 }
@@ -441,51 +314,52 @@ body {
 }
 
 .feature-card {
-    background: rgba(255, 255, 255, 0.9);
-    padding: 2rem;
+    background: white;
+    padding: 2.5rem;
     border-radius: 15px;
     text-align: center;
     transition: all 0.3s ease;
-    border: 2px solid rgba(139, 69, 19, 0.2);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .feature-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    border-color: #FFD700;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
 }
 
 .feature-card i {
     font-size: 3rem;
-    color: #8B4513;
-    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1.5rem;
     transition: all 0.3s ease;
 }
 
 .feature-card:hover i {
-    color: #FFD700;
     transform: scale(1.1);
 }
 
 .feature-card h3 {
-    font-family: 'Cinzel', serif;
+    font-family: 'Poppins', sans-serif;
     font-size: 1.3rem;
     font-weight: 600;
-    color: #2c3e50;
+    color: #2d3748;
     margin-bottom: 1rem;
 }
 
 .feature-card p {
-    color: #666;
+    color: #718096;
     line-height: 1.6;
 }
 
+/* Footer */
 .footer {
-    background: linear-gradient(135deg, #8B4513 0%, #654321 100%);
-    color: #F5DEB3;
+    background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+    color: #e2e8f0;
     padding: 3rem 0 1rem;
-    border-top: 3px solid #FFD700;
 }
 
 .footer-content {
@@ -496,10 +370,11 @@ body {
 }
 
 .footer-section h3 {
-    font-family: 'Cinzel', serif;
-    color: #FFD700;
+    font-family: 'Poppins', sans-serif;
+    color: #f7fafc;
     margin-bottom: 1rem;
     font-size: 1.3rem;
+    font-weight: 600;
 }
 
 .footer-section p {
@@ -516,13 +391,13 @@ body {
 }
 
 .footer-section ul li a {
-    color: #F5DEB3;
+    color: #cbd5e0;
     text-decoration: none;
     transition: color 0.3s ease;
 }
 
 .footer-section ul li a:hover {
-    color: #FFD700;
+    color: #667eea;
 }
 
 .social-links {
@@ -531,28 +406,27 @@ body {
 }
 
 .social-links a {
-    width: 40px;
-    height: 40px;
-    background: rgba(255, 215, 0, 0.2);
-    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #FFD700;
+    color: white;
     text-decoration: none;
     transition: all 0.3s ease;
 }
 
 .social-links a:hover {
-    background: #FFD700;
-    color: #8B4513;
-    transform: scale(1.1);
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
 }
 
 .footer-bottom {
     text-align: center;
     padding-top: 2rem;
-    border-top: 1px solid rgba(255, 215, 0, 0.3);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
     opacity: 0.7;
 }
 
@@ -567,46 +441,11 @@ body {
     }
 }
 
+/* Responsive Design */
 @media (max-width: 1024px) {
-    .town-destinations {
-        width: 100%;
-        height: 100%;
-    }
-
-    .destination {
-        width: 100px;
-        height: 100px;
-        padding: 0.75rem;
-    }
-
-    .destination-icon {
-        width: 40px;
-        height: 40px;
-    }
-
-    .destination-title {
-        font-size: 0.9rem;
-    }
-
-    .destination-description {
-        font-size: 0.7rem;
-    }
-
-    /* Adjust positioning for smaller screens */
-    .north-dest {
-        top: -110px;
-    }
-
-    .south-dest {
-        bottom: -110px;
-    }
-
-    .east-dest {
-        right: -110px;
-    }
-
-    .west-dest {
-        left: -110px;
+    .rooms-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
     }
 }
 
@@ -619,75 +458,35 @@ body {
         gap: 1rem;
     }
 
-    .town-title {
-        font-size: 2.5rem;
+    .hero-title {
+        font-size: 3rem;
     }
 
-    .town-subtitle {
-        font-size: 1.1rem;
+    .hero-subtitle {
+        font-size: 1.2rem;
     }
 
-    .town-square-container {
+    .container {
         padding: 0 1rem;
     }
 
-    .central-compass {
-        width: 300px;
-        height: 300px;
+    .rooms-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
     }
 
-    .compass {
-        width: 150px;
-        height: 150px;
+    .room-card {
+        padding: 2rem;
+        min-height: 250px;
     }
 
-    .compass-face {
-        width: 90px;
-        height: 90px;
+    .room-icon {
+        width: 70px;
+        height: 70px;
     }
 
-    .compass-face i {
+    .room-icon i {
         font-size: 2rem;
-    }
-
-    .destination {
-        width: 80px;
-        height: 80px;
-        padding: 0.5rem;
-    }
-
-    .destination-icon {
-        width: 30px;
-        height: 30px;
-    }
-
-    .destination-icon i {
-        font-size: 1rem;
-    }
-
-    .destination-title {
-        font-size: 0.8rem;
-    }
-
-    .destination-description {
-        font-size: 0.6rem;
-    }
-
-    /* Adjust positioning for mobile */
-    .north-dest {
-        top: -90px;
-    }
-
-    .south-dest {
-        bottom: -90px;
-    }
-
-    .east-dest {
-        right: -90px;
-    }
-
-    .west-dest {
-        left: -90px;
     }
 
     .features-grid {
@@ -696,46 +495,33 @@ body {
 }
 
 @media (max-width: 480px) {
-    .town-title {
-        font-size: 2rem;
+    .hero-title {
+        font-size: 2.5rem;
     }
 
     .nav-links {
         display: none;
     }
 
-    .central-compass {
-        width: 250px;
-        height: 250px;
+    .room-card {
+        padding: 1.5rem;
+        min-height: 220px;
     }
 
-    .destination {
-        width: 70px;
-        height: 70px;
+    .room-icon {
+        width: 60px;
+        height: 60px;
     }
 
-    .destination-title {
-        font-size: 0.7rem;
+    .room-icon i {
+        font-size: 1.8rem;
     }
 
-    .destination-description {
-        display: none;
+    .room-title {
+        font-size: 1.3rem;
     }
 
-    /* Adjust positioning for small mobile */
-    .north-dest {
-        top: -75px;
-    }
-
-    .south-dest {
-        bottom: -75px;
-    }
-
-    .east-dest {
-        right: -75px;
-    }
-
-    .west-dest {
-        left: -75px;
+    .room-description {
+        font-size: 0.9rem;
     }
 } 
