@@ -181,8 +181,8 @@ function initializeAuth() {
             userName.textContent = username;
         } else {
             signInBtn.innerHTML = `
-                <i class="fas fa-user"></i>
-                Sign In
+                <i class="fas fa-door-open"></i>
+                Enter
             `;
             signInBtn.classList.remove('signed-in');
             userMenu.style.display = 'none';
@@ -204,7 +204,7 @@ function initializeAuth() {
         modal.innerHTML = `
             <div class="auth-modal-content">
                 <div class="auth-modal-header">
-                    <h2>Welcome to Chiffly</h2>
+                    <h2><i class="fas fa-door-open"></i> Enter Chiffly</h2>
                     <button class="close-modal" onclick="this.closest('.auth-modal').remove()">
                         <i class="fas fa-times"></i>
                     </button>
@@ -219,12 +219,18 @@ function initializeAuth() {
                             <label for="password">Password</label>
                             <input type="password" id="password" name="password" placeholder="Enter your password" required>
                         </div>
-                        <button type="submit" class="auth-submit-btn">Sign In</button>
+                        <button type="submit" class="auth-submit-btn">
+                            <i class="fas fa-door-open"></i>
+                            Step Inside
+                        </button>
                     </form>
                     <div class="auth-divider">
                         <span>or</span>
                     </div>
-                    <button class="guest-signin-btn" onclick="signInAsGuest()">Continue as Guest</button>
+                    <button class="guest-signin-btn" onclick="signInAsGuest()">
+                        <i class="fas fa-walking"></i>
+                        Walk In as Guest
+                    </button>
                 </div>
             </div>
         `;
@@ -258,7 +264,7 @@ function initializeAuth() {
         updateAuthUI(true, username);
         
         // Show welcome message
-        showNotification(`Welcome back, ${username}!`, 'success');
+        showNotification(`Welcome inside, ${username}!`, 'success');
     }
     
     function signOut() {
@@ -269,7 +275,7 @@ function initializeAuth() {
         updateAuthUI(false, '');
         userMenu.style.display = 'none';
         
-        showNotification('You have been signed out', 'info');
+        showNotification('You have exited Chiffly', 'info');
     }
     
     // Global function for guest sign-in
