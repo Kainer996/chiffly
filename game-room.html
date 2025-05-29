@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Room - Chiffly</title>
+    <link rel="stylesheet" href="main-home-styles.css?v=5">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #2d1b69 0%, #4c1d95 50%, #1e1b4b 100%);
+            color: white;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .game-room-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 1rem;
+            gap: 1rem;
+        }
+
+        .game-header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .game-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .game-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #a855f7, #ec4899);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .game-details h2 {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.3rem;
+        }
+
+        .game-details p {
+            margin: 0;
+            opacity: 0.7;
+            font-size: 0.85rem;
+        }
+
+        .room-code {
+            background: rgba(168, 85, 247, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .game-area {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .game-content {
+            flex: 1;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Snake Game Styles */
+        .snake-game {
+            display: none;
+        }
+
+        .snake-game.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        #gameCanvas {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .game-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .control-btn.active {
+            background: linear-gradient(135deg, #a855f7, #ec4899);
+        }
+
+        .score-display {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        /* Quiz Game Styles */
+        .quiz-game {
+            display: none;
+        }
+
+        .quiz-game.active {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .question-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .answers-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .answer-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .answer-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.02);
+        }
+
+        .answer-btn.correct {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .answer-btn.incorrect {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        .quiz-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        /* Players Panel */
+        .players-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .players-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .player-tag {
+            background: rgba(168, 85, 247, 0.2);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .player-tag.host {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.6rem 0.8rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .game-room-container {
+                padding: 0.5rem;
+                gap: 0.5rem;
+            }
+
+            .game-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .answers-grid {
+                grid-template-columns: 1fr;
+            }
+
+            #gameCanvas {
+                width: 280px;
+                height: 280px;
+            }
+
+            .game-controls {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+        /* Waiting screen */
+        .waiting-screen {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .waiting-screen h3 {
+            margin-bottom: 1rem;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .waiting-screen p {
+            opacity: 0.7;
+            margin-bottom: 2rem;
+        }
+
+        .start-game-btn {
+            background: linear-gradient(135deg, #a855f7, #ec4899);
+            border: none;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+
+        .start-game-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(168, 85, 247, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <!-- Back Button -->
+    <a href="games.html" class="back-btn">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+
+    <div class="game-room-container">
+        <!-- Header -->
+        <div class="game-header">
+            <div class="game-info">
+                <div class="game-icon" id="gameIcon">
+                    <i class="fas fa-gamepad"></i>
+                </div>
+                <div class="game-details">
+                    <h2 id="gameTitle">Game Room</h2>
+                    <p id="gameDescription">Waiting for game to start...</p>
+                </div>
+            </div>
+            <div class="room-code">
+                Room: <span id="roomCodeDisplay">------</span>
+            </div>
+        </div>
+
+        <!-- Game Area -->
+        <div class="game-area">
+            <div class="game-content">
+                <!-- Waiting Screen -->
+                <div id="waitingScreen" class="waiting-screen">
+                    <h3>🎮 Game Room Ready!</h3>
+                    <p>Share the room code with friends to join the game.</p>
+                    <button class="start-game-btn" onclick="startGame()">
+                        <i class="fas fa-play"></i> Start Game
+                    </button>
+                </div>
+
+                <!-- Snake Game -->
+                <div id="snakeGame" class="snake-game">
+                    <div class="score-display">Score: <span id="score">0</span></div>
+                    <canvas id="gameCanvas" width="320" height="320"></canvas>
+                    <div class="game-controls">
+                        <button class="control-btn" onclick="pauseGame()">
+                            <i class="fas fa-pause"></i> Pause
+                        </button>
+                        <button class="control-btn" onclick="resetGame()">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                    </div>
+                    <div style="margin-top: 1rem; text-align: center; opacity: 0.7;">
+                        Use arrow keys or WASD to move
+                    </div>
+                </div>
+
+                <!-- Quiz Game -->
+                <div id="quizGame" class="quiz-game">
+                    <div class="quiz-stats">
+                        <div>Question <span id="questionNumber">1</span> of <span id="totalQuestions">10</span></div>
+                        <div>Score: <span id="quizScore">0</span></div>
+                        <div>Time: <span id="timeLeft">30</span>s</div>
+                    </div>
+                    <div class="question-card">
+                        <div class="question-text" id="questionText">
+                            Loading question...
+                        </div>
+                        <div class="answers-grid" id="answersGrid">
+                            <!-- Answers will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Players Panel -->
+        <div class="players-panel">
+            <h4 style="margin: 0 0 1rem 0;">Players in Room</h4>
+            <div class="players-list" id="playersList">
+                <!-- Players will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+        // Game state
+        let currentGame = null;
+        let gameState = 'waiting';
+        let playerName = '';
+        let roomCode = '';
+        let isHost = false;
+
+        // Snake game variables
+        let snake = [{x: 10, y: 10}];
+        let food = {x: 15, y: 15};
+        let dx = 0;
+        let dy = 0;
+        let score = 0;
+        let gameRunning = false;
+
+        // Quiz game variables
+        let currentQuestionIndex = 0;
+        let quizScore = 0;
+        let timeLeft = 30;
+        let quizTimer = null;
+
+        // Sample quiz questions
+        const quizQuestions = [
+            {
+                question: "What is the capital of France?",
+                answers: ["London", "Berlin", "Paris", "Madrid"],
+                correct: 2
+            },
+            {
+                question: "Which planet is known as the Red Planet?",
+                answers: ["Venus", "Mars", "Jupiter", "Saturn"],
+                correct: 1
+            },
+            {
+                question: "What is 2 + 2?",
+                answers: ["3", "4", "5", "6"],
+                correct: 1
+            },
+            {
+                question: "Who painted the Mona Lisa?",
+                answers: ["Van Gogh", "Picasso", "Da Vinci", "Monet"],
+                correct: 2
+            },
+            {
+                question: "What is the largest ocean on Earth?",
+                answers: ["Atlantic", "Indian", "Arctic", "Pacific"],
+                correct: 3
+            }
+        ];
+
+        // Initialize game room
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            currentGame = urlParams.get('game') || 'snake';
+            playerName = urlParams.get('player') || 'Player';
+            const mode = urlParams.get('mode') || 'create';
+            roomCode = urlParams.get('room') || generateRoomCode();
+
+            if (mode === 'create') {
+                isHost = true;
+            }
+
+            initializeGameRoom();
+        });
+
+        function initializeGameRoom() {
+            // Update UI based on game type
+            const gameInfo = {
+                'snake': {
+                    title: 'Snake Arena',
+                    description: 'Classic snake game with multiplayer scoring',
+                    icon: 'fas fa-snake'
+                },
+                'quiz': {
+                    title: 'Multiplayer Quiz',
+                    description: 'Test your knowledge against friends',
+                    icon: 'fas fa-question-circle'
+                },
+                'memory': {
+                    title: 'Memory Match',
+                    description: 'Match pairs and test your memory',
+                    icon: 'fas fa-brain'
+                },
+                'trivia': {
+                    title: 'Lightning Trivia',
+                    description: 'Quick-fire trivia questions',
+                    icon: 'fas fa-bolt'
+                },
+                'wordchain': {
+                    title: 'Word Chain',
+                    description: 'Create word chains with friends',
+                    icon: 'fas fa-spell-check'
+                },
+                'numbers': {
+                    title: 'Number Rush',
+                    description: 'Solve math puzzles quickly',
+                    icon: 'fas fa-puzzle-piece'
+                }
+            };
+
+            const info = gameInfo[currentGame] || gameInfo['snake'];
+            document.getElementById('gameTitle').textContent = info.title;
+            document.getElementById('gameDescription').textContent = info.description;
+            document.getElementById('gameIcon').innerHTML = `<i class="${info.icon}"></i>`;
+            document.getElementById('roomCodeDisplay').textContent = roomCode;
+
+            // Add current player to list
+            addPlayerToList(playerName, isHost);
+
+            // Show start button only for host
+            if (!isHost) {
+                const startBtn = document.querySelector('.start-game-btn');
+                startBtn.style.display = 'none';
+                document.querySelector('.waiting-screen p').textContent = 'Waiting for host to start the game...';
+            }
+        }
+
+        function generateRoomCode() {
+            return Math.random().toString(36).substr(2, 6).toUpperCase();
+        }
+
+        function addPlayerToList(name, host = false) {
+            const playersList = document.getElementById('playersList');
+            const playerTag = document.createElement('div');
+            playerTag.className = `player-tag ${host ? 'host' : ''}`;
+            playerTag.innerHTML = `
+                <i class="fas fa-user"></i>
+                ${name} ${host ? '(Host)' : ''}
+            `;
+            playersList.appendChild(playerTag);
+        }
+
+        function startGame() {
+            gameState = 'playing';
+            document.getElementById('waitingScreen').style.display = 'none';
+
+            if (currentGame === 'snake') {
+                startSnakeGame();
+            } else if (currentGame === 'quiz') {
+                startQuizGame();
+            } else {
+                // For other games, show a placeholder
+                showGamePlaceholder();
+            }
+        }
+
+        function startSnakeGame() {
+            document.getElementById('snakeGame').classList.add('active');
+            const canvas = document.getElementById('gameCanvas');
+            const ctx = canvas.getContext('2d');
+
+            // Initialize snake game
+            snake = [{x: 10, y: 10}];
+            food = {x: 15, y: 15};
+            dx = 0;
+            dy = 0;
+            score = 0;
+            gameRunning = true;
+
+            // Game loop
+            function gameLoop() {
+                if (!gameRunning) return;
+
+                // Move snake
+                const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+
+                // Check wall collision
+                if (head.x < 0 || head.x >= 20 || head.y < 0 || head.y >= 20) {
+                    gameOver();
+                    return;
+                }
+
+                // Check self collision
+                if (snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+                    gameOver();
+                    return;
+                }
+
+                snake.unshift(head);
+
+                // Check food collision
+                if (head.x === food.x && head.y === food.y) {
+                    score += 10;
+                    document.getElementById('score').textContent = score;
+                    generateFood();
+                } else {
+                    snake.pop();
+                }
+
+                // Draw game
+                drawGame(ctx);
+
+                setTimeout(gameLoop, 150);
+            }
+
+            // Start the game loop
+            gameLoop();
+
+            // Add keyboard controls
+            document.addEventListener('keydown', handleKeyPress);
+        }
+
+        function drawGame(ctx) {
+            // Clear canvas
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, 320, 320);
+
+            // Draw snake
+            ctx.fillStyle = '#a855f7';
+            snake.forEach(segment => {
+                ctx.fillRect(segment.x * 16, segment.y * 16, 14, 14);
+            });
+
+            // Draw food
+            ctx.fillStyle = '#ec4899';
+            ctx.fillRect(food.x * 16, food.y * 16, 14, 14);
+        }
+
+        function generateFood() {
+            food = {
+                x: Math.floor(Math.random() * 20),
+                y: Math.floor(Math.random() * 20)
+            };
+
+            // Make sure food doesn't spawn on snake
+            if (snake.some(segment => segment.x === food.x && segment.y === food.y)) {
+                generateFood();
+            }
+        }
+
+        function handleKeyPress(e) {
+            if (!gameRunning) return;
+
+            switch(e.key) {
+                case 'ArrowUp':
+                case 'w':
+                case 'W':
+                    if (dy === 0) { dx = 0; dy = -1; }
+                    break;
+                case 'ArrowDown':
+                case 's':
+                case 'S':
+                    if (dy === 0) { dx = 0; dy = 1; }
+                    break;
+                case 'ArrowLeft':
+                case 'a':
+                case 'A':
+                    if (dx === 0) { dx = -1; dy = 0; }
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                case 'D':
+                    if (dx === 0) { dx = 1; dy = 0; }
+                    break;
+            }
+        }
+
+        function pauseGame() {
+            gameRunning = !gameRunning;
+            if (gameRunning && currentGame === 'snake') {
+                startSnakeGame();
+            }
+        }
+
+        function resetGame() {
+            gameRunning = false;
+            if (currentGame === 'snake') {
+                startSnakeGame();
+            } else if (currentGame === 'quiz') {
+                startQuizGame();
+            }
+        }
+
+        function gameOver() {
+            gameRunning = false;
+            alert(`Game Over! Final Score: ${score}`);
+        }
+
+        function startQuizGame() {
+            document.getElementById('quizGame').classList.add('active');
+            currentQuestionIndex = 0;
+            quizScore = 0;
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentQuestionIndex >= quizQuestions.length) {
+                endQuiz();
+                return;
+            }
+
+            const question = quizQuestions[currentQuestionIndex];
+            document.getElementById('questionNumber').textContent = currentQuestionIndex + 1;
+            document.getElementById('totalQuestions').textContent = quizQuestions.length;
+            document.getElementById('questionText').textContent = question.question;
+            document.getElementById('quizScore').textContent = quizScore;
+
+            // Create answer buttons
+            const answersGrid = document.getElementById('answersGrid');
+            answersGrid.innerHTML = '';
+
+            question.answers.forEach((answer, index) => {
+                const button = document.createElement('button');
+                button.className = 'answer-btn';
+                button.textContent = answer;
+                button.onclick = () => selectAnswer(index);
+                answersGrid.appendChild(button);
+            });
+
+            // Start timer
+            timeLeft = 30;
+            updateTimer();
+            quizTimer = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            document.getElementById('timeLeft').textContent = timeLeft;
+            timeLeft--;
+
+            if (timeLeft < 0) {
+                clearInterval(quizTimer);
+                selectAnswer(-1); // Time's up
+            }
+        }
+
+        function selectAnswer(selectedIndex) {
+            clearInterval(quizTimer);
+            const question = quizQuestions[currentQuestionIndex];
+            const buttons = document.querySelectorAll('.answer-btn');
+
+            // Show correct/incorrect answers
+            buttons.forEach((button, index) => {
+                if (index === question.correct) {
+                    button.classList.add('correct');
+                } else if (index === selectedIndex && selectedIndex !== question.correct) {
+                    button.classList.add('incorrect');
+                }
+                button.disabled = true;
+            });
+
+            // Update score
+            if (selectedIndex === question.correct) {
+                quizScore += 10;
+                document.getElementById('quizScore').textContent = quizScore;
+            }
+
+            // Move to next question after delay
+            setTimeout(() => {
+                currentQuestionIndex++;
+                loadQuestion();
+            }, 2000);
+        }
+
+        function endQuiz() {
+            alert(`Quiz Complete! Final Score: ${quizScore}/${quizQuestions.length * 10}`);
+            document.getElementById('quizGame').classList.remove('active');
+            document.getElementById('waitingScreen').style.display = 'block';
+        }
+
+        function showGamePlaceholder() {
+            const gameContent = document.querySelector('.game-content');
+            gameContent.innerHTML = `
+                <div class="waiting-screen">
+                    <h3>🚧 Game Coming Soon!</h3>
+                    <p>This game is still in development. Try Snake or Quiz for now!</p>
+                    <button class="start-game-btn" onclick="window.location.href='games.html'">
+                        <i class="fas fa-arrow-left"></i> Back to Games
+                    </button>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html> 
