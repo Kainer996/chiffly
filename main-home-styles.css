@@ -801,7 +801,7 @@ body {
     background: white;
     border-radius: 20px;
     width: 90%;
-    max-width: 400px;
+    max-width: 450px;
     box-shadow: 0 25px 80px rgba(0, 0, 0, 0.2);
     overflow: hidden;
     animation: slideUp 0.3s ease;
@@ -999,6 +999,14 @@ body {
     border-left-color: #4299e1;
 }
 
+.notification.notification-error {
+    border-left-color: #e53e3e;
+}
+
+.notification.notification-warning {
+    border-left-color: #ed8936;
+}
+
 .notification i {
     font-size: 1.2rem;
     color: #667eea;
@@ -1010,4 +1018,59 @@ body {
 
 .notification.notification-info i {
     color: #4299e1;
+}
+
+.notification.notification-error i {
+    color: #e53e3e;
+}
+
+.notification.notification-warning i {
+    color: #ed8936;
+}
+
+/* Auth Toggle Buttons */
+.auth-toggle {
+    display: flex;
+    background: #f7fafc;
+    border-radius: 12px;
+    padding: 0.25rem;
+    margin-bottom: 2rem;
+    gap: 0.25rem;
+}
+
+.auth-toggle-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: #718096;
+}
+
+.auth-toggle-btn.active {
+    background: white;
+    color: #8B4513;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.auth-toggle-btn:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.5);
+    color: #4a5568;
+}
+
+/* Auth Forms */
+.auth-form {
+    display: none;
+}
+
+.auth-form.active {
+    display: block;
 } 

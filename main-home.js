@@ -204,26 +204,64 @@ function initializeAuth() {
         modal.innerHTML = `
             <div class="auth-modal-content">
                 <div class="auth-modal-header">
-                    <h2><i class="fas fa-door-open"></i> Enter Chiffly</h2>
+                    <h2><i class="fas fa-door-open"></i> <span id="modalTitle">Enter Chiffly</span></h2>
                     <button class="close-modal" onclick="this.closest('.auth-modal').remove()">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
                 <div class="auth-modal-body">
-                    <form id="signInForm">
+                    <!-- Auth Toggle Buttons -->
+                    <div class="auth-toggle">
+                        <button class="auth-toggle-btn active" id="signInToggle">
+                            <i class="fas fa-door-open"></i>
+                            Enter
+                        </button>
+                        <button class="auth-toggle-btn" id="signUpToggle">
+                            <i class="fas fa-key"></i>
+                            Register
+                        </button>
+                    </div>
+                    
+                    <!-- Sign In Form -->
+                    <form id="signInForm" class="auth-form active">
                         <div class="form-group">
-                            <label for="username">Username</label>
-                            <input type="text" id="username" name="username" placeholder="Enter your username" required>
+                            <label for="signInUsername">Username</label>
+                            <input type="text" id="signInUsername" name="username" placeholder="Enter your username" required>
                         </div>
                         <div class="form-group">
-                            <label for="password">Password</label>
-                            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                            <label for="signInPassword">Password</label>
+                            <input type="password" id="signInPassword" name="password" placeholder="Enter your password" required>
                         </div>
                         <button type="submit" class="auth-submit-btn">
                             <i class="fas fa-door-open"></i>
                             Step Inside
                         </button>
                     </form>
+                    
+                    <!-- Sign Up Form -->
+                    <form id="signUpForm" class="auth-form">
+                        <div class="form-group">
+                            <label for="signUpUsername">Choose Username</label>
+                            <input type="text" id="signUpUsername" name="username" placeholder="Choose a unique username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signUpEmail">Email Address</label>
+                            <input type="email" id="signUpEmail" name="email" placeholder="Enter your email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signUpPassword">Create Password</label>
+                            <input type="password" id="signUpPassword" name="password" placeholder="Create a secure password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirm Password</label>
+                            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+                        </div>
+                        <button type="submit" class="auth-submit-btn">
+                            <i class="fas fa-key"></i>
+                            Create Account & Enter
+                        </button>
+                    </form>
+                    
                     <div class="auth-divider">
                         <span>or</span>
                     </div>
@@ -237,11 +275,35 @@ function initializeAuth() {
         
         document.body.appendChild(modal);
         
-        // Handle form submission
-        document.getElementById('signInForm').addEventListener('submit', function(e) {
+        // Get form elements
+        const signInForm = document.getElementById('signInForm');
+        const signUpForm = document.getElementById('signUpForm');
+        const signInToggle = document.getElementById('signInToggle');
+        const signUpToggle = document.getElementById('signUpToggle');
+        const modalTitle = document.getElementById('modalTitle');
+        
+        // Toggle between sign in and sign up
+        signInToggle.addEventListener('click', function() {
+            signInToggle.classList.add('active');
+            signUpToggle.classList.remove('active');
+            signInForm.classList.add('active');
+            signUpForm.classList.remove('active');
+            modalTitle.innerHTML = 'Enter Chiffly';
+        });
+        
+        signUpToggle.addEventListener('click', function() {
+            signUpToggle.classList.add('active');
+            signInToggle.classList.remove('active');
+            signUpForm.classList.add('active');
+            signInForm.classList.remove('active');
+            modalTitle.innerHTML = 'Join Chiffly';
+        });
+        
+        // Handle sign in form submission
+        signInForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+            const username = document.getElementById('signInUsername').value;
+            const password = document.getElementById('signInPassword').value;
             
             // Simple authentication (in a real app, this would be server-side)
             if (username && password) {
@@ -250,9 +312,34 @@ function initializeAuth() {
             }
         });
         
+        // Handle sign up form submission
+        signUpForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('signUpUsername').value;
+            const email = document.getElementById('signUpEmail').value;
+            const password = document.getElementById('signUpPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Validate passwords match
+            if (password !== confirmPassword) {
+                showNotification('Passwords do not match!', 'error');
+                return;
+            }
+            
+            // Simple validation (in a real app, this would be server-side)
+            if (username && email && password) {
+                // Simulate account creation
+                showNotification('Account created successfully!', 'success');
+                setTimeout(() => {
+                    signIn(username);
+                    modal.remove();
+                }, 1000);
+            }
+        });
+        
         // Focus on username input
         setTimeout(() => {
-            document.getElementById('username').focus();
+            document.getElementById('signInUsername').focus();
         }, 100);
     }
     
@@ -288,8 +375,14 @@ function initializeAuth() {
     function showNotification(message, type = 'info') {
         const notification = document.createElement('div');
         notification.className = `notification notification-${type}`;
+        
+        let icon = 'info-circle';
+        if (type === 'success') icon = 'check-circle';
+        if (type === 'error') icon = 'exclamation-circle';
+        if (type === 'warning') icon = 'exclamation-triangle';
+        
         notification.innerHTML = `
-            <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+            <i class="fas fa-${icon}"></i>
             <span>${message}</span>
         `;
         
