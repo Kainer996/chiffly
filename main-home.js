@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeRoomCards();
     initializeAnimations();
     initializeNavigation();
+    initializeAuth();
 });
 
 // Room Cards Functionality
@@ -126,6 +127,179 @@ function initializeNavigation() {
             }
         });
     });
+}
+
+// Authentication functionality
+function initializeAuth() {
+    const signInBtn = document.getElementById('signInBtn');
+    const userMenu = document.getElementById('userMenu');
+    const signOutBtn = document.getElementById('signOutBtn');
+    const userName = document.getElementById('userName');
+    
+    let isSignedIn = localStorage.getItem('chiffly_signed_in') === 'true';
+    let currentUser = localStorage.getItem('chiffly_username') || 'Guest User';
+    
+    // Update UI based on sign-in state
+    updateAuthUI(isSignedIn, currentUser);
+    
+    // Sign in button click handler
+    signInBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        
+        if (!isSignedIn) {
+            // Show sign-in modal or redirect to sign-in page
+            showSignInModal();
+        } else {
+            // Toggle user menu
+            toggleUserMenu();
+        }
+    });
+    
+    // Sign out button click handler
+    signOutBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        signOut();
+    });
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.auth-section')) {
+            userMenu.style.display = 'none';
+        }
+    });
+    
+    function updateAuthUI(signedIn, username) {
+        if (signedIn) {
+            signInBtn.innerHTML = `
+                <div class="user-avatar-small">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <span>${username}</span>
+                <i class="fas fa-chevron-down"></i>
+            `;
+            signInBtn.classList.add('signed-in');
+            userName.textContent = username;
+        } else {
+            signInBtn.innerHTML = `
+                <i class="fas fa-user"></i>
+                Sign In
+            `;
+            signInBtn.classList.remove('signed-in');
+            userMenu.style.display = 'none';
+        }
+    }
+    
+    function toggleUserMenu() {
+        if (userMenu.style.display === 'none' || !userMenu.style.display) {
+            userMenu.style.display = 'block';
+        } else {
+            userMenu.style.display = 'none';
+        }
+    }
+    
+    function showSignInModal() {
+        // Create a simple sign-in modal
+        const modal = document.createElement('div');
+        modal.className = 'auth-modal';
+        modal.innerHTML = `
+            <div class="auth-modal-content">
+                <div class="auth-modal-header">
+                    <h2>Welcome to Chiffly</h2>
+                    <button class="close-modal" onclick="this.closest('.auth-modal').remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="auth-modal-body">
+                    <form id="signInForm">
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" id="username" name="username" placeholder="Enter your username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                        </div>
+                        <button type="submit" class="auth-submit-btn">Sign In</button>
+                    </form>
+                    <div class="auth-divider">
+                        <span>or</span>
+                    </div>
+                    <button class="guest-signin-btn" onclick="signInAsGuest()">Continue as Guest</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Handle form submission
+        document.getElementById('signInForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // Simple authentication (in a real app, this would be server-side)
+            if (username && password) {
+                signIn(username);
+                modal.remove();
+            }
+        });
+        
+        // Focus on username input
+        setTimeout(() => {
+            document.getElementById('username').focus();
+        }, 100);
+    }
+    
+    function signIn(username) {
+        isSignedIn = true;
+        currentUser = username;
+        localStorage.setItem('chiffly_signed_in', 'true');
+        localStorage.setItem('chiffly_username', username);
+        updateAuthUI(true, username);
+        
+        // Show welcome message
+        showNotification(`Welcome back, ${username}!`, 'success');
+    }
+    
+    function signOut() {
+        isSignedIn = false;
+        currentUser = 'Guest User';
+        localStorage.removeItem('chiffly_signed_in');
+        localStorage.removeItem('chiffly_username');
+        updateAuthUI(false, '');
+        userMenu.style.display = 'none';
+        
+        showNotification('You have been signed out', 'info');
+    }
+    
+    // Global function for guest sign-in
+    window.signInAsGuest = function() {
+        const guestName = `Guest${Math.floor(Math.random() * 1000)}`;
+        signIn(guestName);
+        document.querySelector('.auth-modal').remove();
+    };
+    
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+            <span>${message}</span>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 100);
+        
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        }, 3000);
+    }
 }
 
 // Utility Functions
