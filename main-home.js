@@ -139,6 +139,11 @@ function initializeAuth() {
     let isSignedIn = localStorage.getItem('chiffly_signed_in') === 'true';
     let currentUser = localStorage.getItem('chiffly_username') || 'Guest User';
     
+    // Initialize registered users database (in a real app, this would be server-side)
+    if (!localStorage.getItem('chiffly_registered_users')) {
+        localStorage.setItem('chiffly_registered_users', JSON.stringify({}));
+    }
+    
     // Update UI based on sign-in state
     updateAuthUI(isSignedIn, currentUser);
     
@@ -170,15 +175,25 @@ function initializeAuth() {
     
     function updateAuthUI(signedIn, username) {
         if (signedIn) {
+            const userType = localStorage.getItem('chiffly_user_type');
+            const isGuest = userType === 'guest';
+            
             signInBtn.innerHTML = `
                 <div class="user-avatar-small">
-                    <i class="fas fa-user-circle"></i>
+                    <i class="fas fa-${isGuest ? 'walking' : 'user-circle'}"></i>
                 </div>
                 <span>${username}</span>
                 <i class="fas fa-chevron-down"></i>
             `;
             signInBtn.classList.add('signed-in');
             userName.textContent = username;
+            
+            // Update user status in the menu
+            const userStatus = document.querySelector('.user-status');
+            if (userStatus) {
+                userStatus.textContent = isGuest ? 'Guest Visitor' : 'Registered User';
+                userStatus.style.color = isGuest ? '#ed8936' : '#68d391';
+            }
         } else {
             signInBtn.innerHTML = `
                 <i class="fas fa-door-open"></i>
@@ -194,6 +209,48 @@ function initializeAuth() {
             userMenu.style.display = 'block';
         } else {
             userMenu.style.display = 'none';
+        }
+    }
+    
+    function getRegisteredUsers() {
+        return JSON.parse(localStorage.getItem('chiffly_registered_users') || '{}');
+    }
+    
+    function registerUser(username, email, password) {
+        const registeredUsers = getRegisteredUsers();
+        
+        // Check if username already exists
+        if (registeredUsers[username]) {
+            return { success: false, message: 'Username already taken!' };
+        }
+        
+        // Check if email already exists
+        const existingEmail = Object.values(registeredUsers).find(user => user.email === email);
+        if (existingEmail) {
+            return { success: false, message: 'Email already registered!' };
+        }
+        
+        // Register the user
+        registeredUsers[username] = {
+            email: email,
+            password: password, // In a real app, this would be hashed
+            registeredAt: new Date().toISOString()
+        };
+        
+        localStorage.setItem('chiffly_registered_users', JSON.stringify(registeredUsers));
+        return { success: true, message: 'Account created successfully!' };
+    }
+    
+    function validateSignIn(username, password) {
+        const registeredUsers = getRegisteredUsers();
+        
+        // Check if user exists and password matches
+        if (registeredUsers[username] && registeredUsers[username].password === password) {
+            return { success: true, message: 'Welcome back!' };
+        } else if (registeredUsers[username]) {
+            return { success: false, message: 'Incorrect password!' };
+        } else {
+            return { success: false, message: 'Account not found. Please register first!' };
         }
     }
     
@@ -305,10 +362,14 @@ function initializeAuth() {
             const username = document.getElementById('signInUsername').value;
             const password = document.getElementById('signInPassword').value;
             
-            // Simple authentication (in a real app, this would be server-side)
-            if (username && password) {
+            // Validate against registered users
+            const validation = validateSignIn(username, password);
+            
+            if (validation.success) {
                 signIn(username);
                 modal.remove();
+            } else {
+                showNotification(validation.message, 'error');
             }
         });
         
@@ -326,14 +387,23 @@ function initializeAuth() {
                 return;
             }
             
-            // Simple validation (in a real app, this would be server-side)
-            if (username && email && password) {
-                // Simulate account creation
-                showNotification('Account created successfully!', 'success');
+            // Validate password strength
+            if (password.length < 6) {
+                showNotification('Password must be at least 6 characters long!', 'error');
+                return;
+            }
+            
+            // Attempt to register the user
+            const registration = registerUser(username, email, password);
+            
+            if (registration.success) {
+                showNotification(registration.message, 'success');
                 setTimeout(() => {
                     signIn(username);
                     modal.remove();
                 }, 1000);
+            } else {
+                showNotification(registration.message, 'error');
             }
         });
         
@@ -343,32 +413,43 @@ function initializeAuth() {
         }, 100);
     }
     
-    function signIn(username) {
+    function signIn(username, isGuest = false) {
         isSignedIn = true;
         currentUser = username;
         localStorage.setItem('chiffly_signed_in', 'true');
         localStorage.setItem('chiffly_username', username);
+        localStorage.setItem('chiffly_user_type', isGuest ? 'guest' : 'registered');
         updateAuthUI(true, username);
         
         // Show welcome message
-        showNotification(`Welcome inside, ${username}!`, 'success');
+        if (isGuest) {
+            showNotification(`Welcome, ${username}! You're visiting as a guest.`, 'info');
+        } else {
+            showNotification(`Welcome inside, ${username}!`, 'success');
+        }
     }
     
     function signOut() {
+        const userType = localStorage.getItem('chiffly_user_type');
         isSignedIn = false;
         currentUser = 'Guest User';
         localStorage.removeItem('chiffly_signed_in');
         localStorage.removeItem('chiffly_username');
+        localStorage.removeItem('chiffly_user_type');
         updateAuthUI(false, '');
         userMenu.style.display = 'none';
         
-        showNotification('You have exited Chiffly', 'info');
+        if (userType === 'guest') {
+            showNotification('Thanks for visiting as a guest!', 'info');
+        } else {
+            showNotification('You have exited Chiffly', 'info');
+        }
     }
     
     // Global function for guest sign-in
     window.signInAsGuest = function() {
         const guestName = `Guest${Math.floor(Math.random() * 1000)}`;
-        signIn(guestName);
+        signIn(guestName, true);
         document.querySelector('.auth-modal').remove();
     };
     
@@ -399,6 +480,28 @@ function initializeAuth() {
             }, 300);
         }, 3000);
     }
+
+    // Debug functions (for testing purposes)
+    window.showRegisteredUsers = function() {
+        const users = getRegisteredUsers();
+        console.log('Registered Users:', users);
+        const userList = Object.keys(users).join(', ');
+        showNotification(`Registered users: ${userList || 'None'}`, 'info');
+    };
+    
+    window.clearAllUserData = function() {
+        localStorage.removeItem('chiffly_registered_users');
+        localStorage.removeItem('chiffly_signed_in');
+        localStorage.removeItem('chiffly_username');
+        localStorage.removeItem('chiffly_user_type');
+        showNotification('All user data cleared!', 'warning');
+        location.reload();
+    };
+    
+    // Console helper message
+    console.log('🚪 Chiffly Authentication System');
+    console.log('📝 To see registered users: showRegisteredUsers()');
+    console.log('🗑️ To clear all data: clearAllUserData()');
 }
 
 // Utility Functions
