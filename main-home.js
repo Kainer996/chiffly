@@ -11,11 +11,32 @@ document.addEventListener('DOMContentLoaded', function() {
 function initializeRoomCards() {
     const roomCards = document.querySelectorAll('.room-card');
     
+    // Check initial authentication status
+    updateRoomAccessIndicators();
+    
     roomCards.forEach(card => {
         // Add click handler for navigation
         card.addEventListener('click', function() {
             const href = this.getAttribute('data-href');
             if (href) {
+                // Check if user is signed in
+                const isSignedIn = localStorage.getItem('chiffly_signed_in') === 'true';
+                
+                if (!isSignedIn) {
+                    // Show authentication required message
+                    showNotification('Please enter Chiffly first to access rooms!', 'warning');
+                    
+                    // Highlight the Enter button
+                    const signInBtn = document.getElementById('signInBtn');
+                    signInBtn.style.animation = 'pulse 1s ease-in-out 3';
+                    
+                    setTimeout(() => {
+                        signInBtn.style.animation = '';
+                    }, 3000);
+                    
+                    return;
+                }
+                
                 // Add loading animation
                 this.style.transform = 'scale(0.95)';
                 this.style.opacity = '0.8';
@@ -53,6 +74,60 @@ function initializeRoomCards() {
             }
         });
     });
+}
+
+function updateRoomAccessIndicators() {
+    const isSignedIn = localStorage.getItem('chiffly_signed_in') === 'true';
+    const roomCards = document.querySelectorAll('.room-card');
+    
+    roomCards.forEach(card => {
+        const existingLock = card.querySelector('.access-lock');
+        
+        if (!isSignedIn) {
+            // Add lock indicator if not signed in
+            if (!existingLock) {
+                const lockIndicator = document.createElement('div');
+                lockIndicator.className = 'access-lock';
+                lockIndicator.innerHTML = '<i class="fas fa-lock"></i>';
+                card.appendChild(lockIndicator);
+            }
+            card.classList.add('locked');
+        } else {
+            // Remove lock indicator if signed in
+            if (existingLock) {
+                existingLock.remove();
+            }
+            card.classList.remove('locked');
+        }
+    });
+    
+    // Show/hide access message
+    updateAccessMessage(isSignedIn);
+}
+
+function updateAccessMessage(isSignedIn) {
+    const container = document.querySelector('.container');
+    const roomsGrid = document.querySelector('.rooms-grid');
+    let accessMessage = document.querySelector('.access-message');
+    
+    if (!isSignedIn) {
+        if (!accessMessage) {
+            accessMessage = document.createElement('div');
+            accessMessage.className = 'access-message';
+            accessMessage.innerHTML = `
+                <div class="access-message-content">
+                    <i class="fas fa-door-open"></i>
+                    <h3>Enter Chiffly to Access Rooms</h3>
+                    <p>Please sign in or walk in as a guest to explore our social spaces</p>
+                </div>
+            `;
+            container.insertBefore(accessMessage, roomsGrid);
+        }
+    } else {
+        if (accessMessage) {
+            accessMessage.remove();
+        }
+    }
 }
 
 // Page Animations
@@ -420,6 +495,7 @@ function initializeAuth() {
         localStorage.setItem('chiffly_username', username);
         localStorage.setItem('chiffly_user_type', isGuest ? 'guest' : 'registered');
         updateAuthUI(true, username);
+        updateRoomAccessIndicators();
         
         // Show welcome message
         if (isGuest) {
@@ -437,6 +513,7 @@ function initializeAuth() {
         localStorage.removeItem('chiffly_username');
         localStorage.removeItem('chiffly_user_type');
         updateAuthUI(false, '');
+        updateRoomAccessIndicators();
         userMenu.style.display = 'none';
         
         if (userType === 'guest') {
