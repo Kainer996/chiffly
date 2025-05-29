@@ -277,14 +277,14 @@ function handleJoinRoom(e) {
         return;
     }
 
-    // Redirect to streaming page with parameters
+    // Redirect to adventure streaming page with parameters
     const params = new URLSearchParams({
         roomId: selectedRoomId,
         username: username,
         isStreamer: isStreamer.toString()
     });
     
-            window.location.href = `stream.html?${params.toString()}`;
+    window.location.href = `adventure-stream.html?${params.toString()}`;
 }
 
 // Utility functions
