@@ -423,16 +423,97 @@
 
         @media (max-width: 768px) {
             .stream-container {
-                padding: 0.5rem;
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr auto auto;
                 gap: 0.5rem;
+                padding: 0.5rem;
             }
 
             .stream-header {
                 padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
             }
 
-            .participants-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .stream-controls {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                justify-content: center;
+            }
+
+            .control-btn {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.8rem;
+                min-width: 80px;
+            }
+
+            .control-btn span {
+                display: none;
+            }
+
+            .control-btn i {
+                margin: 0;
+            }
+
+            .theme-selector {
+                order: -1;
+                width: 100%;
+                justify-content: center;
+                margin: 0;
+                padding: 0;
+                border: none;
+            }
+
+            .theme-btn {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.7rem;
+            }
+
+            .chat-area {
+                order: 3;
+            }
+
+            .participants-area {
+                order: 4;
+            }
+
+            /* Show camera switch button on mobile when camera is on */
+            #switchCameraBtn {
+                background: rgba(255, 255, 255, 0.15);
+                border-color: rgba(255, 255, 255, 0.3);
+            }
+
+            #switchCameraBtn:hover {
+                background: rgba(255, 255, 255, 0.25);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stream-container {
+                padding: 0.25rem;
+                gap: 0.25rem;
+            }
+
+            .stream-header {
+                padding: 0.75rem;
+            }
+
+            .pub-details h2 {
+                font-size: 1.2rem;
+            }
+
+            .pub-details p {
+                font-size: 0.8rem;
+            }
+
+            .control-btn {
+                padding: 0.4rem 0.6rem;
+                min-width: 60px;
+            }
+
+            .theme-btn {
+                padding: 0.3rem 0.5rem;
+                font-size: 0.65rem;
             }
         }
 
@@ -725,6 +806,10 @@
                     <i class="fas fa-video"></i>
                     <span>Camera</span>
                 </button>
+                <button class="control-btn" id="switchCameraBtn" onclick="switchCamera()" style="display: none;">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>Back Cam</span>
+                </button>
                 <button class="control-btn" id="startStreamBtn" onclick="startStream()">
                     <i class="fas fa-broadcast-tower"></i>
                     <span>Start Stream</span>
@@ -830,11 +915,36 @@
         let isMicOn = false;
         let isCameraOn = false;
         let currentTheme = 'default';
+        let currentFacingMode = 'user'; // 'user' for front camera, 'environment' for back camera
 
         // Initialize the pub stream
         document.addEventListener('DOMContentLoaded', function() {
+            // Load saved theme
+            const savedTheme = localStorage.getItem('pubTheme') || 'default';
+            setTheme(savedTheme, true);
+            
+            // Initialize stream
             initializePubStream();
-            initializeTheme();
+            
+            // Mobile device detection and setup
+            if (/Mobi|Android/i.test(navigator.userAgent)) {
+                console.log('Mobile device detected');
+                
+                // Add mobile-specific instructions
+                setTimeout(() => {
+                    addChatMessage('System', 'Mobile detected! Use the camera switch button to toggle between front/back cameras when your camera is on.', true);
+                }, 3000);
+                
+                // Add mobile tips button
+                setTimeout(() => {
+                    addMobileTipsButton();
+                }, 5000);
+                
+                // Ensure video element has proper mobile attributes
+                const hostVideo = document.getElementById('hostVideo');
+                hostVideo.setAttribute('playsinline', 'true');
+                hostVideo.setAttribute('webkit-playsinline', 'true');
+            }
         });
 
         function initializeTheme() {
@@ -912,21 +1022,85 @@
 
         async function initializePubStream() {
             try {
+                // Mobile-friendly camera constraints
+                const constraints = {
+                    video: {
+                        width: { ideal: 1280, max: 1920 },
+                        height: { ideal: 720, max: 1080 },
+                        frameRate: { ideal: 30, max: 60 },
+                        facingMode: 'user' // Front camera by default on mobile
+                    },
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    }
+                };
+
+                console.log('Requesting media devices with mobile-friendly constraints...');
+                
                 // Request camera and microphone permissions
-                localStream = await navigator.mediaDevices.getUserMedia({
-                    video: true,
-                    audio: true
-                });
+                localStream = await navigator.mediaDevices.getUserMedia(constraints);
                 
                 console.log('Media stream obtained successfully');
+                console.log('Video tracks:', localStream.getVideoTracks());
+                console.log('Audio tracks:', localStream.getAudioTracks());
                 
                 // Initially turn off camera and mic
-                localStream.getVideoTracks().forEach(track => track.enabled = false);
+                localStream.getVideoTracks().forEach(track => {
+                    track.enabled = false;
+                    console.log('Video track settings:', track.getSettings());
+                });
                 localStream.getAudioTracks().forEach(track => track.enabled = false);
                 
             } catch (error) {
                 console.error('Error accessing media devices:', error);
-                showError('Unable to access camera/microphone. Please check permissions.');
+                
+                // Try fallback constraints for older mobile devices
+                try {
+                    console.log('Trying fallback constraints...');
+                    const fallbackConstraints = {
+                        video: {
+                            facingMode: 'user',
+                            width: { min: 320, ideal: 640, max: 1280 },
+                            height: { min: 240, ideal: 480, max: 720 }
+                        },
+                        audio: true
+                    };
+                    
+                    localStream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
+                    console.log('Fallback media stream obtained successfully');
+                    
+                    // Initially turn off camera and mic
+                    localStream.getVideoTracks().forEach(track => track.enabled = false);
+                    localStream.getAudioTracks().forEach(track => track.enabled = false);
+                    
+                } catch (fallbackError) {
+                    console.error('Fallback also failed:', fallbackError);
+                    
+                    // Try basic constraints as last resort
+                    try {
+                        console.log('Trying basic constraints...');
+                        localStream = await navigator.mediaDevices.getUserMedia({
+                            video: true,
+                            audio: true
+                        });
+                        console.log('Basic media stream obtained successfully');
+                        
+                        // Initially turn off camera and mic
+                        localStream.getVideoTracks().forEach(track => track.enabled = false);
+                        localStream.getAudioTracks().forEach(track => track.enabled = false);
+                        
+                    } catch (basicError) {
+                        console.error('All attempts failed:', basicError);
+                        showError('Unable to access camera/microphone. Please check permissions and try refreshing the page.');
+                        
+                        // Show detailed error message for mobile users
+                        if (/Mobi|Android/i.test(navigator.userAgent)) {
+                            showError('Mobile tip: Make sure to allow camera access when prompted, and try using Chrome or Safari.');
+                        }
+                    }
+                }
             }
         }
 
@@ -948,6 +1122,61 @@
             }
         }
 
+        async function switchCamera() {
+            if (!localStream) {
+                showError('No camera stream available');
+                return;
+            }
+
+            try {
+                // Stop current video tracks
+                localStream.getVideoTracks().forEach(track => track.stop());
+                
+                // Switch facing mode
+                currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+                
+                console.log(`Switching to ${currentFacingMode} camera...`);
+                
+                // Get new video stream with switched camera
+                const newVideoStream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: currentFacingMode,
+                        width: { ideal: 1280, max: 1920 },
+                        height: { ideal: 720, max: 1080 },
+                        frameRate: { ideal: 30, max: 60 }
+                    }
+                });
+                
+                // Replace video track in existing stream
+                const newVideoTrack = newVideoStream.getVideoTracks()[0];
+                const audioTracks = localStream.getAudioTracks();
+                
+                // Create new stream with new video track and existing audio
+                localStream = new MediaStream([newVideoTrack, ...audioTracks]);
+                
+                // Update video element if camera is on
+                if (isCameraOn) {
+                    const hostVideo = document.getElementById('hostVideo');
+                    hostVideo.srcObject = localStream;
+                }
+                
+                // Update switch button text
+                const switchBtn = document.getElementById('switchCameraBtn');
+                if (switchBtn) {
+                    switchBtn.innerHTML = `<i class="fas fa-sync-alt"></i><span>${currentFacingMode === 'user' ? 'Back Cam' : 'Front Cam'}</span>`;
+                }
+                
+                console.log('Camera switched successfully');
+                
+            } catch (error) {
+                console.error('Error switching camera:', error);
+                showError('Unable to switch camera. This device may only have one camera.');
+                
+                // Revert facing mode if switch failed
+                currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+            }
+        }
+
         function toggleCamera() {
             const cameraBtn = document.getElementById('cameraBtn');
             const cameraIcon = cameraBtn.querySelector('i');
@@ -964,6 +1193,12 @@
                     hostVideo.srcObject = localStream;
                     hostVideo.style.display = 'block';
                     videoPlaceholder.style.display = 'none';
+                    
+                    // Show camera switch button on mobile
+                    const switchBtn = document.getElementById('switchCameraBtn');
+                    if (switchBtn && /Mobi|Android/i.test(navigator.userAgent)) {
+                        switchBtn.style.display = 'flex';
+                    }
                 } else {
                     cameraBtn.classList.remove('active');
                     cameraIcon.className = 'fas fa-video-slash';
@@ -974,7 +1209,15 @@
                         <h3>Camera Off</h3>
                         <p>Click "Camera" to start your video stream</p>
                     `;
+                    
+                    // Hide camera switch button when camera is off
+                    const switchBtn = document.getElementById('switchCameraBtn');
+                    if (switchBtn) {
+                        switchBtn.style.display = 'none';
+                    }
                 }
+            } else {
+                showError('Camera not available. Please refresh the page and allow camera access.');
             }
         }
 
@@ -1047,6 +1290,46 @@
 
         function showError(message) {
             addChatMessage('System', `Error: ${message}`, true);
+        }
+
+        function showMobileCameraTips() {
+            const tips = [
+                "📱 Mobile Camera Tips:",
+                "• Make sure to allow camera access when prompted",
+                "• Try refreshing the page if camera doesn't work",
+                "• Use Chrome or Safari for best compatibility",
+                "• Check if another app is using your camera",
+                "• Try switching between front/back cameras",
+                "• Ensure you have good lighting for better quality"
+            ];
+            
+            tips.forEach((tip, index) => {
+                setTimeout(() => {
+                    addChatMessage('System', tip, true);
+                }, index * 1000);
+            });
+        }
+
+        // Add mobile camera tips button for troubleshooting
+        function addMobileTipsButton() {
+            if (/Mobi|Android/i.test(navigator.userAgent)) {
+                const chatMessages = document.getElementById('chatMessages');
+                const tipsButton = document.createElement('div');
+                tipsButton.className = 'chat-message';
+                tipsButton.style.cursor = 'pointer';
+                tipsButton.style.background = 'rgba(66, 153, 225, 0.2)';
+                tipsButton.style.border = '1px solid #4299e1';
+                tipsButton.onclick = showMobileCameraTips;
+                
+                tipsButton.innerHTML = `
+                    <div class="message-author" style="color: #4299e1;">System</div>
+                    <div class="message-text">📱 Having camera issues? Click here for mobile tips!</div>
+                    <div class="message-time">Help</div>
+                `;
+                
+                chatMessages.appendChild(tipsButton);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
         }
 
         // Handle Enter key in chat input
