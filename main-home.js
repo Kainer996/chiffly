@@ -5,7 +5,99 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeAnimations();
     initializeNavigation();
     initializeAuth();
+    restoreUserSession(); // Add automatic session restoration
 });
+
+// Session Restoration Function
+function restoreUserSession() {
+    const isSignedIn = localStorage.getItem('chiffly_signed_in') === 'true';
+    const username = localStorage.getItem('chiffly_username');
+    const userType = localStorage.getItem('chiffly_user_type');
+    const sessionExpiry = localStorage.getItem('chiffly_session_expiry');
+    
+    // Check if session has expired (24 hours)
+    if (sessionExpiry && new Date().getTime() > parseInt(sessionExpiry)) {
+        // Session expired, clear data
+        localStorage.removeItem('chiffly_signed_in');
+        localStorage.removeItem('chiffly_username');
+        localStorage.removeItem('chiffly_user_type');
+        localStorage.removeItem('chiffly_session_expiry');
+        showNotification('Your session has expired. Please sign in again.', 'warning');
+        return;
+    }
+    
+    if (isSignedIn && username) {
+        console.log(`🔄 Restoring session for ${username} (${userType || 'registered'})`);
+        
+        // Update UI to reflect signed-in state
+        const signInBtn = document.getElementById('signInBtn');
+        const userName = document.getElementById('userName');
+        
+        if (signInBtn && userName) {
+            updateAuthUIForRestoredSession(username, userType);
+        }
+        
+        // Show welcome back message
+        if (userType === 'guest') {
+            showNotification(`Welcome back, ${username}! (Guest session)`, 'info');
+        } else {
+            showNotification(`Welcome back, ${username}!`, 'success');
+        }
+        
+        // Update room access
+        updateRoomAccessIndicators();
+    }
+}
+
+// Enhanced User Session Creation
+function createUserSession(username, userType = 'registered', rememberDuration = 24) {
+    localStorage.setItem('chiffly_signed_in', 'true');
+    localStorage.setItem('chiffly_username', username);
+    localStorage.setItem('chiffly_user_type', userType);
+    
+    // Set session expiry (default 24 hours, can be customized)
+    const expiryTime = new Date().getTime() + (rememberDuration * 60 * 60 * 1000);
+    localStorage.setItem('chiffly_session_expiry', expiryTime.toString());
+    
+    // Save session info for analytics
+    const sessionData = {
+        username: username,
+        userType: userType,
+        loginTime: new Date().toISOString(),
+        expiryTime: new Date(expiryTime).toISOString()
+    };
+    
+    localStorage.setItem('chiffly_current_session', JSON.stringify(sessionData));
+}
+
+// Enhanced Auth UI Update for Restored Sessions
+function updateAuthUIForRestoredSession(username, userType) {
+    const signInBtn = document.getElementById('signInBtn');
+    const userName = document.getElementById('userName');
+    const isGuest = userType === 'guest';
+    
+    if (signInBtn) {
+        signInBtn.innerHTML = `
+            <div class="user-avatar-small">
+                <i class="fas fa-${isGuest ? 'walking' : 'user-circle'}"></i>
+            </div>
+            <span>${username}</span>
+            <i class="fas fa-chevron-down"></i>
+        `;
+        signInBtn.classList.add('signed-in');
+    }
+    
+    if (userName) {
+        userName.textContent = username;
+    }
+    
+    // Update user status in the menu
+    const userStatus = document.querySelector('.user-status');
+    if (userStatus) {
+        userStatus.textContent = isGuest ? 'Guest Visitor' : 'Registered User';
+        userStatus.style.color = isGuest ? '#ed8936' : '#68d391';
+    }
+}
 
 // Room Cards Functionality
 function initializeRoomCards() {
@@ -305,11 +397,18 @@ function initializeAuth() {
             return { success: false, message: 'Email already registered!' };
         }
         
-        // Register the user
+        // Enhanced user registration with more data
         registeredUsers[username] = {
             email: email,
             password: password, // In a real app, this would be hashed
-            registeredAt: new Date().toISOString()
+            registeredAt: new Date().toISOString(),
+            lastLogin: new Date().toISOString(),
+            loginCount: 0,
+            preferences: {
+                rememberMe: true,
+                theme: 'default',
+                notifications: true
+            }
         };
         
         localStorage.setItem('chiffly_registered_users', JSON.stringify(registeredUsers));
@@ -321,6 +420,11 @@ function initializeAuth() {
         
         // Check if user exists and password matches
         if (registeredUsers[username] && registeredUsers[username].password === password) {
+            // Update last login and login count
+            registeredUsers[username].lastLogin = new Date().toISOString();
+            registeredUsers[username].loginCount = (registeredUsers[username].loginCount || 0) + 1;
+            localStorage.setItem('chiffly_registered_users', JSON.stringify(registeredUsers));
+            
             return { success: true, message: 'Welcome back!' };
         } else if (registeredUsers[username]) {
             return { success: false, message: 'Incorrect password!' };
@@ -363,6 +467,13 @@ function initializeAuth() {
                         <div class="form-group">
                             <label for="signInPassword">Password</label>
                             <input type="password" id="signInPassword" name="password" placeholder="Enter your password" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="rememberMe" name="rememberMe" checked>
+                                <span class="checkmark"></span>
+                                Remember me (keeps you signed in for 7 days)
+                            </label>
                         </div>
                         <button type="submit" class="auth-submit-btn">
                             <i class="fas fa-door-open"></i>
@@ -436,12 +547,13 @@ function initializeAuth() {
             e.preventDefault();
             const username = document.getElementById('signInUsername').value;
             const password = document.getElementById('signInPassword').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
             
             // Validate against registered users
             const validation = validateSignIn(username, password);
             
             if (validation.success) {
-                signIn(username);
+                signInWithRemember(username, false, rememberMe);
                 modal.remove();
             } else {
                 showNotification(validation.message, 'error');
@@ -489,19 +601,29 @@ function initializeAuth() {
     }
     
     function signIn(username, isGuest = false) {
+        signInWithRemember(username, isGuest, true);
+    }
+    
+    function signInWithRemember(username, isGuest = false, rememberMe = true) {
         isSignedIn = true;
         currentUser = username;
-        localStorage.setItem('chiffly_signed_in', 'true');
-        localStorage.setItem('chiffly_username', username);
-        localStorage.setItem('chiffly_user_type', isGuest ? 'guest' : 'registered');
+        
+        // Set session duration based on remember me preference
+        const sessionDuration = rememberMe ? (isGuest ? 24 : 168) : 24; // 7 days for registered users, 1 day for guests
+        
+        // Use enhanced session creation
+        createUserSession(username, isGuest ? 'guest' : 'registered', sessionDuration);
+        
         updateAuthUI(true, username);
         updateRoomAccessIndicators();
         
-        // Show welcome message
+        // Show welcome message with session info
+        const sessionInfo = rememberMe && !isGuest ? ' (staying signed in for 7 days)' : '';
+        
         if (isGuest) {
             showNotification(`Welcome, ${username}! You're visiting as a guest.`, 'info');
         } else {
-            showNotification(`Welcome inside, ${username}!`, 'success');
+            showNotification(`Welcome inside, ${username}!${sessionInfo}`, 'success');
         }
     }
     
@@ -509,9 +631,14 @@ function initializeAuth() {
         const userType = localStorage.getItem('chiffly_user_type');
         isSignedIn = false;
         currentUser = 'Guest User';
+        
+        // Clear all session data
         localStorage.removeItem('chiffly_signed_in');
         localStorage.removeItem('chiffly_username');
         localStorage.removeItem('chiffly_user_type');
+        localStorage.removeItem('chiffly_session_expiry');
+        localStorage.removeItem('chiffly_current_session');
+        
         updateAuthUI(false, '');
         updateRoomAccessIndicators();
         userMenu.style.display = 'none';
@@ -571,13 +698,55 @@ function initializeAuth() {
         localStorage.removeItem('chiffly_signed_in');
         localStorage.removeItem('chiffly_username');
         localStorage.removeItem('chiffly_user_type');
+        localStorage.removeItem('chiffly_session_expiry');
+        localStorage.removeItem('chiffly_current_session');
         showNotification('All user data cleared!', 'warning');
         location.reload();
+    };
+    
+    // Enhanced user management functions
+    window.showUserInfo = function(username) {
+        const users = getRegisteredUsers();
+        const currentSession = JSON.parse(localStorage.getItem('chiffly_current_session') || '{}');
+        
+        if (!username && currentSession.username) {
+            username = currentSession.username;
+        }
+        
+        if (username && users[username]) {
+            const user = users[username];
+            console.log(`📊 User Info for ${username}:`, {
+                email: user.email,
+                registeredAt: user.registeredAt,
+                lastLogin: user.lastLogin,
+                loginCount: user.loginCount,
+                preferences: user.preferences,
+                currentSession: currentSession
+            });
+            
+            const lastLogin = new Date(user.lastLogin).toLocaleDateString();
+            showNotification(`${username} - Last login: ${lastLogin}, Total logins: ${user.loginCount || 0}`, 'info');
+        } else {
+            showNotification('User not found or not signed in', 'error');
+        }
+    };
+    
+    window.extendSession = function(hours = 24) {
+        const sessionExpiry = localStorage.getItem('chiffly_session_expiry');
+        if (sessionExpiry) {
+            const newExpiry = new Date().getTime() + (hours * 60 * 60 * 1000);
+            localStorage.setItem('chiffly_session_expiry', newExpiry.toString());
+            showNotification(`Session extended by ${hours} hours`, 'success');
+        } else {
+            showNotification('No active session to extend', 'error');
+        }
     };
     
     // Console helper message
     console.log('🚪 Chiffly Authentication System');
     console.log('📝 To see registered users: showRegisteredUsers()');
+    console.log('👤 To see user info: showUserInfo() or showUserInfo("username")');
+    console.log('⏰ To extend session: extendSession(hours)');
     console.log('🗑️ To clear all data: clearAllUserData()');
 }
 
