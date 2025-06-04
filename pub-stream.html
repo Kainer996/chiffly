@@ -920,6 +920,8 @@
         let currentRoom = null;
         let currentUser = null;
         let isHost = false;
+        let peerConnections = new Map();
+        let remoteStreams = new Map();
 
         // Initialize the pub stream
         document.addEventListener('DOMContentLoaded', function() {
@@ -1033,24 +1035,66 @@
                     displayChatMessage(message);
                 });
 
+                // Setup WebRTC connections for existing participants/streamer
+                if (isHost && participants.length > 0) {
+                    // Host: create connections to all participants
+                    participants.forEach(participant => {
+                        if (participant.id !== socket.id) {
+                            createPeerConnection(participant.id);
+                        }
+                    });
+                } else if (!isHost && streamer) {
+                    // Participant: create connection to host
+                    if (streamer.id !== socket.id) {
+                        createPeerConnection(streamer.id);
+                    }
+                }
+
                 // Show welcome message
                 showWelcomeMessage();
             });
 
             socket.on('user-joined', (data) => {
-                const { username, isStreamer } = data;
+                const { userId, username, isStreamer } = data;
                 addChatMessage('System', `${username} ${isStreamer ? 'started hosting' : 'joined'} the table!`, true);
                 updateParticipantCount();
+
+                // Create WebRTC connection for new user
+                if (userId !== socket.id) {
+                    createPeerConnection(userId);
+                }
             });
 
             socket.on('user-left', (data) => {
-                const { username } = data;
+                const { userId, username } = data;
                 addChatMessage('System', `${username} left the table.`, true);
                 updateParticipantCount();
+
+                // Clean up WebRTC connection
+                if (peerConnections.has(userId)) {
+                    peerConnections.get(userId).close();
+                    peerConnections.delete(userId);
+                }
+                if (remoteStreams.has(userId)) {
+                    remoteStreams.delete(userId);
+                }
             });
 
             socket.on('chat-message', (message) => {
                 displayChatMessage(message);
+            });
+
+            // WebRTC signaling
+            socket.on('offer', (data) => {
+                handleOffer(data);
+            });
+
+            socket.on('answer', (data) => {
+                handleAnswer(data);
+            });
+
+            socket.on('ice-candidate', (data) => {
+                handleIceCandidate(data);
             });
         }
 
@@ -1235,6 +1279,9 @@
                 isMicOn = !isMicOn;
                 localStream.getAudioTracks().forEach(track => track.enabled = isMicOn);
                 
+                // Update peer connections when mic state changes
+                updatePeerConnections();
+                
                 if (isMicOn) {
                     micBtn.classList.add('active');
                     micIcon.className = 'fas fa-microphone';
@@ -1243,6 +1290,28 @@
                     micIcon.className = 'fas fa-microphone-slash';
                 }
             }
+        }
+
+        function updatePeerConnections() {
+            // Update all existing peer connections with current stream
+            peerConnections.forEach((peerConnection, userId) => {
+                // Remove existing tracks
+                const senders = peerConnection.getSenders();
+                senders.forEach(sender => {
+                    if (sender.track) {
+                        peerConnection.removeTrack(sender);
+                    }
+                });
+
+                // Add current tracks based on camera/mic state
+                if (localStream) {
+                    localStream.getTracks().forEach(track => {
+                        if ((track.kind === 'video' && isCameraOn) || (track.kind === 'audio' && isMicOn)) {
+                            peerConnection.addTrack(track, localStream);
+                        }
+                    });
+                }
+            });
         }
 
         async function switchCamera() {
@@ -1310,12 +1379,19 @@
                 isCameraOn = !isCameraOn;
                 localStream.getVideoTracks().forEach(track => track.enabled = isCameraOn);
                 
+                // Update peer connections when camera state changes
+                updatePeerConnections();
+                
                 if (isCameraOn) {
                     cameraBtn.classList.add('active');
                     cameraIcon.className = 'fas fa-video';
-                    hostVideo.srcObject = localStream;
-                    hostVideo.style.display = 'block';
-                    videoPlaceholder.style.display = 'none';
+                    
+                    // Only show local video if user is host
+                    if (isHost) {
+                        hostVideo.srcObject = localStream;
+                        hostVideo.style.display = 'block';
+                        videoPlaceholder.style.display = 'none';
+                    }
                     
                     // Show camera switch button on mobile
                     const switchBtn = document.getElementById('switchCameraBtn');
@@ -1325,13 +1401,17 @@
                 } else {
                     cameraBtn.classList.remove('active');
                     cameraIcon.className = 'fas fa-video-slash';
-                    hostVideo.style.display = 'none';
-                    videoPlaceholder.style.display = 'flex';
-                    videoPlaceholder.innerHTML = `
-                        <i class="fas fa-video-slash"></i>
-                        <h3>Camera Off</h3>
-                        <p>Click "Camera" to start your video stream</p>
-                    `;
+                    
+                    // Only hide local video if user is host
+                    if (isHost) {
+                        hostVideo.style.display = 'none';
+                        videoPlaceholder.style.display = 'flex';
+                        videoPlaceholder.innerHTML = `
+                            <i class="fas fa-video-slash"></i>
+                            <h3>Camera Off</h3>
+                            <p>Click "Camera" to start your video stream</p>
+                        `;
+                    }
                     
                     // Hide camera switch button when camera is off
                     const switchBtn = document.getElementById('switchCameraBtn');
@@ -1411,6 +1491,13 @@
 
         function leavePub() {
             if (confirm('Are you sure you want to leave the pub?')) {
+                // Clean up WebRTC connections
+                peerConnections.forEach((peerConnection, userId) => {
+                    peerConnection.close();
+                });
+                peerConnections.clear();
+                remoteStreams.clear();
+                
                 // Clean up streams
                 if (localStream) {
                     localStream.getTracks().forEach(track => track.stop());
@@ -1493,6 +1580,153 @@
                         addChatMessage('System', '💡 Tip: Turn on your camera and mic to join the conversation!', true);
                     }, 2000);
                 }, 1000);
+            }
+        }
+
+        // WebRTC functions
+        function createPeerConnection(userId) {
+            console.log('Creating peer connection to:', userId);
+            
+            const peerConnection = new RTCPeerConnection({
+                iceServers: [
+                    { urls: 'stun:stun.l.google.com:19302' },
+                    { urls: 'stun:stun1.l.google.com:19302' }
+                ]
+            });
+
+            peerConnections.set(userId, peerConnection);
+
+            // Add local stream to peer connection if available
+            if (localStream && (isCameraOn || isMicOn)) {
+                localStream.getTracks().forEach(track => {
+                    if ((track.kind === 'video' && isCameraOn) || (track.kind === 'audio' && isMicOn)) {
+                        peerConnection.addTrack(track, localStream);
+                    }
+                });
+            }
+
+            // Handle remote stream
+            peerConnection.ontrack = (event) => {
+                console.log('Received remote stream from:', userId);
+                const [remoteStream] = event.streams;
+                remoteStreams.set(userId, remoteStream);
+                displayRemoteVideo(userId, remoteStream);
+            };
+
+            // Handle ICE candidates
+            peerConnection.onicecandidate = (event) => {
+                if (event.candidate) {
+                    socket.emit('ice-candidate', {
+                        target: userId,
+                        candidate: event.candidate
+                    });
+                }
+            };
+
+            // Create offer if this user should initiate (host or if socket ID is smaller)
+            if (isHost || socket.id < userId) {
+                createOffer(userId, peerConnection);
+            }
+
+            return peerConnection;
+        }
+
+        async function createOffer(userId, peerConnection) {
+            try {
+                console.log('Creating offer for:', userId);
+                const offer = await peerConnection.createOffer();
+                await peerConnection.setLocalDescription(offer);
+                
+                socket.emit('offer', {
+                    target: userId,
+                    offer: offer
+                });
+            } catch (error) {
+                console.error('Error creating offer:', error);
+            }
+        }
+
+        async function handleOffer(data) {
+            const { offer, sender } = data;
+            console.log('Received offer from:', sender);
+            
+            const peerConnection = peerConnections.get(sender) || createPeerConnection(sender);
+
+            try {
+                await peerConnection.setRemoteDescription(offer);
+                const answer = await peerConnection.createAnswer();
+                await peerConnection.setLocalDescription(answer);
+
+                socket.emit('answer', {
+                    target: sender,
+                    answer: answer
+                });
+            } catch (error) {
+                console.error('Error handling offer:', error);
+            }
+        }
+
+        async function handleAnswer(data) {
+            const { answer, sender } = data;
+            console.log('Received answer from:', sender);
+            
+            const peerConnection = peerConnections.get(sender);
+
+            if (peerConnection) {
+                try {
+                    await peerConnection.setRemoteDescription(answer);
+                } catch (error) {
+                    console.error('Error handling answer:', error);
+                }
+            }
+        }
+
+        async function handleIceCandidate(data) {
+            const { candidate, sender } = data;
+            const peerConnection = peerConnections.get(sender);
+
+            if (peerConnection) {
+                try {
+                    await peerConnection.addIceCandidate(candidate);
+                } catch (error) {
+                    console.error('Error adding ICE candidate:', error);
+                }
+            }
+        }
+
+        function displayRemoteVideo(userId, stream) {
+            console.log('Displaying remote video from:', userId);
+            
+            if (isHost) {
+                // Host: show participant videos in smaller windows
+                addParticipantVideo(userId, stream);
+            } else {
+                // Participant: show host video in main window
+                const hostVideo = document.getElementById('hostVideo');
+                const videoPlaceholder = document.getElementById('videoPlaceholder');
+                
+                hostVideo.srcObject = stream;
+                hostVideo.style.display = 'block';
+                videoPlaceholder.style.display = 'none';
+                
+                console.log('Remote video displayed in main window');
+            }
+        }
+
+        function addParticipantVideo(userId, stream) {
+            // Find an empty participant slot
+            for (let i = 1; i <= 6; i++) {
+                const slot = document.getElementById(`participant${i}`);
+                if (slot && slot.querySelector('.participant-placeholder')) {
+                    slot.innerHTML = `
+                        <video autoplay muted playsinline class="participant-video"></video>
+                        <div class="participant-name">Patron ${i}</div>
+                    `;
+                    const video = slot.querySelector('video');
+                    video.srcObject = stream;
+                    video.setAttribute('data-user-id', userId);
+                    break;
+                }
             }
         }
     </script>
