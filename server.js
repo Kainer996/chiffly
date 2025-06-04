@@ -15,7 +15,7 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 // CORS configuration for production
 const corsOptions = {
   origin: NODE_ENV === 'production' 
-    ? [process.env.DOMAIN_URL, `https://${process.env.DOMAIN_URL}`] 
+    ? ['https://chifftown.com', 'https://www.chifftown.com', process.env.DOMAIN_URL, `https://${process.env.DOMAIN_URL}`].filter(Boolean)
     : ["http://localhost:3000", "http://127.0.0.1:3000"],
   methods: ["GET", "POST"],
   credentials: true
@@ -80,9 +80,28 @@ app.get('/lounge', (req, res) => {
   res.sendFile(path.join(__dirname, 'lounge.html'));
 });
 
+// Debug endpoint
+app.get('/api/debug', (req, res) => {
+  res.json({
+    totalRooms: rooms.size,
+    totalUsers: users.size,
+    pubRooms: Array.from(rooms.values()).filter(room => room.type === 'pub').length,
+    rooms: Array.from(rooms.values()).map(room => ({
+      id: room.id,
+      name: room.name,
+      type: room.type,
+      participants: room.participants.size,
+      hasStreamer: !!room.streamer
+    })),
+    nodeEnv: NODE_ENV,
+    corsOrigins: corsOptions.origin
+  });
+});
+
 // Socket.IO connection handling
 io.on('connection', (socket) => {
-  console.log('User connected:', socket.id);
+  console.log('✅ User connected:', socket.id);
+  console.log('Total connected users:', io.sockets.sockets.size);
 
   // Handle platform stats request
   socket.on('get-platform-stats', () => {
@@ -119,7 +138,8 @@ io.on('connection', (socket) => {
       participantCount: room.participants.size + (room.streamer ? 1 : 0),
       maxParticipants: room.maxParticipants || 10,
       hasStreamer: !!room.streamer,
-      isPrivate: room.isPrivate || false
+      isPrivate: room.isPrivate || false,
+      type: room.type || 'questing'
     }));
 
     const usersData = Array.from(users.values()).map(user => ({
@@ -145,6 +165,8 @@ io.on('connection', (socket) => {
   // Handle room creation
   socket.on('create-room', (data) => {
     const roomId = uuidv4();
+    console.log('🏠 Creating room:', roomId, 'Type:', data.type, 'Name:', data.name);
+    
     const newRoom = {
       id: roomId,
       name: data.name,
@@ -159,6 +181,7 @@ io.on('connection', (socket) => {
     };
 
     rooms.set(roomId, newRoom);
+    console.log('📊 Total rooms now:', rooms.size);
     
     socket.emit('room-created', {
       id: roomId,
@@ -182,16 +205,17 @@ io.on('connection', (socket) => {
 
   // Handle user joining a room
   socket.on('join-room', (data) => {
-    const { roomId, username, isStreamer } = data;
+    const { roomId, username, isStreamer, roomType } = data;
     
     // Create room if it doesn't exist
     if (!rooms.has(roomId)) {
       rooms.set(roomId, {
         id: roomId,
-        name: `Adventure ${roomId.slice(0, 6)}`,
-        description: 'A spontaneous quest begins!',
+        name: roomType === 'pub' ? `Table ${roomId.slice(0, 6)}` : `Adventure ${roomId.slice(0, 6)}`,
+        description: roomType === 'pub' ? 'A cozy conversation spot!' : 'A spontaneous quest begins!',
         maxParticipants: 10,
         isPrivate: false,
+        type: roomType || 'questing',
         streamer: null,
         participants: new Map(),
         messages: [],
@@ -231,6 +255,19 @@ io.on('connection', (socket) => {
       participants: Array.from(room.participants.values()),
       messages: room.messages.slice(-50) // Last 50 messages
     });
+
+    // Broadcast room update when streamer joins
+    if (isStreamer) {
+      io.emit('room-updated', {
+        id: roomId,
+        name: room.name,
+        description: room.description,
+        maxParticipants: room.maxParticipants,
+        hasStreamer: true,
+        participantCount: room.participants.size + 1,
+        type: room.type
+      });
+    }
 
     console.log(`${username} joined room ${roomId} as ${isStreamer ? 'streamer' : 'participant'}`);
   });

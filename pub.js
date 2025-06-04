@@ -55,8 +55,18 @@ socket.on('room-created', (roomData) => {
     hideCreateRoomModal();
     requestRoomList();
     
-    // Show success message
-    showNotification('Table reserved successfully!', 'success');
+    // Show success message and navigate to streaming page
+    showNotification('Table reserved successfully! Redirecting to your pub...', 'success');
+    
+    // Redirect to pub streaming page after a short delay
+    setTimeout(() => {
+        const params = new URLSearchParams({
+            room: roomData.id,
+            username: 'Host', // Default host name
+            host: '1'
+        });
+        window.location.href = `pub-stream.html?${params.toString()}`;
+    }, 1500);
 });
 
 socket.on('room-updated', (roomData) => {

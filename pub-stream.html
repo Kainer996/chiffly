@@ -916,12 +916,19 @@
         let isCameraOn = false;
         let currentTheme = 'default';
         let currentFacingMode = 'user'; // 'user' for front camera, 'environment' for back camera
+        let socket = null;
+        let currentRoom = null;
+        let currentUser = null;
+        let isHost = false;
 
         // Initialize the pub stream
         document.addEventListener('DOMContentLoaded', function() {
             // Load saved theme
             const savedTheme = localStorage.getItem('pubTheme') || 'default';
             setTheme(savedTheme, true);
+            
+            // Initialize socket connection and room joining
+            initializeSocketConnection();
             
             // Initialize stream
             initializePubStream();
@@ -951,6 +958,122 @@
             // Set default theme or load saved theme
             const savedTheme = localStorage.getItem('pubTheme') || 'default';
             setTheme(savedTheme, true); // true = silent initialization
+        }
+
+        function initializeSocketConnection() {
+            // Get URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const roomId = urlParams.get('room');
+            const username = urlParams.get('username');
+            isHost = urlParams.get('host') === '1';
+
+            if (!roomId || !username) {
+                showError('Missing room or username parameters. Redirecting...');
+                setTimeout(() => {
+                    window.location.href = 'pub.html';
+                }, 3000);
+                return;
+            }
+
+            currentRoom = roomId;
+            currentUser = username;
+
+            // Initialize socket connection  
+            const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const socketUrl = isLocalhost ? 'http://localhost:3000' : window.location.origin;
+            
+            console.log('Connecting to socket at:', socketUrl);
+            socket = io(socketUrl, {
+                transports: ['websocket', 'polling'],
+                timeout: 5000,
+                forceNew: true
+            });
+
+            socket.on('connect', () => {
+                console.log('✅ Connected to pub server successfully!');
+                console.log('Socket ID:', socket.id);
+                addChatMessage('System', 'Connected to pub server!', true);
+                
+                // Join the room
+                console.log('Joining room:', currentRoom, 'as', currentUser, isHost ? '(host)' : '(guest)');
+                socket.emit('join-room', {
+                    roomId: currentRoom,
+                    username: currentUser,
+                    isStreamer: isHost,
+                    roomType: 'pub'
+                });
+            });
+
+            socket.on('disconnect', () => {
+                console.log('❌ Disconnected from pub server');
+                addChatMessage('System', 'Disconnected from server. Trying to reconnect...', true);
+            });
+
+            socket.on('connect_error', (error) => {
+                console.error('❌ Socket connection error:', error);
+                console.error('Error type:', error.type);
+                console.error('Error description:', error.description);
+                addChatMessage('System', `Connection error: ${error.message}`, true);
+            });
+
+            socket.on('error', (error) => {
+                console.error('❌ Socket error:', error);
+                addChatMessage('System', `Socket error: ${error.message}`, true);
+            });
+
+            socket.on('room-state', (data) => {
+                const { streamer, participants, messages } = data;
+                
+                // Update participant count
+                const totalParticipants = participants.length + (streamer ? 1 : 0);
+                document.getElementById('participantCount').textContent = `${totalParticipants} patron${totalParticipants !== 1 ? 's' : ''}`;
+                
+                // Display existing messages
+                messages.forEach(message => {
+                    displayChatMessage(message);
+                });
+
+                // Show welcome message
+                showWelcomeMessage();
+            });
+
+            socket.on('user-joined', (data) => {
+                const { username, isStreamer } = data;
+                addChatMessage('System', `${username} ${isStreamer ? 'started hosting' : 'joined'} the table!`, true);
+                updateParticipantCount();
+            });
+
+            socket.on('user-left', (data) => {
+                const { username } = data;
+                addChatMessage('System', `${username} left the table.`, true);
+                updateParticipantCount();
+            });
+
+            socket.on('chat-message', (message) => {
+                displayChatMessage(message);
+            });
+        }
+
+        function updateParticipantCount() {
+            // This would be updated by the server in a real implementation
+            // For now, we'll just increment/decrement as needed
+        }
+
+        function displayChatMessage(message) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'chat-message';
+            
+            const time = new Date(message.timestamp || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            messageDiv.innerHTML = `
+                <div class="message-author" style="${message.isStreamer ? 'color: #f39c12;' : ''}">${message.username}</div>
+                <div class="message-text">${message.text}</div>
+                <div class="message-time">${time}</div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
         function setTheme(theme, silent = false) {
@@ -1231,8 +1354,12 @@
                 startBtn.classList.add('danger');
                 liveIndicator.classList.add('active');
                 
-                // Add system message
-                addChatMessage('System', 'Pub stream is now live!', true);
+                // Notify server that streaming is active
+                if (socket) {
+                    socket.emit('chat-message', {
+                        text: '📺 Started the pub stream! 🍻'
+                    });
+                }
                 
                 console.log('Stream started');
             } else {
@@ -1241,8 +1368,12 @@
                 startBtn.classList.remove('danger');
                 liveIndicator.classList.remove('active');
                 
-                // Add system message
-                addChatMessage('System', 'Pub stream has ended.', true);
+                // Notify server that streaming stopped
+                if (socket) {
+                    socket.emit('chat-message', {
+                        text: '📺 Ended the pub stream. Thanks for watching! 🍻'
+                    });
+                }
                 
                 console.log('Stream stopped');
             }
@@ -1252,8 +1383,10 @@
             const chatInput = document.getElementById('chatInput');
             const message = chatInput.value.trim();
             
-            if (message) {
-                addChatMessage('You', message);
+            if (message && socket && currentRoom) {
+                socket.emit('chat-message', {
+                    text: message
+                });
                 chatInput.value = '';
             }
         }
@@ -1281,6 +1414,11 @@
                 // Clean up streams
                 if (localStream) {
                     localStream.getTracks().forEach(track => track.stop());
+                }
+                
+                // Disconnect from socket
+                if (socket) {
+                    socket.disconnect();
                 }
                 
                 // Redirect back to pub list
@@ -1339,10 +1477,24 @@
             }
         });
 
-        // Simulate some activity for demo
-        setTimeout(() => {
-            addChatMessage('System', 'Welcome to your pub! Others can join by clicking on your pub from the main page.', true);
-        }, 2000);
+        // Welcome message after socket connection
+        function showWelcomeMessage() {
+            if (isHost) {
+                setTimeout(() => {
+                    addChatMessage('System', '🍻 Welcome to your pub! Others can join by visiting the pub page and clicking on your pub table.', true);
+                    setTimeout(() => {
+                        addChatMessage('System', '💡 Tip: Turn on your camera and start the stream to let people know you\'re here!', true);
+                    }, 2000);
+                }, 1000);
+            } else {
+                setTimeout(() => {
+                    addChatMessage('System', `🍻 Welcome ${currentUser}! You've joined the pub table.`, true);
+                    setTimeout(() => {
+                        addChatMessage('System', '💡 Tip: Turn on your camera and mic to join the conversation!', true);
+                    }, 2000);
+                }, 1000);
+            }
+        }
     </script>
 </body>
 </html> 
