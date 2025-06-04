@@ -380,6 +380,53 @@
             font-weight: 500;
         }
 
+        .leave-slot-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .leave-slot-btn:hover {
+            background: rgba(220, 53, 69, 1);
+            transform: scale(1.1);
+        }
+
+        .participant-slot:not(.participant-slot:has(.participant-placeholder)):hover .participant-name {
+            opacity: 0.7;
+        }
+
+        /* Enhanced hover effects for clickable slots */
+        .participant-slot .participant-placeholder {
+            transition: all 0.3s ease;
+        }
+
+        .participant-slot:hover .participant-placeholder {
+            background: linear-gradient(135deg, #3d4852, #2d3748);
+            transform: scale(1.02);
+        }
+
+        .clickable-slot .participant-placeholder {
+            border: 2px dashed rgba(237, 137, 54, 0.3);
+        }
+
+        .clickable-slot:hover .participant-placeholder {
+            border-color: rgba(237, 137, 54, 0.6);
+            background: linear-gradient(135deg, rgba(237, 137, 54, 0.1), rgba(221, 107, 32, 0.1));
+        }
+
         .back-btn {
             position: fixed;
             top: 1rem;
@@ -1052,6 +1099,9 @@
 
                 // Show welcome message
                 showWelcomeMessage();
+                
+                // Setup participant slot click handlers for guests
+                setupParticipantSlotHandlers();
             });
 
             socket.on('user-joined', (data) => {
@@ -1564,6 +1614,9 @@
             }
         });
 
+        // Make functions globally available for onclick handlers
+        window.leaveSlot = leaveSlot;
+
         // Welcome message after socket connection
         function showWelcomeMessage() {
             if (isHost) {
@@ -1713,20 +1766,149 @@
             }
         }
 
-        function addParticipantVideo(userId, stream) {
-            // Find an empty participant slot
-            for (let i = 1; i <= 6; i++) {
-                const slot = document.getElementById(`participant${i}`);
-                if (slot && slot.querySelector('.participant-placeholder')) {
-                    slot.innerHTML = `
-                        <video autoplay muted playsinline class="participant-video"></video>
-                        <div class="participant-name">Patron ${i}</div>
-                    `;
-                    const video = slot.querySelector('video');
-                    video.srcObject = stream;
-                    video.setAttribute('data-user-id', userId);
-                    break;
+        function addParticipantVideo(userId, stream, targetSlotNumber = null) {
+            let targetSlot = null;
+            
+            if (targetSlotNumber) {
+                // Use specific slot if requested
+                targetSlot = document.getElementById(`participant${targetSlotNumber}`);
+            } else {
+                // Find first empty slot
+                for (let i = 1; i <= 6; i++) {
+                    const slot = document.getElementById(`participant${i}`);
+                    if (slot && slot.querySelector('.participant-placeholder')) {
+                        targetSlot = slot;
+                        break;
+                    }
                 }
+            }
+            
+            if (targetSlot) {
+                const slotNumber = targetSlot.id.replace('participant', '');
+                targetSlot.innerHTML = `
+                    <video autoplay muted playsinline class="participant-video"></video>
+                    <div class="participant-name">Patron ${slotNumber}</div>
+                `;
+                const video = targetSlot.querySelector('video');
+                video.srcObject = stream;
+                video.setAttribute('data-user-id', userId);
+                
+                // Store which slot this user is in
+                targetSlot.setAttribute('data-occupied-by', userId);
+            }
+        }
+
+        function setupParticipantSlotHandlers() {
+            // Add click handlers to participant slots for guests
+            if (!isHost) {
+                for (let i = 1; i <= 6; i++) {
+                    const slot = document.getElementById(`participant${i}`);
+                    if (slot) {
+                        slot.addEventListener('click', () => handleSlotClick(i));
+                        slot.style.cursor = 'pointer';
+                        slot.classList.add('clickable-slot');
+                        
+                        // Add hover effect for empty slots
+                        slot.addEventListener('mouseenter', () => {
+                            if (slot.querySelector('.participant-placeholder')) {
+                                slot.querySelector('.participant-placeholder').innerHTML = `
+                                    <i class="fas fa-video"></i>
+                                    <span>Click to join with camera</span>
+                                `;
+                            }
+                        });
+                        
+                        slot.addEventListener('mouseleave', () => {
+                            if (slot.querySelector('.participant-placeholder')) {
+                                slot.querySelector('.participant-placeholder').innerHTML = `
+                                    <i class="fas fa-user-plus"></i>
+                                    <span>Empty Slot</span>
+                                `;
+                            }
+                        });
+                    }
+                }
+                
+                // Add instruction message for participants
+                setTimeout(() => {
+                    addChatMessage('System', '💡 Tip: Click on any empty slot to join with your camera!', true);
+                }, 3000);
+            }
+        }
+
+        async function handleSlotClick(slotNumber) {
+            const slot = document.getElementById(`participant${slotNumber}`);
+            
+            // Check if slot is empty and user isn't already in a slot
+            if (!slot.querySelector('.participant-placeholder')) {
+                addChatMessage('System', 'This slot is already occupied!', true);
+                return;
+            }
+            
+            // Check if user is already in another slot
+            const existingSlot = document.querySelector(`[data-occupied-by="${socket.id}"]`);
+            if (existingSlot) {
+                addChatMessage('System', 'You are already in a camera slot! Leave your current slot first.', true);
+                return;
+            }
+            
+            try {
+                // Request camera access if not already available
+                if (!localStream || !isCameraOn) {
+                    await requestCameraAccess();
+                }
+                
+                // Show user's video in the selected slot
+                slot.innerHTML = `
+                    <video autoplay muted playsinline class="participant-video"></video>
+                    <div class="participant-name">You (Patron ${slotNumber})</div>
+                    <button class="leave-slot-btn" onclick="leaveSlot(${slotNumber})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                
+                const video = slot.querySelector('video');
+                video.srcObject = localStream;
+                slot.setAttribute('data-occupied-by', socket.id);
+                
+                // Enable camera if not already on
+                if (!isCameraOn) {
+                    toggleCamera();
+                }
+                
+                addChatMessage('System', `You joined the conversation in slot ${slotNumber}! 📹`, true);
+                
+            } catch (error) {
+                console.error('Error accessing camera:', error);
+                addChatMessage('System', 'Could not access camera. Please allow camera permissions and try again.', true);
+            }
+        }
+
+        async function requestCameraAccess() {
+            if (!localStream) {
+                // Initialize camera access
+                await initializePubStream();
+            }
+        }
+
+        function leaveSlot(slotNumber) {
+            const slot = document.getElementById(`participant${slotNumber}`);
+            if (slot && slot.getAttribute('data-occupied-by') === socket.id) {
+                // Reset slot to empty state
+                slot.innerHTML = `
+                    <div class="participant-placeholder">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Empty Slot</span>
+                    </div>
+                `;
+                slot.removeAttribute('data-occupied-by');
+                
+                // Turn off camera
+                if (isCameraOn) {
+                    toggleCamera();
+                }
+                
+                addChatMessage('System', `You left camera slot ${slotNumber}.`, true);
             }
         }
     </script>
