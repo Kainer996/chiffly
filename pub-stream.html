@@ -427,6 +427,31 @@
             background: linear-gradient(135deg, rgba(237, 137, 54, 0.1), rgba(221, 107, 32, 0.1));
         }
 
+        .connecting-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            background: rgba(0, 0, 0, 0.7);
+            padding: 1rem;
+            border-radius: 8px;
+            z-index: 5;
+        }
+
+        .connecting-indicator i {
+            font-size: 1.5rem;
+            color: #ed8936;
+        }
+
+        .connecting-indicator span {
+            font-size: 0.8rem;
+        }
+
         .back-btn {
             position: fixed;
             top: 1rem;
@@ -1146,6 +1171,15 @@
             socket.on('ice-candidate', (data) => {
                 handleIceCandidate(data);
             });
+
+            // Handle slot join/leave events
+            socket.on('user-joined-slot', (data) => {
+                handleUserJoinedSlot(data);
+            });
+
+            socket.on('user-left-slot', (data) => {
+                handleUserLeftSlot(data);
+            });
         }
 
         function updateParticipantCount() {
@@ -1614,6 +1648,62 @@
             }
         });
 
+        // Handle when other users join/leave slots
+        function handleUserJoinedSlot(data) {
+            const { userId, username, slotNumber } = data;
+            console.log(`User ${username} joined slot ${slotNumber}`);
+            
+            const slot = document.getElementById(`participant${slotNumber}`);
+            if (!slot) return;
+
+            // Clear the slot first
+            slot.innerHTML = `
+                <video autoplay muted playsinline class="participant-video" style="display: none;"></video>
+                <div class="participant-name">${username}</div>
+                <div class="connecting-indicator">
+                    <i class="fas fa-circle-notch fa-spin"></i>
+                    <span>Connecting...</span>
+                </div>
+            `;
+            slot.setAttribute('data-occupied-by', userId);
+            
+            // Find the user's video stream
+            const remoteStream = remoteStreams.get(userId);
+            if (remoteStream) {
+                // Stream is available, show it immediately
+                const video = slot.querySelector('video');
+                const connectingIndicator = slot.querySelector('.connecting-indicator');
+                
+                video.srcObject = remoteStream;
+                video.style.display = 'block';
+                if (connectingIndicator) {
+                    connectingIndicator.remove();
+                }
+                
+                console.log(`Stream displayed for ${username} in slot ${slotNumber}`);
+            } else {
+                // Stream not yet available, will be shown when received
+                console.log(`Stream not yet available for user ${userId}, showing connecting indicator`);
+            }
+        }
+
+        function handleUserLeftSlot(data) {
+            const { userId, username, slotNumber } = data;
+            console.log(`User ${username} left slot ${slotNumber}`);
+            
+            const slot = document.getElementById(`participant${slotNumber}`);
+            if (slot && slot.getAttribute('data-occupied-by') === userId) {
+                // Reset slot to empty state
+                slot.innerHTML = `
+                    <div class="participant-placeholder">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Empty Slot</span>
+                    </div>
+                `;
+                slot.removeAttribute('data-occupied-by');
+            }
+        }
+
         // Make functions globally available for onclick handlers
         window.leaveSlot = leaveSlot;
 
@@ -1750,9 +1840,31 @@
         function displayRemoteVideo(userId, stream) {
             console.log('Displaying remote video from:', userId);
             
+            // Check if this user already has a slot assigned
+            const existingSlot = document.querySelector(`[data-occupied-by="${userId}"]`);
+            if (existingSlot) {
+                // Update existing slot with new stream
+                const video = existingSlot.querySelector('video');
+                const connectingIndicator = existingSlot.querySelector('.connecting-indicator');
+                
+                if (video) {
+                    video.srcObject = stream;
+                    video.style.display = 'block';
+                }
+                
+                // Remove connecting indicator if present
+                if (connectingIndicator) {
+                    connectingIndicator.remove();
+                }
+                
+                console.log('Updated existing slot with video stream');
+                return;
+            }
+            
             if (isHost) {
-                // Host: show participant videos in smaller windows
-                addParticipantVideo(userId, stream);
+                // Host: show participant videos in smaller windows (but don't auto-assign slots)
+                // Participants will manually choose their slots
+                console.log('Host received participant stream, waiting for participant to choose slot');
             } else {
                 // Participant: show host video in main window
                 const hostVideo = document.getElementById('hostVideo');
@@ -1875,6 +1987,12 @@
                 if (!isCameraOn) {
                     toggleCamera();
                 }
+
+                // Notify server and other users that this user joined a slot
+                socket.emit('join-slot', { slotNumber });
+
+                // Update all peer connections to ensure video is shared
+                updatePeerConnections();
                 
                 addChatMessage('System', `You joined the conversation in slot ${slotNumber}! 📹`, true);
                 
@@ -1902,6 +2020,9 @@
                     </div>
                 `;
                 slot.removeAttribute('data-occupied-by');
+                
+                // Notify server and other users that this user left a slot
+                socket.emit('leave-slot', { slotNumber });
                 
                 // Turn off camera
                 if (isCameraOn) {

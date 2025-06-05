@@ -299,6 +299,38 @@ io.on('connection', (socket) => {
     io.to(user.roomId).emit('chat-message', message);
   });
 
+  // Handle participant slot join
+  socket.on('join-slot', (data) => {
+    const user = users.get(socket.id);
+    if (!user) return;
+
+    const { slotNumber } = data;
+    console.log(`👤 ${user.username} joined slot ${slotNumber} in room ${user.roomId}`);
+
+    // Broadcast to all other users in the room that this user joined a slot
+    socket.to(user.roomId).emit('user-joined-slot', {
+      userId: socket.id,
+      username: user.username,
+      slotNumber: slotNumber
+    });
+  });
+
+  // Handle participant slot leave
+  socket.on('leave-slot', (data) => {
+    const user = users.get(socket.id);
+    if (!user) return;
+
+    const { slotNumber } = data;
+    console.log(`👤 ${user.username} left slot ${slotNumber} in room ${user.roomId}`);
+
+    // Broadcast to all other users in the room that this user left a slot
+    socket.to(user.roomId).emit('user-left-slot', {
+      userId: socket.id,
+      username: user.username,
+      slotNumber: slotNumber
+    });
+  });
+
   // WebRTC signaling
   socket.on('offer', (data) => {
     socket.to(data.target).emit('offer', {
