@@ -992,8 +992,10 @@
         let currentRoom = null;
         let currentUser = null;
         let isHost = false;
+        let streamerId = null; // ID of the host/streamer
         let peerConnections = new Map();
         let remoteStreams = new Map();
+        let allParticipants = new Set(); // Track all users in the room
 
         // Initialize the pub stream
         document.addEventListener('DOMContentLoaded', function() {
@@ -1026,6 +1028,15 @@
                 hostVideo.setAttribute('playsinline', 'true');
                 hostVideo.setAttribute('webkit-playsinline', 'true');
             }
+            
+            // Periodic check to ensure all necessary peer connections exist
+            setInterval(() => {
+                if (socket && socket.connected) {
+                    ensureAllPeerConnections();
+                    // Log connection status for debugging
+                    logConnectionStatus();
+                }
+            }, 5000); // Check every 5 seconds
         });
 
         function initializeTheme() {
@@ -1097,6 +1108,12 @@
 
             socket.on('room-state', (data) => {
                 const { streamer, participants, messages } = data;
+                streamerId = streamer ? streamer.id : null; // Store streamer's socket ID
+                
+                // Track all participants
+                allParticipants.clear();
+                if (streamer) allParticipants.add(streamer.id);
+                participants.forEach(p => allParticipants.add(p.id));
                 
                 // Update participant count
                 const totalParticipants = participants.length + (streamer ? 1 : 0);
@@ -1107,18 +1124,26 @@
                     displayChatMessage(message);
                 });
 
-                // Setup WebRTC connections for existing participants/streamer
+                // Setup WebRTC connections but DON'T auto-assign to slots
                 if (isHost && participants.length > 0) {
-                    // Host: create connections to all participants
+                    // Host: create connections to all participants (they'll manually choose slots)
                     participants.forEach(participant => {
                         if (participant.id !== socket.id) {
                             createPeerConnection(participant.id);
                         }
                     });
+                    // Add tracks if we have them and camera/mic are on
+                    setTimeout(() => {
+                        updatePeerConnections();
+                    }, 200);
                 } else if (!isHost && streamer) {
-                    // Participant: create connection to host
+                    // Participant: create connection to host to see their main video
                     if (streamer.id !== socket.id) {
                         createPeerConnection(streamer.id);
+                        // Add tracks if we have them and camera/mic are on
+                        setTimeout(() => {
+                            updatePeerConnections();
+                        }, 200);
                     }
                 }
 
@@ -1127,6 +1152,9 @@
                 
                 // Setup participant slot click handlers for guests
                 setupParticipantSlotHandlers();
+                
+                // Start connection health monitoring
+                startConnectionHealthCheck();
             });
 
             socket.on('user-joined', (data) => {
@@ -1134,9 +1162,17 @@
                 addChatMessage('System', `${username} ${isStreamer ? 'started hosting' : 'joined'} the table!`, true);
                 updateParticipantCount();
 
-                // Create WebRTC connection for new user
+                // Track new participant
+                allParticipants.add(userId);
+                if (isStreamer) streamerId = userId;
+
+                // Create WebRTC connection for new user and add any existing tracks
                 if (userId !== socket.id) {
                     createPeerConnection(userId);
+                    // Add tracks if we have them and camera/mic are on
+                    setTimeout(() => {
+                        updatePeerConnections();
+                    }, 100);
                 }
             });
 
@@ -1145,14 +1181,33 @@
                 addChatMessage('System', `${username} left the table.`, true);
                 updateParticipantCount();
 
+                // Remove from participant tracking
+                allParticipants.delete(userId);
+                if (streamerId === userId) streamerId = null;
+
                 // Clean up WebRTC connection
                 if (peerConnections.has(userId)) {
+                    console.log('🧹 Cleaning up peer connection for user:', userId);
                     peerConnections.get(userId).close();
                     peerConnections.delete(userId);
                 }
                 if (remoteStreams.has(userId)) {
+                    console.log('🧹 Cleaning up remote stream for user:', userId);
                     remoteStreams.delete(userId);
                 }
+                
+                // Clean up any slots occupied by this user
+                const userSlots = document.querySelectorAll(`[data-occupied-by="${userId}"]`);
+                userSlots.forEach(slot => {
+                    slot.innerHTML = `
+                        <div class="participant-placeholder">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Empty Slot</span>
+                        </div>
+                    `;
+                    slot.removeAttribute('data-occupied-by');
+                    console.log('🧹 Cleaned up slot for user:', userId);
+                });
             });
 
             socket.on('chat-message', (message) => {
@@ -1273,18 +1328,19 @@
 
         async function initializePubStream() {
             try {
-                // Mobile-friendly camera constraints
+                // Mobile-friendly camera constraints with better compatibility
                 const constraints = {
                     video: {
-                        width: { ideal: 1280, max: 1920 },
-                        height: { ideal: 720, max: 1080 },
-                        frameRate: { ideal: 30, max: 60 },
+                        width: { ideal: 640, max: 1280 },
+                        height: { ideal: 480, max: 720 },
+                        frameRate: { ideal: 15, max: 30 }, // Lower frameRate for mobile stability
                         facingMode: 'user' // Front camera by default on mobile
                     },
                     audio: {
                         echoCancellation: true,
                         noiseSuppression: true,
-                        autoGainControl: true
+                        autoGainControl: true,
+                        sampleRate: 48000
                     }
                 };
 
@@ -1313,10 +1369,14 @@
                     const fallbackConstraints = {
                         video: {
                             facingMode: 'user',
-                            width: { min: 320, ideal: 640, max: 1280 },
-                            height: { min: 240, ideal: 480, max: 720 }
+                            width: { min: 320, ideal: 480, max: 640 },
+                            height: { min: 240, ideal: 360, max: 480 },
+                            frameRate: { max: 15 } // Very conservative for older devices
                         },
-                        audio: true
+                        audio: {
+                            echoCancellation: true,
+                            noiseSuppression: true
+                        }
                     };
                     
                     localStream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
@@ -1376,27 +1436,193 @@
             }
         }
 
-        function updatePeerConnections() {
-            // Update all existing peer connections with current stream
-            peerConnections.forEach((peerConnection, userId) => {
-                // Remove existing tracks
-                const senders = peerConnection.getSenders();
-                senders.forEach(sender => {
-                    if (sender.track) {
-                        peerConnection.removeTrack(sender);
+        function ensureAllPeerConnections() {
+            // Use comprehensive participant tracking
+            const allConnectedUsers = new Set();
+            
+            // Add all tracked participants except myself
+            allParticipants.forEach(userId => {
+                if (userId !== socket.id) {
+                    allConnectedUsers.add(userId);
+                }
+            });
+            
+            // Also add users from slots (in case tracking missed any)
+            for (let i = 1; i <= 6; i++) {
+                const slot = document.getElementById(`participant${i}`);
+                const occupiedBy = slot?.getAttribute('data-occupied-by');
+                if (occupiedBy && occupiedBy !== socket.id) {
+                    allConnectedUsers.add(occupiedBy);
+                }
+            }
+            
+            // Create peer connections for any missing users
+            allConnectedUsers.forEach(userId => {
+                if (!peerConnections.has(userId)) {
+                    console.log(`Creating missing peer connection for user: ${userId}`);
+                    createPeerConnection(userId);
+                } else {
+                    // Check if existing connection is healthy
+                    const pc = peerConnections.get(userId);
+                    if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') {
+                        console.log(`Recreating unhealthy connection to user: ${userId} (state: ${pc.connectionState})`);
+                        pc.close();
+                        peerConnections.delete(userId);
+                        createPeerConnection(userId);
                     }
-                });
-
-                // Add current tracks based on camera/mic state
-                if (localStream) {
-                    localStream.getTracks().forEach(track => {
-                        if ((track.kind === 'video' && isCameraOn) || (track.kind === 'audio' && isMicOn)) {
-                            peerConnection.addTrack(track, localStream);
-                        }
-                    });
                 }
             });
         }
+
+        async function updatePeerConnections() {
+            console.log(`Updating tracks for all peers. Camera: ${isCameraOn}, Mic: ${isMicOn}`);
+            if (!localStream) {
+                console.warn("UpdatePeerConnections called but localStream is not ready.");
+                return;
+            }
+
+            // Ensure we have peer connections to all relevant users
+            ensureAllPeerConnections();
+
+            let trackChanges = false;
+
+            for (const [userId, pc] of peerConnections.entries()) {
+                console.log(`Processing peer connection for ${userId}, state: ${pc.connectionState}, signaling: ${pc.signalingState}`);
+                
+                const videoTrack = localStream.getVideoTracks()[0];
+                const audioTrack = localStream.getAudioTracks()[0];
+
+                // --- Manage Video Track ---
+                const videoSender = pc.getSenders().find(s => s.track && s.track.kind === "video");
+
+                if (isCameraOn && videoTrack) {
+                    if (!videoSender) {
+                        console.log(`[Video] Adding track for ${userId}`);
+                        try {
+                            pc.addTrack(videoTrack, localStream);
+                            trackChanges = true;
+                        } catch (e) {
+                            console.error(`Failed to add video track for ${userId}:`, e);
+                        }
+                    } else if (videoSender.track !== videoTrack) {
+                        console.log(`[Video] Replacing track for ${userId}`);
+                        try {
+                            await videoSender.replaceTrack(videoTrack);
+                        } catch (e) {
+                            console.error(`Failed to replace video track for ${userId}:`, e);
+                        }
+                    }
+                } else if (!isCameraOn && videoSender) {
+                    console.log(`[Video] Removing track for ${userId}`);
+                    try {
+                        pc.removeTrack(videoSender);
+                        trackChanges = true;
+                    } catch (e) {
+                        console.error(`Failed to remove video track for ${userId}:`, e);
+                    }
+                }
+
+                // --- Manage Audio Track ---
+                const audioSender = pc.getSenders().find(s => s.track && s.track.kind === "audio");
+
+                if (isMicOn && audioTrack) {
+                    if (!audioSender) {
+                        console.log(`[Audio] Adding track for ${userId}`);
+                        try {
+                            pc.addTrack(audioTrack, localStream);
+                            trackChanges = true;
+                        } catch (e) {
+                            console.error(`Failed to add audio track for ${userId}:`, e);
+                        }
+                    } else if (audioSender.track !== audioTrack) {
+                        console.log(`[Audio] Replacing track for ${userId}`);
+                        try {
+                            await audioSender.replaceTrack(audioTrack);
+                        } catch (e) {
+                            console.error(`Failed to replace audio track for ${userId}:`, e);
+                        }
+                    }
+                } else if (!isMicOn && audioSender) {
+                    console.log(`[Audio] Removing track for ${userId}`);
+                    try {
+                        pc.removeTrack(audioSender);
+                        trackChanges = true;
+                    } catch (e) {
+                        console.error(`Failed to remove audio track for ${userId}:`, e);
+                    }
+                }
+            }
+
+            console.log(`Track update complete. Changes made: ${trackChanges}`);
+        }
+
+        function logConnectionStatus() {
+            console.log('=== CONNECTION STATUS ===');
+            console.log(`Total participants tracked: ${allParticipants.size}`);
+            console.log(`Total peer connections: ${peerConnections.size}`);
+            console.log(`Total remote streams: ${remoteStreams.size}`);
+            console.log(`Is Host: ${isHost}, Streamer ID: ${streamerId}`);
+            console.log(`Camera On: ${isCameraOn}, Mic On: ${isMicOn}`);
+            console.log(`Local Stream: ${localStream ? 'Available' : 'None'}`);
+            
+            if (localStream) {
+                console.log(`Local Video Tracks: ${localStream.getVideoTracks().length}`);
+                console.log(`Local Audio Tracks: ${localStream.getAudioTracks().length}`);
+                localStream.getVideoTracks().forEach((track, i) => {
+                    console.log(`  Video Track ${i}: enabled=${track.enabled}, state=${track.readyState}`);
+                });
+            }
+            
+            peerConnections.forEach((pc, userId) => {
+                const hasVideo = pc.getSenders().some(s => s.track && s.track.kind === 'video');
+                const hasAudio = pc.getSenders().some(s => s.track && s.track.kind === 'audio');
+                const remoteStream = remoteStreams.get(userId);
+                console.log(`${userId.substring(0,8)}: ${pc.connectionState}/${pc.signalingState}/${pc.iceConnectionState} - Send: V:${hasVideo} A:${hasAudio} - Receive: ${remoteStream ? 'Yes' : 'No'}`);
+                
+                if (remoteStream) {
+                    console.log(`  Remote tracks: Video:${remoteStream.getVideoTracks().length} Audio:${remoteStream.getAudioTracks().length}`);
+                }
+            });
+            
+            console.log('=== END STATUS ===');
+        }
+        
+        // Add a global function to help debug from browser console
+        window.debugConnections = logConnectionStatus;
+        
+        // Add a function to force track addition for debugging
+        window.forceAddTracks = function() {
+            console.log('🔧 FORCE ADDING TRACKS TO ALL CONNECTIONS...');
+            if (!localStream) {
+                console.log('🔧 No local stream available');
+                return;
+            }
+            
+            peerConnections.forEach((pc, userId) => {
+                console.log(`🔧 Force adding tracks to ${userId.substring(0,8)}`);
+                try {
+                    // Remove existing tracks
+                    pc.getSenders().forEach(sender => {
+                        if (sender.track) {
+                            pc.removeTrack(sender);
+                        }
+                    });
+                    
+                    // Add fresh tracks
+                    localStream.getTracks().forEach(track => {
+                        console.log(`🔧 Adding ${track.kind} track (enabled: ${track.enabled})`);
+                        pc.addTrack(track, localStream);
+                    });
+                    
+                    // Force renegotiation
+                    if (pc.signalingState === 'stable') {
+                        pc.dispatchEvent(new Event('negotiationneeded'));
+                    }
+                } catch (e) {
+                    console.error(`🔧 Error force adding tracks:`, e);
+                }
+            });
+        };
 
         async function switchCamera() {
             if (!localStream) {
@@ -1466,15 +1692,35 @@
                 // Update peer connections when camera state changes
                 updatePeerConnections();
                 
+                // Force negotiation for all peer connections to ensure tracks are shared
+                setTimeout(() => {
+                    for (const [userId, pc] of peerConnections.entries()) {
+                        if (pc.connectionState === 'connected' || pc.connectionState === 'new') {
+                            console.log(`Forcing renegotiation with ${userId} after camera toggle`);
+                            // Trigger negotiation by adding/removing a dummy track momentarily
+                            if (pc.signalingState === 'stable') {
+                                pc.dispatchEvent(new Event('negotiationneeded'));
+                            }
+                        }
+                    }
+                }, 500);
+                
                 if (isCameraOn) {
                     cameraBtn.classList.add('active');
                     cameraIcon.className = 'fas fa-video';
                     
-                    // Only show local video if user is host
+                    // Show local video if user is host OR if they're in a participant slot
+                    const userSlot = document.querySelector(`[data-occupied-by="${socket.id}"]`);
                     if (isHost) {
                         hostVideo.srcObject = localStream;
                         hostVideo.style.display = 'block';
                         videoPlaceholder.style.display = 'none';
+                    } else if (userSlot) {
+                        // User is in a participant slot, update that slot's video
+                        const slotVideo = userSlot.querySelector('video');
+                        if (slotVideo) {
+                            slotVideo.srcObject = localStream;
+                        }
                     }
                     
                     // Show camera switch button on mobile
@@ -1656,13 +1902,69 @@
             const slot = document.getElementById(`participant${slotNumber}`);
             if (!slot) return;
 
+            // Close and recreate peer connection for clean state
+            if (peerConnections.has(userId)) {
+                console.log(`Closing existing peer connection for ${userId} before slot join`);
+                peerConnections.get(userId).close();
+                peerConnections.delete(userId);
+                remoteStreams.delete(userId);
+            }
+
+            // Create fresh peer connection for this user
+            console.log(`Creating fresh peer connection for user ${userId} who joined slot ${slotNumber}`);
+            const pc = createPeerConnection(userId);
+            
+            // If we are the host and have our own stream, add tracks using transceivers and start negotiation
+            if (isHost && localStream && isCameraOn) {
+                console.log(`🎯 Host adding tracks via transceivers to participant ${userId.substring(0,8)}`);
+                (async () => {
+                    try {
+                        // Add transceivers first
+                        const videoTransceiver = pc.addTransceiver('video', { direction: 'sendrecv' });
+                        const audioTransceiver = pc.addTransceiver('audio', { direction: 'sendrecv' });
+                        
+                        // Add video track to video transceiver
+                        const videoTrack = localStream.getVideoTracks()[0];
+                        if (videoTrack && videoTransceiver) {
+                            console.log(`🎯 Replacing video track in transceiver for ${userId.substring(0,8)}`);
+                            await videoTransceiver.sender.replaceTrack(videoTrack);
+                        }
+                        
+                        // Add audio track to audio transceiver  
+                        const audioTrack = localStream.getAudioTracks()[0];
+                        if (audioTrack && audioTransceiver) {
+                            console.log(`🎯 Replacing audio track in transceiver for ${userId.substring(0,8)}`);
+                            await audioTransceiver.sender.replaceTrack(audioTrack);
+                        }
+                        
+                        // Host initiates the connection by creating offer immediately
+                        console.log(`🎯 Host creating offer for ${userId.substring(0,8)}`);
+                        const offer = await pc.createOffer();
+                        await pc.setLocalDescription(offer);
+                        socket.emit('offer', {
+                            target: userId,
+                            offer: offer
+                        });
+                        console.log(`🎯 Host sent offer to ${userId.substring(0,8)}`);
+                        
+                    } catch (e) {
+                        console.error(`🎯 Failed to create offer for ${userId.substring(0,8)}:`, e);
+                    }
+                })();
+            } else {
+                console.log(`🎯 Non-host waiting for connection from ${userId.substring(0,8)}`);
+            }
+
             // Clear the slot first
             slot.innerHTML = `
                 <video autoplay muted playsinline class="participant-video" style="display: none;"></video>
                 <div class="participant-name">${username}</div>
                 <div class="connecting-indicator">
                     <i class="fas fa-circle-notch fa-spin"></i>
-                    <span>Connecting...</span>
+                    <span>Connecting camera...</span>
+                    <div class="connection-tips" style="font-size: 0.7rem; margin-top: 0.5rem; opacity: 0.7;">
+                        On mobile? Make sure camera permissions are enabled.
+                    </div>
                 </div>
             `;
             slot.setAttribute('data-occupied-by', userId);
@@ -1684,6 +1986,61 @@
             } else {
                 // Stream not yet available, will be shown when received
                 console.log(`Stream not yet available for user ${userId}, showing connecting indicator`);
+                
+                // Set up multiple retries to check for stream with more aggressive timing
+                let retryCount = 0;
+                const maxRetries = 15; // Increased retries
+                const retryInterval = setInterval(() => {
+                    const currentSlot = document.getElementById(`participant${slotNumber}`);
+                    const currentConnecting = currentSlot?.querySelector('.connecting-indicator');
+                    
+                    if (currentConnecting && currentSlot?.getAttribute('data-occupied-by') === userId) {
+                        // Check again for the stream
+                        const stream = remoteStreams.get(userId);
+                        if (stream) {
+                            const video = currentSlot.querySelector('video');
+                            if (video) {
+                                video.srcObject = stream;
+                                video.style.display = 'block';
+                                currentConnecting.remove();
+                                clearInterval(retryInterval);
+                                console.log(`Stream connected for ${username} in slot ${slotNumber} after ${retryCount + 1} attempts`);
+                                return;
+                            }
+                        }
+                        
+                        // Try to reconnect if peer connection failed
+                        const pc = peerConnections.get(userId);
+                        if (pc && (pc.connectionState === 'failed' || pc.connectionState === 'disconnected')) {
+                            console.log(`Peer connection failed for ${userId}, attempting to reconnect...`);
+                            pc.close();
+                            createPeerConnection(userId);
+                            setTimeout(() => updatePeerConnections(), 100);
+                        }
+                    } else {
+                        // Slot no longer exists or user changed, stop retrying
+                        clearInterval(retryInterval);
+                        return;
+                    }
+                    
+                    retryCount++;
+                    if (retryCount >= maxRetries) {
+                        clearInterval(retryInterval);
+                        console.log(`Max retries reached for ${username} in slot ${slotNumber}`);
+                        
+                        // Final attempt: recreate connection if still stuck
+                        const currentSlot = document.getElementById(`participant${slotNumber}`);
+                        if (currentSlot?.querySelector('.connecting-indicator')) {
+                            console.log(`Final attempt: recreating connection for ${userId}`);
+                            const pc = peerConnections.get(userId);
+                            if (pc) {
+                                pc.close();
+                                createPeerConnection(userId);
+                                setTimeout(() => updatePeerConnections(), 100);
+                            }
+                        }
+                    }
+                }, 800); // Check every 800ms for faster response
             }
         }
 
@@ -1725,35 +2082,178 @@
                 }, 1000);
             }
         }
+        
+        // Periodic connection health check
+        function startConnectionHealthCheck() {
+            setInterval(() => {
+                // Check for stuck connections and slots showing "Connecting"
+                document.querySelectorAll('.connecting-indicator').forEach(indicator => {
+                    const slot = indicator.closest('[id^="participant"]');
+                    if (slot) {
+                        const userId = slot.getAttribute('data-occupied-by');
+                        if (userId) {
+                            const pc = peerConnections.get(userId);
+                            const remoteStream = remoteStreams.get(userId);
+                            
+                            // If we have a remote stream but still showing connecting, fix it
+                            if (remoteStream && remoteStream.getVideoTracks().length > 0) {
+                                console.log(`🔧 Health check: Found stuck slot for ${userId}, fixing...`);
+                                const video = slot.querySelector('video');
+                                if (video) {
+                                    video.srcObject = remoteStream;
+                                    video.style.display = 'block';
+                                    indicator.remove();
+                                }
+                            }
+                            // If connection is failed, try to restart it
+                            else if (pc && (pc.connectionState === 'failed' || pc.iceConnectionState === 'failed')) {
+                                console.log(`🔧 Health check: Restarting failed connection for ${userId}`);
+                                pc.close();
+                                peerConnections.delete(userId);
+                                remoteStreams.delete(userId);
+                                createPeerConnection(userId);
+                                setTimeout(() => updatePeerConnections(), 100);
+                            }
+                        }
+                    }
+                });
+                
+                // Check for stuck connections
+                peerConnections.forEach((pc, userId) => {
+                    const userSlot = document.querySelector(`[data-occupied-by="${userId}"]`);
+                    const connectingIndicator = userSlot?.querySelector('.connecting-indicator');
+                    
+                    // If we see a connecting indicator for more than 10 seconds, try to recover
+                    if (connectingIndicator) {
+                        const connectionAge = Date.now() - (pc.connectionStartTime || Date.now());
+                        if (connectionAge > 10000) { // 10 seconds
+                            console.log(`Connection to ${userId} stuck for ${connectionAge}ms, attempting recovery...`);
+                            
+                            // Try to restart the connection
+                            pc.close();
+                            peerConnections.delete(userId);
+                            remoteStreams.delete(userId);
+                            
+                            // Recreate connection
+                            setTimeout(() => {
+                                createPeerConnection(userId);
+                                updatePeerConnections();
+                            }, 1000);
+                        }
+                    }
+                });
+            }, 5000); // Check every 5 seconds
+        }
 
         // WebRTC functions
         function createPeerConnection(userId) {
-            console.log('Creating peer connection to:', userId);
+            console.log('🔧 Creating peer connection to:', userId.substring(0,8));
             
             const peerConnection = new RTCPeerConnection({
                 iceServers: [
                     { urls: 'stun:stun.l.google.com:19302' },
-                    { urls: 'stun:stun1.l.google.com:19302' }
-                ]
+                    { urls: 'stun:stun1.l.google.com:19302' },
+                    { urls: 'stun:stun2.l.google.com:19302' },
+                    { urls: 'stun:stun3.l.google.com:19302' }
+                ],
+                iceCandidatePoolSize: 10
             });
+            
+            // CRITICAL FIX: Add transceivers for Safari/mobile compatibility
+            // This ensures Safari can properly receive video even without sending
+            console.log('🔧 Adding transceivers for Safari/mobile compatibility...');
+            
+            // Add video transceiver - Safari needs this to receive video properly
+            const videoTransceiver = peerConnection.addTransceiver('video', {
+                direction: 'sendrecv'  // Use sendrecv from start for better compatibility
+            });
+            console.log('🔧 Added video transceiver:', videoTransceiver.direction);
+            
+            // Add audio transceiver - Safari needs this to receive audio properly  
+            const audioTransceiver = peerConnection.addTransceiver('audio', {
+                direction: 'sendrecv'  // Use sendrecv from start for better compatibility
+            });
+            console.log('🔧 Added audio transceiver:', audioTransceiver.direction);
+            
+            let isNegotiating = false;
+            peerConnection.onnegotiationneeded = async () => {
+                if (isNegotiating) {
+                    console.log(`Skipping negotiation for ${userId}, already in progress.`);
+                    return;
+                }
+                
+                // Check if we have any tracks to negotiate
+                const senders = peerConnection.getSenders();
+                const hasActiveTracks = senders.some(sender => sender.track && sender.track.readyState === 'live');
+                
+                if (!hasActiveTracks) {
+                    console.log(`Skipping negotiation for ${userId}, no active tracks to send`);
+                    return;
+                }
+                
+                try {
+                    isNegotiating = true;
+                    console.log(`Negotiation needed for ${userId}, creating offer...`);
+                    console.log(`Tracks to send: ${senders.filter(s => s.track).map(s => s.track.kind).join(', ')}`);
+                    
+                    // Only proceed if connection is stable
+                    if (peerConnection.signalingState === 'stable') {
+                        const offer = await peerConnection.createOffer();
+                        await peerConnection.setLocalDescription(offer);
+                        socket.emit('offer', {
+                            target: userId,
+                            offer: peerConnection.localDescription
+                        });
+                        console.log(`Offer sent to ${userId} with ${senders.filter(s => s.track).length} tracks`);
+                    } else {
+                        console.log(`Skipping offer creation for ${userId}, signaling state: ${peerConnection.signalingState}`);
+                    }
+                } catch (err) {
+                    console.error(`Failed to create offer for ${userId}:`, err);
+                } finally {
+                    isNegotiating = false;
+                }
+            };
 
             peerConnections.set(userId, peerConnection);
+            peerConnection.connectionStartTime = Date.now();
 
-            // Add local stream to peer connection if available
-            if (localStream && (isCameraOn || isMicOn)) {
-                localStream.getTracks().forEach(track => {
-                    if ((track.kind === 'video' && isCameraOn) || (track.kind === 'audio' && isMicOn)) {
-                        peerConnection.addTrack(track, localStream);
-                    }
-                });
-            }
+            // DO NOT ADD TRACKS HERE. They will be added by updatePeerConnections.
 
             // Handle remote stream
             peerConnection.ontrack = (event) => {
-                console.log('Received remote stream from:', userId);
+                console.log('🎬 ONTRACK EVENT FIRED! Received remote stream from:', userId.substring(0,8));
+                console.log('🎬 Event details:', {
+                    streams: event.streams.length,
+                    track: event.track.kind,
+                    trackEnabled: event.track.enabled,
+                    trackState: event.track.readyState
+                });
+                
                 const [remoteStream] = event.streams;
                 remoteStreams.set(userId, remoteStream);
+                
+                // Log track details for debugging
+                remoteStream.getTracks().forEach((track, index) => {
+                    console.log(`🎬 Track ${index} from ${userId.substring(0,8)}: ${track.kind}, enabled: ${track.enabled}, state: ${track.readyState}`);
+                });
+                
+                console.log(`🎬 Storing stream for ${userId.substring(0,8)} and attempting to display...`);
+                
+                // Immediate attempt to display, then retry if needed
                 displayRemoteVideo(userId, remoteStream);
+                
+                // Additional retry in case DOM wasn't ready
+                setTimeout(() => {
+                    console.log(`🎬 Retry 1: Attempting to display stream from ${userId.substring(0,8)}`);
+                    displayRemoteVideo(userId, remoteStream);
+                }, 100);
+                
+                // Final retry after a longer delay
+                setTimeout(() => {
+                    console.log(`🎬 Retry 2: Final attempt to display stream from ${userId.substring(0,8)}`);
+                    displayRemoteVideo(userId, remoteStream);
+                }, 1000);
             };
 
             // Handle ICE candidates
@@ -1766,10 +2266,53 @@
                 }
             };
 
-            // Create offer if this user should initiate (host or if socket ID is smaller)
-            if (isHost || socket.id < userId) {
-                createOffer(userId, peerConnection);
-            }
+            // Handle connection state changes
+            peerConnection.onconnectionstatechange = () => {
+                console.log(`Peer connection to ${userId} state:`, peerConnection.connectionState);
+                
+                // If connection fails, try to re-establish after a delay
+                if (peerConnection.connectionState === 'failed') {
+                    console.log(`Connection to ${userId} failed, attempting to reconnect...`);
+                    setTimeout(() => {
+                        if (peerConnections.has(userId) && peerConnections.get(userId).connectionState === 'failed') {
+                            console.log(`Recreating failed connection to ${userId}`);
+                            peerConnections.get(userId).close();
+                            createPeerConnection(userId);
+                            setTimeout(() => {
+                                updatePeerConnections();
+                            }, 100);
+                        }
+                    }, 2000);
+                }
+            };
+            
+            // Handle ICE connection state changes
+            peerConnection.oniceconnectionstatechange = () => {
+                console.log(`ICE connection to ${userId} state:`, peerConnection.iceConnectionState);
+                
+                if (peerConnection.iceConnectionState === 'failed' || peerConnection.iceConnectionState === 'disconnected') {
+                    console.log(`ICE connection to ${userId} failed/disconnected, attempting recovery...`);
+                    
+                    // Try ICE restart for failed connections
+                    if (peerConnection.iceConnectionState === 'failed') {
+                        setTimeout(async () => {
+                            if (peerConnections.has(userId) && peerConnection.signalingState === 'stable') {
+                                console.log(`Attempting ICE restart for ${userId}`);
+                                try {
+                                    const offer = await peerConnection.createOffer({ iceRestart: true });
+                                    await peerConnection.setLocalDescription(offer);
+                                    socket.emit('offer', {
+                                        target: userId,
+                                        offer: offer
+                                    });
+                                } catch (error) {
+                                    console.error(`ICE restart failed for ${userId}:`, error);
+                                }
+                            }
+                        }, 1000);
+                    }
+                }
+            };
 
             return peerConnection;
         }
@@ -1791,36 +2334,167 @@
 
         async function handleOffer(data) {
             const { offer, sender } = data;
-            console.log('Received offer from:', sender);
+            console.log('📨 Received offer from:', sender.substring(0,8), 'offer type:', offer.type);
             
-            const peerConnection = peerConnections.get(sender) || createPeerConnection(sender);
+            let peerConnection = peerConnections.get(sender);
+            
+            // If no peer connection exists, create one
+            if (!peerConnection) {
+                console.log(`📨 Creating new peer connection for incoming offer from ${sender.substring(0,8)}`);
+                peerConnection = createPeerConnection(sender);
+            }
 
             try {
+                // COLLISION DETECTION: Check if we're also trying to create an offer
+                if (peerConnection.signalingState === 'have-local-offer') {
+                    console.log(`📨 COLLISION DETECTED with ${sender.substring(0,8)}! Both sides creating offers.`);
+                    
+                    // Resolve collision by comparing socket IDs (lexicographic order)
+                    if (socket.id < sender) {
+                        console.log(`📨 I win collision resolution, ignoring incoming offer from ${sender.substring(0,8)}`);
+                        return; // Ignore their offer, continue with ours
+                    } else {
+                        console.log(`📨 They win collision resolution, restarting connection with ${sender.substring(0,8)}`);
+                        // Close our connection and start fresh
+                        peerConnection.close();
+                        peerConnection = createPeerConnection(sender);
+                    }
+                }
+                
+                // Check if we can accept this offer
+                if (peerConnection.signalingState !== 'stable' && peerConnection.signalingState !== 'have-remote-offer') {
+                    console.log(`📨 Cannot handle offer from ${sender.substring(0,8)}, signaling state: ${peerConnection.signalingState}`);
+                    return;
+                }
+
+                console.log(`📨 Setting remote description for user ${sender.substring(0,8)}`);
                 await peerConnection.setRemoteDescription(offer);
+                
+                // Process any queued ICE candidates
+                if (peerConnection.queuedCandidates) {
+                    console.log(`📨 Processing ${peerConnection.queuedCandidates.length} queued ICE candidates for ${sender.substring(0,8)}`);
+                    for (const candidate of peerConnection.queuedCandidates) {
+                        try {
+                            await peerConnection.addIceCandidate(candidate);
+                        } catch (e) {
+                            console.error(`📨 Error adding queued ICE candidate:`, e);
+                        }
+                    }
+                    peerConnection.queuedCandidates = [];
+                }
+                
+                // Add our tracks via transceivers BEFORE creating answer if we have them
+                // Check if this participant is in a slot and should send their video
+                const mySlot = document.querySelector(`[data-occupied-by="${socket.id}"]`);
+                const shouldSendVideo = isHost ? isCameraOn : (mySlot && isCameraOn);
+                
+                if (localStream && shouldSendVideo) {
+                    console.log(`📨 Adding our tracks via transceivers before creating answer for ${sender.substring(0,8)} (shouldSendVideo: ${shouldSendVideo})`);
+                    try {
+                        // Get existing transceivers
+                        const transceivers = peerConnection.getTransceivers();
+                        let videoTransceiver = transceivers.find(t => t.sender.track?.kind === 'video' || t.receiver.track?.kind === 'video');
+                        let audioTransceiver = transceivers.find(t => t.sender.track?.kind === 'audio' || t.receiver.track?.kind === 'audio');
+                        
+                        // Create transceivers if they don't exist
+                        if (!videoTransceiver) {
+                            videoTransceiver = peerConnection.addTransceiver('video', { direction: 'sendrecv' });
+                        }
+                        if (!audioTransceiver) {
+                            audioTransceiver = peerConnection.addTransceiver('audio', { direction: 'sendrecv' });
+                        }
+                        
+                        // Update video transceiver if we have video
+                        const videoTrack = localStream.getVideoTracks()[0];
+                        if (videoTrack && videoTransceiver && videoTrack.enabled) {
+                            console.log(`📨 Updating video transceiver for answer to ${sender.substring(0,8)}`);
+                            await videoTransceiver.sender.replaceTrack(videoTrack);
+                            videoTransceiver.direction = 'sendrecv';
+                        }
+                        
+                        // Update audio transceiver if we have audio
+                        const audioTrack = localStream.getAudioTracks()[0];
+                        if (audioTrack && audioTransceiver && isMicOn) {
+                            console.log(`📨 Updating audio transceiver for answer to ${sender.substring(0,8)}`);
+                            await audioTransceiver.sender.replaceTrack(audioTrack);
+                            audioTransceiver.direction = 'sendrecv';
+                        }
+                    } catch (trackError) {
+                        console.error(`📨 Error updating transceivers before answer:`, trackError);
+                    }
+                } else {
+                    console.log(`📨 Not adding tracks to answer for ${sender.substring(0,8)} - shouldSendVideo: ${shouldSendVideo}, localStream: ${!!localStream}`);
+                }
+                
+                console.log(`📨 Creating answer for user ${sender.substring(0,8)}`);
                 const answer = await peerConnection.createAnswer();
                 await peerConnection.setLocalDescription(answer);
 
+                console.log(`📨 Sending answer to user ${sender.substring(0,8)}`);
                 socket.emit('answer', {
                     target: sender,
                     answer: answer
                 });
+                
+                console.log(`📨 Successfully handled offer from user ${sender.substring(0,8)}`);
             } catch (error) {
-                console.error('Error handling offer:', error);
+                console.error('📨 Error handling offer from', sender.substring(0,8), ':', error);
+                
+                // If there's an error, try to restart the connection
+                console.log(`📨 Restarting connection with ${sender.substring(0,8)} due to error`);
+                peerConnection.close();
+                peerConnections.delete(sender);
+                setTimeout(() => {
+                    createPeerConnection(sender);
+                }, 1000);
             }
         }
 
         async function handleAnswer(data) {
             const { answer, sender } = data;
-            console.log('Received answer from:', sender);
+            console.log('📬 Received answer from:', sender.substring(0,8), 'answer type:', answer.type);
             
             const peerConnection = peerConnections.get(sender);
 
             if (peerConnection) {
                 try {
+                    // Check if we're in the correct state to accept an answer
+                    if (peerConnection.signalingState !== 'have-local-offer') {
+                        console.log(`📬 Cannot accept answer from ${sender.substring(0,8)}, wrong state: ${peerConnection.signalingState}`);
+                        return;
+                    }
+                    
+                    console.log(`📬 Setting remote description (answer) for user ${sender.substring(0,8)}`);
                     await peerConnection.setRemoteDescription(answer);
+                    
+                    // Process any queued ICE candidates
+                    if (peerConnection.queuedCandidates) {
+                        console.log(`📬 Processing ${peerConnection.queuedCandidates.length} queued ICE candidates for ${sender.substring(0,8)}`);
+                        for (const candidate of peerConnection.queuedCandidates) {
+                            try {
+                                await peerConnection.addIceCandidate(candidate);
+                            } catch (e) {
+                                console.error(`📬 Error adding queued ICE candidate:`, e);
+                            }
+                        }
+                        peerConnection.queuedCandidates = [];
+                    }
+                    
+                    console.log(`📬 Successfully set remote description for user ${sender.substring(0,8)}`);
                 } catch (error) {
-                    console.error('Error handling answer:', error);
+                    console.error('📬 Error handling answer from', sender.substring(0,8), ':', error);
+                    
+                    // If there's an error, restart the connection
+                    console.log(`📬 Restarting connection with ${sender.substring(0,8)} due to answer error`);
+                    peerConnection.close();
+                    peerConnections.delete(sender);
+                    setTimeout(() => {
+                        createPeerConnection(sender);
+                        updatePeerConnections();
+                    }, 1000);
                 }
+            } else {
+                console.error('📬 No peer connection found for user', sender.substring(0,8));
             }
         }
 
@@ -1830,51 +2504,95 @@
 
             if (peerConnection) {
                 try {
-                    await peerConnection.addIceCandidate(candidate);
+                    // Only add ICE candidates if we have remote description set
+                    if (peerConnection.remoteDescription) {
+                        console.log(`🧊 Adding ICE candidate from ${sender.substring(0,8)}`);
+                        await peerConnection.addIceCandidate(candidate);
+                    } else {
+                        console.log(`🧊 Queuing ICE candidate from ${sender.substring(0,8)} (no remote description yet)`);
+                        // Store candidate for later
+                        if (!peerConnection.queuedCandidates) {
+                            peerConnection.queuedCandidates = [];
+                        }
+                        peerConnection.queuedCandidates.push(candidate);
+                    }
                 } catch (error) {
-                    console.error('Error adding ICE candidate:', error);
+                    console.error(`🧊 Error adding ICE candidate from ${sender.substring(0,8)}:`, error);
                 }
+            } else {
+                console.error(`🧊 No peer connection found for ICE candidate from ${sender.substring(0,8)}`);
             }
         }
 
         function displayRemoteVideo(userId, stream) {
-            console.log('Displaying remote video from:', userId);
-            
-            // Check if this user already has a slot assigned
-            const existingSlot = document.querySelector(`[data-occupied-by="${userId}"]`);
-            if (existingSlot) {
-                // Update existing slot with new stream
-                const video = existingSlot.querySelector('video');
-                const connectingIndicator = existingSlot.querySelector('.connecting-indicator');
-                
-                if (video) {
-                    video.srcObject = stream;
-                    video.style.display = 'block';
-                }
-                
-                // Remove connecting indicator if present
-                if (connectingIndicator) {
-                    connectingIndicator.remove();
-                }
-                
-                console.log('Updated existing slot with video stream');
+            console.log(`Displaying remote video from: ${userId}. My ID: ${socket.id}. Streamer ID: ${streamerId}. Is Host: ${isHost}`);
+
+            // Validate stream has video tracks
+            const videoTracks = stream.getVideoTracks();
+            if (videoTracks.length === 0) {
+                console.log(`No video tracks in stream from ${userId}`);
                 return;
             }
             
-            if (isHost) {
-                // Host: show participant videos in smaller windows (but don't auto-assign slots)
-                // Participants will manually choose their slots
-                console.log('Host received participant stream, waiting for participant to choose slot');
-            } else {
-                // Participant: show host video in main window
+            console.log(`Stream from ${userId} has ${videoTracks.length} video track(s), enabled: ${videoTracks[0].enabled}`);
+
+            // If I am a participant, and this stream is from the broadcaster, show it in the main video.
+            if (!isHost && userId === streamerId) {
+                console.log(`I am a participant, and this is the host's stream. Displaying in main video.`);
                 const hostVideo = document.getElementById('hostVideo');
                 const videoPlaceholder = document.getElementById('videoPlaceholder');
                 
-                hostVideo.srcObject = stream;
-                hostVideo.style.display = 'block';
-                videoPlaceholder.style.display = 'none';
-                
-                console.log('Remote video displayed in main window');
+                if (hostVideo && videoPlaceholder) {
+                    console.log('Setting host video source...');
+                    hostVideo.srcObject = stream;
+                    hostVideo.style.display = 'block';
+                    videoPlaceholder.style.display = 'none';
+                    
+                    // Ensure video plays
+                    hostVideo.play().then(() => {
+                        console.log('Host video started playing successfully');
+                        addChatMessage('System', '📺 Broadcaster camera is now visible!', true);
+                    }).catch(e => {
+                        console.error("Host video play failed:", e);
+                        // Retry play after a short delay
+                        setTimeout(() => {
+                            hostVideo.play().catch(e2 => console.error("Host video retry failed:", e2));
+                        }, 500);
+                    });
+                }
+                return; // Stop here, don't try to put the host in a participant slot.
+            }
+
+            // For all other cases (I am host, or this is another participant's stream), handle slot display.
+            const userSlot = document.querySelector(`[data-occupied-by="${userId}"]`);
+            if (userSlot) {
+                console.log(`Found slot for user ${userId}, updating video.`);
+                const video = userSlot.querySelector('video');
+                const connectingIndicator = userSlot.querySelector('.connecting-indicator');
+
+                if (video) {
+                    console.log(`Setting participant video source for ${userId}...`);
+                    video.srcObject = stream;
+                    video.style.display = 'block';
+                    if (connectingIndicator) {
+                        connectingIndicator.remove();
+                    }
+                    
+                    // Ensure video plays
+                    video.play().then(() => {
+                        console.log(`Participant video for ${userId} started playing successfully`);
+                        addChatMessage('System', `📹 ${userId.substring(0,4)}'s camera connected!`, true);
+                    }).catch(e => {
+                        console.error(`Participant video play failed for ${userId}:`, e);
+                        // Retry play after a short delay
+                        setTimeout(() => {
+                            video.play().catch(e2 => console.error(`Participant video retry failed for ${userId}:`, e2));
+                        }, 500);
+                    });
+                }
+            } else {
+                console.log(`No slot found for user ${userId}, storing stream for later.`);
+                remoteStreams.set(userId, stream);
             }
         }
 
@@ -1970,7 +2688,10 @@
                     await requestCameraAccess();
                 }
                 
-                // Show user's video in the selected slot
+                // Wait a moment to ensure stream is fully ready
+                await new Promise(resolve => setTimeout(resolve, 200));
+                
+                // Show user's video in the selected slot (NOT in main window)
                 slot.innerHTML = `
                     <video autoplay muted playsinline class="participant-video"></video>
                     <div class="participant-name">You (Patron ${slotNumber})</div>
@@ -1985,14 +2706,100 @@
                 
                 // Enable camera if not already on
                 if (!isCameraOn) {
-                    toggleCamera();
+                    // Turn on camera but ensure main window still shows broadcaster
+                    isCameraOn = true;
+                    const cameraBtn = document.getElementById('cameraBtn');
+                    const cameraIcon = cameraBtn.querySelector('i');
+                    cameraBtn.classList.add('active');
+                    cameraIcon.className = 'fas fa-video';
+                    
+                    // Enable video track
+                    if (localStream) {
+                        localStream.getVideoTracks().forEach(track => {
+                            track.enabled = true;
+                            console.log(`🎥 Enabled video track for slot join: ${track.label}, enabled: ${track.enabled}`);
+                        });
+                    }
+                }
+                
+                // Also enable microphone for better communication
+                if (!isMicOn) {
+                    isMicOn = true;
+                    const micBtn = document.getElementById('micBtn');
+                    const micIcon = micBtn.querySelector('i');
+                    micBtn.classList.add('active');
+                    micIcon.className = 'fas fa-microphone';
+                    
+                    if (localStream) {
+                        localStream.getAudioTracks().forEach(track => {
+                            track.enabled = true;
+                            console.log(`🎥 Enabled audio track for slot join: ${track.label}, enabled: ${track.enabled}`);
+                        });
+                    }
                 }
 
-                // Notify server and other users that this user joined a slot
+                // Notify server and other users that this user joined a slot FIRST
                 socket.emit('join-slot', { slotNumber });
 
-                // Update all peer connections to ensure video is shared
-                updatePeerConnections();
+                // Wait for host to process the join and create connection, then add tracks
+                setTimeout(() => {
+                    console.log('🎥 Adding our tracks to ALL peer connections via transceivers...');
+                    console.log(`🎥 Local stream tracks: Video=${localStream.getVideoTracks().length}, Audio=${localStream.getAudioTracks().length}`);
+                    
+                    for (const [userId, pc] of peerConnections.entries()) {
+                        try {
+                            console.log(`🎥 Processing connection to ${userId.substring(0,8)} via transceivers...`);
+                            
+                            // Get existing transceivers or create new ones
+                            const transceivers = pc.getTransceivers();
+                            let videoTransceiver = transceivers.find(t => t.receiver.track?.kind === 'video' || (!t.sender.track && !t.receiver.track));
+                            let audioTransceiver = transceivers.find(t => t.receiver.track?.kind === 'audio' || (!t.sender.track && !t.receiver.track && t !== videoTransceiver));
+                            
+                            // Create transceivers if they don't exist
+                            if (!videoTransceiver) {
+                                console.log(`🎥 Creating video transceiver for ${userId.substring(0,8)}`);
+                                videoTransceiver = pc.addTransceiver('video', { direction: 'sendrecv' });
+                            }
+                            if (!audioTransceiver) {
+                                console.log(`🎥 Creating audio transceiver for ${userId.substring(0,8)}`);
+                                audioTransceiver = pc.addTransceiver('audio', { direction: 'sendrecv' });
+                            }
+                            
+                            // Add video track via transceiver
+                            const videoTrack = localStream.getVideoTracks()[0];
+                            if (videoTrack && videoTransceiver && videoTransceiver.sender) {
+                                console.log(`🎥 Adding video track via transceiver to ${userId.substring(0,8)}`);
+                                videoTransceiver.sender.replaceTrack(videoTrack).catch(e => {
+                                    console.error(`🎥 Failed to replace video track:`, e);
+                                });
+                                videoTransceiver.direction = 'sendrecv';
+                            }
+                            
+                            // Add audio track via transceiver
+                            const audioTrack = localStream.getAudioTracks()[0];
+                            if (audioTrack && audioTransceiver && audioTransceiver.sender) {
+                                console.log(`🎥 Adding audio track via transceiver to ${userId.substring(0,8)}`);
+                                audioTransceiver.sender.replaceTrack(audioTrack).catch(e => {
+                                    console.error(`🎥 Failed to replace audio track:`, e);
+                                });
+                                audioTransceiver.direction = 'sendrecv';
+                            }
+                            
+                            console.log(`🎥 Successfully configured transceivers for ${userId.substring(0,8)}`);
+                            
+                        } catch (e) {
+                            console.error(`🎥 Failed to configure transceivers for ${userId.substring(0,8)}:`, e);
+                        }
+                    }
+                }, 500);
+
+                // Log connection states periodically for debugging
+                setTimeout(() => {
+                    console.log('🎥 Participant joined slot, checking connection states...');
+                    for (const [userId, pc] of peerConnections.entries()) {
+                        console.log(`🎥 Connection ${userId.substring(0,8)}: ${pc.connectionState}/${pc.signalingState}/${pc.iceConnectionState}`);
+                    }
+                }, 2000);
                 
                 addChatMessage('System', `You joined the conversation in slot ${slotNumber}! 📹`, true);
                 
