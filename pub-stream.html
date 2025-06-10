@@ -2045,27 +2045,41 @@
         
         async function handleSlotJoinConfirmed(data) {
             const { slotNumber } = data;
-            console.log('Participant confirmed slot join, adding tracks to peer connections...');
+            console.log('Participant confirmed slot join, adding tracks and triggering renegotiation...');
             
-            // SIMPLE FIX: Add participant's tracks to all peer connections
-            setTimeout(() => {
+            // CRITICAL FIX: Add participant's tracks AND trigger renegotiation
+            setTimeout(async () => {
                 for (const [userId, pc] of peerConnections.entries()) {
                     try {
                         // Add participant's tracks directly  
                         if (localStream && isCameraOn) {
+                            let tracksAdded = false;
                             localStream.getTracks().forEach(track => {
                                 const sender = pc.getSenders().find(s => s.track && s.track.kind === track.kind);
                                 if (!sender) {
                                     pc.addTrack(track, localStream);
                                     console.log(`Added ${track.kind} track to connection with ${userId.substring(0,8)}`);
+                                    tracksAdded = true;
                                 }
                             });
+                            
+                            // CRITICAL: Create new offer since we added tracks
+                            if (tracksAdded && pc.signalingState === 'stable') {
+                                console.log(`PARTICIPANT creating renegotiation offer for ${userId.substring(0,8)}`);
+                                const offer = await pc.createOffer();
+                                await pc.setLocalDescription(offer);
+                                socket.emit('offer', {
+                                    target: userId,
+                                    offer: offer
+                                });
+                                console.log(`PARTICIPANT sent renegotiation offer to ${userId.substring(0,8)}`);
+                            }
                         }
                     } catch (e) {
-                        console.error(`Failed to add tracks for ${userId.substring(0,8)}:`, e);
+                        console.error(`Failed to add tracks and renegotiate for ${userId.substring(0,8)}:`, e);
                     }
                 }
-            }, 1000);
+            }, 1500);
         }
 
         // Make functions globally available for onclick handlers
@@ -2331,6 +2345,12 @@
             console.log('📨 Offer SDP contains video:', offer.sdp.includes('m=video'));
             console.log('📨 Offer SDP contains audio:', offer.sdp.includes('m=audio'));
             
+            // Check if this is a renegotiation offer (connection already exists)
+            const existingConnection = peerConnections.has(sender);
+            if (existingConnection) {
+                console.log('📨 This is a RENEGOTIATION offer - participant added tracks');
+            }
+            
             let peerConnection = peerConnections.get(sender);
             
             // If no peer connection exists, create one
@@ -2359,6 +2379,15 @@
                 // Check if we can accept this offer
                 if (peerConnection.signalingState !== 'stable' && peerConnection.signalingState !== 'have-remote-offer') {
                     console.log(`📨 Cannot handle offer from ${sender.substring(0,8)}, signaling state: ${peerConnection.signalingState}`);
+                    // For renegotiation, wait a moment and try again
+                    if (existingConnection) {
+                        console.log(`📨 Waiting for stable state to handle renegotiation...`);
+                        setTimeout(() => {
+                            if (peerConnection.signalingState === 'stable') {
+                                handleOffer(data);
+                            }
+                        }, 1000);
+                    }
                     return;
                 }
 
