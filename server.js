@@ -313,6 +313,11 @@ io.on('connection', (socket) => {
       username: user.username,
       slotNumber: slotNumber
     });
+    
+    // Also notify the participant that they should update their peer connections
+    socket.emit('slot-join-confirmed', {
+      slotNumber: slotNumber
+    });
   });
 
   // Handle participant slot leave

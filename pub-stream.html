@@ -1235,6 +1235,10 @@
             socket.on('user-left-slot', (data) => {
                 handleUserLeftSlot(data);
             });
+            
+            socket.on('slot-join-confirmed', (data) => {
+                handleSlotJoinConfirmed(data);
+            });
         }
 
         function updateParticipantCount() {
@@ -1941,6 +1945,8 @@
                         console.log(`🎯 Host creating offer for ${userId.substring(0,8)}`);
                         const offer = await pc.createOffer();
                         await pc.setLocalDescription(offer);
+                        console.log(`🎯 Host offer SDP contains video: ${offer.sdp.includes('m=video')}`);
+                        console.log(`🎯 Host offer SDP contains audio: ${offer.sdp.includes('m=audio')}`);
                         socket.emit('offer', {
                             target: userId,
                             offer: offer
@@ -2059,6 +2065,68 @@
                 `;
                 slot.removeAttribute('data-occupied-by');
             }
+        }
+        
+        async function handleSlotJoinConfirmed(data) {
+            const { slotNumber } = data;
+            console.log('🎥 CONFIRMED: Server confirmed slot join, updating peer connections...');
+            
+            console.log('🎥 DEBUG: Participant state after slot join:');
+            console.log(`🎥 Local stream tracks: Video=${localStream.getVideoTracks().length}, Audio=${localStream.getAudioTracks().length}`);
+            console.log(`🎥 Camera enabled: ${isCameraOn}, Mic enabled: ${isMicOn}`);
+            console.log(`🎥 Peer connections: ${peerConnections.size}`);
+            
+            // Log track states
+            localStream.getVideoTracks().forEach((track, i) => {
+                console.log(`🎥 Video track ${i}: enabled=${track.enabled}, readyState=${track.readyState}, label=${track.label}`);
+            });
+            
+            // Wait a moment for all peer connections to be established, then add tracks
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            console.log('🎥 CRITICAL: Adding participant tracks to all peer connections...');
+            
+            for (const [userId, pc] of peerConnections.entries()) {
+                try {
+                    console.log(`🎥 Updating connection to ${userId.substring(0,8)}...`);
+                    console.log(`🎥 Current signaling state: ${pc.signalingState}`);
+                    console.log(`🎥 Current connection state: ${pc.connectionState}`);
+                    
+                    // Get current transceivers
+                    const transceivers = pc.getTransceivers();
+                    console.log(`🎥 Current transceivers: ${transceivers.length}`);
+                    
+                    transceivers.forEach((t, i) => {
+                        console.log(`🎥 Transceiver ${i}: direction=${t.direction}, sender.track=${t.sender.track?.kind}, receiver.track=${t.receiver.track?.kind}`);
+                    });
+                    
+                    // Update transceivers with our tracks
+                    const videoTrack = localStream.getVideoTracks()[0];
+                    const audioTrack = localStream.getAudioTracks()[0];
+                    
+                    let videoTransceiver = transceivers.find(t => t.receiver.track?.kind === 'video' || t.sender.track?.kind === 'video');
+                    let audioTransceiver = transceivers.find(t => t.receiver.track?.kind === 'audio' || t.sender.track?.kind === 'audio');
+                    
+                    if (videoTrack && videoTransceiver && videoTransceiver.sender) {
+                        console.log(`🎥 Replacing video track for ${userId.substring(0,8)}`);
+                        await videoTransceiver.sender.replaceTrack(videoTrack);
+                        videoTransceiver.direction = 'sendrecv';
+                    }
+                    
+                    if (audioTrack && audioTransceiver && audioTransceiver.sender) {
+                        console.log(`🎥 Replacing audio track for ${userId.substring(0,8)}`);
+                        await audioTransceiver.sender.replaceTrack(audioTrack);
+                        audioTransceiver.direction = 'sendrecv';
+                    }
+                    
+                    console.log(`🎥 Successfully updated transceivers for ${userId.substring(0,8)}`);
+                    
+                } catch (e) {
+                    console.error(`🎥 Failed to update connection for ${userId.substring(0,8)}:`, e);
+                }
+            }
+            
+            console.log('🎥 DONE: All peer connections updated with participant tracks');
         }
 
         // Make functions globally available for onclick handlers
@@ -2335,6 +2403,8 @@
         async function handleOffer(data) {
             const { offer, sender } = data;
             console.log('📨 Received offer from:', sender.substring(0,8), 'offer type:', offer.type);
+            console.log('📨 Offer SDP contains video:', offer.sdp.includes('m=video'));
+            console.log('📨 Offer SDP contains audio:', offer.sdp.includes('m=audio'));
             
             let peerConnection = peerConnections.get(sender);
             
@@ -2740,58 +2810,6 @@
 
                 // Notify server and other users that this user joined a slot FIRST
                 socket.emit('join-slot', { slotNumber });
-
-                // Wait for host to process the join and create connection, then add tracks
-                setTimeout(() => {
-                    console.log('🎥 Adding our tracks to ALL peer connections via transceivers...');
-                    console.log(`🎥 Local stream tracks: Video=${localStream.getVideoTracks().length}, Audio=${localStream.getAudioTracks().length}`);
-                    
-                    for (const [userId, pc] of peerConnections.entries()) {
-                        try {
-                            console.log(`🎥 Processing connection to ${userId.substring(0,8)} via transceivers...`);
-                            
-                            // Get existing transceivers or create new ones
-                            const transceivers = pc.getTransceivers();
-                            let videoTransceiver = transceivers.find(t => t.receiver.track?.kind === 'video' || (!t.sender.track && !t.receiver.track));
-                            let audioTransceiver = transceivers.find(t => t.receiver.track?.kind === 'audio' || (!t.sender.track && !t.receiver.track && t !== videoTransceiver));
-                            
-                            // Create transceivers if they don't exist
-                            if (!videoTransceiver) {
-                                console.log(`🎥 Creating video transceiver for ${userId.substring(0,8)}`);
-                                videoTransceiver = pc.addTransceiver('video', { direction: 'sendrecv' });
-                            }
-                            if (!audioTransceiver) {
-                                console.log(`🎥 Creating audio transceiver for ${userId.substring(0,8)}`);
-                                audioTransceiver = pc.addTransceiver('audio', { direction: 'sendrecv' });
-                            }
-                            
-                            // Add video track via transceiver
-                            const videoTrack = localStream.getVideoTracks()[0];
-                            if (videoTrack && videoTransceiver && videoTransceiver.sender) {
-                                console.log(`🎥 Adding video track via transceiver to ${userId.substring(0,8)}`);
-                                videoTransceiver.sender.replaceTrack(videoTrack).catch(e => {
-                                    console.error(`🎥 Failed to replace video track:`, e);
-                                });
-                                videoTransceiver.direction = 'sendrecv';
-                            }
-                            
-                            // Add audio track via transceiver
-                            const audioTrack = localStream.getAudioTracks()[0];
-                            if (audioTrack && audioTransceiver && audioTransceiver.sender) {
-                                console.log(`🎥 Adding audio track via transceiver to ${userId.substring(0,8)}`);
-                                audioTransceiver.sender.replaceTrack(audioTrack).catch(e => {
-                                    console.error(`🎥 Failed to replace audio track:`, e);
-                                });
-                                audioTransceiver.direction = 'sendrecv';
-                            }
-                            
-                            console.log(`🎥 Successfully configured transceivers for ${userId.substring(0,8)}`);
-                            
-                        } catch (e) {
-                            console.error(`🎥 Failed to configure transceivers for ${userId.substring(0,8)}:`, e);
-                        }
-                    }
-                }, 500);
 
                 // Log connection states periodically for debugging
                 setTimeout(() => {
