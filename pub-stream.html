@@ -2589,73 +2589,115 @@
         }
 
         function displayRemoteVideo(userId, stream) {
-            console.log(`Displaying remote video from: ${userId}. My ID: ${socket.id}. Streamer ID: ${streamerId}. Is Host: ${isHost}`);
+            console.log(`🎬 💪 BULLETPROOF DISPLAY for ${userId.substring(0,8)}`);
 
             // Validate stream has video tracks
             const videoTracks = stream.getVideoTracks();
             if (videoTracks.length === 0) {
-                console.log(`No video tracks in stream from ${userId}`);
+                console.log(`❌ No video tracks in stream from ${userId}`);
                 return;
             }
             
-            console.log(`Stream from ${userId} has ${videoTracks.length} video track(s), enabled: ${videoTracks[0].enabled}`);
+            console.log(`✅ Stream from ${userId} has ${videoTracks.length} video track(s)`);
+            videoTracks.forEach((track, i) => {
+                console.log(`📹 Track ${i}: enabled=${track.enabled}, readyState=${track.readyState}, muted=${track.muted}`);
+            });
 
             // If I am a participant, and this stream is from the broadcaster, show it in the main video.
             if (!isHost && userId === streamerId) {
-                console.log(`I am a participant, and this is the host's stream. Displaying in main video.`);
+                console.log(`Displaying host stream in main video area`);
                 const hostVideo = document.getElementById('hostVideo');
                 const videoPlaceholder = document.getElementById('videoPlaceholder');
                 
                 if (hostVideo && videoPlaceholder) {
-                    console.log('Setting host video source...');
                     hostVideo.srcObject = stream;
                     hostVideo.style.display = 'block';
                     videoPlaceholder.style.display = 'none';
-                    
-                    // Ensure video plays
-                    hostVideo.play().then(() => {
-                        console.log('Host video started playing successfully');
-                        addChatMessage('System', '📺 Broadcaster camera is now visible!', true);
-                    }).catch(e => {
-                        console.error("Host video play failed:", e);
-                        // Retry play after a short delay
-                        setTimeout(() => {
-                            hostVideo.play().catch(e2 => console.error("Host video retry failed:", e2));
-                        }, 500);
-                    });
+                    hostVideo.play().catch(e => console.error("Host video play failed:", e));
                 }
-                return; // Stop here, don't try to put the host in a participant slot.
+                return;
             }
 
-            // For all other cases (I am host, or this is another participant's stream), handle slot display.
+            // BULLETPROOF PARTICIPANT VIDEO DISPLAY
             const userSlot = document.querySelector(`[data-occupied-by="${userId}"]`);
             if (userSlot) {
-                console.log(`Found slot for user ${userId}, updating video.`);
+                console.log(`🎯 FOUND SLOT for ${userId.substring(0,8)}, forcing video display...`);
+                
                 const video = userSlot.querySelector('video');
                 const connectingIndicator = userSlot.querySelector('.connecting-indicator');
 
                 if (video) {
-                    console.log(`Setting participant video source for ${userId}...`);
+                    // FORCE VIDEO DISPLAY - Multiple approaches
+                    console.log(`🚀 FORCE SETTING video source for ${userId.substring(0,8)}`);
+                    
+                    // Method 1: Set srcObject directly
                     video.srcObject = stream;
                     video.style.display = 'block';
+                    video.style.width = '100%';
+                    video.style.height = '100%';
+                    video.style.objectFit = 'cover';
+                    video.autoplay = true;
+                    video.playsInline = true;
+                    video.muted = false; // Unmute to ensure it plays
+                    
+                    // Remove connecting indicator immediately
                     if (connectingIndicator) {
+                        console.log(`💥 REMOVING connecting indicator for ${userId.substring(0,8)}`);
                         connectingIndicator.remove();
                     }
                     
-                    // Ensure video plays
-                    video.play().then(() => {
-                        console.log(`Participant video for ${userId} started playing successfully`);
-                        addChatMessage('System', `📹 ${userId.substring(0,4)}'s camera connected!`, true);
-                    }).catch(e => {
-                        console.error(`Participant video play failed for ${userId}:`, e);
-                        // Retry play after a short delay
-                        setTimeout(() => {
-                            video.play().catch(e2 => console.error(`Participant video retry failed for ${userId}:`, e2));
-                        }, 500);
-                    });
+                    // FORCE PLAY VIDEO - Multiple attempts
+                    const forcePlay = async () => {
+                        try {
+                            console.log(`▶️ ATTEMPTING to play video for ${userId.substring(0,8)}`);
+                            await video.play();
+                            console.log(`✅ SUCCESS! Video playing for ${userId.substring(0,8)}`);
+                            addChatMessage('System', `📹 ${userId.substring(0,4)}'s camera connected!`, true);
+                        } catch (e) {
+                            console.error(`❌ Video play failed for ${userId.substring(0,8)}:`, e);
+                            
+                            // Try muted autoplay as fallback
+                            video.muted = true;
+                            try {
+                                await video.play();
+                                console.log(`✅ Video playing MUTED for ${userId.substring(0,8)}`);
+                            } catch (e2) {
+                                console.error(`❌ Even muted play failed:`, e2);
+                            }
+                        }
+                    };
+                    
+                    // Multiple play attempts
+                    forcePlay();
+                    setTimeout(forcePlay, 100);
+                    setTimeout(forcePlay, 500);
+                    setTimeout(forcePlay, 1000);
+                    
+                    // BACKUP: Recreate video element if needed
+                    setTimeout(() => {
+                        if (video.readyState === 0) {
+                            console.log(`🔄 Video not ready, recreating element for ${userId.substring(0,8)}`);
+                            const newVideo = document.createElement('video');
+                            newVideo.srcObject = stream;
+                            newVideo.autoplay = true;
+                            newVideo.muted = true;
+                            newVideo.playsInline = true;
+                            newVideo.style.width = '100%';
+                            newVideo.style.height = '100%';
+                            newVideo.style.objectFit = 'cover';
+                            newVideo.className = 'participant-video';
+                            
+                            video.parentNode.replaceChild(newVideo, video);
+                            newVideo.play().catch(e => console.error("Recreated video play failed:", e));
+                            console.log(`🔄 Recreated video element for ${userId.substring(0,8)}`);
+                        }
+                    }, 2000);
+                    
+                } else {
+                    console.log(`❌ No video element found in slot for ${userId.substring(0,8)}`);
                 }
             } else {
-                console.log(`No slot found for user ${userId}, storing stream for later.`);
+                console.log(`❌ No slot found for user ${userId.substring(0,8)}, storing stream for later.`);
                 remoteStreams.set(userId, stream);
             }
         }
