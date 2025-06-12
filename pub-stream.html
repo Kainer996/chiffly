@@ -843,6 +843,49 @@
             0% { opacity: 0.7; }
             100% { opacity: 1; }
         }
+
+        .participants-area, .chat-area {
+            padding: 4px 0 !important;
+            margin: 0 !important;
+            border: none !important;
+            border-radius: 6px !important;
+        }
+        .participants-grid {
+            gap: 4px !important;
+        }
+        .participant-slot {
+            margin: 0 !important;
+            padding: 2px !important;
+            border-radius: 6px !important;
+            border: 1px solid #333 !important;
+            min-width: 0 !important;
+            min-height: 0 !important;
+            background: #181818 !important;
+        }
+        .participant-video, .participant-slot video {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            border-radius: 4px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        .chat-messages {
+            padding: 2px 4px !important;
+            font-size: 1em !important;
+        }
+        @media (max-width: 768px) {
+            .participants-area, .chat-area {
+                padding: 2px 0 !important;
+            }
+            .participant-slot {
+                padding: 1px !important;
+                border-radius: 4px !important;
+            }
+            .chat-messages {
+                font-size: 1.1em !important;
+            }
+        }
     </style>
 </head>
 <body>
