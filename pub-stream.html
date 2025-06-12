@@ -863,7 +863,7 @@
                     <p id="pubDescription">Welcome to our virtual pub! Grab a drink and chat.</p>
                 </div>
             </div>
-            <div class="stream-controls">
+            <div class="stream-controls" id="mainStreamControls">
                 <div class="theme-selector">
                     <button class="theme-btn active" onclick="setTheme('default')">Default</button>
                     <button class="theme-btn" onclick="setTheme('cyberpunk')">Cyberpunk</button>
@@ -1155,6 +1155,9 @@
                 
                 // Start connection health monitoring
                 startConnectionHealthCheck();
+
+                // Update main stream controls visibility
+                updateMainControlsVisibility();
             });
 
             socket.on('user-joined', (data) => {
@@ -2298,8 +2301,8 @@
                 
                 // AGGRESSIVE DISPLAY ATTEMPTS - Force show the video
                 const forceDisplayVideo = () => {
-                    displayRemoteVideo(userId, remoteStream);
-                    
+                displayRemoteVideo(userId, remoteStream);
+                
                     // Also force update any stuck connecting indicators
                     const userSlot = document.querySelector(`[data-occupied-by="${userId}"]`);
                     if (userSlot) {
@@ -2652,7 +2655,7 @@
                             console.log(`▶️ ATTEMPTING to play video for ${userId.substring(0,8)}`);
                             await video.play();
                             console.log(`✅ SUCCESS! Video playing for ${userId.substring(0,8)}`);
-                            addChatMessage('System', `📹 ${userId.substring(0,4)}'s camera connected!`, true);
+                        addChatMessage('System', `📹 ${userId.substring(0,4)}'s camera connected!`, true);
                         } catch (e) {
                             console.error(`❌ Video play failed for ${userId.substring(0,8)}:`, e);
                             
@@ -2674,7 +2677,7 @@
                     setTimeout(forcePlay, 1000);
                     
                     // BACKUP: Recreate video element if needed
-                    setTimeout(() => {
+                        setTimeout(() => {
                         if (video.readyState === 0) {
                             console.log(`🔄 Video not ready, recreating element for ${userId.substring(0,8)}`);
                             const newVideo = document.createElement('video');
@@ -2693,7 +2696,7 @@
                         }
                     }, 2000);
                     
-                } else {
+            } else {
                     console.log(`❌ No video element found in slot for ${userId.substring(0,8)}`);
                 }
             } else {
@@ -2804,6 +2807,14 @@
                     <button class="leave-slot-btn" onclick="leaveSlot(${slotNumber})">
                         <i class="fas fa-times"></i>
                     </button>
+                    <div class="participant-controls">
+                        <button class="participant-control-btn" id="participantCamBtn" onclick="toggleCamera()">
+                            <i class="fas fa-video"></i>
+                        </button>
+                        <button class="participant-control-btn" id="participantMicBtn" onclick="toggleMic()">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                    </div>
                 `;
                 
                 const video = slot.querySelector('video');
@@ -2930,7 +2941,16 @@
             }
             console.log('=== END DEBUG ===');
         };
+
+        // Hide main stream controls for participants
+        function updateMainControlsVisibility() {
+            const controls = document.getElementById('mainStreamControls');
+            if (!isHost && controls) {
+                controls.style.display = 'none';
+            } else if (isHost && controls) {
+                controls.style.display = '';
+            }
+        }
     </script>
 </body>
-</html> 
 </html> 
