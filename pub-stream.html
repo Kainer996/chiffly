@@ -1024,6 +1024,8 @@
 
     <!-- Scripts -->
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <!-- Global XP / Leveling system -->
+    <script src="xp-system.js?v=1"></script>
     <script>
         let localStream = null;
         let isStreaming = false;
@@ -1130,6 +1132,12 @@
                     isStreamer: isHost,
                     roomType: 'pub'
                 });
+
+                // Award XP for entering the pub room
+                if (window.xpSystem) {
+                    const xpAmount = isHost ? 25 : 10; // Hosts get more XP for organising
+                    xpSystem.addXp(currentUser, xpAmount, 'entering the pub');
+                }
             });
 
             socket.on('disconnect', () => {
@@ -1819,6 +1827,11 @@
                     socket.emit('chat-message', {
                         text: '📺 Started the pub stream! 🍻'
                     });
+                }
+                
+                // Award XP for broadcasting
+                if (window.xpSystem && isHost) {
+                    xpSystem.addXp(currentUser, 50, 'starting a broadcast');
                 }
                 
                 console.log('Stream started');
@@ -2910,6 +2923,11 @@
                 }, 2000);
                 
                 addChatMessage('System', `You joined the conversation in slot ${slotNumber}! 📹`, true);
+                
+                // Award XP for going on camera
+                if (window.xpSystem) {
+                    xpSystem.addXp(currentUser, 15, 'going on camera');
+                }
                 
             } catch (error) {
                 console.error('Error accessing camera:', error);

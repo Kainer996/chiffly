@@ -404,6 +404,11 @@ function initializeAuth() {
             registeredAt: new Date().toISOString(),
             lastLogin: new Date().toISOString(),
             loginCount: 0,
+            // --- RPG XP system fields ---
+            xp: 0,
+            achievements: [],
+            inventory: [],
+            // --------------------------------
             preferences: {
                 rememberMe: true,
                 theme: 'default',
@@ -715,17 +720,23 @@ function initializeAuth() {
         
         if (username && users[username]) {
             const user = users[username];
+            const level = typeof xpSystem !== 'undefined' ? xpSystem.getLevel(user.xp || 0) : Math.floor((user.xp || 0) / 100) + 1;
+
             console.log(`📊 User Info for ${username}:`, {
                 email: user.email,
                 registeredAt: user.registeredAt,
                 lastLogin: user.lastLogin,
                 loginCount: user.loginCount,
+                xp: user.xp || 0,
+                level: level,
+                achievements: user.achievements || [],
+                inventory: user.inventory || [],
                 preferences: user.preferences,
                 currentSession: currentSession
             });
             
             const lastLogin = new Date(user.lastLogin).toLocaleDateString();
-            showNotification(`${username} - Last login: ${lastLogin}, Total logins: ${user.loginCount || 0}`, 'info');
+            showNotification(`${username} | Lvl ${level} | XP: ${user.xp || 0} | Last login: ${lastLogin}`, 'info');
         } else {
             showNotification('User not found or not signed in', 'error');
         }
