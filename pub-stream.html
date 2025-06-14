@@ -425,38 +425,65 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 10;
+            z-index: 1000;
             cursor: pointer;
             transition: all 0.3s ease;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .click-to-play-overlay:hover {
-            background: rgba(0, 0, 0, 0.9);
+        .click-to-play-overlay:hover,
+        .click-to-play-overlay:active {
+            background: rgba(0, 0, 0, 0.95);
+            transform: scale(1.02);
         }
 
         .click-to-play-overlay i {
-            font-size: 3rem;
+            font-size: 4rem;
             color: #ed8936;
             margin-bottom: 1rem;
             animation: pulse 2s infinite;
+            text-shadow: 0 0 20px rgba(237, 137, 54, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .click-to-play-overlay:hover i {
+            color: #ff9f47;
+            transform: scale(1.1);
         }
 
         .click-to-play-overlay span {
             color: white;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
+            font-weight: bold;
             text-align: center;
             padding: 0 1rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
         }
 
         .click-to-play-overlay .subtitle {
             font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(255, 255, 255, 0.8);
             margin-top: 0.5rem;
+            text-align: center;
+            padding: 0 1rem;
+        }
+
+        /* Enhanced pulse animation */
+        @keyframes pulse {
+            0%, 100% { 
+                opacity: 1; 
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 0.7; 
+                transform: scale(1.05);
+            }
         }
 
         .clickable-slot .participant-placeholder {
@@ -1149,23 +1176,58 @@
                 <div class="subtitle">Your browser requires user interaction to play videos</div>
             `;
             
+            // Also add a direct click handler to the video element as backup
+            const videoClickHandler = async (event) => {
+                event.preventDefault();
+                logToChat('🖱️ Direct video click detected', 'info');
+                try {
+                    videoElement.muted = true;
+                    await videoElement.play();
+                    logToChat('✅ Video playing from direct click!', 'success');
+                    hideClickToPlayOverlay(videoElement);
+                    videoElement.removeEventListener('click', videoClickHandler);
+                } catch (error) {
+                    logToChat(`❌ Direct video click failed: ${error.name}`, 'error');
+                }
+            };
+            videoElement.addEventListener('click', videoClickHandler);
+            
             // Position overlay relative to video's parent
             const parent = videoElement.parentElement;
             if (parent) {
                 parent.style.position = 'relative';
                 parent.appendChild(overlay);
                 
-                // Add click handler
-                overlay.addEventListener('click', async () => {
-                    logToChat('User clicked to play video', 'info');
+                // Add click handler with enhanced debugging
+                overlay.addEventListener('click', async (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    
+                    logToChat('🖱️ User clicked to play video', 'info');
+                    logToChat(`📊 Video element state: readyState=${videoElement.readyState}, srcObject=${!!videoElement.srcObject}`, 'info');
+                    
                     try {
-                        // Try multiple approaches to get video playing
-                        videoElement.muted = true; // Ensure muted for autoplay
+                        // Ensure video element has proper attributes
+                        videoElement.muted = true;
                         videoElement.playsInline = true;
                         videoElement.autoplay = true;
+                        videoElement.controls = false;
                         
+                        // Check if video has a source
+                        if (!videoElement.srcObject) {
+                            logToChat('⚠️ Video has no srcObject, this might be the issue', 'warn');
+                            // Try to find and use any available stream
+                            if (window.localStream) {
+                                logToChat('🔄 Attempting to set localStream as srcObject', 'info');
+                                videoElement.srcObject = window.localStream;
+                            }
+                        }
+                        
+                        logToChat('▶️ Attempting to play video after user click...', 'info');
                         await videoElement.play();
-                        logToChat('✅ Video playing after user interaction!', 'success');
+                        
+                        logToChat('✅ Video playing successfully after user interaction!', 'success');
+                        addChatMessage('System', '🎬 Video started! Click video again to unmute.', true);
                         hideClickToPlayOverlay(videoElement);
                         
                         // Add unmute option after successful play
@@ -1177,9 +1239,21 @@
                                 videoElement.onclick = null;
                             };
                         }, 1000);
+                        
                     } catch (error) {
-                        logToChat(`❌ Video play failed even after user interaction: ${error.name}`, 'error');
-                        // Keep overlay visible for another attempt
+                        logToChat(`❌ Video play failed even after user interaction: ${error.name} - ${error.message}`, 'error');
+                        logToChat(`📊 Video state after error: readyState=${videoElement.readyState}, paused=${videoElement.paused}`, 'error');
+                        
+                        // Try alternative approach - reload the video source
+                        if (videoElement.srcObject) {
+                            logToChat('🔄 Trying to reload video source...', 'info');
+                            const currentSrc = videoElement.srcObject;
+                            videoElement.srcObject = null;
+                            setTimeout(() => {
+                                videoElement.srcObject = currentSrc;
+                                videoElement.play().catch(e => logToChat(`❌ Reload attempt failed: ${e.name}`, 'error'));
+                            }, 100);
+                        }
                     }
                 });
             }
