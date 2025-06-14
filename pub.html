@@ -414,7 +414,7 @@
                     username: username.trim(),
                     host: '1'
                 });
-                window.location.href = `pub-stream.html?${params.toString()}`;
+                window.location.href = `pub-stream.html?v=${new Date().getTime()}&${params.toString()}`;
             }
         }
 
@@ -445,7 +445,7 @@
                 username: username.trim(),
                 host: '0'
             });
-            window.location.href = `pub-stream.html?${params.toString()}`;
+            window.location.href = `pub-stream.html?v=${new Date().getTime()}&${params.toString()}`;
         }
 
         // Initialize socket connection
@@ -500,7 +500,7 @@
                         username: username,
                         host: '1'
                     });
-                    window.location.href = `pub-stream.html?${params.toString()}`;
+                    window.location.href = `pub-stream.html?v=${new Date().getTime()}&${params.toString()}`;
                 }, 500);
             });
 

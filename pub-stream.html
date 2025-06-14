@@ -889,6 +889,19 @@
     </style>
 </head>
 <body>
+    <div id="debug-log-container" style="position: fixed; top: 0; left: 0; right: 0; background: rgba(0,0,0,0.8); color: #fff; padding: 5px; font-size: 10px; z-index: 99999; max-height: 30vh; overflow-y: scroll; font-family: monospace; display: block;">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 5px; border-bottom: 1px solid #555;">
+            <h4 style="margin: 0; padding: 0;">Live Diagnostics</h4>
+            <button onclick="document.getElementById('debug-log-container').style.display='none'" style="background: #555; border: none; color: #fff; cursor: pointer;">Close</button>
+        </div>
+        <div id="debug-log"></div>
+    </div>
+
+    <!-- Theme selection modal -->
+    <div id="themeModal" class="modal">
+        <!-- Add your theme selection content here -->
+    </div>
+
     <!-- Back Button -->
     <button class="back-btn" onclick="window.location.href='pub.html'">
         <i class="fas fa-arrow-left"></i>
@@ -1048,17 +1061,32 @@
         const isDebugMode = true; // Set to true to see detailed logs in chat
 
         function logToChat(message, level = 'info') {
-            if (!isDebugMode) return;
-            
-            let icon = '💬';
-            if (level === 'error') icon = '❌';
-            if (level === 'warn') icon = '⚠️';
-            if (level === 'success') icon = '✅';
-            if (level === 'net') icon = '🌐';
-            
-            console.log(`[DEBUG] ${message}`);
-            addChatMessage('Debug', `${icon} ${message}`, true);
+            const logContainer = document.getElementById('debug-log');
+            if (logContainer) {
+                const d = new Date();
+                const timestamp = `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}.${String(d.getMilliseconds()).padStart(3, '0')}`;
+                
+                const p = document.createElement('p');
+                p.style.margin = '2px 0';
+                p.style.borderBottom = '1px solid #444';
+                p.style.paddingBottom = '2px';
+                
+                let icon = '💬';
+                if (level === 'error') { icon = '❌'; p.style.color = '#ff8a8a'; }
+                if (level === 'warn') { icon = '⚠️'; p.style.color = '#ffdca8'; }
+                if (level === 'success') { icon = '✅'; p.style.color = '#a8ffb1'; }
+                if (level === 'net') { icon = '🌐'; p.style.color = '#a8dfff'; }
+                
+                p.innerHTML = `<strong>[${timestamp}]</strong> ${icon} ${message}`;
+                logContainer.appendChild(p);
+                logContainer.scrollTop = logContainer.scrollHeight;
+            }
+
+            console.log(`[${level.toUpperCase()}] ${message}`);
         }
+
+        // Add an immediate log to confirm script version
+        setTimeout(() => logToChat('DIAGNOSTIC SCRIPT v3 LOADED', 'success'), 100);
 
         // =================================================================================
         // CORE INITIALIZATION
@@ -3174,15 +3202,15 @@
                 setTimeout(() => {
                     logToChat('--- Diagnostics Complete ---', 'info');
                     if (hasSrflx) {
-                        logToChat('STUN server connection: SUCCESSFUL', 'success');
+                        logToChat('STUN server connection: SUCCESSFUL (Direct connection possible)', 'success');
                     } else {
-                        logToChat('STUN server connection: FAILED', 'error');
+                        logToChat('STUN server connection: FAILED (Cannot find public IP)', 'error');
                     }
                     if (hasRelay) {
-                        logToChat('TURN server connection: SUCCESSFUL', 'success');
+                        logToChat('TURN server connection: SUCCESSFUL (Relay connection possible)', 'success');
                     } else {
-                        logToChat('TURN server connection: FAILED', 'error');
-                        logToChat('This is likely the cause of the problem.', 'warn');
+                        logToChat('TURN server connection: FAILED (Relay connection NOT possible)', 'error');
+                        logToChat('The failure of TURN servers is the most likely cause of the problem.', 'warn');
                     }
                     testPC.close();
                 }, 3000);
