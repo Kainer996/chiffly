@@ -1095,8 +1095,20 @@
         // CORE INITIALIZATION
         // =================================================================================
         document.addEventListener('DOMContentLoaded', function() {
+            logToChat('Page loaded, initializing...', 'info');
             initializeSocketConnection();
             initializeTheme();
+            
+            // CRITICAL: Initialize camera/mic stream on page load
+            setTimeout(async () => {
+                logToChat('Initializing camera and microphone...', 'info');
+                try {
+                    await initializePubStream();
+                    logToChat('Camera/microphone initialized successfully!', 'success');
+                } catch (error) {
+                    logToChat(`Camera/microphone initialization failed: ${error.message}`, 'error');
+                }
+            }, 1000);
         });
 
         function initializeTheme() {
@@ -1599,6 +1611,8 @@
         }
 
         async function initializePubStream() {
+            logToChat('Starting camera/microphone initialization...', 'info');
+            
             try {
                 // Mobile-friendly camera constraints with better compatibility
                 const constraints = {
@@ -1616,14 +1630,14 @@
                     }
                 };
 
-                console.log('Requesting media devices with mobile-friendly constraints...');
+                logToChat('Requesting camera and microphone permissions...', 'info');
                 
                 // Request camera and microphone permissions
                 localStream = await navigator.mediaDevices.getUserMedia(constraints);
                 
-                console.log('Media stream obtained successfully');
-                console.log('Video tracks:', localStream.getVideoTracks());
-                console.log('Audio tracks:', localStream.getAudioTracks());
+                logToChat('Media stream obtained successfully!', 'success');
+                logToChat(`Video tracks: ${localStream.getVideoTracks().length}`, 'info');
+                logToChat(`Audio tracks: ${localStream.getAudioTracks().length}`, 'info');
                 
                 // Initially turn off camera and mic
                 localStream.getVideoTracks().forEach(track => {
@@ -1633,11 +1647,11 @@
                 localStream.getAudioTracks().forEach(track => track.enabled = false);
                 
             } catch (error) {
-                console.error('Error accessing media devices:', error);
+                logToChat(`Initial camera request failed: ${error.name} - ${error.message}`, 'error');
                 
                 // Try fallback constraints for older mobile devices
                 try {
-                    console.log('Trying fallback constraints...');
+                    logToChat('Trying fallback constraints...', 'warn');
                     const fallbackConstraints = {
                         video: {
                             facingMode: 'user',
@@ -1966,11 +1980,26 @@
             }
         }
 
-        function toggleCamera() {
+        async function toggleCamera() {
+            logToChat(`Toggle camera called. Current state: ${isCameraOn ? 'ON' : 'OFF'}`, 'info');
+            
             const cameraBtn = document.getElementById('cameraBtn');
             const cameraIcon = cameraBtn.querySelector('i');
             const hostVideo = document.getElementById('hostVideo');
             const videoPlaceholder = document.getElementById('videoPlaceholder');
+            
+            // If localStream doesn't exist, try to initialize it first
+            if (!localStream) {
+                logToChat('Local stream not found, attempting to initialize...', 'warn');
+                try {
+                    await initializePubStream();
+                    logToChat('Stream initialization successful!', 'success');
+                } catch (error) {
+                    logToChat(`Stream initialization failed: ${error.message}`, 'error');
+                    showError('Camera not available. Please refresh the page and allow camera access.');
+                    return;
+                }
+            }
             
             if (localStream) {
                 isCameraOn = !isCameraOn;
