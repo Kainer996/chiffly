@@ -418,6 +418,47 @@
             transform: scale(1.02);
         }
 
+        /* Click to play overlay for mobile autoplay restrictions */
+        .click-to-play-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .click-to-play-overlay:hover {
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        .click-to-play-overlay i {
+            font-size: 3rem;
+            color: #ed8936;
+            margin-bottom: 1rem;
+            animation: pulse 2s infinite;
+        }
+
+        .click-to-play-overlay span {
+            color: white;
+            font-size: 1.1rem;
+            text-align: center;
+            padding: 0 1rem;
+        }
+
+        .click-to-play-overlay .subtitle {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 0.5rem;
+        }
+
         .clickable-slot .participant-placeholder {
             border: 2px dashed rgba(237, 137, 54, 0.3);
         }
@@ -1090,6 +1131,70 @@
 
         // Add an immediate log to confirm script version
         setTimeout(() => logToChat('DIAGNOSTIC SCRIPT v3 LOADED', 'success'), 100);
+
+        // =================================================================================
+        // CLICK-TO-PLAY OVERLAY FUNCTIONS FOR MOBILE AUTOPLAY RESTRICTIONS
+        // =================================================================================
+        function showClickToPlayOverlay(videoElement) {
+            logToChat('Showing click-to-play overlay for mobile autoplay restrictions', 'warn');
+            
+            // Remove any existing overlay
+            hideClickToPlayOverlay(videoElement);
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'click-to-play-overlay';
+            overlay.innerHTML = `
+                <i class="fas fa-play-circle"></i>
+                <span>Tap to play video</span>
+                <div class="subtitle">Your browser requires user interaction to play videos</div>
+            `;
+            
+            // Position overlay relative to video's parent
+            const parent = videoElement.parentElement;
+            if (parent) {
+                parent.style.position = 'relative';
+                parent.appendChild(overlay);
+                
+                // Add click handler
+                overlay.addEventListener('click', async () => {
+                    logToChat('User clicked to play video', 'info');
+                    try {
+                        // Try multiple approaches to get video playing
+                        videoElement.muted = true; // Ensure muted for autoplay
+                        videoElement.playsInline = true;
+                        videoElement.autoplay = true;
+                        
+                        await videoElement.play();
+                        logToChat('✅ Video playing after user interaction!', 'success');
+                        hideClickToPlayOverlay(videoElement);
+                        
+                        // Add unmute option after successful play
+                        setTimeout(() => {
+                            videoElement.onclick = () => {
+                                videoElement.muted = false;
+                                logToChat('🔊 Video unmuted by user', 'info');
+                                addChatMessage('System', '🔊 Video unmuted! You can now hear the audio.', true);
+                                videoElement.onclick = null;
+                            };
+                        }, 1000);
+                    } catch (error) {
+                        logToChat(`❌ Video play failed even after user interaction: ${error.name}`, 'error');
+                        // Keep overlay visible for another attempt
+                    }
+                });
+            }
+        }
+
+        function hideClickToPlayOverlay(videoElement) {
+            const parent = videoElement.parentElement;
+            if (parent) {
+                const existingOverlay = parent.querySelector('.click-to-play-overlay');
+                if (existingOverlay) {
+                    existingOverlay.remove();
+                    logToChat('Removed click-to-play overlay', 'info');
+                }
+            }
+        }
 
         // =================================================================================
         // CORE INITIALIZATION
@@ -2832,13 +2937,24 @@
                         hostVideo.muted = true; // Start muted for autoplay compatibility
                         hostVideo.autoplay = true;
                         
-                        // ENHANCED: Multiple attempts to ensure video plays
+                        // ENHANCED: Multiple attempts to ensure video plays with mobile fallback
+                        let playAttempts = 0;
+                        const maxAttempts = 3;
+                        
                         const playVideo = async () => {
                             try {
-                                logToChat('Attempting to play host video...', 'info');
+                                playAttempts++;
+                                logToChat(`Attempting to play host video... (attempt ${playAttempts})`, 'info');
+                                
+                                // Force video properties before each attempt
+                                hostVideo.muted = true;
+                                hostVideo.playsInline = true;
+                                hostVideo.autoplay = true;
+                                
                                 await hostVideo.play();
-                                logToChat('Host video playing successfully!', 'success');
+                                logToChat('✅ Host video playing successfully!', 'success');
                                 addChatMessage('System', '📹 Host camera connected! Click video to unmute.', true);
+                                hideClickToPlayOverlay(hostVideo);
                                 
                                 // Add click handler to unmute
                                 hostVideo.onclick = () => {
@@ -2847,18 +2963,21 @@
                                     addChatMessage('System', '🔊 Video unmuted!', true);
                                 };
                             } catch (e) {
-                                logToChat(`Host video play failed: ${e.name}`, 'error');
-                                if (e.name === 'NotAllowedError') {
-                                    logToChat('Autoplay was blocked. Click the video to play.', 'warn');
+                                logToChat(`❌ Host video play failed: ${e.name} - ${e.message}`, 'error');
+                                
+                                if (playAttempts >= maxAttempts) {
+                                    logToChat('❌ All autoplay attempts failed - showing click-to-play overlay', 'warn');
+                                    showClickToPlayOverlay(hostVideo);
+                                    addChatMessage('System', '📱 Tap the video to start playback (mobile browser restriction)', true);
+                                } else {
+                                    // Try again after a short delay
+                                    setTimeout(playVideo, 500);
                                 }
                             }
                         };
                         
-                        // Multiple play attempts with delays
+                        // Start first play attempt
                         playVideo();
-                        setTimeout(playVideo, 200);
-                        setTimeout(playVideo, 500);
-                        setTimeout(playVideo, 1000);
                     }, 100);
                 }
                 return;
@@ -2892,32 +3011,39 @@
                         connectingIndicator.remove();
                     }
                     
-                    // FORCE PLAY VIDEO - Multiple attempts
+                    // FORCE PLAY VIDEO - Multiple attempts with mobile fallback
+                    let participantPlayAttempts = 0;
+                    const maxParticipantAttempts = 3;
+                    
                     const forcePlay = async () => {
                         try {
-                            console.log(`▶️ ATTEMPTING to play video for ${userId.substring(0,8)}`);
-                            await video.play();
-                            console.log(`✅ SUCCESS! Video playing for ${userId.substring(0,8)}`);
-                        addChatMessage('System', `📹 ${userId.substring(0,4)}'s camera connected!`, true);
-                        } catch (e) {
-                            console.error(`❌ Video play failed for ${userId.substring(0,8)}:`, e);
+                            participantPlayAttempts++;
+                            logToChat(`▶️ Attempting to play participant video... (attempt ${participantPlayAttempts})`, 'info');
                             
-                            // Try muted autoplay as fallback
+                            // Force video properties
                             video.muted = true;
-                            try {
-                                await video.play();
-                                console.log(`✅ Video playing MUTED for ${userId.substring(0,8)}`);
-                            } catch (e2) {
-                                console.error(`❌ Even muted play failed:`, e2);
+                            video.playsInline = true;
+                            video.autoplay = true;
+                            
+                            await video.play();
+                            logToChat(`✅ Participant video playing successfully!`, 'success');
+                            addChatMessage('System', `📹 ${userId.substring(0,4)}'s camera connected!`, true);
+                            hideClickToPlayOverlay(video);
+                        } catch (e) {
+                            logToChat(`❌ Participant video play failed: ${e.name}`, 'error');
+                            
+                            if (participantPlayAttempts >= maxParticipantAttempts) {
+                                logToChat('❌ All participant video autoplay attempts failed - showing click-to-play overlay', 'warn');
+                                showClickToPlayOverlay(video);
+                            } else {
+                                // Try again after a short delay
+                                setTimeout(forcePlay, 500);
                             }
                         }
                     };
                     
-                    // Multiple play attempts
+                    // Start first play attempt
                     forcePlay();
-                    setTimeout(forcePlay, 100);
-                    setTimeout(forcePlay, 500);
-                    setTimeout(forcePlay, 1000);
                     
                     // BACKUP: Recreate video element if needed
                         setTimeout(() => {
