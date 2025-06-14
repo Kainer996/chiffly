@@ -1047,8 +1047,11 @@
         let isHost = false;
         let streamerId = null;
         let localStream = null;
+        let isStreaming = false;
         let isCameraOn = false;
         let isMicOn = false;
+        let currentTheme = 'default';
+        let currentFacingMode = 'user';
         let currentRoom = null;
         let currentUser = null;
         let peerConnections = new Map();
