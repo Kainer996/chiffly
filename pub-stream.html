@@ -1194,6 +1194,18 @@
                     setTimeout(() => {
                         console.log('🎥 HOST: Updating peer connections with tracks...');
                         updatePeerConnections();
+                        
+                        // CRITICAL: If host already has camera on, force immediate negotiation
+                        if (isCameraOn) {
+                            console.log('🎥 HOST: Camera already on, forcing immediate broadcast to all participants...');
+                            for (const [userId, pc] of peerConnections.entries()) {
+                                if (pc.signalingState === 'stable') {
+                                    setTimeout(() => {
+                                        pc.dispatchEvent(new Event('negotiationneeded'));
+                                    }, 100);
+                                }
+                            }
+                        }
                     }, 300); // Slightly longer delay for stability
                 } else if (!isHost && streamer) {
                     console.log('🎥 PARTICIPANT: Setting up connection to HOST...');
@@ -1216,20 +1228,28 @@
                             updatePeerConnections();
                         }, 300);
                         
-                        // CRITICAL FIX: Let participant know they're waiting for host video
+                        // CRITICAL FIX: Immediately request host's video if they have camera on
                         setTimeout(() => {
                             if (!isHost && streamerId) {
                                 const hostConnection = peerConnections.get(streamerId);
                                 if (hostConnection) {
                                     console.log(`🎥 HOST CONNECTION STATUS: ${hostConnection.connectionState}/${hostConnection.signalingState}`);
+                                    console.log('🎥 PARTICIPANT: Requesting host video stream...');
+                                    
+                                    // Force connection to request video from host
+                                    if (hostConnection.signalingState === 'stable') {
+                                        hostConnection.dispatchEvent(new Event('negotiationneeded'));
+                                    }
+                                    
                                     if (hostConnection.connectionState !== 'connected') {
                                         addChatMessage('System', '📹 Connecting to host camera...', true);
                                     }
                                 } else {
                                     console.warn('🎥 ❌ NO HOST CONNECTION FOUND!');
+                                    addChatMessage('System', '⚠️ Cannot connect to host camera. Please refresh.', true);
                                 }
                             }
-                        }, 2000);
+                        }, 1000); // Reduced delay for faster connection
                     }
                 }
 
@@ -1278,17 +1298,36 @@
                     
                     // CRITICAL FIX: If I'm the host and have camera/mic on, immediately share tracks
                     if (isHost && (isCameraOn || isMicOn)) {
-                        console.log(`🎥 HOST: Immediately sharing tracks with new participant ${userId.substring(0,8)}`);
+                        console.log(`🎥 HOST: Camera/mic on - immediately sharing with new participant ${userId.substring(0,8)}`);
+                        console.log(`🎥 HOST: Current state - Camera: ${isCameraOn}, Mic: ${isMicOn}`);
+                        
                         setTimeout(() => {
                             updatePeerConnections();
                             
-                            // SUPER CRITICAL: Force negotiation with the new user
+                            // SUPER CRITICAL: Force immediate negotiation with the new user
                             const pc = peerConnections.get(userId);
                             if (pc && pc.signalingState === 'stable') {
                                 console.log(`🎥 HOST: Forcing immediate negotiation with new participant`);
                                 pc.dispatchEvent(new Event('negotiationneeded'));
+                                
+                                // Add a message so host knows they're broadcasting
+                                if (isCameraOn) {
+                                    addChatMessage('System', `📹 Broadcasting camera to new participant!`, true);
+                                }
+                            } else {
+                                console.warn(`🎥 HOST: Cannot negotiate - peer connection state: ${pc ? pc.signalingState : 'none'}`);
                             }
                         }, 200);
+                    } else if (!isHost && streamerId === userId) {
+                        // If I'm a participant and the new user is the streamer/host
+                        console.log(`🎥 PARTICIPANT: Streamer joined! Requesting their video...`);
+                        setTimeout(() => {
+                            const pc = peerConnections.get(userId);
+                            if (pc && pc.signalingState === 'stable') {
+                                pc.dispatchEvent(new Event('negotiationneeded'));
+                                addChatMessage('System', '📹 Host joined! Requesting camera feed...', true);
+                            }
+                        }, 300);
                     } else {
                         // Add tracks if we have them and camera/mic are on
                         setTimeout(() => {
@@ -2383,9 +2422,12 @@
                     { urls: 'stun:stun.l.google.com:19302' },
                     { urls: 'stun:stun1.l.google.com:19302' },
                     { urls: 'stun:stun2.l.google.com:19302' },
-                    { urls: 'stun:stun3.l.google.com:19302' }
+                    { urls: 'stun:stun3.l.google.com:19302' },
+                    { urls: 'stun:stun4.l.google.com:19302' }
                 ],
-                iceCandidatePoolSize: 10
+                iceCandidatePoolSize: 10,
+                bundlePolicy: 'max-bundle',
+                rtcpMuxPolicy: 'require'
             });
             
             // SIMPLE FIX: No complex transceiver setup - let WebRTC handle it automatically
@@ -2638,8 +2680,8 @@
                     try {
                         // Add tracks directly - simpler approach
                         localStream.getTracks().forEach(track => {
-                            const sender = peerConnection.getSenders().find(s => s.track && s.track.kind === track.kind);
-                            if (!sender) {
+                            const existingSender = peerConnection.getSenders().find(s => s.track && s.track.kind === track.kind);
+                            if (!existingSender) {
                                 peerConnection.addTrack(track, localStream);
                                 console.log(`Added ${track.kind} track to answer for ${sender.substring(0,8)}`);
                             }
@@ -2764,29 +2806,33 @@
 
             // CRITICAL FIX: If I am a participant, and this stream is from the broadcaster, show it in the main video.
             if (!isHost && userId === streamerId) {
-                console.log(`🎥 🔥 DISPLAYING HOST STREAM IN MAIN VIDEO AREA from ${userId.substring(0,8)}`);
+                console.log(`🎥 🔥 PARTICIPANT RECEIVING HOST STREAM - DISPLAYING IN MAIN VIDEO AREA from ${userId.substring(0,8)}`);
                 const hostVideo = document.getElementById('hostVideo');
                 const videoPlaceholder = document.getElementById('videoPlaceholder');
                 
                 if (hostVideo && videoPlaceholder) {
                     console.log('🎥 Setting host video source and making visible...');
-                    hostVideo.srcObject = stream;
-                    hostVideo.style.display = 'block';
-                    videoPlaceholder.style.display = 'none';
                     
-                    // ENHANCED: Multiple attempts to ensure video plays
-                    const playVideo = async () => {
-                        try {
-                            await hostVideo.play();
-                            console.log('🎥 ✅ HOST VIDEO PLAYING SUCCESSFULLY!');
-                            addChatMessage('System', '📹 Now viewing host\'s camera feed!', true);
-                        } catch (e) {
-                            console.warn('🎥 Host video autoplay failed, trying muted:', e);
-                            // Try muted autoplay for better browser compatibility
-                            hostVideo.muted = true;
+                    // CRITICAL: Clear any existing source first
+                    hostVideo.srcObject = null;
+                    
+                    // Small delay to ensure clean state
+                    setTimeout(() => {
+                        hostVideo.srcObject = stream;
+                        hostVideo.style.display = 'block';
+                        videoPlaceholder.style.display = 'none';
+                        
+                        // Set video properties for better mobile compatibility
+                        hostVideo.playsInline = true;
+                        hostVideo.muted = true; // Start muted for autoplay compatibility
+                        hostVideo.autoplay = true;
+                        
+                        // ENHANCED: Multiple attempts to ensure video plays
+                        const playVideo = async () => {
                             try {
+                                console.log('🎥 Attempting to play host video...');
                                 await hostVideo.play();
-                                console.log('🎥 ✅ HOST VIDEO PLAYING (muted)!');
+                                console.log('🎥 ✅ HOST VIDEO PLAYING SUCCESSFULLY!');
                                 addChatMessage('System', '📹 Host camera connected! Click video to unmute.', true);
                                 
                                 // Add click handler to unmute
@@ -2795,16 +2841,41 @@
                                     hostVideo.onclick = null; // Remove handler after first click
                                     addChatMessage('System', '🔊 Video unmuted!', true);
                                 };
-                            } catch (e2) {
-                                console.error('🎥 ❌ Even muted host video play failed:', e2);
+                            } catch (e) {
+                                console.warn('🎥 Host video play failed:', e);
+                                // Force play with basic settings
+                                try {
+                                    hostVideo.muted = true;
+                                    hostVideo.controls = false;
+                                    await hostVideo.play();
+                                    console.log('🎥 ✅ HOST VIDEO PLAYING (forced)!');
+                                } catch (e2) {
+                                    console.error('🎥 ❌ All host video play attempts failed:', e2);
+                                    // Show error message to user
+                                    addChatMessage('System', '⚠️ Video connection established but autoplay blocked. Click the video area to play.', true);
+                                    
+                                    // Make entire video area clickable
+                                    const videoArea = hostVideo.parentElement;
+                                    videoArea.onclick = async () => {
+                                        try {
+                                            await hostVideo.play();
+                                            addChatMessage('System', '✅ Video now playing!', true);
+                                            videoArea.onclick = null;
+                                        } catch (e3) {
+                                            console.error('Manual play also failed:', e3);
+                                        }
+                                    };
+                                    videoArea.style.cursor = 'pointer';
+                                }
                             }
-                        }
-                    };
-                    
-                    // Multiple play attempts with delays
-                    playVideo();
-                    setTimeout(playVideo, 100);
-                    setTimeout(playVideo, 500);
+                        };
+                        
+                        // Multiple play attempts with delays
+                        playVideo();
+                        setTimeout(playVideo, 200);
+                        setTimeout(playVideo, 500);
+                        setTimeout(playVideo, 1000);
+                    }, 100);
                 }
                 return;
             }
