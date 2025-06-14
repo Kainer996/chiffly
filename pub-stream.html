@@ -1158,8 +1158,13 @@
             });
 
             socket.on('room-state', (data) => {
+                console.log('🎯 ROOM STATE RECEIVED:', data);
                 const { streamer, participants, messages } = data;
                 streamerId = streamer ? streamer.id : null; // Store streamer's socket ID
+                
+                console.log(`🎥 CRITICAL SETUP: streamerId set to: ${streamerId ? streamerId.substring(0,8) : 'null'}`);
+                console.log(`🎥 My ID: ${socket.id.substring(0,8)}, isHost: ${isHost}`);
+                console.log(`🎥 Participants in room: ${participants.length}`);
                 
                 // Track all participants
                 allParticipants.clear();
@@ -1175,26 +1180,56 @@
                     displayChatMessage(message);
                 });
 
-                // Setup WebRTC connections but DON'T auto-assign to slots
+                // ENHANCED: Setup WebRTC connections with proper logging
                 if (isHost && participants.length > 0) {
+                    console.log('🎥 HOST: Setting up connections to participants...');
                     // Host: create connections to all participants (they'll manually choose slots)
                     participants.forEach(participant => {
                         if (participant.id !== socket.id) {
+                            console.log(`🎥 HOST: Creating connection to participant ${participant.id.substring(0,8)}`);
                             createPeerConnection(participant.id);
                         }
                     });
                     // Add tracks if we have them and camera/mic are on
                     setTimeout(() => {
+                        console.log('🎥 HOST: Updating peer connections with tracks...');
                         updatePeerConnections();
-                    }, 200);
+                    }, 300); // Slightly longer delay for stability
                 } else if (!isHost && streamer) {
+                    console.log('🎥 PARTICIPANT: Setting up connection to HOST...');
                     // Participant: create connection to host to see their main video
                     if (streamer.id !== socket.id) {
+                        console.log(`🎥 PARTICIPANT: Creating critical connection to streamer ${streamer.id.substring(0,8)}`);
                         createPeerConnection(streamer.id);
+                        
+                        // CRITICAL: Also create connections to other participants for potential slot interactions
+                        participants.forEach(participant => {
+                            if (participant.id !== socket.id) {
+                                console.log(`🎥 PARTICIPANT: Creating connection to other participant ${participant.id.substring(0,8)}`);
+                                createPeerConnection(participant.id);
+                            }
+                        });
+                        
                         // Add tracks if we have them and camera/mic are on
                         setTimeout(() => {
+                            console.log('🎥 PARTICIPANT: Updating peer connections with tracks...');
                             updatePeerConnections();
-                        }, 200);
+                        }, 300);
+                        
+                        // CRITICAL FIX: Let participant know they're waiting for host video
+                        setTimeout(() => {
+                            if (!isHost && streamerId) {
+                                const hostConnection = peerConnections.get(streamerId);
+                                if (hostConnection) {
+                                    console.log(`🎥 HOST CONNECTION STATUS: ${hostConnection.connectionState}/${hostConnection.signalingState}`);
+                                    if (hostConnection.connectionState !== 'connected') {
+                                        addChatMessage('System', '📹 Connecting to host camera...', true);
+                                    }
+                                } else {
+                                    console.warn('🎥 ❌ NO HOST CONNECTION FOUND!');
+                                }
+                            }
+                        }, 2000);
                     }
                 }
 
@@ -1209,24 +1244,57 @@
 
                 // Update main stream controls visibility
                 updateMainControlsVisibility();
+                
+                // DEBUGGING: Log connection status after setup
+                setTimeout(() => {
+                    console.log('🎥 === POST-SETUP CONNECTION DEBUG ===');
+                    console.log(`🎥 My role: ${isHost ? 'HOST' : 'PARTICIPANT'}`);
+                    console.log(`🎥 Streamer ID: ${streamerId ? streamerId.substring(0,8) : 'none'}`);
+                    console.log(`🎥 Total peer connections: ${peerConnections.size}`);
+                    for (const [userId, pc] of peerConnections.entries()) {
+                        console.log(`🎥 → ${userId.substring(0,8)}: ${pc.connectionState}/${pc.signalingState}/${pc.iceConnectionState}`);
+                    }
+                    console.log('🎥 === END DEBUG ===');
+                }, 4000);
             });
 
             socket.on('user-joined', (data) => {
                 const { userId, username, isStreamer } = data;
+                console.log(`🎯 USER JOINED: ${username} (${userId.substring(0,8)}), isStreamer: ${isStreamer}`);
                 addChatMessage('System', `${username} ${isStreamer ? 'started hosting' : 'joined'} the table!`, true);
                 updateParticipantCount();
 
                 // Track new participant
                 allParticipants.add(userId);
-                if (isStreamer) streamerId = userId;
+                if (isStreamer) {
+                    streamerId = userId;
+                    console.log(`🎥 NEW STREAMER: ${userId.substring(0,8)}`);
+                }
 
                 // Create WebRTC connection for new user and add any existing tracks
                 if (userId !== socket.id) {
+                    console.log(`🎥 Creating connection to new user: ${userId.substring(0,8)}`);
                     createPeerConnection(userId);
-                    // Add tracks if we have them and camera/mic are on
-                    setTimeout(() => {
-                        updatePeerConnections();
-                    }, 100);
+                    
+                    // CRITICAL FIX: If I'm the host and have camera/mic on, immediately share tracks
+                    if (isHost && (isCameraOn || isMicOn)) {
+                        console.log(`🎥 HOST: Immediately sharing tracks with new participant ${userId.substring(0,8)}`);
+                        setTimeout(() => {
+                            updatePeerConnections();
+                            
+                            // SUPER CRITICAL: Force negotiation with the new user
+                            const pc = peerConnections.get(userId);
+                            if (pc && pc.signalingState === 'stable') {
+                                console.log(`🎥 HOST: Forcing immediate negotiation with new participant`);
+                                pc.dispatchEvent(new Event('negotiationneeded'));
+                            }
+                        }, 200);
+                    } else {
+                        // Add tracks if we have them and camera/mic are on
+                        setTimeout(() => {
+                            updatePeerConnections();
+                        }, 100);
+                    }
                 }
             });
 
@@ -1533,7 +1601,7 @@
         }
 
         async function updatePeerConnections() {
-            console.log(`Updating tracks for all peers. Camera: ${isCameraOn}, Mic: ${isMicOn}`);
+            console.log(`🎥 🔄 UPDATING TRACKS for ${peerConnections.size} peers. Camera: ${isCameraOn}, Mic: ${isMicOn}, isHost: ${isHost}`);
             if (!localStream) {
                 console.warn("UpdatePeerConnections called but localStream is not ready.");
                 return;
@@ -1545,59 +1613,74 @@
             let trackChanges = false;
 
             for (const [userId, pc] of peerConnections.entries()) {
-                console.log(`Processing peer connection for ${userId}, state: ${pc.connectionState}, signaling: ${pc.signalingState}`);
+                console.log(`🎥 Processing peer connection for ${userId.substring(0,8)}, state: ${pc.connectionState}/${pc.signalingState}`);
                 
                 const videoTrack = localStream.getVideoTracks()[0];
                 const audioTrack = localStream.getAudioTracks()[0];
 
+                // Log track states for debugging
+                if (videoTrack) {
+                    console.log(`🎥 Video track state: enabled=${videoTrack.enabled}, readyState=${videoTrack.readyState}`);
+                }
+                if (audioTrack) {
+                    console.log(`🎤 Audio track state: enabled=${audioTrack.enabled}, readyState=${audioTrack.readyState}`);
+                }
+
                 // --- Manage Video Track ---
                 const videoSender = pc.getSenders().find(s => s.track && s.track.kind === "video");
 
-                if (isCameraOn && videoTrack) {
+                if (isCameraOn && videoTrack && videoTrack.readyState === 'live') {
                     if (!videoSender) {
-                        console.log(`[Video] Adding track for ${userId}`);
+                        console.log(`🎥 ➕ [Video] Adding NEW track for ${userId.substring(0,8)}`);
                         try {
                             pc.addTrack(videoTrack, localStream);
                             trackChanges = true;
+                            console.log(`🎥 ✅ Successfully added video track for ${userId.substring(0,8)}`);
                         } catch (e) {
-                            console.error(`Failed to add video track for ${userId}:`, e);
+                            console.error(`🎥 ❌ Failed to add video track for ${userId.substring(0,8)}:`, e);
                         }
                     } else if (videoSender.track !== videoTrack) {
-                        console.log(`[Video] Replacing track for ${userId}`);
+                        console.log(`🎥 🔄 [Video] Replacing track for ${userId.substring(0,8)}`);
                         try {
                             await videoSender.replaceTrack(videoTrack);
+                            console.log(`🎥 ✅ Successfully replaced video track for ${userId.substring(0,8)}`);
                         } catch (e) {
-                            console.error(`Failed to replace video track for ${userId}:`, e);
+                            console.error(`🎥 ❌ Failed to replace video track for ${userId.substring(0,8)}:`, e);
                         }
+                    } else {
+                        console.log(`🎥 ✅ Video track already correct for ${userId.substring(0,8)}`);
                     }
                 } else if (!isCameraOn && videoSender) {
-                    console.log(`[Video] Removing track for ${userId}`);
+                    console.log(`🎥 ➖ [Video] Removing track for ${userId.substring(0,8)}`);
                     try {
                         pc.removeTrack(videoSender);
                         trackChanges = true;
+                        console.log(`🎥 ✅ Successfully removed video track for ${userId.substring(0,8)}`);
                     } catch (e) {
-                        console.error(`Failed to remove video track for ${userId}:`, e);
+                        console.error(`🎥 ❌ Failed to remove video track for ${userId.substring(0,8)}:`, e);
                     }
                 }
 
                 // --- Manage Audio Track ---
                 const audioSender = pc.getSenders().find(s => s.track && s.track.kind === "audio");
 
-                if (isMicOn && audioTrack) {
+                if (isMicOn && audioTrack && audioTrack.readyState === 'live') {
                     if (!audioSender) {
-                        console.log(`[Audio] Adding track for ${userId}`);
+                        console.log(`🎤 ➕ [Audio] Adding NEW track for ${userId.substring(0,8)}`);
                         try {
                             pc.addTrack(audioTrack, localStream);
                             trackChanges = true;
+                            console.log(`🎤 ✅ Successfully added audio track for ${userId.substring(0,8)}`);
                         } catch (e) {
-                            console.error(`Failed to add audio track for ${userId}:`, e);
+                            console.error(`🎤 ❌ Failed to add audio track for ${userId.substring(0,8)}:`, e);
                         }
                     } else if (audioSender.track !== audioTrack) {
-                        console.log(`[Audio] Replacing track for ${userId}`);
+                        console.log(`🎤 🔄 [Audio] Replacing track for ${userId.substring(0,8)}`);
                         try {
                             await audioSender.replaceTrack(audioTrack);
+                            console.log(`🎤 ✅ Successfully replaced audio track for ${userId.substring(0,8)}`);
                         } catch (e) {
-                            console.error(`Failed to replace audio track for ${userId}:`, e);
+                            console.error(`🎤 ❌ Failed to replace audio track for ${userId.substring(0,8)}:`, e);
                         }
                     }
                 } else if (!isMicOn && audioSender) {
@@ -1747,21 +1830,7 @@
                 isCameraOn = !isCameraOn;
                 localStream.getVideoTracks().forEach(track => track.enabled = isCameraOn);
                 
-                // Update peer connections when camera state changes
-                updatePeerConnections();
-                
-                // Force negotiation for all peer connections to ensure tracks are shared
-                setTimeout(() => {
-                    for (const [userId, pc] of peerConnections.entries()) {
-                        if (pc.connectionState === 'connected' || pc.connectionState === 'new') {
-                            console.log(`Forcing renegotiation with ${userId} after camera toggle`);
-                            // Trigger negotiation by adding/removing a dummy track momentarily
-                            if (pc.signalingState === 'stable') {
-                                pc.dispatchEvent(new Event('negotiationneeded'));
-                            }
-                        }
-                    }
-                }, 500);
+                console.log(`🎥 Camera toggled: ${isCameraOn ? 'ON' : 'OFF'}, isHost: ${isHost}`);
                 
                 if (isCameraOn) {
                     cameraBtn.classList.add('active');
@@ -1773,6 +1842,15 @@
                         hostVideo.srcObject = localStream;
                         hostVideo.style.display = 'block';
                         videoPlaceholder.style.display = 'none';
+                        
+                        // CRITICAL FIX: Ensure host video is properly transmitted to all participants
+                        console.log('🎥 HOST CAMERA ON - Broadcasting to all participants...');
+                        
+                        // Notify server that host started streaming
+                        socket.emit('host-stream-started', { roomId: currentRoom });
+                        
+                        // Add chat message so participants know host is streaming
+                        addChatMessage('System', '📹 Host has turned on their camera!', true);
                     } else if (userSlot) {
                         // User is in a participant slot, update that slot's video
                         const slotVideo = userSlot.querySelector('video');
@@ -1799,6 +1877,11 @@
                             <h3>Camera Off</h3>
                             <p>Click "Camera" to start your video stream</p>
                         `;
+                        
+                        // Notify server that host stopped streaming
+                        socket.emit('host-stream-stopped', { roomId: currentRoom });
+                        
+                        addChatMessage('System', '📹 Host has turned off their camera.', true);
                     }
                     
                     // Hide camera switch button when camera is off
@@ -1807,6 +1890,23 @@
                         switchBtn.style.display = 'none';
                     }
                 }
+                
+                // CRITICAL FIX: Update peer connections AFTER local display is set
+                updatePeerConnections();
+                
+                // ENHANCED: Force immediate negotiation for all connections
+                setTimeout(() => {
+                    console.log(`🎥 Forcing immediate renegotiation for ${peerConnections.size} connections...`);
+                    for (const [userId, pc] of peerConnections.entries()) {
+                        if (pc.connectionState === 'connected' || pc.connectionState === 'new' || pc.connectionState === 'connecting') {
+                            console.log(`🎥 Triggering renegotiation with ${userId.substring(0,8)}, state: ${pc.connectionState}/${pc.signalingState}`);
+                            if (pc.signalingState === 'stable') {
+                                pc.dispatchEvent(new Event('negotiationneeded'));
+                            }
+                        }
+                    }
+                }, 200); // Reduced delay for faster response
+                
             } else {
                 showError('Camera not available. Please refresh the page and allow camera access.');
             }
@@ -2662,17 +2762,49 @@
                 console.log(`📹 Track ${i}: enabled=${track.enabled}, readyState=${track.readyState}, muted=${track.muted}`);
             });
 
-            // If I am a participant, and this stream is from the broadcaster, show it in the main video.
+            // CRITICAL FIX: If I am a participant, and this stream is from the broadcaster, show it in the main video.
             if (!isHost && userId === streamerId) {
-                console.log(`Displaying host stream in main video area`);
+                console.log(`🎥 🔥 DISPLAYING HOST STREAM IN MAIN VIDEO AREA from ${userId.substring(0,8)}`);
                 const hostVideo = document.getElementById('hostVideo');
                 const videoPlaceholder = document.getElementById('videoPlaceholder');
                 
                 if (hostVideo && videoPlaceholder) {
+                    console.log('🎥 Setting host video source and making visible...');
                     hostVideo.srcObject = stream;
                     hostVideo.style.display = 'block';
                     videoPlaceholder.style.display = 'none';
-                    hostVideo.play().catch(e => console.error("Host video play failed:", e));
+                    
+                    // ENHANCED: Multiple attempts to ensure video plays
+                    const playVideo = async () => {
+                        try {
+                            await hostVideo.play();
+                            console.log('🎥 ✅ HOST VIDEO PLAYING SUCCESSFULLY!');
+                            addChatMessage('System', '📹 Now viewing host\'s camera feed!', true);
+                        } catch (e) {
+                            console.warn('🎥 Host video autoplay failed, trying muted:', e);
+                            // Try muted autoplay for better browser compatibility
+                            hostVideo.muted = true;
+                            try {
+                                await hostVideo.play();
+                                console.log('🎥 ✅ HOST VIDEO PLAYING (muted)!');
+                                addChatMessage('System', '📹 Host camera connected! Click video to unmute.', true);
+                                
+                                // Add click handler to unmute
+                                hostVideo.onclick = () => {
+                                    hostVideo.muted = false;
+                                    hostVideo.onclick = null; // Remove handler after first click
+                                    addChatMessage('System', '🔊 Video unmuted!', true);
+                                };
+                            } catch (e2) {
+                                console.error('🎥 ❌ Even muted host video play failed:', e2);
+                            }
+                        }
+                    };
+                    
+                    // Multiple play attempts with delays
+                    playVideo();
+                    setTimeout(playVideo, 100);
+                    setTimeout(playVideo, 500);
                 }
                 return;
             }
