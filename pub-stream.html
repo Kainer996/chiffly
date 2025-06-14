@@ -1091,11 +1091,23 @@
         }
 
         function initializeSocketConnection() {
-            // Get URL parameters
+            // Get URL parameters with fallback parsing
             const urlParams = new URLSearchParams(window.location.search);
             const roomId = urlParams.get('room');
             const username = urlParams.get('username');
-            isHost = urlParams.get('host') === '1';
+            const hostParam = urlParams.get('host');
+            
+            // BULLETPROOF HOST DETECTION
+            isHost = hostParam === '1' || hostParam === 'true' || hostParam === 'True';
+            
+            // CRITICAL DEBUG: Log all parameters
+            console.log('🔍 === URL PARAMETER DEBUG ===');
+            console.log('Raw URL:', window.location.href);
+            console.log('Room ID:', roomId);
+            console.log('Username:', username);
+            console.log('Host param (raw):', hostParam);
+            console.log('IsHost (computed):', isHost);
+            console.log('🔍 === END PARAMETER DEBUG ===');
 
             if (!roomId || !username) {
                 showError('Missing room or username parameters. Redirecting...');
@@ -1107,6 +1119,10 @@
 
             currentRoom = roomId;
             currentUser = username;
+            
+            // CRITICAL: Show user role prominently
+            console.log(`🎭 USER ROLE: ${isHost ? '👑 HOST/BROADCASTER' : '👤 PARTICIPANT/VIEWER'}`);
+            addChatMessage('System', `You joined as: ${isHost ? '👑 Host (Broadcaster)' : '👤 Participant (Viewer)'}`, true);
 
             // Initialize socket connection  
             const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
@@ -1160,11 +1176,24 @@
             socket.on('room-state', (data) => {
                 console.log('🎯 ROOM STATE RECEIVED:', data);
                 const { streamer, participants, messages } = data;
-                streamerId = streamer ? streamer.id : null; // Store streamer's socket ID
                 
-                console.log(`🎥 CRITICAL SETUP: streamerId set to: ${streamerId ? streamerId.substring(0,8) : 'null'}`);
-                console.log(`🎥 My ID: ${socket.id.substring(0,8)}, isHost: ${isHost}`);
+                // BULLETPROOF STREAMER ID DETECTION
+                const oldStreamerId = streamerId;
+                streamerId = streamer ? streamer.id : null;
+                
+                console.log('🎥 === CRITICAL BROADCASTER DETECTION ===');
+                console.log(`🎥 Streamer object:`, streamer);
+                console.log(`🎥 StreamerId (old): ${oldStreamerId ? oldStreamerId.substring(0,8) : 'none'}`);
+                console.log(`🎥 StreamerId (new): ${streamerId ? streamerId.substring(0,8) : 'none'}`);
+                console.log(`🎥 My socket ID: ${socket.id.substring(0,8)}`);
+                console.log(`🎥 My role: ${isHost ? 'HOST' : 'PARTICIPANT'}`);
+                console.log(`🎥 Am I the streamer?: ${streamerId === socket.id}`);
+                console.log(`🎥 Should I see broadcaster video?: ${!isHost && streamerId && streamerId !== socket.id}`);
                 console.log(`🎥 Participants in room: ${participants.length}`);
+                participants.forEach((p, i) => {
+                    console.log(`🎥 → Participant ${i+1}: ${p.username} (${p.id.substring(0,8)})`);
+                });
+                console.log('🎥 === END BROADCASTER DETECTION ===');
                 
                 // Track all participants
                 allParticipants.clear();
@@ -1183,6 +1212,8 @@
                 // ENHANCED: Setup WebRTC connections with proper logging
                 if (isHost && participants.length > 0) {
                     console.log('🎥 HOST: Setting up connections to participants...');
+                    addChatMessage('System', `📹 Setting up camera connections to ${participants.length} participant(s)...`, true);
+                    
                     // Host: create connections to all participants (they'll manually choose slots)
                     participants.forEach(participant => {
                         if (participant.id !== socket.id) {
@@ -1198,6 +1229,7 @@
                         // CRITICAL: If host already has camera on, force immediate negotiation
                         if (isCameraOn) {
                             console.log('🎥 HOST: Camera already on, forcing immediate broadcast to all participants...');
+                            addChatMessage('System', '📹 Broadcasting camera to participants!', true);
                             for (const [userId, pc] of peerConnections.entries()) {
                                 if (pc.signalingState === 'stable') {
                                     setTimeout(() => {
@@ -1207,11 +1239,13 @@
                             }
                         }
                     }, 300); // Slightly longer delay for stability
-                } else if (!isHost && streamer) {
+                } else if (!isHost && streamerId) {
                     console.log('🎥 PARTICIPANT: Setting up connection to HOST...');
+                    addChatMessage('System', '📹 Connecting to broadcaster camera...', true);
+                    
                     // Participant: create connection to host to see their main video
                     if (streamer.id !== socket.id) {
-                        console.log(`🎥 PARTICIPANT: Creating critical connection to streamer ${streamer.id.substring(0,8)}`);
+                        console.log(`🎥 PARTICIPANT: Creating CRITICAL connection to streamer ${streamer.id.substring(0,8)}`);
                         createPeerConnection(streamer.id);
                         
                         // CRITICAL: Also create connections to other participants for potential slot interactions
@@ -1228,13 +1262,13 @@
                             updatePeerConnections();
                         }, 300);
                         
-                        // CRITICAL FIX: Immediately request host's video if they have camera on
-                        setTimeout(() => {
+                        // SUPER CRITICAL FIX: Multiple aggressive attempts to connect to broadcaster
+                        const connectToBroadcaster = () => {
                             if (!isHost && streamerId) {
                                 const hostConnection = peerConnections.get(streamerId);
                                 if (hostConnection) {
-                                    console.log(`🎥 HOST CONNECTION STATUS: ${hostConnection.connectionState}/${hostConnection.signalingState}`);
-                                    console.log('🎥 PARTICIPANT: Requesting host video stream...');
+                                    console.log(`🎥 BROADCASTER CONNECTION STATUS: ${hostConnection.connectionState}/${hostConnection.signalingState}/${hostConnection.iceConnectionState}`);
+                                    console.log('🎥 PARTICIPANT: DEMANDING broadcaster video stream...');
                                     
                                     // Force connection to request video from host
                                     if (hostConnection.signalingState === 'stable') {
@@ -1242,15 +1276,35 @@
                                     }
                                     
                                     if (hostConnection.connectionState !== 'connected') {
-                                        addChatMessage('System', '📹 Connecting to host camera...', true);
+                                        console.log('🎥 Connection not established yet, will retry...');
                                     }
                                 } else {
-                                    console.warn('🎥 ❌ NO HOST CONNECTION FOUND!');
-                                    addChatMessage('System', '⚠️ Cannot connect to host camera. Please refresh.', true);
+                                    console.warn('🎥 ❌ NO BROADCASTER CONNECTION FOUND! Creating emergency connection...');
+                                    // Emergency: recreate connection
+                                    createPeerConnection(streamerId);
+                                    setTimeout(() => {
+                                        updatePeerConnections();
+                                    }, 100);
                                 }
                             }
-                        }, 1000); // Reduced delay for faster connection
+                        };
+                        
+                        // Multiple connection attempts with increasing delays
+                        setTimeout(connectToBroadcaster, 500);
+                        setTimeout(connectToBroadcaster, 1000);
+                        setTimeout(connectToBroadcaster, 2000);
+                        setTimeout(connectToBroadcaster, 4000);
+                        setTimeout(connectToBroadcaster, 8000);
+                    } else {
+                        console.warn('🎥 ❌ PARTICIPANT: Streamer is me? This should not happen!');
+                        addChatMessage('System', '⚠️ Broadcaster detection error. Please refresh.', true);
                     }
+                } else if (!isHost && !streamerId) {
+                    console.log('🎥 PARTICIPANT: No broadcaster in room yet, waiting...');
+                    addChatMessage('System', '⏳ Waiting for broadcaster to join...', true);
+                } else {
+                    console.log('🎥 HOST: No participants yet, waiting...');
+                    addChatMessage('System', '⏳ Waiting for participants to join...', true);
                 }
 
                 // Show welcome message
@@ -1265,17 +1319,55 @@
                 // Update main stream controls visibility
                 updateMainControlsVisibility();
                 
-                // DEBUGGING: Log connection status after setup
+                // DEBUGGING: Log post-setup status with longer delay to ensure everything is set up
                 setTimeout(() => {
-                    console.log('🎥 === POST-SETUP CONNECTION DEBUG ===');
-                    console.log(`🎥 My role: ${isHost ? 'HOST' : 'PARTICIPANT'}`);
-                    console.log(`🎥 Streamer ID: ${streamerId ? streamerId.substring(0,8) : 'none'}`);
+                    console.log('🎥 === POST-SETUP CONNECTION AUDIT ===');
+                    console.log(`🎥 My role: ${isHost ? 'HOST/BROADCASTER' : 'PARTICIPANT/VIEWER'}`);
+                    console.log(`🎥 Broadcaster ID: ${streamerId ? streamerId.substring(0,8) : 'none'}`);
                     console.log(`🎥 Total peer connections: ${peerConnections.size}`);
+                    console.log(`🎥 Total remote streams: ${remoteStreams.size}`);
+                    
+                    // Show connection status for each peer
                     for (const [userId, pc] of peerConnections.entries()) {
-                        console.log(`🎥 → ${userId.substring(0,8)}: ${pc.connectionState}/${pc.signalingState}/${pc.iceConnectionState}`);
+                        const isThisBroadcaster = userId === streamerId;
+                        console.log(`🎥 → ${userId.substring(0,8)} ${isThisBroadcaster ? '(BROADCASTER)' : '(participant)'}: ${pc.connectionState}/${pc.signalingState}/${pc.iceConnectionState}`);
+                        
+                        // Check if we have a stream from them
+                        const hasStream = remoteStreams.has(userId);
+                        console.log(`🎥   Stream received: ${hasStream ? '✅' : '❌'}`);
+                        
+                        if (hasStream) {
+                            const stream = remoteStreams.get(userId);
+                            const videoTracks = stream.getVideoTracks();
+                            console.log(`🎥   Video tracks: ${videoTracks.length}`);
+                            videoTracks.forEach((track, i) => {
+                                console.log(`🎥     Track ${i}: ${track.enabled ? 'enabled' : 'disabled'}, ${track.readyState}`);
+                            });
+                        }
                     }
-                    console.log('🎥 === END DEBUG ===');
-                }, 4000);
+                    
+                    // CRITICAL: Check if participant should see broadcaster video but doesn't
+                    if (!isHost && streamerId && remoteStreams.has(streamerId)) {
+                        const hostVideo = document.getElementById('hostVideo');
+                        const videoPlaceholder = document.getElementById('videoPlaceholder');
+                        
+                        console.log('🎥 === MAIN VIDEO STATUS ===');
+                        console.log(`🎥 Host video element exists: ${!!hostVideo}`);
+                        console.log(`🎥 Host video visible: ${hostVideo ? (hostVideo.style.display !== 'none') : 'N/A'}`);
+                        console.log(`🎥 Video placeholder visible: ${videoPlaceholder ? (videoPlaceholder.style.display !== 'none') : 'N/A'}`);
+                        console.log(`🎥 Host video has srcObject: ${hostVideo ? !!hostVideo.srcObject : 'N/A'}`);
+                        
+                        // EMERGENCY FIX: If we have the broadcaster's stream but video is not showing
+                        if (hostVideo && (!hostVideo.srcObject || hostVideo.style.display === 'none')) {
+                            console.log('🎥 🚨 EMERGENCY: Broadcaster stream available but not displayed! Fixing...');
+                            const broadcasterStream = remoteStreams.get(streamerId);
+                            displayRemoteVideo(streamerId, broadcasterStream);
+                            addChatMessage('System', '🔧 Fixed broadcaster video display!', true);
+                        }
+                    }
+                    
+                    console.log('🎥 === END CONNECTION AUDIT ===');
+                }, 6000);
             });
 
             socket.on('user-joined', (data) => {
@@ -2417,17 +2509,46 @@
         function createPeerConnection(userId) {
             console.log('🔧 Creating peer connection to:', userId.substring(0,8));
             
+            // ENHANCED ICE server configuration for NAT traversal across different networks
+            const iceServers = [
+                // Google STUN servers
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:stun1.l.google.com:19302' },
+                { urls: 'stun:stun2.l.google.com:19302' },
+                { urls: 'stun:stun3.l.google.com:19302' },
+                { urls: 'stun:stun4.l.google.com:19302' },
+                
+                // Additional STUN servers for better connectivity
+                { urls: 'stun:stun.services.mozilla.com' },
+                { urls: 'stun:stun.stunprotocol.org:3478' },
+                
+                // Free TURN servers for NAT traversal (when STUN fails)
+                {
+                    urls: 'turn:openrelay.metered.ca:80',
+                    username: 'openrelayproject',
+                    credential: 'openrelayproject'
+                },
+                {
+                    urls: 'turn:openrelay.metered.ca:443',
+                    username: 'openrelayproject',
+                    credential: 'openrelayproject'
+                },
+                {
+                    urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+                    username: 'openrelayproject',
+                    credential: 'openrelayproject'
+                }
+            ];
+            
+            console.log(`🌐 Creating peer connection to ${userId.substring(0,8)} with ${iceServers.length} ICE servers (including TURN for NAT traversal)`);
+            
             const peerConnection = new RTCPeerConnection({
-                iceServers: [
-                    { urls: 'stun:stun.l.google.com:19302' },
-                    { urls: 'stun:stun1.l.google.com:19302' },
-                    { urls: 'stun:stun2.l.google.com:19302' },
-                    { urls: 'stun:stun3.l.google.com:19302' },
-                    { urls: 'stun:stun4.l.google.com:19302' }
-                ],
+                iceServers: iceServers,
                 iceCandidatePoolSize: 10,
                 bundlePolicy: 'max-bundle',
-                rtcpMuxPolicy: 'require'
+                rtcpMuxPolicy: 'require',
+                // Enhanced configuration for better NAT traversal
+                iceTransportPolicy: 'all' // Allow both STUN and TURN
             });
             
             // SIMPLE FIX: No complex transceiver setup - let WebRTC handle it automatically
@@ -2526,60 +2647,115 @@
                 setTimeout(forceDisplayVideo, 2000);
             };
 
-            // Handle ICE candidates
+            // Handle ICE candidates with enhanced logging
             peerConnection.onicecandidate = (event) => {
                 if (event.candidate) {
+                    console.log(`🧊 ICE candidate for ${userId.substring(0,8)}:`, {
+                        type: event.candidate.type,
+                        protocol: event.candidate.protocol,
+                        address: event.candidate.address,
+                        port: event.candidate.port,
+                        priority: event.candidate.priority
+                    });
+                    
                     socket.emit('ice-candidate', {
                         target: userId,
                         candidate: event.candidate
                     });
+                } else {
+                    console.log(`🧊 ICE gathering complete for ${userId.substring(0,8)}`);
                 }
             };
 
-            // Handle connection state changes
+            // Handle connection state changes with NAT traversal diagnostics
             peerConnection.onconnectionstatechange = () => {
-                console.log(`Peer connection to ${userId} state:`, peerConnection.connectionState);
+                const state = peerConnection.connectionState;
+                const iceState = peerConnection.iceConnectionState;
+                console.log(`🔗 Connection to ${userId.substring(0,8)}: ${state} (ICE: ${iceState})`);
                 
-                // If connection fails, try to re-establish after a delay
-                if (peerConnection.connectionState === 'failed') {
-                    console.log(`Connection to ${userId} failed, attempting to reconnect...`);
+                // Provide user feedback for connection issues
+                if (state === 'connecting') {
+                    console.log(`🔗 Establishing connection to ${userId.substring(0,8)}...`);
+                } else if (state === 'connected') {
+                    console.log(`✅ Successfully connected to ${userId.substring(0,8)}!`);
+                    if (!isHost && userId === streamerId) {
+                        addChatMessage('System', '📹 Connected to broadcaster!', true);
+                    }
+                } else if (state === 'failed') {
+                    console.log(`❌ Connection to ${userId.substring(0,8)} failed - likely NAT/firewall issue`);
+                    
+                    // Provide specific feedback for different scenarios
+                    if (!isHost && userId === streamerId) {
+                        addChatMessage('System', '⚠️ Cannot connect to broadcaster. This may be due to network/firewall restrictions.', true);
+                        addChatMessage('System', '🔧 Try: 1) Refresh page 2) Check firewall 3) Use same WiFi network', true);
+                    }
+                    
+                    // Attempt reconnection
                     setTimeout(() => {
                         if (peerConnections.has(userId) && peerConnections.get(userId).connectionState === 'failed') {
-                            console.log(`Recreating failed connection to ${userId}`);
+                            console.log(`🔄 Recreating failed connection to ${userId.substring(0,8)}`);
                             peerConnections.get(userId).close();
                             createPeerConnection(userId);
                             setTimeout(() => {
                                 updatePeerConnections();
                             }, 100);
                         }
-                    }, 2000);
+                    }, 3000);
+                } else if (state === 'disconnected') {
+                    console.log(`🔌 Disconnected from ${userId.substring(0,8)}`);
+                    if (!isHost && userId === streamerId) {
+                        addChatMessage('System', '📹 Broadcaster disconnected', true);
+                    }
                 }
             };
             
-            // Handle ICE connection state changes
+            // Handle ICE connection state changes with detailed NAT diagnostics
             peerConnection.oniceconnectionstatechange = () => {
-                console.log(`ICE connection to ${userId} state:`, peerConnection.iceConnectionState);
+                const iceState = peerConnection.iceConnectionState;
+                console.log(`🧊 ICE connection to ${userId.substring(0,8)}: ${iceState}`);
                 
-                if (peerConnection.iceConnectionState === 'failed' || peerConnection.iceConnectionState === 'disconnected') {
-                    console.log(`ICE connection to ${userId} failed/disconnected, attempting recovery...`);
+                if (iceState === 'checking') {
+                    console.log(`🧊 Checking ICE connectivity to ${userId.substring(0,8)}...`);
+                } else if (iceState === 'connected') {
+                    console.log(`✅ ICE connected to ${userId.substring(0,8)}!`);
+                } else if (iceState === 'completed') {
+                    console.log(`🎉 ICE connection completed to ${userId.substring(0,8)}!`);
+                } else if (iceState === 'failed') {
+                    console.log(`❌ ICE connection failed to ${userId.substring(0,8)} - NAT traversal failed`);
                     
-                    // Try ICE restart for failed connections
-                    if (peerConnection.iceConnectionState === 'failed') {
-                        setTimeout(async () => {
-                            if (peerConnections.has(userId) && peerConnection.signalingState === 'stable') {
-                                console.log(`Attempting ICE restart for ${userId}`);
-                                try {
-                                    const offer = await peerConnection.createOffer({ iceRestart: true });
-                                    await peerConnection.setLocalDescription(offer);
-                                    socket.emit('offer', {
-                                        target: userId,
-                                        offer: offer
-                                    });
-                                } catch (error) {
-                                    console.error(`ICE restart failed for ${userId}:`, error);
+                    if (!isHost && userId === streamerId) {
+                        addChatMessage('System', '🌐 Network connection failed. Trying TURN relay servers...', true);
+                    }
+                    
+                    // Try ICE restart with TURN servers
+                    setTimeout(async () => {
+                        if (peerConnections.has(userId) && peerConnection.signalingState === 'stable') {
+                            console.log(`🔄 Attempting ICE restart with TURN servers for ${userId.substring(0,8)}`);
+                            try {
+                                const offer = await peerConnection.createOffer({ iceRestart: true });
+                                await peerConnection.setLocalDescription(offer);
+                                socket.emit('offer', {
+                                    target: userId,
+                                    offer: offer
+                                });
+                                
+                                if (!isHost && userId === streamerId) {
+                                    addChatMessage('System', '🔄 Retrying connection with relay servers...', true);
+                                }
+                            } catch (error) {
+                                console.error(`ICE restart failed for ${userId.substring(0,8)}:`, error);
+                                if (!isHost && userId === streamerId) {
+                                    addChatMessage('System', '❌ Connection retry failed. Network may be blocking video calls.', true);
                                 }
                             }
-                        }, 1000);
+                        }
+                    }, 2000);
+                } else if (iceState === 'disconnected') {
+                    console.log(`🔌 ICE disconnected from ${userId.substring(0,8)}`);
+                    
+                    // For broadcaster disconnection, show immediate feedback
+                    if (!isHost && userId === streamerId) {
+                        addChatMessage('System', '📹 Broadcaster connection lost, attempting to reconnect...', true);
                     }
                 }
             };
@@ -2804,8 +2980,21 @@
                 console.log(`📹 Track ${i}: enabled=${track.enabled}, readyState=${track.readyState}, muted=${track.muted}`);
             });
 
+            // BULLETPROOF BROADCASTER DETECTION: Multiple ways to determine if this is the broadcaster
+            const isBroadcasterStream = (
+                (!isHost && userId === streamerId) || // Standard check
+                (!isHost && streamerId === null && allParticipants.size === 2) || // Emergency: only 2 people, other must be host
+                (!isHost && stream.getVideoTracks().length > 0 && remoteStreams.size === 1) // Emergency: first video stream received
+            );
+
+            console.log(`🎥 BROADCASTING CHECK for ${userId.substring(0,8)}:`);
+            console.log(`🎥 → Standard check (!isHost && userId === streamerId): ${!isHost && userId === streamerId}`);
+            console.log(`🎥 → Emergency check (2 people): ${!isHost && streamerId === null && allParticipants.size === 2}`);
+            console.log(`🎥 → Emergency check (first video): ${!isHost && stream.getVideoTracks().length > 0 && remoteStreams.size === 1}`);
+            console.log(`🎥 → FINAL DECISION: ${isBroadcasterStream ? 'BROADCASTER STREAM' : 'participant stream'}`);
+
             // CRITICAL FIX: If I am a participant, and this stream is from the broadcaster, show it in the main video.
-            if (!isHost && userId === streamerId) {
+            if (isBroadcasterStream) {
                 console.log(`🎥 🔥 PARTICIPANT RECEIVING HOST STREAM - DISPLAYING IN MAIN VIDEO AREA from ${userId.substring(0,8)}`);
                 const hostVideo = document.getElementById('hostVideo');
                 const videoPlaceholder = document.getElementById('videoPlaceholder');
@@ -2854,6 +3043,12 @@
                                     // Show error message to user
                                     addChatMessage('System', '⚠️ Video connection established but autoplay blocked. Click the video area to play.', true);
                                     
+                                    // Special message for mobile users
+                                    if (/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)) {
+                                        addChatMessage('System', '📱 Mobile Tip: Tap the dark video area above and allow camera permissions if prompted.', true);
+                                        addChatMessage('System', '🌐 If video still doesn\'t work, type "runNetworkDiagnostics()" in browser console', true);
+                                    }
+                                    
                                     // Make entire video area clickable
                                     const videoArea = hostVideo.parentElement;
                                     videoArea.onclick = async () => {
@@ -2863,9 +3058,11 @@
                                             videoArea.onclick = null;
                                         } catch (e3) {
                                             console.error('Manual play also failed:', e3);
+                                            addChatMessage('System', '🔧 Try refreshing the page if video still doesn\'t work.', true);
                                         }
                                     };
                                     videoArea.style.cursor = 'pointer';
+                                    videoArea.title = 'Click to play video';
                                 }
                             }
                         };
@@ -3215,6 +3412,101 @@
                 controls.style.display = '';
             }
         }
+
+        // Network diagnostics function for troubleshooting NAT/firewall issues
+        async function runNetworkDiagnostics() {
+            addChatMessage('System', '🔍 Running network diagnostics...', true);
+            
+            try {
+                // Test STUN server connectivity
+                const stunTest = new RTCPeerConnection({
+                    iceServers: [
+                        { urls: 'stun:stun.l.google.com:19302' },
+                        {
+                            urls: 'turn:openrelay.metered.ca:80',
+                            username: 'openrelayproject',
+                            credential: 'openrelayproject'
+                        }
+                    ]
+                });
+                
+                let stunWorking = false;
+                let turnWorking = false;
+                let candidateCount = 0;
+                
+                stunTest.onicecandidate = (event) => {
+                    if (event.candidate) {
+                        candidateCount++;
+                        console.log(`🧊 Diagnostic ICE candidate:`, event.candidate.type, event.candidate.protocol);
+                        
+                        if (event.candidate.type === 'srflx') {
+                            stunWorking = true;
+                            addChatMessage('System', '✅ STUN servers working (can detect your public IP)', true);
+                        } else if (event.candidate.type === 'relay') {
+                            turnWorking = true;
+                            addChatMessage('System', '✅ TURN relay servers working', true);
+                        }
+                    } else {
+                        // ICE gathering complete
+                        console.log(`🧊 ICE gathering complete. Total candidates: ${candidateCount}`);
+                    }
+                };
+                
+                // Create a dummy offer to trigger ICE gathering
+                const offer = await stunTest.createOffer();
+                await stunTest.setLocalDescription(offer);
+                
+                // Wait for ICE gathering
+                setTimeout(() => {
+                    addChatMessage('System', `📊 Found ${candidateCount} network paths`, true);
+                    
+                    if (!stunWorking && !turnWorking) {
+                        addChatMessage('System', '❌ Network connectivity issues detected', true);
+                        addChatMessage('System', '🔧 Your network may be blocking WebRTC connections', true);
+                        addChatMessage('System', '💡 Solutions: 1) Use same WiFi 2) Check firewall 3) Try mobile hotspot', true);
+                    } else if (stunWorking && !turnWorking) {
+                        addChatMessage('System', '⚠️ Limited connectivity - may fail across different networks', true);
+                        addChatMessage('System', '💡 If video fails, try connecting to same WiFi as broadcaster', true);
+                    } else {
+                        addChatMessage('System', '✅ Network connectivity looks good!', true);
+                    }
+                    
+                    stunTest.close();
+                }, 4000);
+                
+            } catch (error) {
+                console.error('Network diagnostics error:', error);
+                addChatMessage('System', '❌ Network diagnostics failed: ' + error.message, true);
+            }
+        }
+        
+        // Make diagnostics available globally
+        window.runNetworkDiagnostics = runNetworkDiagnostics;
+        
+        // Auto-run diagnostics if connection issues detected
+        function autoRunDiagnosticsOnFailure() {
+            let failureCount = 0;
+            const originalCreatePeerConnection = createPeerConnection;
+            
+            createPeerConnection = function(userId) {
+                const pc = originalCreatePeerConnection(userId);
+                
+                pc.oniceconnectionstatechange = function() {
+                    if (pc.iceConnectionState === 'failed') {
+                        failureCount++;
+                        if (failureCount === 1) {
+                            addChatMessage('System', '🔍 Connection issues detected. Running diagnostics...', true);
+                            setTimeout(runNetworkDiagnostics, 1000);
+                        }
+                    }
+                };
+                
+                return pc;
+            };
+        }
+        
+        // Initialize auto-diagnostics
+        autoRunDiagnosticsOnFailure();
     </script>
 </body>
 </html> 
