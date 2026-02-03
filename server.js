@@ -31,9 +31,31 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.static('.'));
 
+// Metered TURN Server credentials (keep secret!)
+const METERED_API_KEY = process.env.METERED_API_KEY || 'ay6wPA7qecPBLXC8p1_A45Z0gFuhTdn8fhqHg_IVgGWjxrZo';
+const METERED_APP_NAME = 'chiffly';
+
 // Store active rooms and users
 const rooms = new Map();
 const users = new Map();
+
+// TURN Server credentials endpoint - fetches from Metered
+app.get('/api/turn-credentials', async (req, res) => {
+  try {
+    const response = await fetch(
+      `https://${METERED_APP_NAME}.metered.live/api/v1/turn/credentials?apiKey=${METERED_API_KEY}`
+    );
+    const iceServers = await response.json();
+    res.json(iceServers);
+  } catch (error) {
+    console.error('Error fetching TURN credentials:', error);
+    // Fallback to basic STUN servers if Metered fails
+    res.json([
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' }
+    ]);
+  }
+});
 
 // Serve the main homepage
 app.get('/', (req, res) => {

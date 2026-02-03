@@ -8,14 +8,34 @@ class CVLogApp {
         this.isStreamer = false;
         this.isCameraOn = false;
         this.isMicOn = false;
+        // ICE servers for WebRTC (STUN + TURN)
+        this.iceServers = [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:stun1.l.google.com:19302' }
+        ];
         
         this.init();
     }
 
-    init() {
+    async init() {
+        // Fetch TURN server credentials first
+        await this.fetchTurnCredentials();
         this.setupSocketConnection();
         this.setupEventListeners();
         this.checkUrlParameters();
+    }
+
+    async fetchTurnCredentials() {
+        try {
+            const response = await fetch('/api/turn-credentials');
+            const iceServers = await response.json();
+            if (iceServers && iceServers.length > 0) {
+                this.iceServers = iceServers;
+                console.log('✅ TURN credentials loaded:', iceServers.length, 'servers');
+            }
+        } catch (error) {
+            console.warn('⚠️ Could not fetch TURN credentials, using STUN only:', error);
+        }
     }
 
     checkUrlParameters() {
@@ -259,11 +279,9 @@ class CVLogApp {
 
     createPeerConnection(userId) {
         const peerConnection = new RTCPeerConnection({
-            iceServers: [
-                { urls: 'stun:stun.l.google.com:19302' },
-                { urls: 'stun:stun1.l.google.com:19302' }
-            ]
+            iceServers: this.iceServers
         });
+        console.log('🔗 Creating peer connection with', this.iceServers.length, 'ICE servers');
 
         this.peerConnections.set(userId, peerConnection);
 
