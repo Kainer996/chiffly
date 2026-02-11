@@ -1,0 +1,13 @@
+NOTE: Apartment images need to be generated with Nano Banana when GEMINI_API_KEY is available.
+
+Commands to run:
+SKILL_DIR="/home/ubuntu/.npm-global/lib/node_modules/openclaw/skills/nano-banana-pro"
+
+1. Living Room:
+uv run "$SKILL_DIR/scripts/generate_image.py" --prompt "Empty modern apartment living room, dark moody interior, large windows with city night view, hardwood floors, exposed brick wall, warm ambient lighting, minimalist style. First person perspective. No furniture. No people." --filename "/home/ubuntu/chiffly/images/apartment-livingroom.png" --resolution 1K
+
+2. Bedroom:
+uv run "$SKILL_DIR/scripts/generate_image.py" --prompt "Empty modern apartment bedroom, dark moody interior, large window with night city view, hardwood floors, warm ambient lighting, minimalist. First person perspective. No furniture. No people." --filename "/home/ubuntu/chiffly/images/apartment-bedroom.png" --resolution 1K
+
+3. Kitchen:
+uv run "$SKILL_DIR/scripts/generate_image.py" --prompt "Empty modern apartment kitchen, dark moody interior, marble countertops, dark cabinets, city night view through window, warm ambient lighting. First person perspective. No people." --filename "/home/ubuntu/chiffly/images/apartment-kitchen.png" --resolution 1K

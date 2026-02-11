@@ -6,7 +6,7 @@
     <title>ChiffTown — Your Virtual Town</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="main-home-styles.css?v=11">
+    <link rel="stylesheet" href="main-home-styles.css?v=14">
 </head>
 <body>
     <!-- Ambient particles canvas -->
@@ -41,7 +41,7 @@
                             </div>
                         </div>
                         <div class="menu-divider"></div>
-                        <a href="#" class="menu-item">
+                        <a href="profile.html" class="menu-item">
                             <i class="fas fa-user-cog"></i>
                             Profile Settings
                         </a>
@@ -246,8 +246,14 @@
                 <p class="section-desc">Click a venue to enter</p>
             </div>
             
-            <div class="interactive-map-container">
-                <img src="/images/chifftown-map-iso.png" alt="Chifftown City Map" class="city-map-image">
+            <div class="map-controls">
+                <button class="fullscreen-btn" onclick="toggleMapFullscreen()" title="Explore Chifftown">
+                    <i class="fas fa-expand"></i> Explore Full Screen
+                </button>
+            </div>
+            
+            <div class="interactive-map-container" id="mapContainer">
+                <img src="/images/chifftown-map-wide.png" alt="Chifftown City Map" class="city-map-image">
                 <!-- Hotspot Overlays -->
                 <a href="/questing.html" class="map-hotspot adventure-hotspot" data-venue="Adventure Guild">
                     <div class="hotspot-glow"></div>
@@ -282,6 +288,54 @@
                 <a href="https://goodnews-24.com" target="_blank" class="map-hotspot billboard-hotspot" data-venue="Good News 24">
                     <div class="hotspot-glow"></div>
                     <div class="hotspot-label">Good News 24</div>
+                </a>
+                
+                <a href="/apartment.html" class="map-hotspot apartment-hotspot" data-venue="Your Apartment">
+                    <div class="hotspot-glow"></div>
+                    <div class="hotspot-label">🏠 Your Apartment</div>
+                </a>
+            </div>
+            <!-- Venue Quick List -->
+            <div class="venue-list">
+                <a href="/pub.html" class="venue-item">
+                    <span class="venue-icon">🍺</span>
+                    <span class="venue-name">The Chiff Inn</span>
+                    <span class="venue-desc">Cozy pub vibes</span>
+                </a>
+                <a href="/nightclub.html" class="venue-item">
+                    <span class="venue-icon">🎵</span>
+                    <span class="venue-name">Neon Pulse</span>
+                    <span class="venue-desc">Dance & party</span>
+                </a>
+                <a href="/cinema.html" class="venue-item">
+                    <span class="venue-icon">🎬</span>
+                    <span class="venue-name">Starlight Cinema</span>
+                    <span class="venue-desc">Watch together</span>
+                </a>
+                <a href="/games.html" class="venue-item">
+                    <span class="venue-icon">🎮</span>
+                    <span class="venue-name">Pixel Palace</span>
+                    <span class="venue-desc">Retro arcade</span>
+                </a>
+                <a href="/lounge.html" class="venue-item">
+                    <span class="venue-icon">🛋️</span>
+                    <span class="venue-name">Velvet Sky</span>
+                    <span class="venue-desc">Chill & chat</span>
+                </a>
+                <a href="/questing.html" class="venue-item">
+                    <span class="venue-icon">⚔️</span>
+                    <span class="venue-name">Adventure Guild</span>
+                    <span class="venue-desc">Quests & stories</span>
+                </a>
+                <a href="/apartment.html" class="venue-item">
+                    <span class="venue-icon">🏠</span>
+                    <span class="venue-name">Your Apartment</span>
+                    <span class="venue-desc">Your own space</span>
+                </a>
+                <a href="/profile.html" class="venue-item">
+                    <span class="venue-icon">👤</span>
+                    <span class="venue-name">Profile</span>
+                    <span class="venue-desc">Customize you</span>
                 </a>
             </div>
         </div>
@@ -571,5 +625,36 @@
         setTimeout(spawnAircraft, 10000 + Math.random() * 10000);
     })();
     </script>
+<script>
+function toggleMapFullscreen() {
+    const container = document.getElementById('mapContainer');
+    if (container.classList.contains('fullscreen-map')) {
+        container.classList.remove('fullscreen-map');
+        document.body.style.overflow = '';
+        const closeBtn = document.getElementById('fsCloseBtn');
+        if (closeBtn) closeBtn.remove();
+        if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
+    } else {
+        container.classList.add('fullscreen-map');
+        document.body.style.overflow = 'hidden';
+        const closeBtn = document.createElement('button');
+        closeBtn.id = 'fsCloseBtn';
+        closeBtn.className = 'fullscreen-close';
+        closeBtn.innerHTML = '<i class="fas fa-compress"></i> Exit';
+        closeBtn.onclick = toggleMapFullscreen;
+        closeBtn.style.display = 'block';
+        document.body.appendChild(closeBtn);
+        if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock('landscape').catch(() => {});
+        }
+    }
+}
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        const container = document.getElementById('mapContainer');
+        if (container.classList.contains('fullscreen-map')) toggleMapFullscreen();
+    }
+});
+</script>
 </body>
 </html>

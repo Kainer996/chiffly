@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Profile — ChiffTown</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-deep: #0a0a1a;
+            --bg-mid: #12122a;
+            --bg-surface: #1a1a3e;
+            --text-primary: #f0eef6;
+            --text-secondary: rgba(240, 238, 246, 0.65);
+            --accent-gold: #f4c542;
+            --accent-teal: #40E0D0;
+            --accent-blue: #3b82f6;
+            --accent-silver: #c0c0c0;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--bg-deep) 0%, var(--bg-mid) 50%, var(--bg-surface) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .profile-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 0;
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .profile-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            margin-bottom: 0.5rem;
+            letter-spacing: 2px;
+        }
+
+        .profile-subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .profile-card {
+            background: rgba(10, 10, 26, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            color: var(--accent-gold);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Profile Photo Section */
+        .photo-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .profile-photo {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: var(--glass-bg);
+            border: 3px solid var(--accent-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .profile-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-photo-placeholder {
+            font-size: 4rem;
+            color: var(--text-secondary);
+        }
+
+        .photo-upload-btn {
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-teal));
+            color: var(--bg-deep);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .photo-upload-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(244, 197, 66, 0.4);
+        }
+
+        #photoInput {
+            display: none;
+        }
+
+        /* Form Fields */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-input,
+        .form-textarea,
+        .form-select {
+            width: 100%;
+            padding: 0.9rem 1.2rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--accent-teal);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Tags Section */
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        .tag {
+            padding: 0.6rem 1.2rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .tag:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .tag.active {
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-teal));
+            color: var(--bg-deep);
+            border-color: transparent;
+            font-weight: 600;
+        }
+
+        /* Theme Colors */
+        .theme-colors {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .theme-color {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .theme-color:hover {
+            transform: scale(1.1);
+        }
+
+        .theme-color.active {
+            border-color: white;
+            box-shadow: 0 0 20px currentColor;
+        }
+
+        .theme-gold { background: linear-gradient(135deg, #f4c542, #d4af37); }
+        .theme-teal { background: linear-gradient(135deg, #40E0D0, #20B2AA); }
+        .theme-blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+        .theme-silver { background: linear-gradient(135deg, #c0c0c0, #808080); }
+        .theme-emerald { background: linear-gradient(135deg, #10b981, #059669); }
+        .theme-amber { background: linear-gradient(135deg, #f59e0b, #d97706); }
+
+        /* Social Links */
+        .social-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .social-input-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+
+        /* Stats Section */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .stat-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-teal));
+            color: var(--bg-deep);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(244, 197, 66, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--glass-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-teal);
+        }
+
+        /* Back to Town */
+        .back-link {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            padding: 0.8rem 1.5rem;
+            background: rgba(10, 10, 26, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
+        .save-indicator {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            border-radius: 10px;
+            color: #22c55e;
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .save-indicator.show {
+            display: flex;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-link">
+        <i class="fas fa-arrow-left"></i>
+        Back to Town
+    </a>
+
+    <div class="profile-container">
+        <div class="profile-header">
+            <h1 class="profile-title">YOUR PROFILE</h1>
+            <p class="profile-subtitle">Customize your ChiffTown identity</p>
+        </div>
+
+        <!-- Profile Photo & Basic Info -->
+        <div class="profile-card">
+            <div class="photo-section">
+                <div class="profile-photo" id="profilePhoto">
+                    <div class="profile-photo-placeholder">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                </div>
+                <input type="file" id="photoInput" accept="image/*">
+                <button class="photo-upload-btn" onclick="document.getElementById('photoInput').click()">
+                    <i class="fas fa-camera"></i> Upload Photo
+                </button>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Display Name</label>
+                <input type="text" class="form-input" id="displayName" placeholder="Enter your name" maxlength="30">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Bio</label>
+                <textarea class="form-textarea" id="bio" placeholder="Tell us about yourself..." maxlength="200"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Mood Status</label>
+                <input type="text" class="form-input" id="moodStatus" placeholder="How are you feeling?" maxlength="50">
+            </div>
+        </div>
+
+        <!-- Interests -->
+        <div class="profile-card">
+            <h2 class="section-title">
+                <i class="fas fa-heart"></i>
+                Into
+            </h2>
+            <div class="tags-container" id="interestTags">
+                <!-- Generated dynamically -->
+            </div>
+        </div>
+
+        <!-- Preferences -->
+        <div class="profile-card">
+            <h2 class="section-title">
+                <i class="fas fa-sliders-h"></i>
+                Preferences
+            </h2>
+
+            <div class="form-group">
+                <label class="form-label">Favourite Drink</label>
+                <select class="form-select" id="favouriteDrink">
+                    <option value="">Select a drink...</option>
+                    <option value="beer">🍺 Beer</option>
+                    <option value="wine">🍷 Wine</option>
+                    <option value="cocktail">🍸 Cocktail</option>
+                    <option value="whisky">🥃 Whisky</option>
+                    <option value="non-alcoholic">🥤 Non-alcoholic</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Profile Theme Colour</label>
+                <div class="theme-colors">
+                    <div class="theme-color theme-gold" data-theme="gold"></div>
+                    <div class="theme-color theme-teal" data-theme="teal"></div>
+                    <div class="theme-color theme-blue" data-theme="blue"></div>
+                    <div class="theme-color theme-silver" data-theme="silver"></div>
+                    <div class="theme-color theme-emerald" data-theme="emerald"></div>
+                    <div class="theme-color theme-amber" data-theme="amber"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Social Links -->
+        <div class="profile-card">
+            <h2 class="section-title">
+                <i class="fas fa-link"></i>
+                Social Links
+            </h2>
+            <div class="social-inputs">
+                <div class="social-input-group">
+                    <div class="social-icon"><i class="fab fa-twitter"></i></div>
+                    <input type="text" class="form-input" id="socialX" placeholder="@username">
+                </div>
+                <div class="social-input-group">
+                    <div class="social-icon"><i class="fab fa-discord"></i></div>
+                    <input type="text" class="form-input" id="socialDiscord" placeholder="username#0000">
+                </div>
+                <div class="social-input-group">
+                    <div class="social-icon"><i class="fab fa-instagram"></i></div>
+                    <input type="text" class="form-input" id="socialInstagram" placeholder="@username">
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="profile-card">
+            <h2 class="section-title">
+                <i class="fas fa-chart-line"></i>
+                Your Stats
+            </h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="statDays">0</div>
+                    <div class="stat-label">Days in Town</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statRooms">0</div>
+                    <div class="stat-label">Rooms Visited</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statFurniture">0</div>
+                    <div class="stat-label">Furniture Owned</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="saveProfile()">
+                <i class="fas fa-save"></i>
+                Save Profile
+            </button>
+            <a href="apartment.html" class="btn btn-secondary">
+                <i class="fas fa-home"></i>
+                My Apartment
+            </a>
+            <a href="index.html" class="btn btn-secondary">
+                <i class="fas fa-map"></i>
+                Town Map
+            </a>
+        </div>
+    </div>
+
+    <div class="save-indicator" id="saveIndicator">
+        <i class="fas fa-check-circle"></i>
+        Profile saved!
+    </div>
+
+    <script src="js/inventory.js"></script>
+    <script>
+        const INTEREST_TAGS = [
+            'Music', 'Gaming', 'Movies', 'Sports', 'Art', 'Photography',
+            'Cooking', 'Travel', 'Reading', 'Fitness', 'Technology', 'Fashion'
+        ];
+
+        const PROFILE_KEY = 'chifftown_profile';
+
+        // Load profile on page load
+        window.addEventListener('DOMContentLoaded', loadProfile);
+
+        function loadProfile() {
+            const profile = getProfile();
+            
+            // Load photo
+            if (profile.photo) {
+                document.getElementById('profilePhoto').innerHTML = `<img src="${profile.photo}" alt="Profile">`;
+            }
+            
+            // Load basic info
+            document.getElementById('displayName').value = profile.displayName || '';
+            document.getElementById('bio').value = profile.bio || '';
+            document.getElementById('moodStatus').value = profile.mood || '';
+            
+            // Load interests
+            renderInterestTags(profile.interests || []);
+            
+            // Load preferences
+            document.getElementById('favouriteDrink').value = profile.drink || '';
+            
+            // Load theme
+            const theme = profile.theme || 'gold';
+            document.querySelectorAll('.theme-color').forEach(el => {
+                el.classList.toggle('active', el.dataset.theme === theme);
+            });
+            
+            // Load social links
+            document.getElementById('socialX').value = profile.social?.x || '';
+            document.getElementById('socialDiscord').value = profile.social?.discord || '';
+            document.getElementById('socialInstagram').value = profile.social?.instagram || '';
+            
+            // Update stats
+            updateStats();
+        }
+
+        function getProfile() {
+            const data = localStorage.getItem(PROFILE_KEY);
+            return data ? JSON.parse(data) : {};
+        }
+
+        function saveProfile() {
+            const profile = {
+                photo: document.querySelector('#profilePhoto img')?.src || null,
+                displayName: document.getElementById('displayName').value,
+                bio: document.getElementById('bio').value,
+                mood: document.getElementById('moodStatus').value,
+                interests: Array.from(document.querySelectorAll('#interestTags .tag.active'))
+                    .map(tag => tag.textContent),
+                drink: document.getElementById('favouriteDrink').value,
+                theme: document.querySelector('.theme-color.active')?.dataset.theme || 'gold',
+                social: {
+                    x: document.getElementById('socialX').value,
+                    discord: document.getElementById('socialDiscord').value,
+                    instagram: document.getElementById('socialInstagram').value
+                },
+                joinedDate: getProfile().joinedDate || Date.now()
+            };
+            
+            localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+            showSaveIndicator();
+        }
+
+        function showSaveIndicator() {
+            const indicator = document.getElementById('saveIndicator');
+            indicator.classList.add('show');
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 2000);
+        }
+
+        function renderInterestTags(activeInterests) {
+            const container = document.getElementById('interestTags');
+            container.innerHTML = INTEREST_TAGS.map(tag => `
+                <div class="tag ${activeInterests.includes(tag) ? 'active' : ''}" onclick="toggleTag(this)">
+                    ${tag}
+                </div>
+            `).join('');
+        }
+
+        function toggleTag(element) {
+            element.classList.toggle('active');
+        }
+
+        // Photo upload
+        document.getElementById('photoInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profilePhoto').innerHTML = `<img src="${e.target.result}" alt="Profile">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Theme color selection
+        document.querySelectorAll('.theme-color').forEach(el => {
+            el.addEventListener('click', function() {
+                document.querySelectorAll('.theme-color').forEach(e => e.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Auto-save on change
+        const inputs = document.querySelectorAll('input, textarea, select');
+        inputs.forEach(input => {
+            input.addEventListener('change', saveProfile);
+        });
+
+        function updateStats() {
+            const profile = getProfile();
+            const inventory = getInventory();
+            const placed = getPlacedFurniture();
+            
+            // Days in town
+            const joinedDate = profile.joinedDate || Date.now();
+            const days = Math.floor((Date.now() - joinedDate) / (1000 * 60 * 60 * 24));
+            document.getElementById('statDays').textContent = days;
+            
+            // Rooms visited (simulate - can be enhanced)
+            const visited = new Set();
+            Object.keys(placed).forEach(room => {
+                if (Object.keys(placed[room]).length > 0) {
+                    visited.add(room);
+                }
+            });
+            document.getElementById('statRooms').textContent = visited.size;
+            
+            // Furniture owned
+            document.getElementById('statFurniture').textContent = inventory.length;
+        }
+    </script>
+</body>
+</html>
