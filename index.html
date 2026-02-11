@@ -6,7 +6,8 @@
     <title>ChiffTown — Your Virtual Town</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="main-home-styles.css?v=14">
+    <link rel="stylesheet" href="main-home-styles.css?v=22">
+    <link rel="stylesheet" href="css/town-buildings.css?v=1">
 </head>
 <body>
     <!-- Ambient particles canvas -->
@@ -206,32 +207,27 @@
                 <span class="title-main">Chiff<span class="title-accent">Town</span></span>
             </h1>
             <p class="hero-subtitle">A virtual town where every venue has its own vibe. Meet up with your besties or make new friends in cozy pubs, buzzing nightclubs, chill lounges, and more — all with live video chat.</p>
-            <a href="#venues" class="hero-cta">
-                <span>Explore the Town</span>
-                <i class="fas fa-chevron-down"></i>
-            </a>
-            <div class="hero-stats" style="margin-top: 2rem;">
-                <div class="hero-stat">
-                    <div class="stat-icon"><i class="fas fa-users"></i></div>
-                    <div class="stat-info">
-                        <span class="stat-number" id="totalUsers">0</span>
-                        <span class="stat-label">Online</span>
+            <!-- Town Noticeboard -->
+            <div class="town-noticeboard">
+                <div class="noticeboard-frame">
+                    <div class="noticeboard-header">
+                        <span class="noticeboard-title">📋 TOWN BOARD</span>
                     </div>
-                </div>
-                <div class="stat-divider"></div>
-                <div class="hero-stat">
-                    <div class="stat-icon"><i class="fas fa-door-open"></i></div>
-                    <div class="stat-info">
-                        <span class="stat-number" id="activeRooms">0</span>
-                        <span class="stat-label">Active Rooms</span>
-                    </div>
-                </div>
-                <div class="stat-divider"></div>
-                <div class="hero-stat">
-                    <div class="stat-icon"><i class="fas fa-broadcast-tower"></i></div>
-                    <div class="stat-info">
-                        <span class="stat-number" id="liveStreams">0</span>
-                        <span class="stat-label">Live Now</span>
+                    <div class="noticeboard-stats">
+                        <div class="board-stat">
+                            <span class="board-stat-num" id="totalUsers">0</span>
+                            <span class="board-stat-label">wandering<br>the town</span>
+                        </div>
+                        <div class="board-nail"></div>
+                        <div class="board-stat">
+                            <span class="board-stat-num" id="activeRooms">0</span>
+                            <span class="board-stat-label">rooms<br>open</span>
+                        </div>
+                        <div class="board-nail"></div>
+                        <div class="board-stat">
+                            <span class="board-stat-num" id="liveStreams">0</span>
+                            <span class="board-stat-label">live<br>now</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -241,11 +237,6 @@
     <!-- Venues Section — Town Map -->
     <section id="venues" class="venues-section">
         <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Explore Chifftown</h2>
-                <p class="section-desc">Click a venue to enter</p>
-            </div>
-            
             <div class="map-controls">
                 <button class="fullscreen-btn" onclick="toggleMapFullscreen()" title="Explore Chifftown">
                     <i class="fas fa-expand"></i> Explore Full Screen
@@ -253,46 +244,43 @@
             </div>
             
             <div class="interactive-map-container" id="mapContainer">
+                <!-- Fullscreen HUD -->
+                <div class="fs-hud" id="fsHud">
+                    <div class="hud-left">
+                        <div class="hud-avatar" id="hudAvatar"><i class="fas fa-user"></i></div>
+                        <div class="hud-info">
+                            <div class="hud-username" id="hudUsername">Guest</div>
+                            <div class="hud-xp-bar">
+                                <div class="hud-xp-fill" id="hudXpFill" style="width: 35%"></div>
+                            </div>
+                            <div class="hud-xp-text"><span id="hudLevel">Lvl 1</span> · <span id="hudXp">350</span>/<span id="hudXpMax">1000</span> XP</div>
+                        </div>
+                    </div>
+                    <div class="hud-right">
+                        <div class="hud-currency">
+                            <span class="hud-coin">🪙</span>
+                            <span class="hud-coin-amount" id="hudCoins">250</span>
+                        </div>
+                        <div class="hud-currency hud-gems">
+                            <span class="hud-gem">💎</span>
+                            <span class="hud-gem-amount" id="hudGems">5</span>
+                        </div>
+                        <button class="fs-exit-btn" id="editModeBtn" onclick="toggleEdit()" title="Rearrange Town"><i class="fas fa-arrows-alt"></i></button>
+                        <button class="fs-exit-btn" onclick="toggleMapFullscreen()"><i class="fas fa-compress"></i></button>
+                    </div>
+                </div>
+                <div class="edit-toolbar" id="editToolbar">
+                    <span class="edit-label">✏️ Edit Mode</span>
+                    <button onclick="TownEngine.resetLayout()">Reset</button>
+                    <button class="save-btn" onclick="toggleEdit()">✓ Done</button>
+                </div>
                 <img src="/images/chifftown-map-wide.png" alt="Chifftown City Map" class="city-map-image">
-                <!-- Hotspot Overlays -->
-                <a href="/questing.html" class="map-hotspot adventure-hotspot" data-venue="Adventure Guild">
-                    <div class="hotspot-glow"></div>
-                    <div class="hotspot-label">Adventure Guild</div>
-                </a>
+                <!-- Buildings rendered dynamically by TownEngine -->
                 
-                <a href="/pub.html" class="map-hotspot tavern-hotspot" data-venue="The Chiff Inn">
-                    <div class="hotspot-glow"></div>
-                    <div class="hotspot-label">The Chiff Inn</div>
-                </a>
-                
-                <a href="/nightclub.html" class="map-hotspot nightclub-hotspot" data-venue="Neon Pulse">
-                    <div class="hotspot-glow"></div>
-                    <div class="hotspot-label">Neon Pulse</div>
-                </a>
-                
-                <a href="/cinema.html" class="map-hotspot cinema-hotspot" data-venue="Starlight Cinema">
-                    <div class="hotspot-glow"></div>
-                    <div class="hotspot-label">Starlight Cinema</div>
-                </a>
-                
-                <a href="/games.html" class="map-hotspot arcade-hotspot" data-venue="Pixel Palace">
-                    <div class="hotspot-glow"></div>
-                    <div class="hotspot-label">Pixel Palace</div>
-                </a>
-                
-                <a href="/lounge.html" class="map-hotspot lounge-hotspot" data-venue="Velvet Sky">
-                    <div class="hotspot-glow"></div>
-                    <div class="hotspot-label">Velvet Sky</div>
-                </a>
-                
+                <!-- GN24 Billboard (stays fixed on map) -->
                 <a href="https://goodnews-24.com" target="_blank" class="map-hotspot billboard-hotspot" data-venue="Good News 24">
                     <div class="hotspot-glow"></div>
                     <div class="hotspot-label">Good News 24</div>
-                </a>
-                
-                <a href="/apartment.html" class="map-hotspot apartment-hotspot" data-venue="Your Apartment">
-                    <div class="hotspot-glow"></div>
-                    <div class="hotspot-label">🏠 Your Apartment</div>
                 </a>
             </div>
             <!-- Venue Quick List -->
@@ -331,6 +319,11 @@
                     <span class="venue-icon">🏠</span>
                     <span class="venue-name">Your Apartment</span>
                     <span class="venue-desc">Your own space</span>
+                </a>
+                <a href="/wellness.html" class="venue-item">
+                    <span class="venue-icon">🧘</span>
+                    <span class="venue-name">Wellness Centre</span>
+                    <span class="venue-desc">Feel good science</span>
                 </a>
                 <a href="/profile.html" class="venue-item">
                     <span class="venue-icon">👤</span>
@@ -628,13 +621,34 @@
 <script>
 function toggleMapFullscreen() {
     const container = document.getElementById('mapContainer');
-    if (container.classList.contains('fullscreen-map')) {
-        container.classList.remove('fullscreen-map');
-        document.body.style.overflow = '';
-        const closeBtn = document.getElementById('fsCloseBtn');
-        if (closeBtn) closeBtn.remove();
-        if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
+    const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement);
+    
+    if (isFullscreen) {
+        // Exit fullscreen
+        (document.exitFullscreen || document.webkitExitFullscreen).call(document);
     } else {
+        // Enter real fullscreen
+        const requestFS = container.requestFullscreen || container.webkitRequestFullscreen;
+        if (requestFS) {
+            requestFS.call(container).then(() => {
+                container.classList.add('fullscreen-map');
+                // Try landscape on mobile
+                if (screen.orientation && screen.orientation.lock) {
+                    screen.orientation.lock('landscape').catch(() => {});
+                }
+            }).catch(() => {
+                // Fallback: CSS-only fullscreen for browsers that block the API
+                cssFullscreen(container, true);
+            });
+        } else {
+            // No Fullscreen API — CSS fallback
+            cssFullscreen(container, true);
+        }
+    }
+}
+
+function cssFullscreen(container, enter) {
+    if (enter) {
         container.classList.add('fullscreen-map');
         document.body.style.overflow = 'hidden';
         const closeBtn = document.createElement('button');
@@ -644,17 +658,89 @@ function toggleMapFullscreen() {
         closeBtn.onclick = toggleMapFullscreen;
         closeBtn.style.display = 'block';
         document.body.appendChild(closeBtn);
-        if (screen.orientation && screen.orientation.lock) {
-            screen.orientation.lock('landscape').catch(() => {});
-        }
+    } else {
+        container.classList.remove('fullscreen-map');
+        document.body.style.overflow = '';
+        const closeBtn = document.getElementById('fsCloseBtn');
+        if (closeBtn) closeBtn.remove();
     }
 }
+
+// Listen for fullscreen change to sync CSS class + cleanup
+document.addEventListener('fullscreenchange', onFSChange);
+document.addEventListener('webkitfullscreenchange', onFSChange);
+
+function onFSChange() {
+    const container = document.getElementById('mapContainer');
+    const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement);
+    if (isFullscreen) {
+        container.classList.add('fullscreen-map');
+        document.body.style.overflow = 'hidden';
+    } else {
+        container.classList.remove('fullscreen-map');
+        document.body.style.overflow = '';
+        if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
+        const closeBtn = document.getElementById('fsCloseBtn');
+        if (closeBtn) closeBtn.remove();
+    }
+}
+
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         const container = document.getElementById('mapContainer');
-        if (container.classList.contains('fullscreen-map')) toggleMapFullscreen();
+        if (container.classList.contains('fullscreen-map') && !document.fullscreenElement) {
+            cssFullscreen(container, false);
+        }
     }
 });
+
+// === HUD Data ===
+function updateHud() {
+    try {
+        const user = JSON.parse(localStorage.getItem('chifftown_user') || '{}');
+        const stats = JSON.parse(localStorage.getItem('chifftown_stats') || '{}');
+        
+        if (user.username || user.displayName) {
+            document.getElementById('hudUsername').textContent = user.displayName || user.username;
+        }
+        
+        const xp = stats.xp || 350;
+        const level = stats.level || Math.floor(xp / 1000) + 1;
+        const xpInLevel = xp % 1000;
+        const xpMax = 1000;
+        const coins = stats.coins || 250;
+        const gems = stats.gems || 5;
+        
+        document.getElementById('hudLevel').textContent = 'Lvl ' + level;
+        document.getElementById('hudXp').textContent = xpInLevel;
+        document.getElementById('hudXpMax').textContent = xpMax;
+        document.getElementById('hudXpFill').style.width = (xpInLevel / xpMax * 100) + '%';
+        document.getElementById('hudCoins').textContent = coins.toLocaleString();
+        document.getElementById('hudGems').textContent = gems;
+    } catch(e) {}
+}
+updateHud();
+
+// === EDIT MODE ===
+function toggleEdit() {
+    const isEdit = TownEngine.toggleEditMode();
+    const btn = document.getElementById('editModeBtn');
+    const toolbar = document.getElementById('editToolbar');
+    if (isEdit) {
+        btn.style.background = 'rgba(42, 157, 143, 0.4)';
+        btn.style.borderColor = 'rgba(42, 157, 143, 0.6)';
+        toolbar.classList.add('visible');
+    } else {
+        btn.style.background = '';
+        btn.style.borderColor = '';
+        toolbar.classList.remove('visible');
+    }
+}
+</script>
+<script src="/js/town-engine.js?v=1"></script>
+<script>
+    // Init town engine after DOM ready
+    TownEngine.init('mapContainer');
 </script>
 </body>
 </html>

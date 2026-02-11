@@ -1,0 +1,140 @@
+/* === Town Building Sprites === */
+
+.town-building {
+    position: absolute;
+    z-index: 5;
+    text-decoration: none;
+    transition: transform 0.2s ease, filter 0.2s ease;
+    cursor: pointer;
+    display: block;
+}
+
+.town-building:hover {
+    transform: scale(1.05) translateY(-4px);
+    z-index: 10;
+    filter: drop-shadow(0 8px 20px rgba(233, 196, 106, 0.3));
+}
+
+.town-building:hover .building-label {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.building-sprite {
+    width: 100%;
+    height: auto;
+    display: block;
+    pointer-events: none;
+    image-rendering: auto;
+}
+
+.building-label {
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%) translateY(5px);
+    background: rgba(0, 0, 0, 0.85);
+    color: #e9c46a;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: all 0.2s ease;
+    pointer-events: none;
+    border: 1px solid rgba(233, 196, 106, 0.2);
+    z-index: 20;
+}
+
+/* === Edit Mode === */
+.town-building.editable {
+    cursor: grab;
+    animation: editPulse 2s ease-in-out infinite;
+}
+
+.town-building.editable:active,
+.town-building.dragging {
+    cursor: grabbing;
+    animation: none;
+    transform: scale(1.1);
+    z-index: 100;
+    filter: drop-shadow(0 12px 30px rgba(42, 157, 143, 0.5));
+}
+
+.town-building.editable .building-label {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    background: rgba(42, 157, 143, 0.9);
+    color: white;
+    border-color: rgba(42, 157, 143, 0.5);
+}
+
+@keyframes editPulse {
+    0%, 100% { filter: drop-shadow(0 0 0 transparent); }
+    50% { filter: drop-shadow(0 0 12px rgba(42, 157, 143, 0.4)); }
+}
+
+/* Edit mode toolbar */
+.edit-toolbar {
+    display: none;
+    position: absolute;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10002;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    padding: 0.5rem 1rem;
+    gap: 0.8rem;
+    align-items: center;
+    font-family: 'Inter', sans-serif;
+}
+
+.edit-toolbar.visible {
+    display: flex;
+}
+
+.edit-toolbar button {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #f0ead6;
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.edit-toolbar button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.edit-toolbar button.save-btn {
+    background: rgba(42, 157, 143, 0.3);
+    border-color: rgba(42, 157, 143, 0.5);
+    color: #2a9d8f;
+}
+
+.edit-toolbar .edit-label {
+    font-size: 0.7rem;
+    color: rgba(240, 234, 214, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+    .building-label {
+        font-size: 0.55rem;
+        padding: 0.2rem 0.4rem;
+    }
+    .town-building:hover {
+        transform: scale(1.03) translateY(-2px);
+    }
+}

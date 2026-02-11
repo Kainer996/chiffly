@@ -849,6 +849,37 @@ a {
 .apartment-hotspot:hover {
     background: rgba(244, 197, 66, 0.15);
 }
+.hotspot-building-img {
+    position: absolute;
+    width: 80%;
+    height: auto;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5));
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+.apartment-hotspot:hover .hotspot-building-img {
+    transform: translate(-50%, -52%);
+    filter: drop-shadow(0 8px 20px rgba(244, 197, 66, 0.4));
+}
+
+/* Wellness Centre - bottom left area */
+.wellness-hotspot {
+    left: 2%;
+    top: 48%;
+    width: 18%;
+    height: 40%;
+    background: rgba(42, 157, 143, 0.0);
+}
+.wellness-hotspot .hotspot-glow {
+    background: radial-gradient(ellipse, rgba(42, 157, 143, 0.3) 0%, transparent 70%);
+    box-shadow: 0 0 50px rgba(42, 157, 143, 0.3);
+}
+.wellness-hotspot:hover {
+    background: rgba(42, 157, 143, 0.15);
+}
 
 /* Responsive map */
 @media (max-width: 768px) {
@@ -2064,12 +2095,266 @@ a {
     width: 100vw;
     height: 100vh;
     background: #0a0a1a;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Real browser fullscreen */
+.interactive-map-container:fullscreen,
+.interactive-map-container:-webkit-full-screen {
+    background: #0a0a1a;
+    width: 100%;
+    height: 100%;
+}
+
+.interactive-map-container:fullscreen .city-map-image,
+.interactive-map-container:-webkit-full-screen .city-map-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 .interactive-map-container.fullscreen-map .city-map-image {
     width: 100%;
     height: 100%;
     object-fit: contain;
+}
+
+/* === Town Noticeboard === */
+.town-noticeboard {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+}
+
+.noticeboard-frame {
+    background: linear-gradient(145deg, #2a1f0e 0%, #3d2b14 30%, #2a1f0e 100%);
+    border: 3px solid #5a3d1a;
+    border-radius: 6px;
+    padding: 0.6rem 1.2rem 0.8rem;
+    box-shadow: 
+        0 4px 20px rgba(0,0,0,0.5),
+        inset 0 1px 0 rgba(255,255,255,0.05),
+        0 0 0 1px rgba(0,0,0,0.3);
+    position: relative;
+    min-width: 220px;
+    /* Woodgrain texture via repeating gradient */
+    background-image: 
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 3px,
+            rgba(0,0,0,0.05) 3px,
+            rgba(0,0,0,0.05) 4px
+        );
+}
+
+/* Two nails at top */
+.noticeboard-frame::before,
+.noticeboard-frame::after {
+    content: '';
+    position: absolute;
+    top: -4px;
+    width: 8px;
+    height: 8px;
+    background: radial-gradient(circle, #8a8a8a 30%, #555 70%);
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+.noticeboard-frame::before { left: 12px; }
+.noticeboard-frame::after { right: 12px; }
+
+.noticeboard-header {
+    text-align: center;
+    margin-bottom: 0.4rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.noticeboard-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(233, 196, 106, 0.7);
+}
+
+.noticeboard-stats {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+}
+
+.board-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1rem;
+}
+
+.board-stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #e9c46a;
+    text-shadow: 0 0 8px rgba(233, 196, 106, 0.3);
+    line-height: 1;
+}
+
+.board-stat-label {
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: rgba(240, 234, 214, 0.4);
+    text-align: center;
+    line-height: 1.3;
+}
+
+.board-nail {
+    width: 1px;
+    height: 28px;
+    background: rgba(255,255,255,0.08);
+}
+
+/* === Fullscreen HUD === */
+.fs-hud {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10001;
+    padding: 0.6rem 1rem;
+    background: linear-gradient(180deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 70%, transparent 100%);
+    align-items: center;
+    justify-content: space-between;
+    font-family: 'Inter', sans-serif;
+    pointer-events: auto;
+}
+
+.interactive-map-container.fullscreen-map .fs-hud,
+.interactive-map-container:fullscreen .fs-hud,
+.interactive-map-container:-webkit-full-screen .fs-hud {
+    display: flex;
+}
+
+.hud-left {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.hud-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    border: 2px solid rgba(233, 196, 106, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(233, 196, 106, 0.8);
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.hud-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.hud-username {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #f0ead6;
+    letter-spacing: 0.3px;
+}
+
+.hud-xp-bar {
+    width: 120px;
+    height: 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.hud-xp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #2a9d8f, #e9c46a);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+    box-shadow: 0 0 6px rgba(42, 157, 143, 0.5);
+}
+
+.hud-xp-text {
+    font-size: 0.6rem;
+    color: rgba(240, 234, 214, 0.5);
+}
+
+.hud-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.hud-currency {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 0.3rem 0.7rem;
+}
+
+.hud-coin, .hud-gem {
+    font-size: 0.9rem;
+}
+
+.hud-coin-amount, .hud-gem-amount {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #e9c46a;
+}
+
+.hud-gems .hud-gem-amount {
+    color: #7dd3fc;
+}
+
+.fs-exit-btn {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(240, 234, 214, 0.7);
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+.fs-exit-btn:hover {
+    background: rgba(255,255,255,0.2);
+    color: white;
+}
+
+/* Mobile HUD adjustments */
+@media (max-width: 600px) {
+    .fs-hud {
+        padding: 0.4rem 0.6rem;
+    }
+    .hud-xp-bar { width: 80px; }
+    .hud-avatar { width: 28px; height: 28px; font-size: 0.7rem; }
+    .hud-username { font-size: 0.7rem; }
+    .hud-currency { padding: 0.2rem 0.5rem; }
+    .hud-coin-amount, .hud-gem-amount { font-size: 0.7rem; }
 }
 
 .fullscreen-close {

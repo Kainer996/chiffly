@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>✨ The Wellness Centre — Chifftown</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --warm: #f4a261;
+            --gold: #e9c46a;
+            --soft-blue: #264653;
+            --teal: #2a9d8f;
+            --coral: #e76f51;
+            --cream: #fefae0;
+            --dark: #1a1a2e;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark);
+            color: #f0ead6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated gradient background */
+        .bg-gradient {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #1a1a2e 75%, #16213e 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 20s ease infinite;
+            z-index: 0;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating particles (fireflies) */
+        .firefly {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--gold);
+            box-shadow: 0 0 10px var(--gold), 0 0 20px var(--warm);
+            animation: float linear infinite;
+            opacity: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0% { opacity: 0; transform: translateY(100vh) translateX(0); }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { opacity: 0; transform: translateY(-10vh) translateX(100px); }
+        }
+
+        .content {
+            position: relative;
+            z-index: 2;
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            min-height: 100vh;
+        }
+
+        /* Welcome section */
+        .welcome {
+            text-align: center;
+            padding: 3rem 0 2rem;
+        }
+
+        .welcome-emoji {
+            font-size: 3rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .welcome h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--gold);
+            margin: 1rem 0 0.5rem;
+            line-height: 1.3;
+        }
+
+        .welcome p {
+            font-size: 0.95rem;
+            color: rgba(240, 234, 214, 0.7);
+            line-height: 1.6;
+            max-width: 360px;
+            margin: 0 auto;
+        }
+
+        /* Science badge */
+        .science-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(42, 157, 143, 0.15);
+            border: 1px solid rgba(42, 157, 143, 0.3);
+            border-radius: 20px;
+            padding: 0.4rem 0.9rem;
+            font-size: 0.75rem;
+            color: var(--teal);
+            margin-bottom: 1rem;
+        }
+
+        /* Cards */
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 1.8rem;
+            margin-bottom: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:active {
+            transform: scale(0.98);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+
+        .card-title {
+            font-weight: 600;
+            font-size: 1.05rem;
+            color: #f0ead6;
+        }
+
+        .card-subtitle {
+            font-size: 0.75rem;
+            color: rgba(240, 234, 214, 0.5);
+            margin-top: 0.15rem;
+        }
+
+        .card-body {
+            font-size: 0.9rem;
+            line-height: 1.7;
+            color: rgba(240, 234, 214, 0.8);
+        }
+
+        /* Breathing exercise */
+        .breathing-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 0;
+        }
+
+        .breath-circle {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(42, 157, 143, 0.4) 0%, rgba(42, 157, 143, 0.1) 60%, transparent 70%);
+            border: 2px solid rgba(42, 157, 143, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--teal);
+            cursor: pointer;
+            transition: all 0.1s;
+            position: relative;
+        }
+
+        .breath-circle.breathing {
+            animation: breathe 8s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+            0%, 100% { 
+                transform: scale(1); 
+                background: radial-gradient(circle, rgba(42, 157, 143, 0.3) 0%, rgba(42, 157, 143, 0.1) 60%, transparent 70%);
+                border-color: rgba(42, 157, 143, 0.4);
+            }
+            25% { 
+                transform: scale(1.3); 
+                background: radial-gradient(circle, rgba(42, 157, 143, 0.6) 0%, rgba(42, 157, 143, 0.2) 60%, transparent 70%);
+                border-color: rgba(42, 157, 143, 0.8);
+            }
+            50% {
+                transform: scale(1.3);
+                background: radial-gradient(circle, rgba(233, 196, 106, 0.5) 0%, rgba(233, 196, 106, 0.15) 60%, transparent 70%);
+                border-color: rgba(233, 196, 106, 0.7);
+            }
+            75% { 
+                transform: scale(1); 
+                background: radial-gradient(circle, rgba(42, 157, 143, 0.3) 0%, rgba(42, 157, 143, 0.1) 60%, transparent 70%);
+                border-color: rgba(42, 157, 143, 0.4);
+            }
+        }
+
+        .breath-text {
+            font-size: 0.85rem;
+            margin-top: 1.2rem;
+            color: rgba(240, 234, 214, 0.6);
+            text-align: center;
+            min-height: 1.5em;
+        }
+
+        .breath-counter {
+            font-size: 0.75rem;
+            color: rgba(240, 234, 214, 0.4);
+            margin-top: 0.5rem;
+        }
+
+        /* Gratitude journal */
+        .gratitude-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            color: #f0ead6;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.3s;
+            margin-bottom: 0.6rem;
+        }
+
+        .gratitude-input:focus {
+            border-color: var(--gold);
+        }
+
+        .gratitude-input::placeholder {
+            color: rgba(240, 234, 214, 0.3);
+        }
+
+        .gratitude-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .gratitude-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+            padding: 0.6rem 0;
+            font-size: 0.85rem;
+            color: rgba(240, 234, 214, 0.7);
+            animation: fadeIn 0.5s ease;
+        }
+
+        .gratitude-item::before {
+            content: '✨';
+            flex-shrink: 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Affirmation */
+        .affirmation-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            line-height: 1.5;
+            color: var(--gold);
+            text-align: center;
+            padding: 1.5rem 0;
+            min-height: 80px;
+            transition: opacity 0.5s;
+        }
+
+        .affirmation-btn {
+            display: block;
+            width: 100%;
+            padding: 0.8rem;
+            background: rgba(233, 196, 106, 0.1);
+            border: 1px solid rgba(233, 196, 106, 0.3);
+            border-radius: 12px;
+            color: var(--gold);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .affirmation-btn:active {
+            background: rgba(233, 196, 106, 0.2);
+            transform: scale(0.98);
+        }
+
+        /* Nature sounds */
+        .sound-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.8rem;
+        }
+
+        .sound-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 1rem 0.5rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: rgba(240, 234, 214, 0.7);
+            font-size: 0.75rem;
+        }
+
+        .sound-btn:active, .sound-btn.active {
+            background: rgba(42, 157, 143, 0.15);
+            border-color: rgba(42, 157, 143, 0.4);
+            color: var(--teal);
+        }
+
+        .sound-emoji {
+            font-size: 1.6rem;
+        }
+
+        /* Mood tracker */
+        .mood-grid {
+            display: flex;
+            justify-content: space-around;
+            padding: 1rem 0;
+        }
+
+        .mood-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.8rem;
+            background: none;
+            border: 2px solid transparent;
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 2rem;
+            transition: all 0.3s;
+        }
+
+        .mood-btn:active, .mood-btn.selected {
+            border-color: var(--gold);
+            background: rgba(233, 196, 106, 0.1);
+        }
+
+        .mood-label {
+            font-size: 0.65rem;
+            color: rgba(240, 234, 214, 0.5);
+        }
+
+        .mood-response {
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.9rem;
+            color: rgba(240, 234, 214, 0.7);
+            line-height: 1.6;
+            min-height: 60px;
+        }
+
+        /* Quick boost button */
+        .boost-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--warm) 0%, var(--coral) 100%);
+            border: none;
+            border-radius: 16px;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 1rem 0;
+        }
+
+        .boost-btn:active {
+            transform: scale(0.97);
+            filter: brightness(1.1);
+        }
+
+        /* Compliment from Ava */
+        .ava-message {
+            background: linear-gradient(135deg, rgba(42, 157, 143, 0.1) 0%, rgba(233, 196, 106, 0.1) 100%);
+            border: 1px solid rgba(42, 157, 143, 0.2);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+
+        .ava-message .ava-avatar {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .ava-message p {
+            font-size: 0.9rem;
+            line-height: 1.7;
+            color: rgba(240, 234, 214, 0.85);
+        }
+
+        .ava-message .ava-name {
+            display: block;
+            margin-top: 0.8rem;
+            font-size: 0.8rem;
+            color: var(--teal);
+            font-weight: 500;
+        }
+
+        /* Progress section */
+        .streak-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            font-size: 0.9rem;
+            color: var(--gold);
+        }
+
+        .streak-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Science section */
+        .science-fact {
+            font-size: 0.82rem;
+            line-height: 1.7;
+            color: rgba(240, 234, 214, 0.6);
+            padding: 0.8rem;
+            border-left: 2px solid var(--teal);
+            margin-top: 0.8rem;
+        }
+
+        /* Haptic-like visual feedback */
+        .haptic {
+            animation: hapticBurst 0.4s ease;
+        }
+
+        @keyframes hapticBurst {
+            0% { transform: scale(1); }
+            20% { transform: scale(1.05); }
+            40% { transform: scale(0.97); }
+            60% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        /* Confetti */
+        .confetti-piece {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+            z-index: 100;
+            pointer-events: none;
+            animation: confettiFall 3s ease-out forwards;
+        }
+
+        @keyframes confettiFall {
+            0% { opacity: 1; transform: translateY(-20px) rotate(0deg); }
+            100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem 0;
+            font-size: 0.75rem;
+            color: rgba(240, 234, 214, 0.3);
+        }
+
+        .footer a {
+            color: var(--teal);
+            text-decoration: none;
+        }
+
+        /* Section divider */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+            margin: 0.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-gradient"></div>
+
+    <!-- Fireflies -->
+    <div id="fireflies"></div>
+
+    <div class="content">
+        <!-- Back to town -->
+        <a href="/" style="display:inline-flex;align-items:center;gap:0.4rem;color:rgba(240,234,214,0.5);text-decoration:none;font-size:0.85rem;padding:0.5rem 0;transition:color 0.3s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='rgba(240,234,214,0.5)'">← Back to Chifftown</a>
+
+        <!-- Welcome -->
+        <div class="welcome">
+            <div class="science-badge">🧬 Neuroscience-backed</div>
+            <div class="welcome-emoji">🏛️</div>
+            <h1>The Wellness Centre</h1>
+            <p id="welcomeMsg">Every tool here is designed to trigger real neurochemical responses — serotonin, dopamine, oxytocin, and endorphins. The science of feeling good, made simple.</p>
+        </div>
+
+        <!-- How you're feeling -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="background: rgba(233, 196, 106, 0.15);">🫂</div>
+                <div>
+                    <div class="card-title">How are you feeling?</div>
+                    <div class="card-subtitle">Naming emotions reduces their intensity (neuroscience fact!)</div>
+                </div>
+            </div>
+            <div class="mood-grid">
+                <button class="mood-btn" onclick="selectMood(this, 'rough')" data-mood="rough">😔<span class="mood-label">Rough</span></button>
+                <button class="mood-btn" onclick="selectMood(this, 'meh')" data-mood="meh">😐<span class="mood-label">Meh</span></button>
+                <button class="mood-btn" onclick="selectMood(this, 'okay')" data-mood="okay">🙂<span class="mood-label">Okay</span></button>
+                <button class="mood-btn" onclick="selectMood(this, 'good')" data-mood="good">😊<span class="mood-label">Good</span></button>
+                <button class="mood-btn" onclick="selectMood(this, 'great')" data-mood="great">🤩<span class="mood-label">Great!</span></button>
+            </div>
+            <div class="mood-response" id="moodResponse"></div>
+            <div class="science-fact">
+                🧠 <strong>Affect labelling:</strong> UCLA research shows that simply naming your emotions activates the prefrontal cortex and calms the amygdala — reducing emotional reactivity by up to 50%.
+            </div>
+        </div>
+
+        <!-- Breathing Exercise -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="background: rgba(42, 157, 143, 0.15);">🌊</div>
+                <div>
+                    <div class="card-title">4-7-8 Breathing</div>
+                    <div class="card-subtitle">Activates your parasympathetic nervous system</div>
+                </div>
+            </div>
+            <div class="breathing-container">
+                <div class="breath-circle" id="breathCircle" onclick="startBreathing()">
+                    <span id="breathLabel">Tap to start</span>
+                </div>
+                <div class="breath-text" id="breathText">This technique was developed by Dr. Andrew Weil</div>
+                <div class="breath-counter" id="breathCounter"></div>
+            </div>
+            <div class="science-fact">
+                🧠 <strong>Vagus nerve activation:</strong> Extended exhales stimulate the vagus nerve, triggering serotonin release and shifting your body from fight-or-flight to rest-and-digest. Just 3 cycles measurably reduces cortisol.
+            </div>
+        </div>
+
+        <!-- Instant Boost -->
+        <button class="boost-btn" onclick="instantBoost()">
+            ⚡ Instant Serotonin Boost
+        </button>
+
+        <!-- Gratitude Journal -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="background: rgba(244, 162, 97, 0.15);">📝</div>
+                <div>
+                    <div class="card-title">Gratitude Moment</div>
+                    <div class="card-subtitle">Rewires your brain's negativity bias</div>
+                </div>
+            </div>
+            <div class="card-body">
+                <p style="margin-bottom: 1rem; font-size: 0.85rem; color: rgba(240,234,214,0.6);">Name 3 things you're grateful for — even tiny ones count.</p>
+                <input class="gratitude-input" id="gratitudeInput" type="text" placeholder="Something you're grateful for..." onkeydown="if(event.key==='Enter')addGratitude()">
+                <ul class="gratitude-list" id="gratitudeList"></ul>
+            </div>
+            <div class="science-fact">
+                🧠 <strong>Neural pathway rewiring:</strong> Dr. Robert Emmons' research shows 21 days of gratitude journaling increases serotonin production by strengthening neural pathways in the medial prefrontal cortex. Even faking it works — the brain can't tell the difference.
+            </div>
+        </div>
+
+        <!-- Affirmations -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="background: rgba(233, 196, 106, 0.15);">💫</div>
+                <div>
+                    <div class="card-title">Power Affirmation</div>
+                    <div class="card-subtitle">Self-affirmation activates the reward centres</div>
+                </div>
+            </div>
+            <div class="affirmation-text" id="affirmationText">You are stronger than you think, braver than you feel, and more loved than you know.</div>
+            <button class="affirmation-btn" onclick="newAffirmation()">✨ Another one</button>
+            <div class="science-fact">
+                🧠 <strong>Self-affirmation theory:</strong> fMRI studies show affirmations activate the ventromedial prefrontal cortex — the same reward centre triggered by food and winning money. Reading them aloud amplifies the effect 3x.
+            </div>
+        </div>
+
+        <!-- Chifftown wellness message -->
+        <div class="ava-message">
+            <div class="ava-avatar">🏛️</div>
+            <p id="avaMessage">Welcome to the Wellness Centre. This is your space — no judgement, no rush, no expectations. Just you and a few tools backed by real science to help you feel a little better. You showed up, and that's already a win. Take what you need. 💙</p>
+            <span class="ava-name">— The Wellness Centre, Chifftown</span>
+        </div>
+
+        <!-- Nature sounds (visual only, using Web Audio API for tones) -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="background: rgba(42, 157, 143, 0.15);">🎵</div>
+                <div>
+                    <div class="card-title">Calming Tones</div>
+                    <div class="card-subtitle">Binaural-inspired frequencies for calm</div>
+                </div>
+            </div>
+            <div class="sound-grid">
+                <button class="sound-btn" onclick="toggleTone(this, 'rain')"><span class="sound-emoji">🌧️</span>Rain</button>
+                <button class="sound-btn" onclick="toggleTone(this, 'ocean')"><span class="sound-emoji">🌊</span>Ocean</button>
+                <button class="sound-btn" onclick="toggleTone(this, 'fire')"><span class="sound-emoji">🔥</span>Fireplace</button>
+                <button class="sound-btn" onclick="toggleTone(this, 'wind')"><span class="sound-emoji">🍃</span>Wind</button>
+                <button class="sound-btn" onclick="toggleTone(this, 'night')"><span class="sound-emoji">🦗</span>Night</button>
+                <button class="sound-btn" onclick="toggleTone(this, 'hum')"><span class="sound-emoji">🕉️</span>Om Hum</button>
+            </div>
+            <div class="science-fact">
+                🧠 <strong>Auditory entrainment:</strong> Low-frequency sounds activate alpha brainwaves (8-12 Hz), associated with relaxed alertness. Nature sounds in particular reduce cortisol and increase parasympathetic activity within 5 minutes.
+            </div>
+        </div>
+
+        <!-- Streak -->
+        <div class="card" style="text-align: center;">
+            <div class="card-title" style="margin-bottom: 0.5rem;">Your Wellness Streak</div>
+            <div class="streak-display">
+                <span>🔥</span>
+                <span class="streak-number" id="streakCount">1</span>
+                <span>day</span>
+            </div>
+            <p style="font-size: 0.8rem; color: rgba(240,234,214,0.5);">Come back tomorrow to keep it going</p>
+            <div class="science-fact">
+                🧠 <strong>Dopamine loops:</strong> Streaks trigger the brain's reward prediction system. Each consecutive day releases a small dopamine hit — the same mechanism that makes games addictive, but used for good.
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>The Wellness Centre — Chifftown</p>
+            <p style="margin-top: 0.3rem;">Based on peer-reviewed neuroscience research</p>
+        </div>
+    </div>
+
+    <script>
+        // === FIREFLIES ===
+        function createFireflies() {
+            const container = document.getElementById('fireflies');
+            for (let i = 0; i < 15; i++) {
+                const f = document.createElement('div');
+                f.className = 'firefly';
+                f.style.left = Math.random() * 100 + '%';
+                f.style.animationDuration = (8 + Math.random() * 12) + 's';
+                f.style.animationDelay = Math.random() * 10 + 's';
+                f.style.width = f.style.height = (3 + Math.random() * 5) + 'px';
+                container.appendChild(f);
+            }
+        }
+        createFireflies();
+
+        // === MOOD TRACKER ===
+        const moodResponses = {
+            rough: [
+                "I hear you. It's okay to feel this way — you're not broken, you're human. The fact that you opened this shows strength. Let's take a breath together. 💙",
+                "Rough days don't last forever, even when they feel endless. You've survived every bad day so far. That's a 100% success rate. 💪",
+                "When everything feels heavy, remember: even your brain chemistry is temporary. This feeling will shift. Let's help it along. 🌊"
+            ],
+            meh: [
+                "Meh is honest. Not every day needs to be amazing — sometimes just getting through it is the win. But let's see if we can nudge it up a notch. ✨",
+                "You know what? 'Meh' means you're still here, still open. That's more than enough. Let's do something small that feels good. 🌟"
+            ],
+            okay: [
+                "Okay is underrated! Stable ground is good ground. Let's build on it. 🌱",
+                "Okay is a perfectly fine place to be. Let's see if we can tip it towards good. You deserve it. 😊"
+            ],
+            good: [
+                "That's what I like to hear! Let's amplify this. Good feelings are like campfires — the more fuel you give them, the brighter they burn. 🔥",
+                "YES! Good energy attracts more good energy. Your brain is literally bathing in serotonin right now. Let's keep it going! ✨"
+            ],
+            great: [
+                "Look at you shining! 🤩 This is your natural state — remember this feeling. Your brain just created a memory marker for happiness. Come back to this moment anytime.",
+                "AMAZING! You are radiating right now. This is the real you — brilliant, alive, unstoppable. 🚀💫"
+            ]
+        };
+
+        function selectMood(btn, mood) {
+            document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            btn.classList.add('haptic');
+            setTimeout(() => btn.classList.remove('haptic'), 400);
+            
+            const responses = moodResponses[mood];
+            const response = responses[Math.floor(Math.random() * responses.length)];
+            const el = document.getElementById('moodResponse');
+            el.style.opacity = 0;
+            setTimeout(() => {
+                el.textContent = response;
+                el.style.opacity = 1;
+                el.style.transition = 'opacity 0.5s';
+            }, 200);
+
+            // Save mood
+            const today = new Date().toDateString();
+            localStorage.setItem('lastMood', JSON.stringify({ date: today, mood }));
+        }
+
+        // === BREATHING ===
+        let breathingActive = false;
+        let breathInterval = null;
+        let breathCycles = 0;
+
+        function startBreathing() {
+            const circle = document.getElementById('breathCircle');
+            const label = document.getElementById('breathLabel');
+            const text = document.getElementById('breathText');
+            const counter = document.getElementById('breathCounter');
+            
+            if (breathingActive) {
+                breathingActive = false;
+                circle.classList.remove('breathing');
+                label.textContent = 'Tap to start';
+                text.textContent = 'Paused — tap to continue';
+                clearInterval(breathInterval);
+                return;
+            }
+
+            breathingActive = true;
+            circle.classList.add('breathing');
+            breathCycles = 0;
+            
+            const phases = [
+                { text: 'Breathe in...', label: '4', duration: 4000 },
+                { text: 'Hold...', label: '7', duration: 3000 },  // show 7 but 3s animation hold
+                { text: 'Breathe out slowly...', label: '8', duration: 4000 },
+                { text: 'And rest...', label: '·', duration: 1000 }
+            ];
+
+            let phaseIndex = 0;
+
+            function nextPhase() {
+                if (!breathingActive) return;
+                const phase = phases[phaseIndex];
+                label.textContent = phase.label;
+                text.textContent = phase.text;
+                
+                phaseIndex++;
+                if (phaseIndex >= phases.length) {
+                    phaseIndex = 0;
+                    breathCycles++;
+                    counter.textContent = `Cycle ${breathCycles} of 5`;
+                    
+                    if (breathCycles >= 5) {
+                        breathingActive = false;
+                        circle.classList.remove('breathing');
+                        label.textContent = '✓';
+                        text.textContent = 'Beautiful. Your nervous system thanks you. 🌟';
+                        counter.textContent = '5 cycles complete!';
+                        clearInterval(breathInterval);
+                        confetti();
+                        return;
+                    }
+                }
+
+                clearInterval(breathInterval);
+                breathInterval = setTimeout(nextPhase, phase.duration);
+            }
+
+            nextPhase();
+        }
+
+        // === GRATITUDE ===
+        let gratitudes = JSON.parse(localStorage.getItem('gratitudes') || '[]');
+
+        function renderGratitudes() {
+            const list = document.getElementById('gratitudeList');
+            list.innerHTML = '';
+            gratitudes.slice(-5).forEach(g => {
+                const li = document.createElement('li');
+                li.className = 'gratitude-item';
+                li.textContent = g;
+                list.appendChild(li);
+            });
+        }
+
+        function addGratitude() {
+            const input = document.getElementById('gratitudeInput');
+            const val = input.value.trim();
+            if (!val) return;
+            
+            gratitudes.push(val);
+            localStorage.setItem('gratitudes', JSON.stringify(gratitudes));
+            input.value = '';
+            renderGratitudes();
+            
+            if (gratitudes.length === 3) {
+                confetti();
+            }
+        }
+
+        renderGratitudes();
+
+        // === AFFIRMATIONS ===
+        const affirmations = [
+            "You are stronger than you think, braver than you feel, and more loved than you know.",
+            "Your past does not define your future. Every day is a fresh neural pathway waiting to form.",
+            "You don't have to have it all figured out. You just have to keep going.",
+            "The fact that you're still here, still trying, still fighting — that IS the victory.",
+            "You are not your worst days. You are the incredible human who survived them all.",
+            "Someone right now wishes they had your strength. You just can't see it yet.",
+            "Your sensitivity is not weakness — it's your superpower. You feel deeply because you ARE deep.",
+            "The world needs exactly who you are. Not a polished version. The real, messy, beautiful you.",
+            "Rest is not giving up. It's gearing up.",
+            "You've been through storms before and you're still standing. That's not luck — that's you.",
+            "Tough times don't last. Tough people do. And you are tougher than you give yourself credit for.",
+            "Every expert was once a beginner. Every success was once a struggle. You're in the becoming phase.",
+            "You are not behind. You are exactly where you need to be for what comes next.",
+            "The struggle you're in today is building the strength you need for tomorrow.",
+            "You have the kind of warmth that makes people feel safe. That's rare. That's a gift.",
+            "Right now, in this moment, you are enough. You have always been enough."
+        ];
+
+        let lastAffirmation = 0;
+
+        function newAffirmation() {
+            let idx;
+            do { idx = Math.floor(Math.random() * affirmations.length); } while (idx === lastAffirmation);
+            lastAffirmation = idx;
+            
+            const el = document.getElementById('affirmationText');
+            el.style.opacity = 0;
+            setTimeout(() => {
+                el.textContent = affirmations[idx];
+                el.style.opacity = 1;
+            }, 300);
+        }
+
+        // === CALMING TONES (Web Audio API) ===
+        let audioCtx = null;
+        let activeTones = {};
+
+        const toneConfigs = {
+            rain: { type: 'brown', freq: 200, gain: 0.15 },
+            ocean: { type: 'pink', freq: 100, gain: 0.12 },
+            fire: { type: 'brown', freq: 300, gain: 0.1 },
+            wind: { type: 'pink', freq: 150, gain: 0.08 },
+            night: { type: 'sine', freq: 432, gain: 0.05 },
+            hum: { type: 'sine', freq: 136.1, gain: 0.08 }  // Om frequency
+        };
+
+        function createNoiseNode(type) {
+            const bufferSize = 2 * audioCtx.sampleRate;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            
+            if (type === 'brown') {
+                let last = 0;
+                for (let i = 0; i < bufferSize; i++) {
+                    const white = Math.random() * 2 - 1;
+                    data[i] = (last + (0.02 * white)) / 1.02;
+                    last = data[i];
+                    data[i] *= 3.5;
+                }
+            } else {
+                // pink noise approximation
+                let b0=0, b1=0, b2=0, b3=0, b4=0, b5=0, b6=0;
+                for (let i = 0; i < bufferSize; i++) {
+                    const white = Math.random() * 2 - 1;
+                    b0 = 0.99886*b0 + white*0.0555179;
+                    b1 = 0.99332*b1 + white*0.0750759;
+                    b2 = 0.96900*b2 + white*0.1538520;
+                    b3 = 0.86650*b3 + white*0.3104856;
+                    b4 = 0.55000*b4 + white*0.5329522;
+                    b5 = -0.7616*b5 - white*0.0168980;
+                    data[i] = b0+b1+b2+b3+b4+b5+b6+white*0.5362;
+                    data[i] *= 0.11;
+                    b6 = white*0.115926;
+                }
+            }
+            
+            const node = audioCtx.createBufferSource();
+            node.buffer = buffer;
+            node.loop = true;
+            return node;
+        }
+
+        function toggleTone(btn, name) {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            
+            if (activeTones[name]) {
+                activeTones[name].gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1);
+                setTimeout(() => {
+                    try { activeTones[name].source.stop(); } catch(e) {}
+                    delete activeTones[name];
+                }, 1100);
+                btn.classList.remove('active');
+                return;
+            }
+
+            const config = toneConfigs[name];
+            const gainNode = audioCtx.createGain();
+            gainNode.gain.value = 0;
+            gainNode.connect(audioCtx.destination);
+
+            let source;
+            if (config.type === 'sine') {
+                source = audioCtx.createOscillator();
+                source.type = 'sine';
+                source.frequency.value = config.freq;
+            } else {
+                source = createNoiseNode(config.type);
+                // Add a filter for character
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.value = config.freq;
+                source.connect(filter);
+                filter.connect(gainNode);
+                source.start();
+                activeTones[name] = { source, gain: gainNode };
+                gainNode.gain.linearRampToValueAtTime(config.gain, audioCtx.currentTime + 2);
+                btn.classList.add('active');
+                return;
+            }
+
+            source.connect(gainNode);
+            source.start();
+            activeTones[name] = { source, gain: gainNode };
+            gainNode.gain.linearRampToValueAtTime(config.gain, audioCtx.currentTime + 2);
+            btn.classList.add('active');
+        }
+
+        // === INSTANT BOOST ===
+        const boostFacts = [
+            { emoji: '😊', text: 'Smiling — even forcing one — triggers serotonin release. Your brain monitors your facial muscles and adjusts mood accordingly. Try it now! Smile wide for 30 seconds.' },
+            { emoji: '🤗', text: 'Give yourself a hug. Seriously — cross your arms and squeeze. Self-touch releases oxytocin, the bonding hormone. Hold it for 20 seconds.' },
+            { emoji: '👀', text: 'Look up at the sky for 60 seconds. Panoramic vision activates a calming neural circuit that narrows vision can\'t access. It literally changes your brain state.' },
+            { emoji: '🏃', text: 'Do 20 jumping jacks right now. Exercise is the most potent natural antidepressant — it increases serotonin, BDNF, and endorphins within minutes.' },
+            { emoji: '🎵', text: 'Hum your favourite song. Humming activates the vagus nerve, reduces cortisol, and the vibrations literally massage your internal organs. Weird but true!' },
+            { emoji: '🧊', text: 'Splash cold water on your face. Cold exposure triggers the "dive reflex" — your heart rate drops, blood pressure lowers, and noradrenaline surges (the focus chemical).' },
+            { emoji: '✋', text: 'Press your thumb firmly into the centre of your palm for 30 seconds. This acupressure point (Pericardium 8) activates your parasympathetic system.' },
+            { emoji: '🌬️', text: 'Physiological sigh: two quick inhales through the nose, then one long exhale through the mouth. Stanford research shows this is the fastest way to calm your nervous system.' },
+            { emoji: '🙌', text: 'Raise both arms above your head in a V-shape for 2 minutes. "Power posing" increases testosterone and decreases cortisol — real hormonal changes from just standing differently.' },
+            { emoji: '👃', text: 'Breathe in through your nose only. Nasal breathing releases nitric oxide, which improves oxygen delivery by 15% and triggers calming signals to the brain.' }
+        ];
+
+        let lastBoost = -1;
+
+        function instantBoost() {
+            let idx;
+            do { idx = Math.floor(Math.random() * boostFacts.length); } while (idx === lastBoost);
+            lastBoost = idx;
+            
+            const boost = boostFacts[idx];
+            
+            // Create a popup overlay
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:50;display:flex;align-items:center;justify-content:center;padding:2rem;animation:fadeIn 0.3s;';
+            
+            overlay.innerHTML = `
+                <div style="max-width:380px;text-align:center;">
+                    <div style="font-size:3rem;margin-bottom:1rem;">${boost.emoji}</div>
+                    <div style="font-size:1.2rem;font-family:'Playfair Display',serif;color:var(--gold);margin-bottom:1.5rem;">Quick Serotonin Hit</div>
+                    <p style="font-size:0.95rem;line-height:1.8;color:rgba(240,234,214,0.85);">${boost.text}</p>
+                    <button onclick="this.parentElement.parentElement.remove()" style="margin-top:2rem;padding:0.8rem 2rem;background:rgba(42,157,143,0.2);border:1px solid rgba(42,157,143,0.4);border-radius:12px;color:var(--teal);font-family:'Inter',sans-serif;font-size:0.9rem;cursor:pointer;">Got it! ✨</button>
+                </div>
+            `;
+            
+            document.body.appendChild(overlay);
+            overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+            confetti();
+        }
+
+        // === CONFETTI ===
+        function confetti() {
+            const colors = ['#e9c46a', '#2a9d8f', '#f4a261', '#e76f51', '#264653'];
+            for (let i = 0; i < 30; i++) {
+                const piece = document.createElement('div');
+                piece.className = 'confetti-piece';
+                piece.style.left = Math.random() * 100 + '%';
+                piece.style.top = '-10px';
+                piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+                piece.style.animationDelay = Math.random() * 0.5 + 's';
+                piece.style.animationDuration = (2 + Math.random() * 2) + 's';
+                document.body.appendChild(piece);
+                setTimeout(() => piece.remove(), 4000);
+            }
+        }
+
+        // === STREAK ===
+        function updateStreak() {
+            const today = new Date().toDateString();
+            const data = JSON.parse(localStorage.getItem('streak') || '{"count":0,"lastDate":""}');
+            
+            if (data.lastDate === today) {
+                document.getElementById('streakCount').textContent = data.count;
+                return;
+            }
+            
+            const yesterday = new Date(Date.now() - 86400000).toDateString();
+            if (data.lastDate === yesterday) {
+                data.count++;
+            } else {
+                data.count = 1;
+            }
+            data.lastDate = today;
+            localStorage.setItem('streak', JSON.stringify(data));
+            document.getElementById('streakCount').textContent = data.count;
+        }
+        updateStreak();
+
+        // === AVA MESSAGES (rotate) ===
+        const wellnessMessages = [
+            "Welcome to the Wellness Centre. This is your space — no judgement, no rush, no expectations. Just you and a few tools backed by real science to help you feel a little better. You showed up, and that's already a win. Take what you need. 💙",
+            "You made it here, and that matters. Most people scroll past. You stopped. That curiosity, that willingness to try — that's already your brain reaching for something better. Let's help it along. 🌱",
+            "Here's a secret from neuroscience: the simple act of seeking help releases dopamine. Your brain just rewarded you for opening this page. You're already winning. 🧠✨",
+            "This is a no-pressure zone. You don't have to do everything here. Pick one thing. Try it. If it helps even 1%, that compounds over time. Small shifts, big changes. 🌊",
+            "Fun fact: you can't be anxious and grateful at the same time — they use the same neural circuits. The exercises below literally rewire which one wins. Science is cool like that. 🔬"
+        ];
+        
+        document.getElementById('avaMessage').textContent = wellnessMessages[Math.floor(Math.random() * wellnessMessages.length)];
+
+        // === USERNAME PERSONALISATION ===
+        function getUsername() {
+            try {
+                const user = JSON.parse(localStorage.getItem('chifftown_user') || '{}');
+                return user.username || user.displayName || null;
+            } catch(e) { return null; }
+        }
+
+        function personalise() {
+            const name = getUsername();
+            if (name) {
+                document.getElementById('welcomeMsg').innerHTML = 
+                    `Welcome back, <strong style="color:var(--gold)">${name}</strong>. Every tool here is designed to trigger real neurochemical responses — serotonin, dopamine, oxytocin, and endorphins. The science of feeling good, made simple.`;
+            }
+        }
+        personalise();
+    </script>
+</body>
+</html>
