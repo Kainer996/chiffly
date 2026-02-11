@@ -724,10 +724,10 @@ a {
 /* Hotspot Positions & Colors - Isometric Layout */
 /* The Rustic Tavern - tall skyscraper center-left */
 .tavern-hotspot {
-    left: 25%;
-    top: 15%;
-    width: 17%;
-    height: 40%;
+    left: 20%;
+    top: 14%;
+    width: 14%;
+    height: 34%;
     background: rgba(217, 119, 6, 0.0);
 }
 .tavern-hotspot .hotspot-glow {
@@ -740,10 +740,10 @@ a {
 
 /* Neon Pulse - nightclub far left */
 .nightclub-hotspot {
-    left: 0%;
-    top: 35%;
-    width: 22%;
-    height: 35%;
+    left: 9%;
+    top: 42%;
+    width: 14%;
+    height: 34%;
     background: rgba(0, 206, 209, 0.0);
 }
 .nightclub-hotspot .hotspot-glow {
@@ -756,10 +756,10 @@ a {
 
 /* Starlight Cinema - art deco center-left bottom */
 .cinema-hotspot {
-    left: 20%;
-    top: 55%;
-    width: 22%;
-    height: 25%;
+    left: 26%;
+    top: 38%;
+    width: 15%;
+    height: 38%;
     background: rgba(239, 68, 68, 0.0);
 }
 .cinema-hotspot .hotspot-glow {
@@ -772,10 +772,10 @@ a {
 
 /* Pixel Palace - arcade center-right */
 .arcade-hotspot {
-    left: 45%;
-    top: 45%;
-    width: 20%;
-    height: 25%;
+    left: 38%;
+    top: 14%;
+    width: 14%;
+    height: 34%;
     background: rgba(34, 197, 94, 0.0);
 }
 .arcade-hotspot .hotspot-glow {
@@ -788,10 +788,10 @@ a {
 
 /* Velvet Sky - glass lounge far right */
 .lounge-hotspot {
-    left: 68%;
-    top: 50%;
-    width: 20%;
-    height: 22%;
+    left: 44%;
+    top: 42%;
+    width: 15%;
+    height: 32%;
     background: rgba(64, 224, 208, 0.0);
 }
 .lounge-hotspot .hotspot-glow {
@@ -804,10 +804,10 @@ a {
 
 /* Adventure Guild - castle on mountain upper right */
 .adventure-hotspot {
-    left: 50%;
-    top: 10%;
-    width: 25%;
-    height: 35%;
+    left: 55%;
+    top: 8%;
+    width: 16%;
+    height: 38%;
     background: rgba(59, 130, 246, 0.0);
 }
 .adventure-hotspot .hotspot-glow {
@@ -820,11 +820,7 @@ a {
 
 /* Good News 24 - billboard center bottom */
 .billboard-hotspot {
-    left: 35%;
-    top: 72%;
-    width: 25%;
-    height: 16%;
-    background: rgba(251, 191, 36, 0.0);
+    display: none;
 }
 .billboard-hotspot .hotspot-glow {
     background: radial-gradient(ellipse, rgba(251, 191, 36, 0.3) 0%, transparent 70%);
@@ -836,10 +832,10 @@ a {
 
 /* Your Apartment - residential building bottom right */
 .apartment-hotspot {
-    left: 75%;
-    top: 68%;
-    width: 18%;
-    height: 20%;
+    left: 63%;
+    top: 36%;
+    width: 12%;
+    height: 38%;
     background: rgba(244, 197, 66, 0.0);
 }
 .apartment-hotspot .hotspot-glow {
@@ -867,10 +863,10 @@ a {
 
 /* Wellness Centre - bottom left area */
 .wellness-hotspot {
-    left: 2%;
-    top: 48%;
-    width: 18%;
-    height: 40%;
+    left: 4%;
+    top: 16%;
+    width: 14%;
+    height: 36%;
     background: rgba(42, 157, 143, 0.0);
 }
 .wellness-hotspot .hotspot-glow {
@@ -2094,7 +2090,7 @@ a {
     max-width: 100vw;
     width: 100vw;
     height: 100vh;
-    background: #0a0a1a;
+    background: #0a0a1a url('/images/chifftown-map-wide.png') center center / contain no-repeat;
     overflow: auto;
     -webkit-overflow-scrolling: touch;
 }
@@ -2120,102 +2116,30 @@ a {
     object-fit: contain;
 }
 
-/* === Town Noticeboard === */
-.town-noticeboard {
-    margin-top: 2rem;
+/* === Hero Inline Stats === */
+.hero-inline-stats {
+    margin-top: 1.5rem;
     display: flex;
+    align-items: center;
     justify-content: center;
-}
-
-.noticeboard-frame {
-    background: linear-gradient(145deg, #2a1f0e 0%, #3d2b14 30%, #2a1f0e 100%);
-    border: 3px solid #5a3d1a;
-    border-radius: 6px;
-    padding: 0.6rem 1.2rem 0.8rem;
-    box-shadow: 
-        0 4px 20px rgba(0,0,0,0.5),
-        inset 0 1px 0 rgba(255,255,255,0.05),
-        0 0 0 1px rgba(0,0,0,0.3);
-    position: relative;
-    min-width: 220px;
-    /* Woodgrain texture via repeating gradient */
-    background-image: 
-        repeating-linear-gradient(
-            90deg,
-            transparent,
-            transparent 3px,
-            rgba(0,0,0,0.05) 3px,
-            rgba(0,0,0,0.05) 4px
-        );
-}
-
-/* Two nails at top */
-.noticeboard-frame::before,
-.noticeboard-frame::after {
-    content: '';
-    position: absolute;
-    top: -4px;
-    width: 8px;
-    height: 8px;
-    background: radial-gradient(circle, #8a8a8a 30%, #555 70%);
-    border-radius: 50%;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.5);
-}
-.noticeboard-frame::before { left: 12px; }
-.noticeboard-frame::after { right: 12px; }
-
-.noticeboard-header {
-    text-align: center;
-    margin-bottom: 0.4rem;
-    padding-bottom: 0.3rem;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-}
-
-.noticeboard-title {
+    gap: 0.6rem;
     font-family: 'Inter', sans-serif;
-    font-size: 0.6rem;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: rgba(233, 196, 106, 0.7);
 }
 
-.noticeboard-stats {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.8rem;
-}
-
-.board-stat {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.1rem;
-}
-
-.board-stat-num {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: #e9c46a;
-    text-shadow: 0 0 8px rgba(233, 196, 106, 0.3);
-    line-height: 1;
-}
-
-.board-stat-label {
-    font-size: 0.55rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+.inline-stat {
+    font-size: 0.8rem;
     color: rgba(240, 234, 214, 0.4);
-    text-align: center;
-    line-height: 1.3;
+    letter-spacing: 0.3px;
 }
 
-.board-nail {
-    width: 1px;
-    height: 28px;
-    background: rgba(255,255,255,0.08);
+.inline-num {
+    color: rgba(233, 196, 106, 0.7);
+    font-weight: 600;
+}
+
+.inline-dot {
+    color: rgba(240, 234, 214, 0.2);
+    font-size: 0.8rem;
 }
 
 /* === Fullscreen HUD === */

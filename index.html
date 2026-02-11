@@ -6,7 +6,8 @@
     <title>ChiffTown — Your Virtual Town</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="main-home-styles.css?v=22">
+    <link rel="preload" href="/images/chifftown-map-wide.png" as="image">
+    <link rel="stylesheet" href="main-home-styles.css?v=25">
     <link rel="stylesheet" href="css/town-buildings.css?v=1">
 </head>
 <body>
@@ -207,29 +208,13 @@
                 <span class="title-main">Chiff<span class="title-accent">Town</span></span>
             </h1>
             <p class="hero-subtitle">A virtual town where every venue has its own vibe. Meet up with your besties or make new friends in cozy pubs, buzzing nightclubs, chill lounges, and more — all with live video chat.</p>
-            <!-- Town Noticeboard -->
-            <div class="town-noticeboard">
-                <div class="noticeboard-frame">
-                    <div class="noticeboard-header">
-                        <span class="noticeboard-title">📋 TOWN BOARD</span>
-                    </div>
-                    <div class="noticeboard-stats">
-                        <div class="board-stat">
-                            <span class="board-stat-num" id="totalUsers">0</span>
-                            <span class="board-stat-label">wandering<br>the town</span>
-                        </div>
-                        <div class="board-nail"></div>
-                        <div class="board-stat">
-                            <span class="board-stat-num" id="activeRooms">0</span>
-                            <span class="board-stat-label">rooms<br>open</span>
-                        </div>
-                        <div class="board-nail"></div>
-                        <div class="board-stat">
-                            <span class="board-stat-num" id="liveStreams">0</span>
-                            <span class="board-stat-label">live<br>now</span>
-                        </div>
-                    </div>
-                </div>
+            <!-- Minimal inline stats -->
+            <div class="hero-inline-stats">
+                <span class="inline-stat"><span class="inline-num" id="totalUsers">0</span> online</span>
+                <span class="inline-dot">·</span>
+                <span class="inline-stat"><span class="inline-num" id="activeRooms">0</span> rooms</span>
+                <span class="inline-dot">·</span>
+                <span class="inline-stat"><span class="inline-num" id="liveStreams">0</span> live</span>
             </div>
         </div>
     </section>
@@ -275,12 +260,50 @@
                     <button class="save-btn" onclick="toggleEdit()">✓ Done</button>
                 </div>
                 <img src="/images/chifftown-map-wide.png" alt="Chifftown City Map" class="city-map-image">
-                <!-- Buildings rendered dynamically by TownEngine -->
+                <!-- Hotspot Overlays (until isometric sprites are ready) -->
+                <a href="/questing.html" class="map-hotspot adventure-hotspot" data-venue="Adventure Guild">
+                    <div class="hotspot-glow"></div>
+                    <div class="hotspot-label">Adventure Guild</div>
+                </a>
                 
-                <!-- GN24 Billboard (stays fixed on map) -->
+                <a href="/pub.html" class="map-hotspot tavern-hotspot" data-venue="The Chiff Inn">
+                    <div class="hotspot-glow"></div>
+                    <div class="hotspot-label">The Chiff Inn</div>
+                </a>
+                
+                <a href="/nightclub.html" class="map-hotspot nightclub-hotspot" data-venue="Neon Pulse">
+                    <div class="hotspot-glow"></div>
+                    <div class="hotspot-label">Neon Pulse</div>
+                </a>
+                
+                <a href="/cinema.html" class="map-hotspot cinema-hotspot" data-venue="Starlight Cinema">
+                    <div class="hotspot-glow"></div>
+                    <div class="hotspot-label">Starlight Cinema</div>
+                </a>
+                
+                <a href="/games.html" class="map-hotspot arcade-hotspot" data-venue="Pixel Palace">
+                    <div class="hotspot-glow"></div>
+                    <div class="hotspot-label">Pixel Palace</div>
+                </a>
+                
+                <a href="/lounge.html" class="map-hotspot lounge-hotspot" data-venue="Velvet Sky">
+                    <div class="hotspot-glow"></div>
+                    <div class="hotspot-label">Velvet Sky</div>
+                </a>
+                
                 <a href="https://goodnews-24.com" target="_blank" class="map-hotspot billboard-hotspot" data-venue="Good News 24">
                     <div class="hotspot-glow"></div>
                     <div class="hotspot-label">Good News 24</div>
+                </a>
+                
+                <a href="/wellness.html" class="map-hotspot wellness-hotspot" data-venue="The Wellness Centre">
+                    <div class="hotspot-glow"></div>
+                    <div class="hotspot-label">🧘 Wellness Centre</div>
+                </a>
+                
+                <a href="/apartment.html" class="map-hotspot apartment-hotspot" data-venue="Your Apartment">
+                    <div class="hotspot-glow"></div>
+                    <div class="hotspot-label">🏠 Your Apartment</div>
                 </a>
             </div>
             <!-- Venue Quick List -->
@@ -739,8 +762,9 @@ function toggleEdit() {
 </script>
 <script src="/js/town-engine.js?v=1"></script>
 <script>
-    // Init town engine after DOM ready
-    TownEngine.init('mapContainer');
+    // Town engine ready but disabled until we have proper isometric sprites
+    // TownEngine.init('mapContainer');
+    // TODO: Generate isometric building sprites, then enable
 </script>
 </body>
 </html>
