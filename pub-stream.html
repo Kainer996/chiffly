@@ -1046,6 +1046,11 @@
                 </div>
             </div>
             <div class="chat-input-area">
+                <div style="display:flex;align-items:center;gap:6px;padding:0 8px 4px;">
+                    <span id="coinBalance" style="font-size:12px;color:#f4c542;cursor:default;" title="Your coins">🪙 <span id="coinCount">100</span></span>
+                    <button id="tipBtn" onclick="openTipModal()" style="background:linear-gradient(135deg,#f4c542,#ff8c42);border:none;border-radius:12px;padding:4px 10px;font-size:11px;color:#1a0e05;font-weight:700;cursor:pointer;display:none;" title="Tip the caster">💰 Tip</button>
+                    <span id="totalTipsWrap" style="font-size:12px;color:#f4c542;margin-left:auto;display:none;">Tips: 🪙 <span id="totalTips">0</span></span>
+                </div>
                 <div class="chat-input-container">
                     <input type="text" class="chat-input" id="chatInput" placeholder="Type your message..." maxlength="500">
                     <button class="chat-send-btn" onclick="sendMessage()">
@@ -1053,6 +1058,23 @@
                     </button>
                 </div>
             </div>
+            <!-- Tip Modal -->
+            <div id="tipModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;justify-content:center;align-items:center;">
+                <div style="background:#1a1025;border:2px solid #f4c542;border-radius:16px;padding:24px;max-width:320px;width:90%;text-align:center;position:relative;">
+                    <button onclick="closeTipModal()" style="position:absolute;top:8px;right:12px;background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">&times;</button>
+                    <h3 style="color:#f4c542;margin:0 0 8px;">💰 Send a Tip</h3>
+                    <p style="color:#aaa;font-size:13px;margin:0 0 16px;">Your balance: 🪙 <span id="tipModalBalance">100</span></p>
+                    <div id="tipAmounts" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:16px;">
+                        <button class="tip-amount-btn" onclick="sendTip(1)" style="background:#2a1f3a;border:1px solid #f4c542;color:#f4c542;border-radius:10px;padding:8px 16px;font-size:14px;cursor:pointer;font-weight:600;">🪙 1</button>
+                        <button class="tip-amount-btn" onclick="sendTip(5)" style="background:#2a1f3a;border:1px solid #f4c542;color:#f4c542;border-radius:10px;padding:8px 16px;font-size:14px;cursor:pointer;font-weight:600;">🪙 5</button>
+                        <button class="tip-amount-btn" onclick="sendTip(10)" style="background:#2a1f3a;border:1px solid #f4c542;color:#f4c542;border-radius:10px;padding:8px 16px;font-size:14px;cursor:pointer;font-weight:600;">🪙 10</button>
+                        <button class="tip-amount-btn" onclick="sendTip(50)" style="background:#2a1f3a;border:1px solid #f4c542;color:#f4c542;border-radius:10px;padding:8px 16px;font-size:14px;cursor:pointer;font-weight:600;">🪙 50</button>
+                        <button class="tip-amount-btn" onclick="sendTip(100)" style="background:#2a1f3a;border:1px solid #f4c542;color:#f4c542;border-radius:10px;padding:8px 16px;font-size:14px;cursor:pointer;font-weight:600;">🪙 100</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Tip animation container -->
+            <div id="tipAnimContainer" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9998;overflow:hidden;"></div>
         </div>
 
         <!-- Participants Area -->
@@ -1291,10 +1313,20 @@
         });
 
         function initializeTheme() {
-            // Set default theme or load saved theme
-            const savedTheme = localStorage.getItem('pubTheme') || 'default';
-            setTheme(savedTheme, true); // true = silent initialization
+            // Theme will be set from server room-state for viewers
+            // For hosts, use saved theme or default
+            const urlParams = new URLSearchParams(window.location.search);
+            const hostParam = urlParams.get('host');
+            const isHostInit = hostParam === '1' || hostParam === 'true' || hostParam === 'True';
+            if (isHostInit) {
+                const savedTheme = localStorage.getItem('pubTheme') || 'default';
+                setTheme(savedTheme, true);
+            }
+            // Viewers will get theme from room-state event
         }
+
+        // Store the venue type from URL
+        let venueType = 'pub';
 
         function initializeSocketConnection() {
             // Get URL parameters with fallback parsing
@@ -1302,6 +1334,7 @@
             const roomId = urlParams.get('room');
             const username = urlParams.get('username');
             const hostParam = urlParams.get('host');
+            venueType = urlParams.get('type') || 'pub';
             
             // BULLETPROOF HOST DETECTION
             isHost = hostParam === '1' || hostParam === 'true' || hostParam === 'True';
@@ -1317,8 +1350,9 @@
 
             if (!roomId || !username) {
                 showError('Missing room or username parameters. Redirecting...');
+                const redirectMap = { pub: 'pub.html', nightclub: 'nightclub.html', cinema: 'cinema.html', lounge: 'lounge.html', arcade: 'games.html', questing: 'questing.html' };
                 setTimeout(() => {
-                    window.location.href = 'pub.html';
+                    window.location.href = redirectMap[venueType] || 'pub.html';
                 }, 3000);
                 return;
             }
@@ -1352,8 +1386,11 @@
                     roomId: currentRoom,
                     username: currentUser,
                     isStreamer: isHost,
-                    roomType: 'pub'
+                    roomType: venueType
                 });
+
+                // Initialize tipping system
+                initTipping();
 
                 // Award XP for entering the pub room
                 if (window.xpSystem) {
@@ -1382,6 +1419,12 @@
             socket.on('room-state', (data) => {
                 console.log('🎯 ROOM STATE RECEIVED:', data);
                 const { streamer, participants, messages } = data;
+                
+                // Apply theme from server (for viewers)
+                if (data.theme && !isHost) {
+                    console.log('🎨 Applying room theme from server:', data.theme);
+                    setTheme(data.theme, true);
+                }
                 
                 // BULLETPROOF STREAMER ID DETECTION
                 const oldStreamerId = streamerId;
@@ -1574,6 +1617,25 @@
                     
                     console.log('🎥 === END CONNECTION AUDIT ===');
                 }, 6000);
+            });
+
+            // Handle live theme changes from host
+            socket.on('theme-changed', (data) => {
+                console.log('🎨 Theme changed by host:', data.theme);
+                setTheme(data.theme, false);
+            });
+
+            // Handle tip received
+            socket.on('tip-received', (data) => {
+                console.log('💰 Tip received:', data);
+                showTipAnimation(data.from, data.amount);
+                addChatMessage('System', `💰 ${data.from} tipped ${data.amount} coins to ${data.to}!`, true);
+                // Update total tips display
+                const totalTipsEl = document.getElementById('totalTips');
+                if (totalTipsEl) {
+                    const current = parseInt(totalTipsEl.textContent) || 0;
+                    totalTipsEl.textContent = current + data.amount;
+                }
             });
 
             socket.on('user-joined', (data) => {
@@ -1780,6 +1842,11 @@
             
             // Save theme preference
             localStorage.setItem('pubTheme', theme);
+            
+            // If host changes theme, broadcast to viewers via server
+            if (!silent && isHost && typeof socket !== 'undefined' && socket && socket.connected) {
+                socket.emit('set-theme', { theme: theme });
+            }
             
             // Add theme change message to chat (only if not silent initialization)
             if (!silent) {
@@ -2306,6 +2373,118 @@
             }
         }
 
+        // === TIPPING SYSTEM ===
+        function initTipping() {
+            // Initialize coin balance from localStorage
+            let balance = parseInt(localStorage.getItem('chifftown_coins'));
+            if (isNaN(balance)) {
+                balance = 100; // Free starting coins
+                localStorage.setItem('chifftown_coins', balance);
+            }
+            updateCoinDisplay(balance);
+            
+            // Show tip button for viewers (non-hosts)
+            if (!isHost) {
+                document.getElementById('tipBtn').style.display = 'inline-block';
+            }
+            // Show total tips for hosts
+            if (isHost) {
+                document.getElementById('totalTipsWrap').style.display = 'inline';
+            }
+        }
+        
+        function updateCoinDisplay(balance) {
+            document.getElementById('coinCount').textContent = balance;
+            const modalBal = document.getElementById('tipModalBalance');
+            if (modalBal) modalBal.textContent = balance;
+        }
+        
+        function openTipModal() {
+            const modal = document.getElementById('tipModal');
+            const balance = parseInt(localStorage.getItem('chifftown_coins')) || 0;
+            updateCoinDisplay(balance);
+            modal.style.display = 'flex';
+        }
+        
+        function closeTipModal() {
+            document.getElementById('tipModal').style.display = 'none';
+        }
+        
+        function sendTip(amount) {
+            let balance = parseInt(localStorage.getItem('chifftown_coins')) || 0;
+            if (balance < amount) {
+                addChatMessage('System', '❌ Not enough coins!', true);
+                return;
+            }
+            balance -= amount;
+            localStorage.setItem('chifftown_coins', balance);
+            updateCoinDisplay(balance);
+            
+            // Send to server
+            if (socket && socket.connected) {
+                socket.emit('send-tip', { amount: amount });
+            }
+            closeTipModal();
+        }
+        
+        function showTipAnimation(fromUser, amount) {
+            const container = document.getElementById('tipAnimContainer');
+            if (!container) return;
+            
+            // Create floating coin elements
+            const numCoins = Math.min(amount, 20);
+            for (let i = 0; i < numCoins; i++) {
+                setTimeout(() => {
+                    const coin = document.createElement('div');
+                    coin.textContent = '🪙';
+                    coin.style.cssText = `
+                        position: absolute;
+                        font-size: ${16 + Math.random() * 16}px;
+                        left: ${30 + Math.random() * 40}%;
+                        bottom: -30px;
+                        animation: coinFloat ${1.5 + Math.random()}s ease-out forwards;
+                        pointer-events: none;
+                    `;
+                    container.appendChild(coin);
+                    setTimeout(() => coin.remove(), 3000);
+                }, i * 80);
+            }
+            
+            // Show notification
+            const notif = document.createElement('div');
+            notif.style.cssText = `
+                position: fixed; top: 20%; left: 50%; transform: translateX(-50%);
+                background: linear-gradient(135deg, #f4c542, #ff8c42);
+                color: #1a0e05; font-weight: 800; font-size: 18px;
+                padding: 12px 24px; border-radius: 16px;
+                z-index: 9999; box-shadow: 0 4px 20px rgba(244,197,66,0.5);
+                animation: tipNotifPop 2.5s ease forwards;
+                pointer-events: none; text-align: center;
+            `;
+            notif.textContent = `💰 ${fromUser} tipped ${amount} coin${amount !== 1 ? 's' : ''}!`;
+            document.body.appendChild(notif);
+            setTimeout(() => notif.remove(), 3000);
+        }
+        
+        // Add CSS keyframes for tip animations
+        (function() {
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes coinFloat {
+                    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+                    100% { transform: translateY(-60vh) rotate(720deg); opacity: 0; }
+                }
+                @keyframes tipNotifPop {
+                    0% { transform: translateX(-50%) scale(0.5); opacity: 0; }
+                    15% { transform: translateX(-50%) scale(1.1); opacity: 1; }
+                    25% { transform: translateX(-50%) scale(1); opacity: 1; }
+                    80% { transform: translateX(-50%) scale(1); opacity: 1; }
+                    100% { transform: translateX(-50%) scale(0.8); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+        })();
+
         function sendMessage() {
             const chatInput = document.getElementById('chatInput');
             const message = chatInput.value.trim();
@@ -2738,21 +2917,16 @@
                 { urls: 'stun:stun.l.google.com:19302' },
                 { urls: 'stun:stun1.l.google.com:19302' },
                 
-                // Free TURN servers for NAT traversal (when STUN fails)
+                // Our own TURN server for NAT traversal
                 {
-                    urls: 'turn:openrelay.metered.ca:80',
-                    username: 'openrelayproject',
-                    credential: 'openrelayproject'
+                    urls: 'turn:13.49.240.95:3478',
+                    username: 'chiffly',
+                    credential: 'chiffly2026secure'
                 },
                 {
-                    urls: 'turn:openrelay.metered.ca:443',
-                    username: 'openrelayproject',
-                    credential: 'openrelayproject'
-                },
-                {
-                    urls: 'turn:openrelay.metered.ca:443?transport=tcp',
-                    username: 'openrelayproject',
-                    credential: 'openrelayproject'
+                    urls: 'turn:13.49.240.95:3478?transport=tcp',
+                    username: 'chiffly',
+                    credential: 'chiffly2026secure'
                 }
             ];
             
@@ -3410,9 +3584,9 @@
                     iceServers: [
                         { urls: 'stun:stun.l.google.com:19302' },
                         {
-                            urls: 'turn:openrelay.metered.ca:80',
-                            username: 'openrelayproject',
-                            credential: 'openrelayproject'
+                            urls: 'turn:13.49.240.95:3478',
+                            username: 'chiffly',
+                            credential: 'chiffly2026secure'
                         }
                     ]
                 });

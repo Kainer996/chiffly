@@ -13,8 +13,7 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-logo">
-                <i class="fas fa-globe"></i>
-                <span>Social Hub</span>
+                <span style="font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; color: #c9a84c; letter-spacing: 2px; text-transform: uppercase;">Chifftown</span>
             </div>
             <div class="nav-links">
                 <a href="#about" class="nav-link">About</a>
@@ -26,8 +25,9 @@
 
     <!-- Hero Section -->
     <section class="hero">
+        <div class="hero-map-bg"></div>
         <div class="hero-content">
-            <h1 class="hero-title">Welcome to Social Hub</h1>
+            <h1 class="hero-title">Welcome to Chifftown</h1>
             <p class="hero-subtitle">Connect, Adventure, and Socialize in Virtual Spaces</p>
             <div class="hero-stats">
                 <div class="stat">
@@ -50,75 +50,53 @@
     <!-- Main Sections -->
     <main class="main-content">
         <div class="container">
-            <div class="sections-grid">
-                <!-- Questing IRL Section -->
-                <div class="section-card questing" onclick="navigateToSection('questing')">
-                    <div class="section-background">
-                        <div class="section-overlay"></div>
-                    </div>
-                    <div class="section-content">
-                        <div class="section-icon">
-                            <i class="fas fa-map-marked-alt"></i>
-                        </div>
-                        <h2 class="section-title">Questing IRL</h2>
-                        <p class="section-description">
-                            Join real-world adventures across the British countryside. 
-                            Stream your quests, explore historic locations, and share 
-                            your journey with fellow adventurers.
-                        </p>
-                        <div class="section-stats">
-                            <div class="stat-item">
-                                <i class="fas fa-users"></i>
-                                <span id="questingUsers">0</span>
-                                <span>Questers</span>
-                            </div>
-                            <div class="stat-item">
-                                <i class="fas fa-video"></i>
-                                <span id="questingRooms">0</span>
-                                <span>Adventures</span>
-                            </div>
-                        </div>
-                        <button class="section-btn">
-                            <i class="fas fa-compass"></i>
-                            Start Adventure
-                        </button>
-                    </div>
+            <!-- Interactive City Map -->
+            <section class="city-map-section">
+                <div class="section-header">
+                    <h2 class="section-title">Explore Chifftown</h2>
+                    <p class="section-desc">Click a venue to enter</p>
                 </div>
-
-                <!-- Virtual Pub Section -->
-                <div class="section-card pub" onclick="navigateToSection('pub')">
-                    <div class="section-background">
-                        <div class="section-overlay"></div>
-                    </div>
-                    <div class="section-content">
-                        <div class="section-icon">
-                            <i class="fas fa-beer"></i>
-                        </div>
-                        <h2 class="section-title">Virtual Pub</h2>
-                        <p class="section-description">
-                            Relax and socialize in our cozy virtual pub. 
-                            Chat with friends, share stories, play games, 
-                            and enjoy the warm atmosphere of community.
-                        </p>
-                        <div class="section-stats">
-                            <div class="stat-item">
-                                <i class="fas fa-users"></i>
-                                <span id="pubUsers">0</span>
-                                <span>Patrons</span>
-                            </div>
-                            <div class="stat-item">
-                                <i class="fas fa-video"></i>
-                                <span id="pubRooms">0</span>
-                                <span>Tables</span>
-                            </div>
-                        </div>
-                        <button class="section-btn">
-                            <i class="fas fa-door-open"></i>
-                            Enter Pub
-                        </button>
-                    </div>
+                
+                <div class="interactive-map-container">
+                    <img src="/images/chifftown-map-iso.png" alt="Chifftown City Map" class="city-map-image">
+                    
+                    <!-- Hotspot Overlays -->
+                    <a href="/questing.html" class="map-hotspot adventure-hotspot" data-venue="Adventure Guild">
+                        <div class="hotspot-glow"></div>
+                        <div class="hotspot-label">Adventure Guild</div>
+                    </a>
+                    
+                    <a href="/pub.html" class="map-hotspot tavern-hotspot" data-venue="The Chiff Inn">
+                        <div class="hotspot-glow"></div>
+                        <div class="hotspot-label">The Chiff Inn</div>
+                    </a>
+                    
+                    <a href="/nightclub.html" class="map-hotspot nightclub-hotspot" data-venue="Neon Pulse">
+                        <div class="hotspot-glow"></div>
+                        <div class="hotspot-label">Neon Pulse</div>
+                    </a>
+                    
+                    <a href="/cinema.html" class="map-hotspot cinema-hotspot" data-venue="Starlight Cinema">
+                        <div class="hotspot-glow"></div>
+                        <div class="hotspot-label">Starlight Cinema</div>
+                    </a>
+                    
+                    <a href="/games.html" class="map-hotspot arcade-hotspot" data-venue="Pixel Palace">
+                        <div class="hotspot-glow"></div>
+                        <div class="hotspot-label">Pixel Palace</div>
+                    </a>
+                    
+                    <a href="/lounge.html" class="map-hotspot lounge-hotspot" data-venue="Velvet Sky">
+                        <div class="hotspot-glow"></div>
+                        <div class="hotspot-label">Velvet Sky</div>
+                    </a>
+                    
+                    <a href="https://goodnews-24.com" target="_blank" class="map-hotspot billboard-hotspot" data-venue="Good News 24">
+                        <div class="hotspot-glow"></div>
+                        <div class="hotspot-label">Good News 24</div>
+                    </a>
                 </div>
-            </div>
+            </section>
 
             <!-- Features Section -->
             <section id="features" class="features-section">

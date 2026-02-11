@@ -3,29 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chiffly - Modern Social Platform</title>
-    <link rel="stylesheet" href="main-home-styles.css?v=5">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>ChiffTown — Your Virtual Town</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="main-home-styles.css?v=11">
 </head>
 <body>
+    <!-- Ambient particles canvas -->
+    <canvas id="particleCanvas"></canvas>
+
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
-            <div class="nav-logo">
-                <i class="fas fa-cube"></i>
-                <span>Chiffly</span>
-            </div>
+            <a href="/" class="nav-logo">
+                <span style="font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; color: #c9a84c; letter-spacing: 2px; text-transform: uppercase;">Chifftown</span>
+            </a>
             <div class="nav-right">
                 <div class="nav-links">
-                    <a href="#about" class="nav-link">About</a>
+                    <a href="#venues" class="nav-link">Venues</a>
                     <a href="#features" class="nav-link">Features</a>
-                    <a href="#contact" class="nav-link">Contact</a>
+                    <a href="#about" class="nav-link">About</a>
                 </div>
                 <div class="auth-section">
-                    <button class="sign-in-btn" id="signInBtn">
+                    <button class="enter-btn" id="signInBtn">
+                        <span class="enter-btn-glow"></span>
                         <i class="fas fa-door-open"></i>
-                        Enter
+                        <span>Enter Town</span>
                     </button>
                     <div class="user-menu" id="userMenu" style="display: none;">
                         <div class="user-info">
@@ -53,7 +56,7 @@
                         <div class="menu-divider"></div>
                         <a href="#" class="menu-item sign-out" id="signOutBtn">
                             <i class="fas fa-door-closed"></i>
-                            Exit
+                            Leave Town
                         </a>
                     </div>
                 </div>
@@ -61,165 +64,512 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
+    <!-- Hero Section — Town Centre -->
     <section class="hero">
-        <div class="hero-content">
-            <h1 class="hero-title">Welcome to Chiffly</h1>
-            <p class="hero-subtitle">Connect. Entertain. Play.</p>
+        <div class="hero-map-bg"></div>
+        <div class="hero-skyline" style="display:none;">
+            <!-- SVG Town Silhouette -->
+            <svg class="town-silhouette" viewBox="0 0 1440 400" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Buildings -->
+                <rect x="50" y="180" width="60" height="220" fill="rgba(15,10,30,0.9)"/>
+                <rect x="55" y="170" width="50" height="10" fill="rgba(15,10,30,0.9)"/>
+                <rect x="120" y="220" width="80" height="180" fill="rgba(20,15,35,0.85)"/>
+                <rect x="210" y="160" width="50" height="240" fill="rgba(15,10,30,0.9)"/>
+                <polygon points="210,160 235,130 260,160" fill="rgba(15,10,30,0.9)"/>
+                <rect x="270" y="240" width="70" height="160" fill="rgba(20,15,35,0.85)"/>
+                <rect x="350" y="200" width="90" height="200" fill="rgba(15,10,30,0.9)"/>
+                <rect x="380" y="185" width="30" height="15" fill="rgba(15,10,30,0.9)"/>
+                <rect x="450" y="250" width="60" height="150" fill="rgba(20,15,35,0.85)"/>
+                <rect x="520" y="190" width="100" height="210" fill="rgba(15,10,30,0.9)"/>
+                <polygon points="520,190 570,140 620,190" fill="rgba(15,10,30,0.9)"/>
+                <rect x="630" y="230" width="80" height="170" fill="rgba(20,15,35,0.85)"/>
+                <rect x="720" y="170" width="60" height="230" fill="rgba(15,10,30,0.9)"/>
+                <rect x="735" y="155" width="30" height="15" fill="rgba(15,10,30,0.9)"/>
+                <rect x="790" y="210" width="90" height="190" fill="rgba(20,15,35,0.85)"/>
+                <rect x="890" y="250" width="70" height="150" fill="rgba(15,10,30,0.9)"/>
+                <rect x="970" y="180" width="80" height="220" fill="rgba(20,15,35,0.85)"/>
+                <polygon points="970,180 1010,145 1050,180" fill="rgba(20,15,35,0.85)"/>
+                <rect x="1060" y="220" width="60" height="180" fill="rgba(15,10,30,0.9)"/>
+                <rect x="1130" y="200" width="100" height="200" fill="rgba(20,15,35,0.85)"/>
+                <rect x="1240" y="240" width="70" height="160" fill="rgba(15,10,30,0.9)"/>
+                <rect x="1320" y="190" width="80" height="210" fill="rgba(20,15,35,0.85)"/>
+                <!-- Windows (animated) -->
+                <rect class="window" x="70" y="200" width="8" height="10" rx="1" fill="rgba(255,200,100,0.7)"/>
+                <rect class="window" x="85" y="200" width="8" height="10" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="70" y="230" width="8" height="10" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect class="window" x="85" y="230" width="8" height="10" rx="1" fill="rgba(255,200,100,0.8)"/>
+                <rect class="window" x="70" y="260" width="8" height="10" rx="1" fill="rgba(255,200,100,0.3)"/>
+                <rect class="window" x="85" y="260" width="8" height="10" rx="1" fill="rgba(255,200,100,0.4)"/>
+                <rect class="window" x="140" y="240" width="10" height="12" rx="1" fill="rgba(255,180,80,0.6)"/>
+                <rect class="window" x="160" y="240" width="10" height="12" rx="1" fill="rgba(255,180,80,0.7)"/>
+                <rect class="window" x="180" y="240" width="10" height="12" rx="1" fill="rgba(255,180,80,0.3)"/>
+                <rect class="window" x="140" y="270" width="10" height="12" rx="1" fill="rgba(255,180,80,0.5)"/>
+                <rect class="window" x="160" y="270" width="10" height="12" rx="1" fill="rgba(255,180,80,0.8)"/>
+                <rect class="window" x="180" y="270" width="10" height="12" rx="1" fill="rgba(255,180,80,0.4)"/>
+                <rect class="window" x="140" y="300" width="10" height="12" rx="1" fill="rgba(255,180,80,0.6)"/>
+                <rect class="window" x="160" y="300" width="10" height="12" rx="1" fill="rgba(255,180,80,0.3)"/>
+                <rect class="window" x="225" y="180" width="8" height="10" rx="1" fill="rgba(200,220,255,0.6)"/>
+                <rect class="window" x="240" y="180" width="8" height="10" rx="1" fill="rgba(200,220,255,0.5)"/>
+                <rect class="window" x="225" y="210" width="8" height="10" rx="1" fill="rgba(255,200,100,0.7)"/>
+                <rect class="window" x="240" y="210" width="8" height="10" rx="1" fill="rgba(200,220,255,0.4)"/>
+                <rect class="window" x="225" y="240" width="8" height="10" rx="1" fill="rgba(255,200,100,0.3)"/>
+                <rect class="window" x="240" y="240" width="8" height="10" rx="1" fill="rgba(200,220,255,0.5)"/>
+                <rect class="window" x="285" y="260" width="10" height="12" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="305" y="260" width="10" height="12" rx="1" fill="rgba(255,200,100,0.4)"/>
+                <rect class="window" x="285" y="290" width="10" height="12" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect class="window" x="305" y="290" width="10" height="12" rx="1" fill="rgba(255,200,100,0.3)"/>
+                <rect class="window" x="370" y="220" width="10" height="12" rx="1" fill="rgba(255,100,150,0.6)"/>
+                <rect class="window" x="390" y="220" width="10" height="12" rx="1" fill="rgba(100,200,255,0.6)"/>
+                <rect class="window" x="410" y="220" width="10" height="12" rx="1" fill="rgba(255,100,200,0.7)"/>
+                <rect class="window" x="370" y="250" width="10" height="12" rx="1" fill="rgba(100,255,200,0.5)"/>
+                <rect class="window" x="390" y="250" width="10" height="12" rx="1" fill="rgba(255,150,100,0.4)"/>
+                <rect class="window" x="410" y="250" width="10" height="12" rx="1" fill="rgba(100,200,255,0.5)"/>
+                <rect class="window" x="370" y="280" width="10" height="12" rx="1" fill="rgba(255,200,100,0.3)"/>
+                <rect class="window" x="390" y="280" width="10" height="12" rx="1" fill="rgba(100,255,200,0.6)"/>
+                <rect class="window" x="465" y="265" width="8" height="10" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="480" y="265" width="8" height="10" rx="1" fill="rgba(255,200,100,0.4)"/>
+                <rect class="window" x="465" y="295" width="8" height="10" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect class="window" x="480" y="295" width="8" height="10" rx="1" fill="rgba(255,200,100,0.3)"/>
+                <rect class="window" x="540" y="210" width="10" height="12" rx="1" fill="rgba(255,200,100,0.7)"/>
+                <rect class="window" x="560" y="210" width="10" height="12" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="580" y="210" width="10" height="12" rx="1" fill="rgba(255,200,100,0.8)"/>
+                <rect class="window" x="540" y="240" width="10" height="12" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect class="window" x="560" y="240" width="10" height="12" rx="1" fill="rgba(255,200,100,0.4)"/>
+                <rect class="window" x="580" y="240" width="10" height="12" rx="1" fill="rgba(255,200,100,0.7)"/>
+                <rect class="window" x="540" y="270" width="10" height="12" rx="1" fill="rgba(255,200,100,0.3)"/>
+                <rect class="window" x="560" y="270" width="10" height="12" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="580" y="270" width="10" height="12" rx="1" fill="rgba(255,200,100,0.4)"/>
+                <rect class="window" x="645" y="245" width="10" height="12" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="665" y="245" width="10" height="12" rx="1" fill="rgba(200,220,255,0.6)"/>
+                <rect class="window" x="685" y="245" width="10" height="12" rx="1" fill="rgba(255,200,100,0.4)"/>
+                <rect class="window" x="645" y="275" width="10" height="12" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect class="window" x="665" y="275" width="10" height="12" rx="1" fill="rgba(200,220,255,0.3)"/>
+                <rect class="window" x="685" y="275" width="10" height="12" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="740" y="190" width="8" height="10" rx="1" fill="rgba(200,200,255,0.6)"/>
+                <rect class="window" x="740" y="220" width="8" height="10" rx="1" fill="rgba(255,200,100,0.7)"/>
+                <rect class="window" x="740" y="250" width="8" height="10" rx="1" fill="rgba(200,200,255,0.4)"/>
+                <rect class="window" x="755" y="190" width="8" height="10" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="755" y="220" width="8" height="10" rx="1" fill="rgba(200,200,255,0.3)"/>
+                <rect class="window" x="810" y="230" width="10" height="12" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect class="window" x="840" y="230" width="10" height="12" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="860" y="230" width="10" height="12" rx="1" fill="rgba(255,200,100,0.4)"/>
+                <rect class="window" x="810" y="260" width="10" height="12" rx="1" fill="rgba(255,200,100,0.8)"/>
+                <rect class="window" x="840" y="260" width="10" height="12" rx="1" fill="rgba(255,200,100,0.3)"/>
+                <rect class="window" x="860" y="260" width="10" height="12" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="810" y="290" width="10" height="12" rx="1" fill="rgba(255,200,100,0.4)"/>
+                <rect class="window" x="840" y="290" width="10" height="12" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect class="window" x="905" y="265" width="8" height="10" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="920" y="265" width="8" height="10" rx="1" fill="rgba(255,200,100,0.4)"/>
+                <rect class="window" x="935" y="265" width="8" height="10" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect class="window" x="905" y="295" width="8" height="10" rx="1" fill="rgba(255,200,100,0.3)"/>
+                <rect class="window" x="920" y="295" width="8" height="10" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="990" y="200" width="10" height="12" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect class="window" x="1010" y="200" width="10" height="12" rx="1" fill="rgba(200,220,255,0.5)"/>
+                <rect class="window" x="1030" y="200" width="10" height="12" rx="1" fill="rgba(255,200,100,0.4)"/>
+                <rect class="window" x="990" y="230" width="10" height="12" rx="1" fill="rgba(200,220,255,0.4)"/>
+                <rect class="window" x="1010" y="230" width="10" height="12" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect class="window" x="1030" y="230" width="10" height="12" rx="1" fill="rgba(200,220,255,0.5)"/>
+                <rect class="window" x="1075" y="240" width="8" height="10" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="1090" y="240" width="8" height="10" rx="1" fill="rgba(255,200,100,0.4)"/>
+                <rect class="window" x="1075" y="270" width="8" height="10" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect class="window" x="1090" y="270" width="8" height="10" rx="1" fill="rgba(255,200,100,0.3)"/>
+                <rect class="window" x="1150" y="220" width="10" height="12" rx="1" fill="rgba(255,200,100,0.7)"/>
+                <rect class="window" x="1175" y="220" width="10" height="12" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="1200" y="220" width="10" height="12" rx="1" fill="rgba(255,200,100,0.4)"/>
+                <rect class="window" x="1150" y="250" width="10" height="12" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect class="window" x="1175" y="250" width="10" height="12" rx="1" fill="rgba(255,200,100,0.3)"/>
+                <rect class="window" x="1200" y="250" width="10" height="12" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="1150" y="280" width="10" height="12" rx="1" fill="rgba(255,200,100,0.4)"/>
+                <rect class="window" x="1175" y="280" width="10" height="12" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect class="window" x="1255" y="255" width="8" height="10" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="1270" y="255" width="8" height="10" rx="1" fill="rgba(255,200,100,0.4)"/>
+                <rect class="window" x="1285" y="255" width="8" height="10" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect class="window" x="1255" y="285" width="8" height="10" rx="1" fill="rgba(255,200,100,0.3)"/>
+                <rect class="window" x="1270" y="285" width="8" height="10" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="1340" y="210" width="10" height="12" rx="1" fill="rgba(255,180,80,0.7)"/>
+                <rect class="window" x="1365" y="210" width="10" height="12" rx="1" fill="rgba(255,180,80,0.5)"/>
+                <rect class="window" x="1340" y="240" width="10" height="12" rx="1" fill="rgba(255,180,80,0.4)"/>
+                <rect class="window" x="1365" y="240" width="10" height="12" rx="1" fill="rgba(255,180,80,0.6)"/>
+                <rect class="window" x="1340" y="270" width="10" height="12" rx="1" fill="rgba(255,180,80,0.5)"/>
+                <rect class="window" x="1365" y="270" width="10" height="12" rx="1" fill="rgba(255,180,80,0.3)"/>
+                <!-- Street level line -->
+                <rect x="0" y="395" width="1440" height="5" fill="rgba(30,20,50,0.95)"/>
+            </svg>
         </div>
-        <div class="hero-background"></div>
-    </section>
-
-    <!-- Main Content -->
-    <main class="main-content">
-        <div class="container">
-            <!-- Rooms Grid -->
-            <div class="rooms-grid">
-                <!-- Tavern Room -->
-                <div class="room-card tavern-room" data-href="pub.html">
-                    <div class="room-icon">
-                        <i class="fas fa-wine-glass"></i>
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-star"></i>
+                <span>Welcome to the Town</span>
+            </div>
+            <h1 class="hero-title">
+                <span class="title-line">Welcome to</span>
+                <span class="title-main">Chiff<span class="title-accent">Town</span></span>
+            </h1>
+            <p class="hero-subtitle">A virtual town where every venue has its own vibe. Meet up with your besties or make new friends in cozy pubs, buzzing nightclubs, chill lounges, and more — all with live video chat.</p>
+            <a href="#venues" class="hero-cta">
+                <span>Explore the Town</span>
+                <i class="fas fa-chevron-down"></i>
+            </a>
+            <div class="hero-stats" style="margin-top: 2rem;">
+                <div class="hero-stat">
+                    <div class="stat-icon"><i class="fas fa-users"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="totalUsers">0</span>
+                        <span class="stat-label">Online</span>
                     </div>
-                    <div class="room-content">
-                        <h3 class="room-title">Tavern</h3>
-                        <p class="room-description">Social drinks and conversations</p>
-                    </div>
-                    <div class="room-overlay"></div>
                 </div>
-
-                <!-- Adventure Room -->
-                <div class="room-card adventure-room" data-href="questing.html">
-                    <div class="room-icon">
-                        <i class="fas fa-mountain"></i>
+                <div class="stat-divider"></div>
+                <div class="hero-stat">
+                    <div class="stat-icon"><i class="fas fa-door-open"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="activeRooms">0</span>
+                        <span class="stat-label">Active Rooms</span>
                     </div>
-                    <div class="room-content">
-                        <h3 class="room-title">Adventure</h3>
-                        <p class="room-description">Epic quests and outdoor exploration</p>
-                    </div>
-                    <div class="room-overlay"></div>
                 </div>
-
-                <!-- Cinema Room -->
-                <div class="room-card cinema-room" data-href="cinema.html">
-                    <div class="room-icon">
-                        <i class="fas fa-film"></i>
+                <div class="stat-divider"></div>
+                <div class="hero-stat">
+                    <div class="stat-icon"><i class="fas fa-broadcast-tower"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="liveStreams">0</span>
+                        <span class="stat-label">Live Now</span>
                     </div>
-                    <div class="room-content">
-                        <h3 class="room-title">Cinema</h3>
-                        <p class="room-description">Live video streaming and movies</p>
-                    </div>
-                    <div class="room-overlay"></div>
-                </div>
-
-                <!-- Night Club Room -->
-                <div class="room-card club-room" data-href="nightclub.html">
-                    <div class="room-icon">
-                        <i class="fas fa-music"></i>
-                    </div>
-                    <div class="room-content">
-                        <h3 class="room-title">Night Club</h3>
-                        <p class="room-description">Dance, music, and nightlife</p>
-                    </div>
-                    <div class="room-overlay"></div>
-                </div>
-
-                <!-- Games Room -->
-                <div class="room-card games-room" data-href="games.html">
-                    <div class="room-icon">
-                        <i class="fas fa-gamepad"></i>
-                    </div>
-                    <div class="room-content">
-                        <h3 class="room-title">Games</h3>
-                        <p class="room-description">Gaming and competitions</p>
-                    </div>
-                    <div class="room-overlay"></div>
-                </div>
-
-                <!-- Lounge Room -->
-                <div class="room-card lounge-room" data-href="lounge.html">
-                    <div class="room-icon">
-                        <i class="fas fa-couch"></i>
-                    </div>
-                    <div class="room-content">
-                        <h3 class="room-title">Lounge</h3>
-                        <p class="room-description">Civilized chiff chaff and relaxation</p>
-                    </div>
-                    <div class="room-overlay"></div>
                 </div>
             </div>
-
-            <!-- Features Section -->
-            <section id="features" class="features-section">
-                <div class="section-header">
-                    <h2>Platform Features</h2>
-                    <p>Everything you need for modern social experiences</p>
-                </div>
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <i class="fas fa-video"></i>
-                        <h3>Live Streaming</h3>
-                        <p>High-quality video streaming with real-time interaction</p>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fas fa-comments"></i>
-                        <h3>Real-time Chat</h3>
-                        <p>Instant messaging and community discussions</p>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fas fa-users"></i>
-                        <h3>Social Spaces</h3>
-                        <p>Connect with like-minded people in themed rooms</p>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fas fa-mobile-alt"></i>
-                        <h3>Mobile First</h3>
-                        <p>Seamless experience across all your devices</p>
-                    </div>
-                </div>
-            </section>
         </div>
-    </main>
+    </section>
+
+    <!-- Venues Section — Town Map -->
+    <section id="venues" class="venues-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Explore Chifftown</h2>
+                <p class="section-desc">Click a venue to enter</p>
+            </div>
+            
+            <div class="interactive-map-container">
+                <img src="/images/chifftown-map-iso.png" alt="Chifftown City Map" class="city-map-image">
+                <!-- Hotspot Overlays -->
+                <a href="/questing.html" class="map-hotspot adventure-hotspot" data-venue="Adventure Guild">
+                    <div class="hotspot-glow"></div>
+                    <div class="hotspot-label">Adventure Guild</div>
+                </a>
+                
+                <a href="/pub.html" class="map-hotspot tavern-hotspot" data-venue="The Chiff Inn">
+                    <div class="hotspot-glow"></div>
+                    <div class="hotspot-label">The Chiff Inn</div>
+                </a>
+                
+                <a href="/nightclub.html" class="map-hotspot nightclub-hotspot" data-venue="Neon Pulse">
+                    <div class="hotspot-glow"></div>
+                    <div class="hotspot-label">Neon Pulse</div>
+                </a>
+                
+                <a href="/cinema.html" class="map-hotspot cinema-hotspot" data-venue="Starlight Cinema">
+                    <div class="hotspot-glow"></div>
+                    <div class="hotspot-label">Starlight Cinema</div>
+                </a>
+                
+                <a href="/games.html" class="map-hotspot arcade-hotspot" data-venue="Pixel Palace">
+                    <div class="hotspot-glow"></div>
+                    <div class="hotspot-label">Pixel Palace</div>
+                </a>
+                
+                <a href="/lounge.html" class="map-hotspot lounge-hotspot" data-venue="Velvet Sky">
+                    <div class="hotspot-glow"></div>
+                    <div class="hotspot-label">Velvet Sky</div>
+                </a>
+                
+                <a href="https://goodnews-24.com" target="_blank" class="map-hotspot billboard-hotspot" data-venue="Good News 24">
+                    <div class="hotspot-glow"></div>
+                    <div class="hotspot-label">Good News 24</div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge"><i class="fas fa-sparkles"></i> What's Inside</span>
+                <h2 class="section-title">Built for Hanging Out</h2>
+                <p class="section-desc">Real connections, not just another video call.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <h3>Live Video Chat</h3>
+                    <p>WebRTC-powered face-to-face conversations with crystal-clear quality.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <h3>Themed Venues</h3>
+                    <p>Every room has its own atmosphere — from cozy pubs to electric nightclubs.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h3>Real-time Chat</h3>
+                    <p>Text chat alongside video for sharing links, reactions, and banter.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-screen"></i>
+                    </div>
+                    <h3>Works Everywhere</h3>
+                    <p>Desktop, mobile, tablet — jump in from wherever you are.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about-section">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <span class="section-badge"><i class="fas fa-info-circle"></i> About ChiffTown</span>
+                    <h2>More Than Just a Video Call</h2>
+                    <p>ChiffTown is a virtual town where you don't just join a meeting — you step into a place. Each venue has its own personality, its own crowd, its own vibe. It's the feeling of walking into your local pub, hitting the club with mates, or chilling in a lounge — but from anywhere in the world.</p>
+                    <p>Built with love using WebRTC, Socket.io, and a lot of CSS magic. No downloads, no installs — just click and you're there.</p>
+                </div>
+                <div class="about-visual">
+                    <div class="about-card">
+                        <div class="about-card-icon"><i class="fas fa-mug-hot"></i></div>
+                        <span>6 Unique Venues</span>
+                    </div>
+                    <div class="about-card">
+                        <div class="about-card-icon"><i class="fas fa-video"></i></div>
+                        <span>HD Video Chat</span>
+                    </div>
+                    <div class="about-card">
+                        <div class="about-card-icon"><i class="fas fa-bolt"></i></div>
+                        <span>Instant Access</span>
+                    </div>
+                    <div class="about-card">
+                        <div class="about-card-icon"><i class="fas fa-lock"></i></div>
+                        <span>Private Rooms</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
-                <div class="footer-section">
-                    <h3>Chiffly</h3>
-                    <p>The modern platform for social connection and entertainment.</p>
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <i class="fas fa-city"></i>
+                        <span>Chiff<span class="logo-accent">Town</span></span>
+                    </div>
+                    <p>Your virtual town for real connections.</p>
+                    <div class="social-links">
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="Discord"><i class="fab fa-discord"></i></a>
+                        <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    </div>
                 </div>
-                <div class="footer-section">
-                    <h3>Explore</h3>
+                <div class="footer-links">
+                    <h4>Venues</h4>
                     <ul>
-                        <li><a href="questing.html">Adventure</a></li>
-                        <li><a href="pub.html">Tavern</a></li>
-                        <li><a href="cinema.html">Cinema</a></li>
+                        <li><a href="pub.html">The Chiff Inn</a></li>
                         <li><a href="nightclub.html">Night Club</a></li>
-                        <li><a href="games.html">Games</a></li>
+                        <li><a href="cinema.html">Cinema</a></li>
+                        <li><a href="games.html">Arcade</a></li>
                         <li><a href="lounge.html">Lounge</a></li>
-                        <li><a href="#about">About</a></li>
-                        <li><a href="#contact">Contact</a></li>
+                        <li><a href="questing.html">Adventure Guild</a></li>
                     </ul>
                 </div>
-                <div class="footer-section">
-                    <h3>Connect</h3>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-discord"></i></a>
-                        <a href="#"><i class="fab fa-youtube"></i></a>
-                    </div>
+                <div class="footer-links">
+                    <h4>Platform</h4>
+                    <ul>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#">Privacy</a></li>
+                        <li><a href="#">Terms</a></li>
+                    </ul>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 Chiffly. All rights reserved.</p>
+                <p>&copy; 2025 ChiffTown. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
+    <!-- Aircraft container (for planes/helicopters flying across) -->
+    <div id="aircraftLayer" style="position:fixed;top:0;left:0;width:100%;height:40vh;pointer-events:none;z-index:999;overflow:hidden;"></div>
+
+    <style>
+        /* Window glow animation */
+        .window {
+            transition: fill 2s ease-in-out, opacity 2s ease-in-out;
+        }
+        .window.off {
+            fill: rgba(20,15,35,0.3) !important;
+            opacity: 0.2;
+        }
+        .window.bright {
+            filter: url(#windowGlow);
+        }
+        /* Aircraft styles */
+        .aircraft {
+            position: absolute;
+            opacity: 0.7;
+        }
+        .aircraft-light {
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: #fff;
+            position: absolute;
+            animation: blink 1.5s ease-in-out infinite;
+        }
+        .aircraft-light.red {
+            background: #ff3333;
+            animation: blink 1s ease-in-out infinite;
+        }
+        .aircraft-light.green {
+            background: #33ff33;
+            animation: blink 1.2s ease-in-out infinite 0.5s;
+        }
+        .aircraft-body {
+            width: 6px;
+            height: 2px;
+            background: rgba(180,180,200,0.3);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.1; }
+        }
+        @keyframes flyRight {
+            from { transform: translateX(-50px); }
+            to { transform: translateX(calc(100vw + 50px)); }
+        }
+        @keyframes flyLeft {
+            from { transform: translateX(calc(100vw + 50px)); }
+            to { transform: translateX(-50px); }
+        }
+    </style>
+
     <!-- Scripts -->
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-    <!-- Global XP / Leveling system -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <script src="xp-system.js?v=1"></script>
-    <script src="main-home.js?v=5"></script>
+    <script src="main-home.js?v=11"></script>
+    <script>
+    // === TOWN ALIVE ANIMATIONS ===
+    (function() {
+        // --- Window Light Animation ---
+        const windows = document.querySelectorAll('.town-silhouette .window');
+        if (windows.length) {
+            // Add SVG glow filter
+            const svg = document.querySelector('.town-silhouette');
+            const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+            defs.innerHTML = `
+                <filter id="windowGlow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="2.5" result="blur"/>
+                    <feMerge>
+                        <feMergeNode in="blur"/>
+                        <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                </filter>
+            `;
+            svg.insertBefore(defs, svg.firstChild);
+
+            // Start some windows off
+            windows.forEach(w => {
+                if (Math.random() < 0.3) w.classList.add('off');
+                if (Math.random() < 0.4) w.classList.add('bright');
+            });
+
+            // Randomly toggle windows
+            function toggleWindow() {
+                const w = windows[Math.floor(Math.random() * windows.length)];
+                if (w.classList.contains('off')) {
+                    w.classList.remove('off');
+                    // Random warm color when turning on
+                    const colors = [
+                        'rgba(255,200,100,0.7)', 'rgba(255,180,80,0.6)', 
+                        'rgba(200,220,255,0.5)', 'rgba(255,150,100,0.6)',
+                        'rgba(255,220,150,0.7)', 'rgba(200,200,255,0.5)'
+                    ];
+                    w.setAttribute('fill', colors[Math.floor(Math.random() * colors.length)]);
+                    if (Math.random() < 0.3) w.classList.add('bright');
+                } else {
+                    w.classList.add('off');
+                    w.classList.remove('bright');
+                }
+                // Next toggle in 1-5 seconds
+                setTimeout(toggleWindow, 1000 + Math.random() * 4000);
+            }
+            setTimeout(toggleWindow, 2000);
+            // Run 2-3 parallel toggle chains for more life
+            setTimeout(() => setTimeout(toggleWindow, 500 + Math.random() * 3000), 1000);
+            setTimeout(() => setTimeout(toggleWindow, 1500 + Math.random() * 3000), 2000);
+        }
+
+        // --- Aircraft Animation ---
+        const aircraftLayer = document.getElementById('aircraftLayer');
+        if (!aircraftLayer) return;
+
+        function spawnAircraft() {
+            const isHelicopter = Math.random() < 0.3;
+            const goesRight = Math.random() < 0.5;
+            const y = 15 + Math.random() * 60; // 15-75% of the aircraft layer height
+            const duration = isHelicopter ? (25 + Math.random() * 15) : (20 + Math.random() * 20); // seconds
+
+            const el = document.createElement('div');
+            el.className = 'aircraft';
+            el.style.top = y + '%';
+
+            if (isHelicopter) {
+                // Helicopter: white light + red blinking
+                el.innerHTML = `
+                    <div class="aircraft-body" style="width:4px;height:2px;"></div>
+                    <div class="aircraft-light" style="left:0;top:0;"></div>
+                    <div class="aircraft-light red" style="left:6px;top:-1px;width:2px;height:2px;"></div>
+                `;
+            } else {
+                // Plane: white + red + green wingtip lights
+                el.innerHTML = `
+                    <div class="aircraft-body" style="width:8px;height:2px;"></div>
+                    <div class="aircraft-light" style="left:3px;top:0;"></div>
+                    <div class="aircraft-light red" style="left:-2px;top:1px;width:2px;height:2px;"></div>
+                    <div class="aircraft-light green" style="left:10px;top:1px;width:2px;height:2px;"></div>
+                `;
+            }
+
+            el.style.animation = `${goesRight ? 'flyRight' : 'flyLeft'} ${duration}s linear forwards`;
+            el.style.opacity = 0.5 + Math.random() * 0.4;
+            
+            aircraftLayer.appendChild(el);
+
+            // Remove after animation
+            setTimeout(() => {
+                el.remove();
+            }, duration * 1000 + 500);
+
+            // Schedule next aircraft: 15-35 seconds
+            setTimeout(spawnAircraft, 15000 + Math.random() * 20000);
+        }
+
+        // Start first aircraft after 3-8 seconds
+        setTimeout(spawnAircraft, 3000 + Math.random() * 5000);
+        // Start a second chain slightly delayed for variety
+        setTimeout(spawnAircraft, 10000 + Math.random() * 10000);
+    })();
+    </script>
 </body>
-</html> 
+</html>

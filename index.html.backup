@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chiffly - Modern Social Platform</title>
+    <link rel="stylesheet" href="main-home-styles.css?v=5">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-cube"></i>
+                <span>Chiffly</span>
+            </div>
+            <div class="nav-right">
+                <div class="nav-links">
+                    <a href="#about" class="nav-link">About</a>
+                    <a href="#features" class="nav-link">Features</a>
+                    <a href="#contact" class="nav-link">Contact</a>
+                </div>
+                <div class="auth-section">
+                    <button class="sign-in-btn" id="signInBtn">
+                        <i class="fas fa-door-open"></i>
+                        Enter
+                    </button>
+                    <div class="user-menu" id="userMenu" style="display: none;">
+                        <div class="user-info">
+                            <div class="user-avatar">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div class="user-details">
+                                <span class="user-name" id="userName">Guest User</span>
+                                <span class="user-status">Online</span>
+                            </div>
+                        </div>
+                        <div class="menu-divider"></div>
+                        <a href="#" class="menu-item">
+                            <i class="fas fa-user-cog"></i>
+                            Profile Settings
+                        </a>
+                        <a href="#" class="menu-item">
+                            <i class="fas fa-bell"></i>
+                            Notifications
+                        </a>
+                        <a href="#" class="menu-item">
+                            <i class="fas fa-heart"></i>
+                            Favorites
+                        </a>
+                        <div class="menu-divider"></div>
+                        <a href="#" class="menu-item sign-out" id="signOutBtn">
+                            <i class="fas fa-door-closed"></i>
+                            Exit
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Welcome to Chiffly</h1>
+            <p class="hero-subtitle">Connect. Entertain. Play.</p>
+        </div>
+        <div class="hero-background"></div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Rooms Grid -->
+            <div class="rooms-grid">
+                <!-- Tavern Room -->
+                <div class="room-card tavern-room" data-href="pub.html">
+                    <div class="room-icon">
+                        <i class="fas fa-wine-glass"></i>
+                    </div>
+                    <div class="room-content">
+                        <h3 class="room-title">Tavern</h3>
+                        <p class="room-description">Social drinks and conversations</p>
+                    </div>
+                    <div class="room-overlay"></div>
+                </div>
+
+                <!-- Adventure Room -->
+                <div class="room-card adventure-room" data-href="questing.html">
+                    <div class="room-icon">
+                        <i class="fas fa-mountain"></i>
+                    </div>
+                    <div class="room-content">
+                        <h3 class="room-title">Adventure</h3>
+                        <p class="room-description">Epic quests and outdoor exploration</p>
+                    </div>
+                    <div class="room-overlay"></div>
+                </div>
+
+                <!-- Cinema Room -->
+                <div class="room-card cinema-room" data-href="cinema.html">
+                    <div class="room-icon">
+                        <i class="fas fa-film"></i>
+                    </div>
+                    <div class="room-content">
+                        <h3 class="room-title">Cinema</h3>
+                        <p class="room-description">Live video streaming and movies</p>
+                    </div>
+                    <div class="room-overlay"></div>
+                </div>
+
+                <!-- Night Club Room -->
+                <div class="room-card club-room" data-href="nightclub.html">
+                    <div class="room-icon">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <div class="room-content">
+                        <h3 class="room-title">Night Club</h3>
+                        <p class="room-description">Dance, music, and nightlife</p>
+                    </div>
+                    <div class="room-overlay"></div>
+                </div>
+
+                <!-- Games Room -->
+                <div class="room-card games-room" data-href="games.html">
+                    <div class="room-icon">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <div class="room-content">
+                        <h3 class="room-title">Games</h3>
+                        <p class="room-description">Gaming and competitions</p>
+                    </div>
+                    <div class="room-overlay"></div>
+                </div>
+
+                <!-- Lounge Room -->
+                <div class="room-card lounge-room" data-href="lounge.html">
+                    <div class="room-icon">
+                        <i class="fas fa-couch"></i>
+                    </div>
+                    <div class="room-content">
+                        <h3 class="room-title">Lounge</h3>
+                        <p class="room-description">Civilized chiff chaff and relaxation</p>
+                    </div>
+                    <div class="room-overlay"></div>
+                </div>
+            </div>
+
+            <!-- Features Section -->
+            <section id="features" class="features-section">
+                <div class="section-header">
+                    <h2>Platform Features</h2>
+                    <p>Everything you need for modern social experiences</p>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <i class="fas fa-video"></i>
+                        <h3>Live Streaming</h3>
+                        <p>High-quality video streaming with real-time interaction</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-comments"></i>
+                        <h3>Real-time Chat</h3>
+                        <p>Instant messaging and community discussions</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-users"></i>
+                        <h3>Social Spaces</h3>
+                        <p>Connect with like-minded people in themed rooms</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-mobile-alt"></i>
+                        <h3>Mobile First</h3>
+                        <p>Seamless experience across all your devices</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Chiffly</h3>
+                    <p>The modern platform for social connection and entertainment.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Explore</h3>
+                    <ul>
+                        <li><a href="questing.html">Adventure</a></li>
+                        <li><a href="pub.html">Tavern</a></li>
+                        <li><a href="cinema.html">Cinema</a></li>
+                        <li><a href="nightclub.html">Night Club</a></li>
+                        <li><a href="games.html">Games</a></li>
+                        <li><a href="lounge.html">Lounge</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Connect</h3>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-discord"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Chiffly. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <!-- Global XP / Leveling system -->
+    <script src="xp-system.js?v=1"></script>
+    <script src="main-home.js?v=5"></script>
+</body>
+</html> 

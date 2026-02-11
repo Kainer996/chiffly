@@ -3,193 +3,623 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Questing IRL - Live Adventure Hub</title>
-    <link rel="stylesheet" href="homepage-styles.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
+    <title>Adventure Guild — ChiffTown</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --quest-dark: #071525;
+            --quest-deep: #0c2d48;
+            --quest-mid: #145374;
+            --quest-blue: #3b82f6;
+            --quest-sky: #60a5fa;
+            --quest-text: #eff6ff;
+            --quest-text-dim: rgba(239, 246, 255, 0.55);
+        }
+        html { scroll-behavior: smooth; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--quest-dark); 
+            color: var(--quest-text); 
+            overflow-x: hidden; 
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Epic Viking/Adventure background */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: url('/images/venue-adventure.png') center/cover no-repeat fixed;
+            opacity: 0.35;
+            z-index: -1;
+            filter: contrast(1.1) brightness(0.9);
+        }
+        
+        /* Epic atmospheric overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(
+                180deg,
+                rgba(7, 21, 37, 0.85) 0%,
+                rgba(12, 45, 72, 0.75) 25%,
+                rgba(20, 83, 116, 0.65) 50%,
+                rgba(30, 96, 145, 0.7) 70%,
+                rgba(20, 83, 116, 0.8) 85%,
+                rgba(7, 21, 37, 0.9) 100%
+            );
+            z-index: -1;
+        }
+        
+        /* Epic mist effect - enhanced */
+        @keyframes mistDrift {
+            0%, 100% { transform: translateX(0) translateY(0); opacity: 0.15; }
+            50% { transform: translateX(40px) translateY(-15px); opacity: 0.25; }
+        }
+        
+        .epic-mist {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .mist-layer {
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            background: radial-gradient(ellipse, rgba(96, 165, 250, 0.08) 0%, transparent 70%);
+            animation: mistDrift 20s ease-in-out infinite;
+        }
+        
+        .mist-layer:nth-child(1) { top: -20%; left: -30%; animation-delay: 0s; }
+        .mist-layer:nth-child(2) { bottom: -20%; right: -30%; animation-delay: -7s; opacity: 0.18; }
+        .mist-layer:nth-child(3) { top: 30%; left: 40%; animation-delay: -14s; opacity: 0.12; animation-duration: 25s; }
+        
+        /* Torch flames on sides */
+        .side-torches {
+            position: absolute;
+            top: 15%;
+            width: 80px;
+            height: 300px;
+            pointer-events: none;
+            z-index: 4;
+        }
+        .side-torches.left { left: 3%; }
+        .side-torches.right { right: 3%; }
+        
+        .torch-flame {
+            width: 40px;
+            height: 70px;
+            background: radial-gradient(ellipse at bottom,
+                #ff6b35 0%,
+                #ff9933 30%,
+                rgba(255, 160, 50, 0.6) 60%,
+                transparent 100%);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            position: absolute;
+            left: 50%;
+            top: 30px;
+            transform: translateX(-50%);
+            animation: torchFlicker 2.5s ease-in-out infinite;
+            filter: blur(2px);
+            box-shadow: 0 0 30px rgba(255, 107, 53, 0.6), 0 0 50px rgba(255, 153, 51, 0.4);
+        }
+        
+        .torch-flame::before {
+            content: '';
+            position: absolute;
+            top: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 35px;
+            background: radial-gradient(ellipse,
+                rgba(255, 220, 100, 0.9) 0%,
+                rgba(255, 200, 80, 0.6) 50%,
+                transparent 100%);
+            border-radius: 50%;
+            animation: innerTorchFlame 2s ease-in-out infinite;
+        }
+        
+        .torch-mount {
+            width: 8px;
+            height: 120px;
+            background: linear-gradient(to bottom, #2d1f17, #1a120d);
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+        
+        .torch-mount::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle, #3a2a1f, #1a120d);
+            border-radius: 50%;
+        }
+        
+        @keyframes torchFlicker {
+            0%, 100% {
+                transform: translateX(-50%) scaleY(1) scaleX(1);
+                opacity: 1;
+            }
+            15% {
+                transform: translateX(-48%) scaleY(1.08) scaleX(0.92);
+                opacity: 0.85;
+            }
+            30% {
+                transform: translateX(-52%) scaleY(0.95) scaleX(1.05);
+                opacity: 0.95;
+            }
+            50% {
+                transform: translateX(-50%) scaleY(1.03) scaleX(0.97);
+                opacity: 0.9;
+            }
+            70% {
+                transform: translateX(-49%) scaleY(0.97) scaleX(1.03);
+                opacity: 1;
+            }
+            85% {
+                transform: translateX(-51%) scaleY(1.05) scaleX(0.95);
+                opacity: 0.92;
+            }
+        }
+        
+        @keyframes innerTorchFlame {
+            0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.85; }
+            50% { transform: translateX(-50%) scale(1.15); opacity: 1; }
+        }
+        
+        /* Falling snow/embers */
+        .quest-particles {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 3;
+        }
+        
+        .quest-particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            animation: particleFall 12s linear infinite;
+        }
+        
+        .quest-particle.ember {
+            background: rgba(255, 153, 51, 0.7);
+            box-shadow: 0 0 4px rgba(255, 153, 51, 0.8);
+        }
+        
+        .quest-particle:nth-child(1) { left: 10%; animation-delay: 0s; animation-duration: 10s; }
+        .quest-particle:nth-child(2) { left: 25%; animation-delay: -3s; animation-duration: 14s; }
+        .quest-particle:nth-child(3) { left: 40%; animation-delay: -6s; animation-duration: 11s; }
+        .quest-particle:nth-child(4) { left: 55%; animation-delay: -2s; animation-duration: 13s; }
+        .quest-particle:nth-child(5) { left: 70%; animation-delay: -8s; animation-duration: 15s; }
+        .quest-particle:nth-child(6) { left: 85%; animation-delay: -4s; animation-duration: 12s; }
+        .quest-particle:nth-child(7) { left: 15%; animation-delay: -10s; animation-duration: 14s; }
+        .quest-particle:nth-child(8) { left: 60%; animation-delay: -5s; animation-duration: 13s; }
+        .quest-particle:nth-child(9) { left: 35%; animation-delay: -7s; animation-duration: 11s; }
+        .quest-particle:nth-child(10) { left: 80%; animation-delay: -9s; animation-duration: 15s; }
+        
+        @keyframes particleFall {
+            0% { top: -5%; opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.2; }
+            100% { top: 105%; opacity: 0; }
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+        
+        .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 0.75rem 0; background: rgba(7,21,37,0.9); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(59,130,246,0.12); }
+        .nav-container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .nav-logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: var(--quest-text); }
+        .nav-logo img { height: 32px; width: auto; }
+        .nav-logo span { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; }
+        .nav-links, .nav-actions { display: flex; gap: 0.5rem; align-items: center; }
+        .nav-links a, .btn { color: var(--quest-text-dim); text-decoration: none; font-size: 0.88rem; font-weight: 500; padding: 0.4rem 0.8rem; border-radius: 8px; transition: all 0.2s ease; border: none; cursor: pointer; background: none; font-family: inherit; }
+        .nav-links a:hover, .btn:hover { color: var(--quest-text); background: rgba(59,130,246,0.1); }
+        .btn-primary { background: linear-gradient(135deg, var(--quest-blue), #2563eb) !important; color: #fff !important; padding: 0.5rem 1.2rem !important; border-radius: 10px !important; font-weight: 600 !important; }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
+        .btn-secondary { border: 1px solid rgba(59,130,246,0.2) !important; }
+        
+        .back-btn { position: fixed; top: 80px; left: 1.5rem; background: rgba(7,21,37,0.9); backdrop-filter: blur(10px); border: 1px solid rgba(59,130,246,0.2); color: var(--quest-blue); padding: 0.6rem 1rem; border-radius: 50px; cursor: pointer; z-index: 999; transition: all 0.3s ease; font-size: 0.85rem; display: flex; align-items: center; gap: 0.4rem; }
+        .back-btn:hover { background: rgba(59,130,246,0.1); transform: translateX(-3px); }
+        
+        .quest-hero {
+            min-height: 65vh; display: flex; align-items: center; justify-content: center; text-align: center;
+            position: relative; overflow: hidden;
+            background: linear-gradient(180deg, #071525 0%, #0c2d48 25%, #145374 50%, #1e6091 70%, #145374 85%, #071525 100%);
+        }
+        
+        /* Mountain silhouette */
+        .mountains {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            height: 200px; z-index: 1;
+        }
+        .mountains svg { width: 100%; height: 100%; display: block; }
+        
+        /* Stars */
+        .stars { position: absolute; inset: 0; pointer-events: none; }
+        .star {
+            position: absolute; width: 2px; height: 2px; border-radius: 50%;
+            background: rgba(255,255,255,0.6);
+            animation: twinkle 3s ease-in-out infinite;
+        }
+        .star:nth-child(1) { top: 10%; left: 15%; animation-delay: 0s; }
+        .star:nth-child(2) { top: 20%; left: 45%; animation-delay: -1s; width: 3px; height: 3px; }
+        .star:nth-child(3) { top: 8%; left: 70%; animation-delay: -2s; }
+        .star:nth-child(4) { top: 25%; left: 85%; animation-delay: -0.5s; }
+        .star:nth-child(5) { top: 15%; left: 30%; animation-delay: -1.5s; width: 2.5px; height: 2.5px; }
+        .star:nth-child(6) { top: 5%; left: 60%; animation-delay: -2.5s; }
+        .star:nth-child(7) { top: 30%; left: 20%; animation-delay: -0.8s; }
+        .star:nth-child(8) { top: 12%; left: 90%; animation-delay: -1.8s; }
+        
+        @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+        
+        .quest-content { position: relative; z-index: 5; max-width: 650px; padding: 0 2rem; }
+        
+        .quest-badge {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2);
+            padding: 0.4rem 1rem; border-radius: 50px;
+            font-size: 0.8rem; font-weight: 600; color: var(--quest-sky); margin-bottom: 1.25rem;
+        }
+        
+        .quest-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 900;
+            margin-bottom: 0.75rem; line-height: 1.1;
+        }
+        
+        .quest-subtitle { font-size: 1.15rem; color: var(--quest-text-dim); margin-bottom: 2rem; line-height: 1.6; }
+        
+        .quest-actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+        .quest-btn {
+            background: linear-gradient(135deg, var(--quest-blue), #2563eb); color: #fff; border: none;
+            padding: 0.85rem 1.8rem; border-radius: 50px; font-weight: 600; font-size: 1rem;
+            cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 0.6rem;
+            font-family: inherit; box-shadow: 0 4px 15px rgba(59,130,246,0.3);
+        }
+        .quest-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(59,130,246,0.4); }
+        .quest-btn.secondary { background: rgba(255,255,255,0.05); border: 1px solid rgba(59,130,246,0.2); box-shadow: none; }
+        .quest-btn.secondary:hover { background: rgba(59,130,246,0.1); }
+        
+        .quest-section { padding: 4rem 0; background: var(--quest-dark); position: relative; z-index: 1; }
+        
+        .stats-bar {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;
+            margin-bottom: 3rem;
+        }
+        .stat-item, .stat-card {
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(59,130,246,0.08);
+            padding: 1.5rem; border-radius: 16px; text-align: center;
+            transition: all 0.3s ease;
+        }
+        .stat-item:hover, .stat-card:hover { background: rgba(59,130,246,0.04); transform: translateY(-3px); }
+        .stat-item i, .stat-card i { font-size: 1.8rem; color: var(--quest-blue); margin-bottom: 0.75rem; display: block; }
+        .stat-item span:first-of-type { font-size: 1.8rem; font-weight: 700; font-family: 'Playfair Display', serif; display: block; margin-bottom: 0.25rem; }
+        .stat-item span:last-of-type { color: var(--quest-text-dim); font-size: 0.85rem; }
+        
+        .section-header { margin-bottom: 2rem; }
+        .section-header h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.75rem; }
+        .section-header p { color: var(--quest-text-dim); font-size: 0.95rem; }
+        
+        .content-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; }
+        
+        .rooms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; }
+        .room-card {
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(59,130,246,0.08);
+            border-radius: 16px; padding: 1.5rem; cursor: pointer; transition: all 0.3s ease;
+        }
+        .room-card:hover { background: rgba(59,130,246,0.04); border-color: rgba(59,130,246,0.2); transform: translateY(-4px); box-shadow: 0 8px 30px rgba(59,130,246,0.1); }
+        .room-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
+        .room-name { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 600; }
+        .room-status { display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; color: #4ade80; background: rgba(74,222,128,0.1); padding: 0.2rem 0.5rem; border-radius: 20px; }
+        .room-description { color: var(--quest-text-dim); font-size: 0.88rem; margin-bottom: 1rem; line-height: 1.5; }
+        .room-stats { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+        .room-participants { display: flex; align-items: center; gap: 0.4rem; color: var(--quest-text-dim); font-size: 0.85rem; }
+        .room-actions { display: flex; gap: 0.5rem; }
+        .btn-small { padding: 0.4rem 0.8rem !important; font-size: 0.8rem !important; border-radius: 8px !important; }
+        
+        .users-list { display: flex; flex-direction: column; gap: 0.75rem; }
+        .user-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(59,130,246,0.06); border-radius: 12px; padding: 0.75rem; display: flex; align-items: center; gap: 0.75rem; }
+        .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--quest-blue), #2563eb); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.85rem; }
+        .user-info { flex: 1; }
+        .user-name { font-weight: 600; font-size: 0.9rem; }
+        .user-status { font-size: 0.78rem; color: var(--quest-text-dim); }
+        
+        .empty-state { text-align: center; padding: 4rem 2rem; }
+        .empty-state i { font-size: 3rem; color: var(--quest-blue); margin-bottom: 1rem; opacity: 0.6; }
+        .empty-state h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 0.75rem; }
+        .empty-state p { color: var(--quest-text-dim); margin-bottom: 1.5rem; max-width: 400px; margin-left: auto; margin-right: auto; }
+        
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; backdrop-filter: blur(8px); }
+        .modal.show { display: flex; align-items: center; justify-content: center; }
+        .modal-content { background: var(--quest-deep); border: 1px solid rgba(59,130,246,0.15); border-radius: 20px; padding: 2rem; max-width: 500px; width: 90%; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .modal-header h2 { font-family: 'Playfair Display', serif; font-size: 1.3rem; display: flex; align-items: center; gap: 0.6rem; }
+        .close-btn { background: none; border: none; color: var(--quest-text-dim); font-size: 1.2rem; cursor: pointer; padding: 0.4rem; border-radius: 50%; transition: all 0.2s ease; }
+        .close-btn:hover { background: rgba(255,255,255,0.05); color: var(--quest-text); }
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group label { display: block; margin-bottom: 0.4rem; font-weight: 500; font-size: 0.88rem; color: var(--quest-text-dim); }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.7rem; background: rgba(255,255,255,0.04); border: 1px solid rgba(59,130,246,0.12); border-radius: 10px; color: var(--quest-text); font-family: inherit; font-size: 0.95rem; transition: border-color 0.2s ease; }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: rgba(59,130,246,0.3); }
+        .form-group textarea { resize: vertical; min-height: 70px; }
+        .form-actions { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.05); }
+        
+        .status-indicator { position: fixed; bottom: 1.5rem; right: 1.5rem; background: rgba(7,21,37,0.95); backdrop-filter: blur(10px); border: 1px solid rgba(59,130,246,0.1); padding: 0.6rem 1rem; border-radius: 50px; display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; font-weight: 500; z-index: 1500; }
+        .status-indicator.connected { color: #4ade80; }
+        .status-indicator.disconnected { color: #f87171; }
+        .status-indicator.connecting { color: #fbbf24; }
+        .status-indicator i { font-size: 0.6rem; }
+        
+        .footer { background: rgba(4,10,18,0.95); border-top: 1px solid rgba(59,130,246,0.06); padding: 3rem 0 1.25rem; position: relative; z-index: 1; }
+        .footer-content { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-bottom: 2rem; }
+        .footer-section h3 { font-family: 'Playfair Display', serif; margin-bottom: 0.75rem; font-size: 1.1rem; }
+        .footer-section p, .footer-section a { color: var(--quest-text-dim); font-size: 0.88rem; text-decoration: none; }
+        .footer-section ul { list-style: none; }
+        .footer-section li { margin-bottom: 0.4rem; }
+        .footer-section a:hover { color: var(--quest-blue); }
+        .social-links { display: flex; gap: 0.5rem; }
+        .social-links a { width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; color: var(--quest-text-dim); transition: all 0.3s ease; }
+        .social-links a:hover { background: rgba(59,130,246,0.1); color: var(--quest-blue); }
+        .footer-bottom { text-align: center; padding-top: 1.25rem; border-top: 1px solid rgba(255,255,255,0.04); }
+        .footer-bottom p { color: rgba(239,246,255,0.3); font-size: 0.8rem; }
+        
+        @media (max-width: 1024px) { .content-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) {
+            .quest-title { font-size: 2.5rem; }
+            .quest-actions { flex-direction: column; align-items: center; }
+            .stats-bar { grid-template-columns: 1fr; }
+            .rooms-grid { grid-template-columns: 1fr; }
+            .mountains { height: 120px; }
+        }
+    </style>
 </head>
 <body>
-    <!-- Navigation -->
+    <!-- Epic Mist Effect -->
+    <div class="epic-mist">
+        <div class="mist-layer"></div>
+        <div class="mist-layer"></div>
+        <div class="mist-layer"></div>
+    </div>
+    
     <nav class="navbar">
         <div class="nav-container">
-            <div class="nav-logo">
-                <a href="index.html" style="color: inherit; text-decoration: none; display: flex; align-items: center; gap: 0.75rem;">
-                    <i class="fas fa-map-marked-alt"></i>
-                    <span>Questing IRL</span>
-                </a>
-            </div>
+            <a href="index.html" class="nav-logo"><img src="/images/chifftown-logo.png" alt="ChiffTown"></a>
             <div class="nav-actions">
-                <button id="createRoomBtn" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> Create Adventure
-                </button>
-                <button id="refreshBtn" class="btn btn-secondary">
-                    <i class="fas fa-sync-alt"></i> Refresh
-                </button>
+                <button id="createRoomBtn" class="btn btn-primary" onclick="showCreateRoomModal()"><i class="fas fa-plus"></i> Create Adventure</button>
+                <button id="refreshBtn" class="btn btn-secondary" onclick="refreshList()"><i class="fas fa-sync-alt"></i></button>
             </div>
         </div>
     </nav>
+    <button class="back-btn" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i> Town Centre</button>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1 class="hero-title">Live Adventure Hub</h1>
-            <p class="hero-subtitle">Join fellow questers on real-time adventures across the British countryside</p>
+    <section class="quest-hero">
+        <!-- Side Torches -->
+        <div class="side-torches left">
+            <div class="torch-mount"></div>
+            <div class="torch-flame"></div>
+        </div>
+        <div class="side-torches right">
+            <div class="torch-mount"></div>
+            <div class="torch-flame"></div>
+        </div>
+        
+        <!-- Falling particles (snow/embers mix) -->
+        <div class="quest-particles">
+            <div class="quest-particle"></div>
+            <div class="quest-particle ember"></div>
+            <div class="quest-particle"></div>
+            <div class="quest-particle ember"></div>
+            <div class="quest-particle"></div>
+            <div class="quest-particle"></div>
+            <div class="quest-particle ember"></div>
+            <div class="quest-particle"></div>
+            <div class="quest-particle"></div>
+            <div class="quest-particle ember"></div>
+        </div>
+        
+        <div class="stars">
+            <div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div>
+            <div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div>
+        </div>
+        <div class="mountains">
+            <svg viewBox="0 0 1440 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <polygon points="0,200 200,80 350,140 500,50 650,120 800,30 950,110 1100,60 1250,130 1440,40 1440,200" fill="rgba(7,21,37,0.8)"/>
+                <polygon points="0,200 100,120 280,160 420,100 580,150 720,80 880,140 1050,90 1200,155 1440,95 1440,200" fill="rgba(7,21,37,0.95)"/>
+            </svg>
+        </div>
+        <div class="quest-content">
+            <div class="quest-badge"><i class="fas fa-compass"></i><span>Real-World Adventures</span></div>
+            <h1 class="quest-title">Adventure Guild</h1>
+            <p class="quest-subtitle">Stream real-world quests, explore the countryside, and share your journey with fellow adventurers.</p>
+            <div class="quest-actions">
+                <button class="quest-btn" onclick="showCreateRoomModal()"><i class="fas fa-plus"></i> Start a Quest</button>
+                <button class="quest-btn secondary" onclick="refreshList()"><i class="fas fa-sync-alt"></i> Refresh</button>
+            </div>
         </div>
     </section>
 
-    <!-- Main Content -->
-    <main class="main-content">
+    <section class="quest-section">
         <div class="container">
-            <!-- Stats Bar -->
             <div class="stats-bar">
-                <div class="stat-item">
-                    <i class="fas fa-users"></i>
-                    <span id="totalUsers">0</span>
-                    <span>Questers Online</span>
-                </div>
-                <div class="stat-item">
-                    <i class="fas fa-video"></i>
-                    <span id="activeRooms">0</span>
-                    <span>Active Adventures</span>
-                </div>
-                <div class="stat-item">
-                    <i class="fas fa-broadcast-tower"></i>
-                    <span id="liveStreams">0</span>
-                    <span>Live Streams</span>
-                </div>
+                <div class="stat-item"><i class="fas fa-users"></i><span id="totalUsers">0</span><span>Questers Online</span></div>
+                <div class="stat-item"><i class="fas fa-video"></i><span id="activeRooms">0</span><span>Active Quests</span></div>
+                <div class="stat-item"><i class="fas fa-broadcast-tower"></i><span id="liveStreams">0</span><span>Live Streams</span></div>
             </div>
-
-            <!-- Content Grid -->
             <div class="content-grid">
-                <!-- Active Rooms Section -->
                 <section class="rooms-section">
                     <div class="section-header">
                         <h2><i class="fas fa-compass"></i> Active Adventures</h2>
-                        <p>Join ongoing quests or start your own adventure</p>
+                        <p>Join ongoing quests or start your own</p>
                     </div>
-                    
-                    <div id="roomsList" class="rooms-grid">
-                        <!-- Rooms will be populated here -->
-                    </div>
-
+                    <div id="roomsList" class="rooms-grid"></div>
                     <div id="noRooms" class="empty-state">
                         <i class="fas fa-map"></i>
                         <h3>No Active Adventures</h3>
-                        <p>Be the first to start an adventure! Create a new room and begin your quest.</p>
-                        <button class="btn btn-primary" onclick="showCreateRoomModal()">
-                            <i class="fas fa-plus"></i> Start Adventure
-                        </button>
+                        <p>The trail awaits. Start a quest and blaze the path.</p>
+                        <button class="quest-btn" onclick="showCreateRoomModal()"><i class="fas fa-plus"></i> Start Adventure</button>
                     </div>
                 </section>
-
-                <!-- Online Users Section -->
                 <section class="users-section">
                     <div class="section-header">
-                        <h2><i class="fas fa-users"></i> Fellow Questers</h2>
-                        <p>Adventurers currently online</p>
+                        <h2><i class="fas fa-users"></i> Online</h2>
                     </div>
-                    
                     <div id="usersList" class="users-list">
-                        <!-- Users will be populated here -->
-                    </div>
-
-                    <div id="noUsers" class="empty-state">
-                        <i class="fas fa-user-friends"></i>
-                        <h3>No Questers Online</h3>
-                        <p>You're the first adventurer here! Others will join soon.</p>
+                        <div class="empty-state" style="padding: 2rem 1rem;">
+                            <i class="fas fa-campground" style="font-size: 2rem;"></i>
+                            <p style="margin-bottom: 0;">No questers online yet</p>
+                        </div>
                     </div>
                 </section>
             </div>
         </div>
-    </main>
+    </section>
 
     <!-- Create Room Modal -->
     <div id="createRoomModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2><i class="fas fa-map-marked-alt"></i> Create New Adventure</h2>
-                <button class="close-btn" onclick="hideCreateRoomModal()">
-                    <i class="fas fa-times"></i>
-                </button>
+                <h2><i class="fas fa-scroll"></i> New Adventure</h2>
+                <button class="close-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
             </div>
             <form id="createRoomForm">
-                <div class="form-group">
-                    <label for="adventureName">Adventure Name:</label>
-                    <input type="text" id="adventureName" required placeholder="e.g., Exploring Stonehenge">
-                </div>
-                <div class="form-group">
-                    <label for="adventureDescription">Description:</label>
-                    <textarea id="adventureDescription" placeholder="Describe your quest..."></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="maxParticipants">Max Participants:</label>
-                    <select id="maxParticipants">
-                        <option value="5">5 Questers</option>
-                        <option value="10" selected>10 Questers</option>
-                        <option value="20">20 Questers</option>
-                        <option value="50">50 Questers</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="isPrivate">
-                        <span class="checkmark"></span>
-                        Private Adventure (invite only)
-                    </label>
-                </div>
+                <div class="form-group"><label>Adventure Name</label><input type="text" id="roomName" placeholder="Name your quest" required></div>
+                <div class="form-group"><label>Description</label><textarea id="roomDescription" placeholder="What's the adventure about?"></textarea></div>
+                <div class="form-group"><label>Your Name</label><input type="text" id="hostUsername" placeholder="Your adventurer name" required></div>
+                <div class="form-group"><label>Max Participants</label><select id="maxParticipants"><option value="5">5</option><option value="10" selected>10</option></select></div>
                 <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" onclick="hideCreateRoomModal()">
-                        Cancel
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-play"></i> Start Adventure
-                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-compass"></i> Begin Quest</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Join Room Modal -->
-    <div id="joinRoomModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-sign-in-alt"></i> Join Adventure</h2>
-                <button class="close-btn" onclick="hideJoinRoomModal()">
-                    <i class="fas fa-times"></i>
-                </button>
+    <div id="statusIndicator" class="status-indicator connecting">
+        <i class="fas fa-circle"></i> <span>Connecting...</span>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section"><h3>Adventure Guild</h3><p>ChiffTown's outdoor exploration hub.</p></div>
+                <div class="footer-section"><h3>Features</h3><ul><li><a href="#">Live Streaming</a></li><li><a href="#">Quest Rooms</a></li><li><a href="#">Leaderboards</a></li></ul></div>
+                <div class="footer-section"><h3>Connect</h3><div class="social-links"><a href="#"><i class="fab fa-twitter"></i></a><a href="#"><i class="fab fa-discord"></i></a></div></div>
             </div>
-            <form id="joinRoomForm">
-                <div class="form-group">
-                    <label for="username">Your Name:</label>
-                    <input type="text" id="username" required placeholder="Enter your quester name">
-                </div>
-                <div class="form-group">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="joinAsStreamer">
-                        <span class="checkmark"></span>
-                        Join as Adventure Leader (Broadcaster)
-                    </label>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" onclick="hideJoinRoomModal()">
-                        Cancel
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-compass"></i> Join Quest
-                    </button>
-                </div>
-            </form>
+            <div class="footer-bottom"><p>&copy; 2025 ChiffTown — Adventure Guild</p></div>
         </div>
-    </div>
+    </footer>
 
-    <!-- Status Indicator -->
-    <div id="statusIndicator" class="status-indicator">
-        <i class="fas fa-circle"></i>
-        <span>Connecting...</span>
-    </div>
-
-    <!-- Scripts -->
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-    <script src="homepage.js"></script>
+    <script>
+        let socket = null;
+        const statusEl = document.getElementById('statusIndicator');
+
+        function updateStatus(state, text) {
+            statusEl.className = `status-indicator ${state}`;
+            statusEl.querySelector('span').textContent = text;
+        }
+
+        function showCreateRoomModal() { document.getElementById('createRoomModal').classList.add('show'); }
+        function closeModal() { document.getElementById('createRoomModal').classList.remove('show'); }
+        function refreshList() { if (socket) socket.emit('get-room-list'); }
+        function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+
+        function init() {
+            const url = ['localhost','127.0.0.1'].includes(location.hostname) ? 'http://localhost:3000' : location.origin;
+            socket = io(url, { transports: ['websocket', 'polling'], timeout: 5000, forceNew: true });
+
+            socket.on('connect', () => { updateStatus('connected', 'Connected'); socket.emit('get-room-list'); socket.emit('get-platform-stats'); });
+            socket.on('disconnect', () => updateStatus('disconnected', 'Disconnected'));
+            socket.on('connect_error', () => updateStatus('disconnected', 'Connection Error'));
+
+            socket.on('platform-stats', s => {
+                document.getElementById('totalUsers').textContent = s.totalUsers || 0;
+                document.getElementById('activeRooms').textContent = s.activeRooms || 0;
+                document.getElementById('liveStreams').textContent = s.liveStreams || 0;
+            });
+
+            socket.on('room-list', data => {
+                const questing = data.rooms.filter(r => r.type === 'questing' || !r.type);
+                updateRoomsList(questing);
+                updateUsersList(data.users);
+            });
+
+            socket.on('room-created', r => {
+                const username = document.getElementById('hostUsername').value || 'Host';
+                closeModal();
+                setTimeout(() => {
+                    const params = new URLSearchParams({ room: r.id, username, host: '1' });
+                    window.location.href = `adventure-stream.html?${params}`;
+                }, 400);
+            });
+
+            socket.on('room-updated', () => socket.emit('get-room-list'));
+
+            document.getElementById('createRoomForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                socket.emit('create-room', {
+                    name: document.getElementById('roomName').value,
+                    description: document.getElementById('roomDescription').value,
+                    maxParticipants: parseInt(document.getElementById('maxParticipants').value),
+                    isPrivate: false,
+                    type: 'questing'
+                });
+            });
+        }
+
+        function updateRoomsList(rooms) {
+            const list = document.getElementById('roomsList'), empty = document.getElementById('noRooms');
+            if (!rooms.length) { list.style.display = 'none'; empty.style.display = 'block'; return; }
+            list.style.display = 'grid'; empty.style.display = 'none';
+            list.innerHTML = rooms.map(r => `
+                <div class="room-card" onclick="joinRoom('${r.id}')">
+                    <div class="room-header">
+                        <span class="room-name">${escapeHtml(r.name)}</span>
+                        ${r.hasStreamer ? '<span class="room-status"><i class="fas fa-circle"></i> Live</span>' : ''}
+                    </div>
+                    <p class="room-description">${escapeHtml(r.description)}</p>
+                    <div class="room-stats">
+                        <span class="room-participants"><i class="fas fa-users"></i> ${r.participantCount}/${r.maxParticipants}</span>
+                    </div>
+                </div>`).join('');
+        }
+
+        function updateUsersList(users) {
+            const list = document.getElementById('usersList');
+            if (!users || !users.length) return;
+            list.innerHTML = users.map(u => `
+                <div class="user-card">
+                    <div class="user-avatar">${(u.username || 'G')[0].toUpperCase()}</div>
+                    <div class="user-info">
+                        <div class="user-name">${escapeHtml(u.username)}</div>
+                        <div class="user-status">${u.isStreaming ? '🔴 Streaming' : u.roomName || 'Browsing'}</div>
+                    </div>
+                </div>`).join('');
+        }
+
+        function joinRoom(id) {
+            const u = prompt('Your adventurer name?');
+            if (!u?.trim()) return;
+            window.location.href = `adventure-stream.html?room=${id}&username=${encodeURIComponent(u.trim())}&host=0`;
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
 </body>
-</html> 
+</html>

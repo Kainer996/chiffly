@@ -39,6 +39,108 @@ const METERED_APP_NAME = 'chiffly';
 const rooms = new Map();
 const users = new Map();
 
+// Arcade game stores
+const tttGames = new Map(); // Tic Tac Toe
+const rpsGames = new Map(); // Rock Paper Scissors
+const triviaGames = new Map(); // Trivia
+
+// Game helper functions
+function checkTTTWinner(board) {
+  const lines = [
+    [0,1,2], [3,4,5], [6,7,8], // rows
+    [0,3,6], [1,4,7], [2,5,8], // cols
+    [0,4,8], [2,4,6]            // diagonals
+  ];
+  for (const [a,b,c] of lines) {
+    if (board[a] && board[a] === board[b] && board[a] === board[c]) return board[a];
+  }
+  return null;
+}
+
+function rpsResult(c1, c2) {
+  if (c1 === c2) return 0;
+  if ((c1 === 'rock' && c2 === 'scissors') || (c1 === 'scissors' && c2 === 'paper') || (c1 === 'paper' && c2 === 'rock')) return 1;
+  return 2;
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function decodeHTMLEntities(text) {
+  const entities = { '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&#039;': "'", '&apos;': "'", '&eacute;': 'é', '&ouml;': 'ö', '&uuml;': 'ü', '&ntilde;': 'ñ', '&rsquo;': "'", '&lsquo;': "'", '&rdquo;': '"', '&ldquo;': '"', '&hellip;': '…', '&ndash;': '–', '&mdash;': '—' };
+  return text.replace(/&[^;]+;/g, match => entities[match] || match);
+}
+
+function sendTriviaQuestion(gameId) {
+  const game = triviaGames.get(gameId);
+  if (!game || game.state !== 'playing') return;
+  
+  const q = game.questions[game.currentQ];
+  game.answers = new Map();
+  
+  io.to('trivia-' + gameId).emit('trivia-question', {
+    index: game.currentQ,
+    total: game.questions.length,
+    question: q.question,
+    options: q.options,
+    category: q.category,
+    difficulty: q.difficulty,
+    timeLimit: 15
+  });
+  
+  // Auto-advance after timeout
+  game.timer = setTimeout(() => advanceTriviaQuestion(gameId), 17000);
+}
+
+function advanceTriviaQuestion(gameId) {
+  const game = triviaGames.get(gameId);
+  if (!game) return;
+  if (game.timer) clearTimeout(game.timer);
+  
+  const q = game.questions[game.currentQ];
+  
+  // Send scoreboard
+  io.to('trivia-' + gameId).emit('trivia-scores', {
+    correctAnswer: q.correct,
+    scores: game.players.map(p => ({ username: p.username, score: p.score })).sort((a, b) => b.score - a.score)
+  });
+  
+  game.currentQ++;
+  if (game.currentQ >= game.questions.length) {
+    // Game over
+    setTimeout(() => {
+      io.to('trivia-' + gameId).emit('trivia-game-over', {
+        scores: game.players.map(p => ({ username: p.username, score: p.score })).sort((a, b) => b.score - a.score),
+        winner: game.players.reduce((a, b) => a.score > b.score ? a : b).username
+      });
+      triviaGames.delete(gameId);
+    }, 3000);
+  } else {
+    setTimeout(() => sendTriviaQuestion(gameId), 3000);
+  }
+}
+
+// Clean up stale games every 5 minutes
+setInterval(() => {
+  const now = Date.now();
+  const maxAge = 30 * 60 * 1000; // 30 minutes
+  for (const [gid, game] of tttGames) {
+    if (now - game.createdAt > maxAge) tttGames.delete(gid);
+  }
+  for (const [gid, game] of rpsGames) {
+    if (now - game.createdAt > maxAge) rpsGames.delete(gid);
+  }
+  for (const [gid, game] of triviaGames) {
+    if (now - game.createdAt > maxAge) triviaGames.delete(gid);
+  }
+}, 5 * 60 * 1000);
+
 // TURN Server credentials endpoint - fetches from Metered
 app.get('/api/turn-credentials', async (req, res) => {
   try {
@@ -49,10 +151,12 @@ app.get('/api/turn-credentials', async (req, res) => {
     res.json(iceServers);
   } catch (error) {
     console.error('Error fetching TURN credentials:', error);
-    // Fallback to basic STUN servers if Metered fails
+    // Fallback to our own coturn server
     res.json([
       { urls: 'stun:stun.l.google.com:19302' },
-      { urls: 'stun:stun1.l.google.com:19302' }
+      { urls: 'stun:stun1.l.google.com:19302' },
+      { urls: 'turn:13.49.240.95:3478', username: 'chiffly', credential: 'chiffly2026secure' },
+      { urls: 'turn:13.49.240.95:3478?transport=tcp', username: 'chiffly', credential: 'chiffly2026secure' }
     ]);
   }
 });
@@ -161,7 +265,8 @@ io.on('connection', (socket) => {
       maxParticipants: room.maxParticipants || 10,
       hasStreamer: !!room.streamer,
       isPrivate: room.isPrivate || false,
-      type: room.type || 'questing'
+      type: room.type || 'questing',
+      theme: room.theme || 'default'
     }));
 
     const usersData = Array.from(users.values()).map(user => ({
@@ -187,7 +292,7 @@ io.on('connection', (socket) => {
   // Handle room creation
   socket.on('create-room', (data) => {
     const roomId = uuidv4();
-    console.log('🏠 Creating room:', roomId, 'Type:', data.type, 'Name:', data.name);
+    console.log('🏠 Creating room:', roomId, 'Type:', data.type, 'Name:', data.name, 'Theme:', data.theme);
     
     const newRoom = {
       id: roomId,
@@ -195,7 +300,8 @@ io.on('connection', (socket) => {
       description: data.description,
       maxParticipants: data.maxParticipants || 10,
       isPrivate: data.isPrivate || false,
-      type: data.type || 'questing', // 'questing' or 'pub'
+      type: data.type || 'questing',
+      theme: data.theme || 'default',
       streamer: null,
       participants: new Map(),
       messages: [],
@@ -275,7 +381,9 @@ io.on('connection', (socket) => {
     socket.emit('room-state', {
       streamer: room.streamer,
       participants: Array.from(room.participants.values()),
-      messages: room.messages.slice(-50) // Last 50 messages
+      messages: room.messages.slice(-50), // Last 50 messages
+      type: room.type || 'pub',
+      theme: room.theme || 'default'
     });
 
     // Broadcast room update when streamer joins
@@ -292,6 +400,32 @@ io.on('connection', (socket) => {
     }
 
     console.log(`${username} joined room ${roomId} as ${isStreamer ? 'streamer' : 'participant'}`);
+  });
+
+  // Handle theme change (host only)
+  socket.on('set-theme', (data) => {
+    const user = users.get(socket.id);
+    if (!user || !user.isStreamer) return;
+    const room = rooms.get(user.roomId);
+    if (!room) return;
+    room.theme = data.theme || 'default';
+    console.log(`🎨 Theme changed in room ${user.roomId} to: ${room.theme}`);
+    // Broadcast theme change to all users in the room
+    io.to(user.roomId).emit('theme-changed', { theme: room.theme });
+  });
+
+  // Handle tip event
+  socket.on('send-tip', (data) => {
+    const user = users.get(socket.id);
+    if (!user) return;
+    const room = rooms.get(user.roomId);
+    if (!room || !room.streamer) return;
+    // Broadcast tip to everyone in the room
+    io.to(user.roomId).emit('tip-received', {
+      from: user.username,
+      amount: data.amount,
+      to: room.streamer.username
+    });
   });
 
   // Handle chat messages
@@ -380,6 +514,262 @@ io.on('connection', (socket) => {
     });
   });
 
+  // === ARCADE GAME EVENTS ===
+  
+  // Tic Tac Toe
+  socket.on('ttt-find-game', (data) => {
+    const username = data.username;
+    // Find waiting TTT game or create one
+    let found = false;
+    for (const [gid, game] of tttGames) {
+      if (!game.player2 && game.player1.id !== socket.id) {
+        game.player2 = { id: socket.id, username, symbol: 'O' };
+        socket.join('ttt-' + gid);
+        found = true;
+        io.to('ttt-' + gid).emit('ttt-start', {
+          gameId: gid,
+          player1: { username: game.player1.username, symbol: 'X' },
+          player2: { username, symbol: 'O' },
+          board: game.board,
+          turn: 'X'
+        });
+        break;
+      }
+    }
+    if (!found) {
+      const gid = uuidv4().slice(0, 8);
+      tttGames.set(gid, {
+        player1: { id: socket.id, username, symbol: 'X' },
+        player2: null,
+        board: Array(9).fill(null),
+        turn: 'X',
+        createdAt: Date.now()
+      });
+      socket.join('ttt-' + gid);
+      socket.emit('ttt-waiting', { gameId: gid });
+    }
+  });
+
+  socket.on('ttt-move', (data) => {
+    const game = tttGames.get(data.gameId);
+    if (!game || !game.player2) return;
+    const player = game.player1.id === socket.id ? game.player1 : game.player2;
+    if (player.symbol !== game.turn) return;
+    if (game.board[data.cell] !== null) return;
+    
+    game.board[data.cell] = player.symbol;
+    const winner = checkTTTWinner(game.board);
+    const draw = !winner && game.board.every(c => c !== null);
+    game.turn = game.turn === 'X' ? 'O' : 'X';
+    
+    io.to('ttt-' + data.gameId).emit('ttt-update', {
+      board: game.board,
+      turn: game.turn,
+      winner: winner,
+      draw: draw,
+      lastMove: { cell: data.cell, symbol: player.symbol, username: player.username }
+    });
+    
+    if (winner || draw) {
+      tttGames.delete(data.gameId);
+    }
+  });
+
+  socket.on('ttt-leave', (data) => {
+    if (data.gameId && tttGames.has(data.gameId)) {
+      io.to('ttt-' + data.gameId).emit('ttt-opponent-left', {});
+      tttGames.delete(data.gameId);
+      socket.leave('ttt-' + data.gameId);
+    }
+  });
+
+  // Rock Paper Scissors
+  socket.on('rps-find-game', (data) => {
+    const username = data.username;
+    let found = false;
+    for (const [gid, game] of rpsGames) {
+      if (!game.player2 && game.player1.id !== socket.id) {
+        game.player2 = { id: socket.id, username, choice: null };
+        socket.join('rps-' + gid);
+        found = true;
+        io.to('rps-' + gid).emit('rps-start', {
+          gameId: gid,
+          player1: game.player1.username,
+          player2: username
+        });
+        break;
+      }
+    }
+    if (!found) {
+      const gid = uuidv4().slice(0, 8);
+      rpsGames.set(gid, {
+        player1: { id: socket.id, username, choice: null },
+        player2: null,
+        round: 1,
+        scores: [0, 0],
+        createdAt: Date.now()
+      });
+      socket.join('rps-' + gid);
+      socket.emit('rps-waiting', { gameId: gid });
+    }
+  });
+
+  socket.on('rps-choose', (data) => {
+    const game = rpsGames.get(data.gameId);
+    if (!game || !game.player2) return;
+    if (game.player1.id === socket.id) game.player1.choice = data.choice;
+    else if (game.player2.id === socket.id) game.player2.choice = data.choice;
+    
+    if (game.player1.choice && game.player2.choice) {
+      const result = rpsResult(game.player1.choice, game.player2.choice);
+      if (result === 1) game.scores[0]++;
+      else if (result === 2) game.scores[1]++;
+      
+      io.to('rps-' + data.gameId).emit('rps-result', {
+        p1Choice: game.player1.choice,
+        p2Choice: game.player2.choice,
+        p1Name: game.player1.username,
+        p2Name: game.player2.username,
+        winner: result === 0 ? 'draw' : result === 1 ? game.player1.username : game.player2.username,
+        scores: game.scores,
+        round: game.round
+      });
+      
+      game.player1.choice = null;
+      game.player2.choice = null;
+      game.round++;
+      
+      if (game.round > 5) {
+        io.to('rps-' + data.gameId).emit('rps-game-over', {
+          scores: game.scores,
+          winner: game.scores[0] > game.scores[1] ? game.player1.username : game.scores[1] > game.scores[0] ? game.player2.username : 'Draw'
+        });
+        rpsGames.delete(data.gameId);
+      }
+    } else {
+      // Notify opponent that this player has chosen
+      socket.to('rps-' + data.gameId).emit('rps-opponent-chose', {});
+    }
+  });
+
+  socket.on('rps-leave', (data) => {
+    if (data.gameId && rpsGames.has(data.gameId)) {
+      io.to('rps-' + data.gameId).emit('rps-opponent-left', {});
+      rpsGames.delete(data.gameId);
+      socket.leave('rps-' + data.gameId);
+    }
+  });
+
+  // Trivia Quiz
+  socket.on('trivia-find-game', (data) => {
+    const username = data.username;
+    let found = false;
+    for (const [gid, game] of triviaGames) {
+      if (game.state === 'waiting' && !game.players.find(p => p.id === socket.id) && game.players.length < 8) {
+        game.players.push({ id: socket.id, username, score: 0 });
+        socket.join('trivia-' + gid);
+        found = true;
+        io.to('trivia-' + gid).emit('trivia-player-joined', {
+          gameId: gid,
+          players: game.players.map(p => ({ username: p.username, score: p.score })),
+          hostCanStart: game.players.length >= 2
+        });
+        break;
+      }
+    }
+    if (!found) {
+      const gid = uuidv4().slice(0, 8);
+      triviaGames.set(gid, {
+        players: [{ id: socket.id, username, score: 0 }],
+        questions: [],
+        currentQ: -1,
+        state: 'waiting',
+        answers: new Map(),
+        host: socket.id,
+        createdAt: Date.now()
+      });
+      socket.join('trivia-' + gid);
+      socket.emit('trivia-waiting', { gameId: gid });
+    }
+  });
+
+  socket.on('trivia-start', async (data) => {
+    const game = triviaGames.get(data.gameId);
+    if (!game || game.host !== socket.id || game.state !== 'waiting') return;
+    if (game.players.length < 1) return;
+    
+    // Fetch questions from Open Trivia DB
+    try {
+      const resp = await fetch('https://opentdb.com/api.php?amount=10&type=multiple');
+      const json = await resp.json();
+      game.questions = json.results.map(q => ({
+        question: decodeHTMLEntities(q.question),
+        correct: decodeHTMLEntities(q.correct_answer),
+        options: shuffle([decodeHTMLEntities(q.correct_answer), ...q.incorrect_answers.map(a => decodeHTMLEntities(a))]),
+        category: q.category,
+        difficulty: q.difficulty
+      }));
+    } catch (e) {
+      // Fallback questions
+      game.questions = [
+        { question: 'What is the capital of France?', correct: 'Paris', options: ['Paris', 'London', 'Berlin', 'Madrid'], category: 'Geography', difficulty: 'easy' },
+        { question: 'What year did the Moon landing happen?', correct: '1969', options: ['1969', '1965', '1972', '1959'], category: 'History', difficulty: 'easy' },
+        { question: 'What is the largest planet?', correct: 'Jupiter', options: ['Jupiter', 'Saturn', 'Neptune', 'Earth'], category: 'Science', difficulty: 'easy' },
+        { question: 'Who painted the Mona Lisa?', correct: 'Leonardo da Vinci', options: ['Leonardo da Vinci', 'Michelangelo', 'Raphael', 'Picasso'], category: 'Art', difficulty: 'easy' },
+        { question: 'What is H2O?', correct: 'Water', options: ['Water', 'Oxygen', 'Hydrogen', 'Helium'], category: 'Science', difficulty: 'easy' }
+      ];
+    }
+    
+    game.state = 'playing';
+    game.currentQ = 0;
+    game.answers = new Map();
+    
+    io.to('trivia-' + data.gameId).emit('trivia-game-started', {
+      totalQuestions: game.questions.length,
+      players: game.players.map(p => ({ username: p.username, score: p.score }))
+    });
+    
+    // Send first question after a short delay
+    setTimeout(() => sendTriviaQuestion(data.gameId), 2000);
+  });
+
+  socket.on('trivia-answer', (data) => {
+    const game = triviaGames.get(data.gameId);
+    if (!game || game.state !== 'playing') return;
+    const player = game.players.find(p => p.id === socket.id);
+    if (!player || game.answers.has(socket.id)) return;
+    
+    const q = game.questions[game.currentQ];
+    const correct = data.answer === q.correct;
+    if (correct) {
+      // Score based on speed (data.timeLeft is seconds remaining)
+      player.score += 100 + (data.timeLeft || 0) * 10;
+    }
+    game.answers.set(socket.id, { answer: data.answer, correct });
+    
+    socket.emit('trivia-answer-result', { correct, correctAnswer: q.correct });
+    
+    // If all players answered, advance
+    if (game.answers.size >= game.players.length) {
+      advanceTriviaQuestion(data.gameId);
+    }
+  });
+
+  socket.on('trivia-leave', (data) => {
+    if (data.gameId && triviaGames.has(data.gameId)) {
+      const game = triviaGames.get(data.gameId);
+      game.players = game.players.filter(p => p.id !== socket.id);
+      socket.leave('trivia-' + data.gameId);
+      if (game.players.length === 0) {
+        triviaGames.delete(data.gameId);
+      } else {
+        io.to('trivia-' + data.gameId).emit('trivia-player-left', {
+          players: game.players.map(p => ({ username: p.username, score: p.score }))
+        });
+      }
+    }
+  });
+
   // Handle disconnection
   socket.on('disconnect', () => {
     const user = users.get(socket.id);
@@ -405,6 +795,31 @@ io.on('connection', (socket) => {
       }
       users.delete(socket.id);
     }
+    // Clean up arcade games on disconnect
+    for (const [gid, game] of tttGames) {
+      if (game.player1?.id === socket.id || game.player2?.id === socket.id) {
+        io.to('ttt-' + gid).emit('ttt-opponent-left', {});
+        tttGames.delete(gid);
+      }
+    }
+    for (const [gid, game] of rpsGames) {
+      if (game.player1?.id === socket.id || game.player2?.id === socket.id) {
+        io.to('rps-' + gid).emit('rps-opponent-left', {});
+        rpsGames.delete(gid);
+      }
+    }
+    for (const [gid, game] of triviaGames) {
+      game.players = game.players.filter(p => p.id !== socket.id);
+      if (game.players.length === 0) {
+        if (game.timer) clearTimeout(game.timer);
+        triviaGames.delete(gid);
+      } else {
+        io.to('trivia-' + gid).emit('trivia-player-left', {
+          players: game.players.map(p => ({ username: p.username, score: p.score }))
+        });
+      }
+    }
+
     console.log('User disconnected:', socket.id);
   });
 });

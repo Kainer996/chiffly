@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Games Room - Chiffly</title>
+    <link rel="stylesheet" href="main-home-styles.css?v=5">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #2d1b69 0%, #4c1d95 50%, #1e1b4b 100%);
+            color: white;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .games-container {
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .games-header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .games-header h1 {
+            margin: 0 0 0.5rem 0;
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .games-header p {
+            margin: 0;
+            opacity: 0.8;
+            font-size: 1.1rem;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(168, 85, 247, 0.5);
+            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.3);
+        }
+
+        .game-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #a855f7, #ec4899);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .game-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0 0 0.5rem 0;
+            color: white;
+        }
+
+        .game-description {
+            opacity: 0.8;
+            margin: 0 0 1rem 0;
+            line-height: 1.5;
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            opacity: 0.7;
+        }
+
+        .play-btn {
+            background: linear-gradient(135deg, #a855f7, #ec4899);
+            border: none;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(168, 85, 247, 0.4);
+        }
+
+        .game-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(168, 85, 247, 0.8);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.8rem 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .games-container {
+                padding: 0.5rem;
+            }
+
+            .games-header {
+                padding: 1.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .games-header h1 {
+                font-size: 2rem;
+            }
+
+            .games-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .game-card {
+                padding: 1rem;
+            }
+
+            .game-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+
+            .game-title {
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .games-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .games-header p {
+                font-size: 1rem;
+            }
+
+            .game-card {
+                padding: 0.8rem;
+            }
+        }
+
+        /* Game-specific styling */
+        .quiz-card .game-icon {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .snake-card .game-icon {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .memory-card .game-icon {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        }
+
+        .trivia-card .game-icon {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        .word-card .game-icon {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        }
+
+        .puzzle-card .game-icon {
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+        }
+    </style>
+</head>
+<body>
+    <!-- Back Button -->
+    <a href="index.html" class="back-btn">
+        <i class="fas fa-arrow-left"></i>
+        <span>Back to Lobby</span>
+    </a>
+
+    <div class="games-container">
+        <!-- Header -->
+        <div class="games-header">
+            <h1><i class="fas fa-gamepad"></i> Games Room</h1>
+            <p>Challenge friends and test your skills with our collection of multiplayer games</p>
+        </div>
+
+        <!-- Games Grid -->
+        <div class="games-grid">
+            <!-- Multiplayer Quiz -->
+            <div class="game-card quiz-card" onclick="playGame('quiz')">
+                <div class="game-badge">Multiplayer</div>
+                <div class="game-icon">
+                    <i class="fas fa-question-circle"></i>
+                </div>
+                <h3 class="game-title">Multiplayer Quiz</h3>
+                <p class="game-description">Test your knowledge against friends in real-time trivia battles. Categories include general knowledge, science, history, and more!</p>
+                <div class="game-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-users"></i>
+                        <span>2-8 players</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-clock"></i>
+                        <span>5-10 min</span>
+                    </div>
+                </div>
+                <button class="play-btn">
+                    <i class="fas fa-play"></i> Start Quiz Battle
+                </button>
+            </div>
+
+            <!-- Snake Game -->
+            <div class="game-card snake-card" onclick="playGame('snake')">
+                <div class="game-badge">Classic</div>
+                <div class="game-icon">
+                    <i class="fas fa-snake"></i>
+                </div>
+                <h3 class="game-title">Snake Arena</h3>
+                <p class="game-description">The classic snake game with a multiplayer twist! Compete to become the longest snake while avoiding collisions.</p>
+                <div class="game-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-users"></i>
+                        <span>1-4 players</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-clock"></i>
+                        <span>3-5 min</span>
+                    </div>
+                </div>
+                <button class="play-btn">
+                    <i class="fas fa-play"></i> Enter Arena
+                </button>
+            </div>
+
+            <!-- Memory Match -->
+            <div class="game-card memory-card" onclick="playGame('memory')">
+                <div class="game-badge">Brain Game</div>
+                <div class="game-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3 class="game-title">Memory Match</h3>
+                <p class="game-description">Challenge your memory by matching pairs of cards. Race against time and other players to find all matches first!</p>
+                <div class="game-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-users"></i>
+                        <span>1-6 players</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-clock"></i>
+                        <span>2-4 min</span>
+                    </div>
+                </div>
+                <button class="play-btn">
+                    <i class="fas fa-play"></i> Test Memory
+                </button>
+            </div>
+
+            <!-- Quick Trivia -->
+            <div class="game-card trivia-card" onclick="playGame('trivia')">
+                <div class="game-badge">Fast-Paced</div>
+                <div class="game-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h3 class="game-title">Lightning Trivia</h3>
+                <p class="game-description">Quick-fire trivia questions with only seconds to answer! Think fast and beat your opponents to the buzzer.</p>
+                <div class="game-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-users"></i>
+                        <span>2-10 players</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-clock"></i>
+                        <span>3-6 min</span>
+                    </div>
+                </div>
+                <button class="play-btn">
+                    <i class="fas fa-play"></i> Quick Fire
+                </button>
+            </div>
+
+            <!-- Word Chain -->
+            <div class="game-card word-card" onclick="playGame('wordchain')">
+                <div class="game-badge">Word Game</div>
+                <div class="game-icon">
+                    <i class="fas fa-spell-check"></i>
+                </div>
+                <h3 class="game-title">Word Chain</h3>
+                <p class="game-description">Create words using the last letter of the previous word. Keep the chain going and outlast your opponents!</p>
+                <div class="game-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-users"></i>
+                        <span>2-6 players</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-clock"></i>
+                        <span>5-8 min</span>
+                    </div>
+                </div>
+                <button class="play-btn">
+                    <i class="fas fa-play"></i> Start Chain
+                </button>
+            </div>
+
+            <!-- Number Puzzle -->
+            <div class="game-card puzzle-card" onclick="playGame('numbers')">
+                <div class="game-badge">Puzzle</div>
+                <div class="game-icon">
+                    <i class="fas fa-puzzle-piece"></i>
+                </div>
+                <h3 class="game-title">Number Rush</h3>
+                <p class="game-description">Solve math puzzles and number sequences faster than your opponents. Perfect for sharpening your mental math skills!</p>
+                <div class="game-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-users"></i>
+                        <span>1-8 players</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-clock"></i>
+                        <span>4-7 min</span>
+                    </div>
+                </div>
+                <button class="play-btn">
+                    <i class="fas fa-play"></i> Solve Puzzles
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Selection Modal -->
+    <div id="gameModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2 id="modalTitle">Join Game</h2>
+                <button class="close-btn" onclick="hideGameModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="playerName">Your Name:</label>
+                    <input type="text" id="playerName" placeholder="Enter your player name" required>
+                </div>
+                <div class="form-group">
+                    <label>Game Mode:</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="gameMode" value="create" checked>
+                            <span class="radio-custom"></span>
+                            Create New Game Room
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="gameMode" value="join">
+                            <span class="radio-custom"></span>
+                            Join Existing Room
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group" id="roomCodeGroup" style="display: none;">
+                    <label for="roomCode">Room Code:</label>
+                    <input type="text" id="roomCode" placeholder="Enter 6-digit room code" maxlength="6">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="hideGameModal()">
+                        Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="startSelectedGame()">
+                        <i class="fas fa-play"></i> Start Game
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+        let selectedGame = null;
+
+        function playGame(gameType) {
+            selectedGame = gameType;
+            const modal = document.getElementById('gameModal');
+            const modalTitle = document.getElementById('modalTitle');
+            
+            const gameNames = {
+                'quiz': 'Multiplayer Quiz',
+                'snake': 'Snake Arena',
+                'memory': 'Memory Match',
+                'trivia': 'Lightning Trivia',
+                'wordchain': 'Word Chain',
+                'numbers': 'Number Rush'
+            };
+            
+            modalTitle.textContent = `Join ${gameNames[gameType]}`;
+            modal.style.display = 'flex';
+            document.getElementById('playerName').focus();
+        }
+
+        function hideGameModal() {
+            document.getElementById('gameModal').style.display = 'none';
+            document.getElementById('playerName').value = '';
+            document.getElementById('roomCode').value = '';
+            document.querySelector('input[name="gameMode"][value="create"]').checked = true;
+            document.getElementById('roomCodeGroup').style.display = 'none';
+            selectedGame = null;
+        }
+
+        function startSelectedGame() {
+            const playerName = document.getElementById('playerName').value.trim();
+            const gameMode = document.querySelector('input[name="gameMode"]:checked').value;
+            const roomCode = document.getElementById('roomCode').value.trim();
+
+            if (!playerName) {
+                alert('Please enter your player name');
+                return;
+            }
+
+            if (gameMode === 'join' && !roomCode) {
+                alert('Please enter a room code');
+                return;
+            }
+
+            // Create URL parameters
+            const params = new URLSearchParams({
+                game: selectedGame,
+                player: playerName,
+                mode: gameMode
+            });
+
+            if (gameMode === 'join') {
+                params.append('room', roomCode);
+            }
+
+            // Redirect to game page
+            window.location.href = `game-room.html?${params.toString()}`;
+        }
+
+        // Handle radio button changes
+        document.addEventListener('change', function(e) {
+            if (e.target.name === 'gameMode') {
+                const roomCodeGroup = document.getElementById('roomCodeGroup');
+                if (e.target.value === 'join') {
+                    roomCodeGroup.style.display = 'block';
+                    document.getElementById('roomCode').focus();
+                } else {
+                    roomCodeGroup.style.display = 'none';
+                }
+            }
+        });
+
+        // Handle Enter key in inputs
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                if (e.target.id === 'playerName' || e.target.id === 'roomCode') {
+                    startSelectedGame();
+                }
+            }
+        });
+
+        // Close modal when clicking outside
+        document.addEventListener('click', function(e) {
+            const modal = document.getElementById('gameModal');
+            if (e.target === modal) {
+                hideGameModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                hideGameModal();
+            }
+        });
+
+        // Add some interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover sound effect simulation
+            const gameCards = document.querySelectorAll('.game-card');
+            gameCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    // Could add sound effects here
+                    console.log('Hovering over game:', this.querySelector('.game-title').textContent);
+                });
+            });
+
+            // Add click animation
+            const playButtons = document.querySelectorAll('.play-btn');
+            playButtons.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1.05)';
+                    }, 100);
+                });
+            });
+        });
+    </script>
+
+    <style>
+        /* Modal styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0;
+            width: 90%;
+            max-width: 400px;
+            color: white;
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .radio-label:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .radio-custom {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        input[type="radio"] {
+            display: none;
+        }
+
+        input[type="radio"]:checked + .radio-custom {
+            border-color: #a855f7;
+            background: #a855f7;
+        }
+
+        input[type="radio"]:checked + .radio-custom::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #a855f7, #ec4899);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(168, 85, 247, 0.4);
+        }
+    </style>
+</body>
+</html> 

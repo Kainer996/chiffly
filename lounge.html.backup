@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Lounge - Chiffly</title>
+    <link rel="stylesheet" href="main-home-styles.css?v=5">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        .lounge-hero {
+            background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
+            min-height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lounge-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%"><stop offset="0%" stop-color="%23ffffff" stop-opacity="0.1"/><stop offset="100%" stop-color="%23ffffff" stop-opacity="0"/></radialGradient></defs><circle cx="200" cy="200" r="120" fill="url(%23a)"/><circle cx="800" cy="300" r="180" fill="url(%23a)"/><circle cx="400" cy="700" r="150" fill="url(%23a)"/></svg>');
+            animation: float 25s ease-in-out infinite;
+        }
+
+        .lounge-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            padding: 0 2rem;
+        }
+
+        .lounge-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .lounge-subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .lounge-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .lounge-btn {
+            background: linear-gradient(135deg, #9f7aea, #805ad5);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            box-shadow: 0 5px 15px rgba(159, 122, 234, 0.3);
+        }
+
+        .lounge-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(159, 122, 234, 0.4);
+        }
+
+        .lounge-btn.secondary {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .lounge-section {
+            padding: 4rem 0;
+            background: #f8fafc;
+        }
+
+        .conversation-areas {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .conversation-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .conversation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+            border-color: #9f7aea;
+        }
+
+        .conversation-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .conversation-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #9f7aea, #805ad5);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .conversation-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin: 0;
+        }
+
+        .conversation-description {
+            color: #718096;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .conversation-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .conversation-stat {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .etiquette-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .etiquette-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .etiquette-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .etiquette-list li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e2e8f0;
+            color: #718096;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .etiquette-list li:last-child {
+            border-bottom: none;
+        }
+
+        .etiquette-list li i {
+            color: #9f7aea;
+            width: 20px;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 100px;
+            left: 2rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        @media (max-width: 768px) {
+            .lounge-title {
+                font-size: 2.5rem;
+            }
+            
+            .lounge-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .back-btn {
+                left: 1rem;
+            }
+
+            .conversation-areas {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-cube"></i>
+                <span>Chiffly</span>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="#about" class="nav-link">About</a>
+                <a href="#contact" class="nav-link">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Back Button -->
+    <button class="back-btn" onclick="window.location.href='index.html'">
+        <i class="fas fa-arrow-left"></i>
+    </button>
+
+    <!-- Lounge Hero Section -->
+    <section class="lounge-hero">
+        <div class="lounge-content">
+            <h1 class="lounge-title">
+                <i class="fas fa-couch"></i>
+                The Lounge
+            </h1>
+            <p class="lounge-subtitle">A refined space for civilized chiff chaff and intellectual discourse</p>
+            
+            <div class="lounge-actions">
+                <button class="lounge-btn" onclick="joinConversation()">
+                    <i class="fas fa-comments"></i>
+                    Join Conversation
+                </button>
+                <button class="lounge-btn secondary" onclick="createTopic()">
+                    <i class="fas fa-plus"></i>
+                    Start New Topic
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lounge Section -->
+    <section class="lounge-section">
+        <div class="container">
+            <!-- Lounge Etiquette -->
+            <div class="etiquette-section">
+                <h3 class="etiquette-title">
+                    <i class="fas fa-crown"></i>
+                    Lounge Etiquette
+                </h3>
+                <ul class="etiquette-list">
+                    <li><i class="fas fa-handshake"></i>Maintain respectful and courteous dialogue</li>
+                    <li><i class="fas fa-volume-down"></i>Keep conversations at a civilized volume</li>
+                    <li><i class="fas fa-brain"></i>Engage in thoughtful and meaningful discussions</li>
+                    <li><i class="fas fa-heart"></i>Be kind and considerate to all members</li>
+                    <li><i class="fas fa-ban"></i>No heated arguments or controversial debates</li>
+                    <li><i class="fas fa-coffee"></i>Enjoy the refined atmosphere and good company</li>
+                </ul>
+            </div>
+
+            <!-- Active Conversations -->
+            <div class="section-header">
+                <h2>Active Conversations</h2>
+                <p>Join ongoing discussions or start your own refined topic</p>
+            </div>
+            
+            <div class="conversation-areas">
+                <div class="conversation-card" onclick="joinConversation('books')">
+                    <div class="conversation-header">
+                        <div class="conversation-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <h3 class="conversation-title">Literature & Books</h3>
+                    </div>
+                    <p class="conversation-description">Discussing classic literature, recent reads, and book recommendations in a scholarly atmosphere.</p>
+                    <div class="conversation-stats">
+                        <div class="conversation-stat">
+                            <i class="fas fa-users"></i>
+                            <span>8 participants</span>
+                        </div>
+                        <div class="conversation-stat">
+                            <i class="fas fa-clock"></i>
+                            <span>Active now</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="conversation-card" onclick="joinConversation('philosophy')">
+                    <div class="conversation-header">
+                        <div class="conversation-icon">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <h3 class="conversation-title">Philosophy & Ideas</h3>
+                    </div>
+                    <p class="conversation-description">Thoughtful discussions on life, ethics, and philosophical concepts in a respectful environment.</p>
+                    <div class="conversation-stats">
+                        <div class="conversation-stat">
+                            <i class="fas fa-users"></i>
+                            <span>5 participants</span>
+                        </div>
+                        <div class="conversation-stat">
+                            <i class="fas fa-clock"></i>
+                            <span>Active now</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="conversation-card" onclick="joinConversation('culture')">
+                    <div class="conversation-header">
+                        <div class="conversation-icon">
+                            <i class="fas fa-palette"></i>
+                        </div>
+                        <h3 class="conversation-title">Arts & Culture</h3>
+                    </div>
+                    <p class="conversation-description">Exploring fine arts, classical music, theater, and cultural experiences with fellow enthusiasts.</p>
+                    <div class="conversation-stats">
+                        <div class="conversation-stat">
+                            <i class="fas fa-users"></i>
+                            <span>12 participants</span>
+                        </div>
+                        <div class="conversation-stat">
+                            <i class="fas fa-clock"></i>
+                            <span>Active now</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="conversation-card" onclick="joinConversation('travel')">
+                    <div class="conversation-header">
+                        <div class="conversation-icon">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <h3 class="conversation-title">Travel & Experiences</h3>
+                    </div>
+                    <p class="conversation-description">Sharing sophisticated travel experiences, cultural insights, and worldly adventures.</p>
+                    <div class="conversation-stats">
+                        <div class="conversation-stat">
+                            <i class="fas fa-users"></i>
+                            <span>6 participants</span>
+                        </div>
+                        <div class="conversation-stat">
+                            <i class="fas fa-clock"></i>
+                            <span>Active now</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="conversation-card" onclick="joinConversation('wellness')">
+                    <div class="conversation-header">
+                        <div class="conversation-icon">
+                            <i class="fas fa-leaf"></i>
+                        </div>
+                        <h3 class="conversation-title">Wellness & Mindfulness</h3>
+                    </div>
+                    <p class="conversation-description">Gentle discussions on mental wellness, mindfulness practices, and personal growth.</p>
+                    <div class="conversation-stats">
+                        <div class="conversation-stat">
+                            <i class="fas fa-users"></i>
+                            <span>9 participants</span>
+                        </div>
+                        <div class="conversation-stat">
+                            <i class="fas fa-clock"></i>
+                            <span>Active now</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="conversation-card" onclick="createTopic()">
+                    <div class="conversation-header">
+                        <div class="conversation-icon">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <h3 class="conversation-title">Start New Topic</h3>
+                    </div>
+                    <p class="conversation-description">Create your own refined discussion topic and invite others to join the conversation.</p>
+                    <div class="conversation-stats">
+                        <div class="conversation-stat">
+                            <i class="fas fa-sparkles"></i>
+                            <span>Be the host</span>
+                        </div>
+                        <div class="conversation-stat">
+                            <i class="fas fa-crown"></i>
+                            <span>Your topic</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>The Lounge</h3>
+                    <p>Your refined space for civilized conversation and intellectual discourse.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Topics</h3>
+                    <ul>
+                        <li><a href="#">Literature & Books</a></li>
+                        <li><a href="#">Philosophy & Ideas</a></li>
+                        <li><a href="#">Arts & Culture</a></li>
+                        <li><a href="#">Travel & Experiences</a></li>
+                        <li><a href="#">Wellness & Mindfulness</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Connect</h3>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-discord"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Chiffly Lounge. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+        function joinConversation(topic = 'general') {
+            console.log(`Joining ${topic} conversation...`);
+            // This will be implemented with Socket.IO for real conversations
+            alert(`Welcome to the ${topic} conversation! This feature will be fully implemented with real-time chat.`);
+        }
+
+        function createTopic() {
+            const topic = prompt('What refined topic would you like to discuss?');
+            if (topic && topic.trim()) {
+                console.log(`Creating new topic: ${topic}`);
+                alert(`Your topic "${topic}" has been created! Others can now join your civilized discussion.`);
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('The Lounge is ready for civilized conversation!');
+        });
+    </script>
+</body>
+</html> 
