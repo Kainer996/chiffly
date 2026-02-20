@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Challenges - Chifftown</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a1628 0%, #1a2744 100%);
+            color: #e0e6ed;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #e0e6ed;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-50%) translateX(-3px);
+        }
+
+        .header h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #4fc3f7, #29b6f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-subtitle {
+            font-size: 18px;
+            color: #90a4ae;
+            margin-bottom: 15px;
+        }
+
+        .header-stats {
+            display: inline-block;
+            background: rgba(79, 195, 247, 0.15);
+            border: 1px solid rgba(79, 195, 247, 0.3);
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #4fc3f7;
+        }
+
+        /* Reset Timer */
+        .reset-timer {
+            text-align: center;
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 30px;
+            color: #ffc107;
+            font-size: 14px;
+        }
+
+        .reset-timer strong {
+            font-size: 18px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* Challenges Grid */
+        .challenges-grid {
+            display: grid;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .challenge-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .challenge-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #4fc3f7, #29b6f6);
+            opacity: 0.5;
+        }
+
+        .challenge-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(79, 195, 247, 0.4);
+            box-shadow: 0 8px 24px rgba(79, 195, 247, 0.2);
+        }
+
+        .challenge-card.completed {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: rgba(76, 175, 80, 0.4);
+        }
+
+        .challenge-card.completed::before {
+            background: linear-gradient(90deg, #4caf50, #66bb6a);
+            opacity: 1;
+        }
+
+        .challenge-card.completed .challenge-icon {
+            animation: bounce 0.6s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .challenge-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .challenge-icon {
+            font-size: 48px;
+            line-height: 1;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        .challenge-info {
+            flex: 1;
+        }
+
+        .challenge-name {
+            font-size: 22px;
+            font-weight: bold;
+            color: #e0e6ed;
+            margin-bottom: 6px;
+        }
+
+        .challenge-description {
+            font-size: 15px;
+            color: #90a4ae;
+            line-height: 1.4;
+        }
+
+        /* Progress Bar */
+        .challenge-progress-bar {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            height: 12px;
+            overflow: hidden;
+            margin: 16px 0 12px 0;
+            position: relative;
+        }
+
+        .challenge-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4fc3f7, #29b6f6);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .challenge-card.completed .challenge-progress-fill {
+            background: linear-gradient(90deg, #4caf50, #66bb6a);
+        }
+
+        .challenge-progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, 
+                transparent 0%,
+                rgba(255,255,255,0.2) 50%,
+                transparent 100%
+            );
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .challenge-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .challenge-counter {
+            color: #90a4ae;
+            font-weight: bold;
+        }
+
+        .challenge-card.completed .challenge-counter {
+            color: #4caf50;
+        }
+
+        .challenge-reward {
+            background: rgba(79, 195, 247, 0.2);
+            border: 1px solid rgba(79, 195, 247, 0.4);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            color: #4fc3f7;
+        }
+
+        .challenge-card.completed .challenge-reward {
+            background: rgba(76, 175, 80, 0.2);
+            border-color: rgba(76, 175, 80, 0.4);
+            color: #4caf50;
+        }
+
+        /* Bonus Section */
+        .bonus-section {
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.15), rgba(255, 152, 0, 0.15));
+            border: 2px solid rgba(255, 193, 7, 0.4);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .bonus-section h2 {
+            font-size: 24px;
+            margin-bottom: 12px;
+            color: #ffc107;
+        }
+
+        .bonus-section p {
+            font-size: 16px;
+            color: #e0e6ed;
+            margin-bottom: 8px;
+        }
+
+        .bonus-section .bonus-xp {
+            font-size: 32px;
+            font-weight: bold;
+            color: #ffc107;
+            margin-top: 8px;
+        }
+
+        /* Tips Section */
+        .tips-section {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .tips-section h3 {
+            font-size: 18px;
+            margin-bottom: 12px;
+            color: #4fc3f7;
+        }
+
+        .tips-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .tips-section li {
+            padding: 8px 0;
+            padding-left: 24px;
+            position: relative;
+            color: #90a4ae;
+            line-height: 1.5;
+        }
+
+        .tips-section li::before {
+            content: '💡';
+            position: absolute;
+            left: 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 32px;
+            }
+
+            .back-button {
+                position: static;
+                transform: none;
+                margin-bottom: 20px;
+                display: inline-flex;
+            }
+
+            .back-button:hover {
+                transform: translateX(-3px);
+            }
+
+            .challenge-card {
+                padding: 20px;
+            }
+
+            .challenge-icon {
+                font-size: 40px;
+            }
+
+            .challenge-name {
+                font-size: 18px;
+            }
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #90a4ae;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(79, 195, 247, 0.2);
+            border-top-color: #4fc3f7;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="index.html" class="back-button">
+                ← Back to Town
+            </a>
+            <h1>🎯 Daily Challenges</h1>
+            <div class="header-subtitle">Complete challenges to earn bonus XP!</div>
+            <div class="header-stats" id="challenges-header-stats">
+                Loading...
+            </div>
+        </div>
+
+        <div class="reset-timer" id="reset-timer">
+            <strong>⏰ Challenges Reset In:</strong>
+            <div id="reset-countdown">Calculating...</div>
+        </div>
+
+        <div class="bonus-section">
+            <h2>🎁 Daily Completion Bonus</h2>
+            <p>Complete all challenges today to earn a massive bonus!</p>
+            <div class="bonus-xp">+250 XP</div>
+        </div>
+
+        <div class="challenges-grid" id="daily-challenges-list">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <div>Loading challenges...</div>
+            </div>
+        </div>
+
+        <div class="tips-section">
+            <h3>💡 Tips</h3>
+            <ul>
+                <li>Challenges reset daily at midnight (your local time)</li>
+                <li>Each completed challenge awards bonus XP on top of the base reward</li>
+                <li>Complete all 3 challenges for a mega 250 XP bonus!</li>
+                <li>New challenges are randomly selected each day</li>
+                <li>Progress is saved automatically</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/xp-engine.js"></script>
+    <script src="js/daily-challenges.js"></script>
+    <script>
+        // Update reset countdown
+        function updateResetCountdown() {
+            const now = new Date();
+            const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+            const timeUntilReset = tomorrow - now;
+
+            const hours = Math.floor(timeUntilReset / (1000 * 60 * 60));
+            const minutes = Math.floor((timeUntilReset % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeUntilReset % (1000 * 60)) / 1000);
+
+            const countdown = document.getElementById('reset-countdown');
+            if (countdown) {
+                countdown.textContent = `${hours}h ${minutes}m ${seconds}s`;
+            }
+        }
+
+        // Update every second
+        setInterval(updateResetCountdown, 1000);
+        updateResetCountdown();
+
+        // Update UI after a brief delay to ensure DailyChallenges is initialized
+        setTimeout(() => {
+            if (window.DailyChallenges) {
+                window.DailyChallenges.init();
+            }
+        }, 100);
+    </script>
+</body>
+</html>

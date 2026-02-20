@@ -6,6 +6,7 @@
     <title>Your Apartment — ChiffTown</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="/socket.io/socket.io.js"></script>
     <style>
         *, *::before, *::after {
             margin: 0;
@@ -14,15 +15,20 @@
         }
 
         :root {
-            --bg-deep: #0a0a1a;
-            --bg-mid: #12122a;
-            --bg-surface: #1a1a3e;
+            --bg-deep: #0d1b2a;
+            --bg-mid: #1a2332;
+            --bg-surface: #243447;
             --text-primary: #f0eef6;
             --text-secondary: rgba(240, 238, 246, 0.65);
-            --accent-gold: #f4c542;
-            --accent-teal: #40E0D0;
+            --accent-gold: #c9a84c;
+            --accent-warm: #d4a574;
             --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(201, 168, 76, 0.15);
+            
+            /* Theme Colors */
+            --theme-floor: #8b6f47;
+            --theme-wall: #a0826d;
+            --theme-accent: #c9a84c;
         }
 
         body {
@@ -31,34 +37,36 @@
             color: var(--text-primary);
             overflow: hidden;
             height: 100vh;
-        }
-
-        /* Room View Container */
-        .apartment-container {
-            width: 100%;
-            height: 100vh;
             position: relative;
-            overflow: hidden;
         }
 
-        .room-view {
-            width: 100%;
-            height: 100%;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            position: relative;
-            transition: opacity 0.5s ease;
+        /* Starry Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(2px 2px at 20% 30%, white, transparent),
+                radial-gradient(2px 2px at 60% 70%, white, transparent),
+                radial-gradient(1px 1px at 50% 50%, white, transparent),
+                radial-gradient(1px 1px at 80% 10%, white, transparent),
+                radial-gradient(2px 2px at 90% 60%, white, transparent),
+                radial-gradient(1px 1px at 33% 80%, white, transparent),
+                radial-gradient(1px 1px at 15% 90%, white, transparent);
+            background-size: 200% 200%;
+            background-position: 0% 0%;
+            opacity: 0.3;
+            animation: twinkle 8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
         }
 
-        .room-view.livingroom {
-            background: url('/images/apartment-livingroom.png') center/cover no-repeat;
-        }
-        .room-view.bedroom {
-            background: url('/images/apartment-bedroom.png') center/cover no-repeat;
-        }
-        .room-view.kitchen {
-            background: url('/images/apartment-kitchen.png') center/cover no-repeat;
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.4; }
         }
 
         /* Top Navigation Bar */
@@ -68,7 +76,7 @@
             left: 0;
             right: 0;
             height: 70px;
-            background: rgba(10, 10, 26, 0.95);
+            background: rgba(13, 27, 42, 0.95);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--glass-border);
             display: flex;
@@ -85,13 +93,25 @@
             color: var(--accent-gold);
             letter-spacing: 1px;
         }
+        
+        .view-mode-badge {
+            display: inline-block;
+            background: rgba(201, 168, 76, 0.15);
+            border: 1px solid rgba(201, 168, 76, 0.3);
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: var(--accent-gold);
+            margin-left: 1rem;
+        }
 
         .nav-buttons {
             display: flex;
             gap: 1rem;
+            align-items: center;
         }
 
-        .nav-btn {
+        .nav-btn, .theme-btn, .share-btn {
             padding: 0.6rem 1.2rem;
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
@@ -101,542 +121,1399 @@
             font-size: 0.9rem;
             transition: all 0.3s ease;
             cursor: pointer;
+            font-family: 'Inter', sans-serif;
         }
 
-        .nav-btn:hover {
+        .nav-btn:hover, .theme-btn:hover, .share-btn:hover {
             background: rgba(255, 255, 255, 0.1);
-            border-color: var(--accent-teal);
-            color: var(--accent-teal);
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
         }
 
-        /* Room Tabs */
-        .room-tabs {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 1rem;
-            background: rgba(10, 10, 26, 0.9);
-            backdrop-filter: blur(20px);
-            padding: 1rem 1.5rem;
-            border-radius: 20px;
-            border: 1px solid var(--glass-border);
-            z-index: 50;
-        }
-
-        .room-tab {
-            padding: 0.8rem 1.5rem;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.95rem;
-            font-weight: 500;
-        }
-
-        .room-tab.active {
-            background: linear-gradient(135deg, var(--accent-gold), var(--accent-teal));
+        .share-btn {
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-warm));
             color: var(--bg-deep);
-            border-color: transparent;
             font-weight: 600;
+            border: none;
         }
 
-        .room-tab:hover:not(.active) {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-primary);
-        }
-
-        /* Furniture Placement Hotspots */
-        .furniture-spot {
-            position: absolute;
-            width: 120px;
-            height: 120px;
-            background: rgba(244, 197, 66, 0.15);
-            border: 2px dashed rgba(244, 197, 66, 0.4);
-            border-radius: 12px;
-            cursor: pointer;
+        /* Isometric Room Container */
+        .apartment-container {
+            width: 100%;
+            height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-direction: column;
-            gap: 0.5rem;
-            transition: all 0.3s ease;
-            opacity: 0.7;
+            position: relative;
+            padding-top: 70px;
+            z-index: 1;
         }
 
-        .furniture-spot:hover {
+        .isometric-room {
+            position: relative;
+            width: 600px;
+            height: 500px;
+            transform-style: preserve-3d;
+            transform: rotateX(60deg) rotateZ(45deg) scale(1);
+        }
+
+        /* Floor */
+        .floor {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: var(--theme-floor);
+            transform: translateZ(-1px);
+            border: 3px solid rgba(0, 0, 0, 0.3);
+            background-image: 
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 49px,
+                    rgba(0, 0, 0, 0.1) 49px,
+                    rgba(0, 0, 0, 0.1) 50px
+                ),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 49px,
+                    rgba(0, 0, 0, 0.1) 49px,
+                    rgba(0, 0, 0, 0.1) 50px
+                );
+            box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Back Wall */
+        .wall-back {
+            position: absolute;
+            width: 500px;
+            height: 300px;
+            background: var(--theme-wall);
+            transform-origin: bottom;
+            transform: rotateX(90deg) translateZ(-1px);
+            border: 3px solid rgba(0, 0, 0, 0.3);
+            border-bottom: none;
+            background-image: linear-gradient(
+                to bottom,
+                rgba(255, 255, 255, 0.1),
+                transparent
+            );
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Left Wall */
+        .wall-left {
+            position: absolute;
+            width: 500px;
+            height: 300px;
+            background: var(--theme-wall);
+            transform-origin: right;
+            transform: rotateY(90deg) translateZ(1px);
+            border: 3px solid rgba(0, 0, 0, 0.3);
+            border-right: none;
+            background-image: linear-gradient(
+                to bottom,
+                rgba(255, 255, 255, 0.05),
+                transparent
+            );
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Grid overlay on floor for placement */
+        .grid-overlay {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            transform: translateZ(0px);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .grid-overlay.visible {
             opacity: 1;
-            background: rgba(244, 197, 66, 0.25);
-            border-color: rgba(244, 197, 66, 0.8);
-            transform: scale(1.05);
         }
 
-        .furniture-spot.filled {
-            background: rgba(64, 224, 208, 0.2);
-            border-color: rgba(64, 224, 208, 0.6);
-            border-style: solid;
+        /* Furniture Container */
+        .furniture-container {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            transform: translateZ(1px);
         }
 
-        .spot-label {
-            font-size: 0.8rem;
-            color: var(--text-primary);
-            font-weight: 500;
-            text-align: center;
+        /* Base furniture item styles */
+        .furniture-item {
+            position: absolute;
+            cursor: grab;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transform-style: preserve-3d;
         }
 
-        .spot-emoji {
-            font-size: 2.5rem;
+        .furniture-item:hover {
+            transform: translateZ(5px) scale(1.05);
+            filter: brightness(1.1);
         }
 
-        .empty-indicator {
+        .furniture-item.dragging {
+            cursor: grabbing;
+            opacity: 0.7;
+            z-index: 1000;
+        }
+
+        .furniture-item.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(1);
+        }
+
+        .furniture-item.locked::after {
+            content: '🔒';
+            position: absolute;
+            top: -10px;
+            right: -10px;
             font-size: 1.5rem;
-            color: var(--accent-gold);
         }
 
-        /* Inventory Sidebar */
-        .inventory-sidebar {
-            position: fixed;
-            right: -350px;
-            top: 70px;
+        /* Sofa - Blue chunky couch */
+        .sofa {
+            width: 120px;
+            height: 80px;
+        }
+
+        .sofa-base {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            border-radius: 20px;
+            position: relative;
+            box-shadow: 
+                0 8px 0 #2a5a8d,
+                0 15px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .sofa-back {
+            position: absolute;
+            top: -20px;
+            left: 10px;
+            right: 10px;
+            height: 30px;
+            background: linear-gradient(135deg, #5a9ff2, #4a90e2);
+            border-radius: 15px 15px 5px 5px;
+            box-shadow: inset 0 -5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .sofa-arm {
+            position: absolute;
+            width: 20px;
+            height: 40px;
+            background: linear-gradient(135deg, #5a9ff2, #4a90e2);
+            border-radius: 10px;
+            top: 10px;
+        }
+
+        .sofa-arm.left { left: -5px; }
+        .sofa-arm.right { right: -5px; }
+
+        /* Bed - Cozy with pillows */
+        .bed {
+            width: 140px;
+            height: 100px;
+        }
+
+        .bed-frame {
+            width: 100%;
+            height: 70%;
+            background: linear-gradient(135deg, #8b4513, #654321);
+            border-radius: 15px;
+            position: absolute;
             bottom: 0;
-            width: 350px;
-            background: rgba(10, 10, 26, 0.95);
-            backdrop-filter: blur(20px);
-            border-left: 1px solid var(--glass-border);
-            padding: 2rem;
-            overflow-y: auto;
-            transition: right 0.4s ease;
-            z-index: 90;
+            box-shadow: 
+                0 8px 0 #4a2511,
+                0 15px 20px rgba(0, 0, 0, 0.4);
         }
 
-        .inventory-sidebar.open {
-            right: 0;
+        .bed-mattress {
+            position: absolute;
+            top: 10px;
+            left: 5px;
+            right: 5px;
+            height: 50px;
+            background: linear-gradient(135deg, #f0e6d2, #e6dcc8);
+            border-radius: 10px;
+            box-shadow: inset 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .inventory-toggle {
+        .bed-pillow {
+            position: absolute;
+            width: 30px;
+            height: 20px;
+            background: linear-gradient(135deg, #fff, #f5f5f5);
+            border-radius: 10px;
+            top: 5px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .bed-pillow:nth-child(1) { left: 10px; }
+        .bed-pillow:nth-child(2) { left: 45px; }
+        .bed-pillow:nth-child(3) { left: 80px; }
+
+        /* Table - Wooden with grain effect */
+        .table {
+            width: 100px;
+            height: 100px;
+        }
+
+        .table-top {
+            width: 100%;
+            height: 15px;
+            background: linear-gradient(135deg, #a0826d, #8b6f47);
+            border-radius: 50%;
+            box-shadow: 
+                0 5px 0 #6d5638,
+                0 10px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+            background-image: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 10px,
+                rgba(0, 0, 0, 0.1) 10px,
+                rgba(0, 0, 0, 0.1) 11px
+            );
+        }
+
+        .table-leg {
+            position: absolute;
+            width: 8px;
+            height: 60px;
+            background: linear-gradient(135deg, #8b6f47, #6d5638);
+            border-radius: 4px;
+            top: 15px;
+        }
+
+        .table-leg:nth-child(2) { left: 15px; }
+        .table-leg:nth-child(3) { right: 15px; }
+        .table-leg:nth-child(4) { left: 15px; transform: translateY(0); }
+        .table-leg:nth-child(5) { right: 15px; transform: translateY(0); }
+
+        /* Lamp - With animated glow */
+        .lamp {
+            width: 50px;
+            height: 90px;
+        }
+
+        .lamp-shade {
+            width: 40px;
+            height: 30px;
+            background: linear-gradient(135deg, #f4c542, #e6b732);
+            border-radius: 50% 50% 0 0;
+            position: absolute;
+            top: 0;
+            left: 5px;
+            box-shadow: 
+                0 5px 0 #d4a722,
+                0 0 30px rgba(244, 197, 66, 0.6);
+            animation: lampGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes lampGlow {
+            0%, 100% { box-shadow: 0 5px 0 #d4a722, 0 0 30px rgba(244, 197, 66, 0.6); }
+            50% { box-shadow: 0 5px 0 #d4a722, 0 0 50px rgba(244, 197, 66, 0.9); }
+        }
+
+        .lamp-base {
+            width: 12px;
+            height: 50px;
+            background: linear-gradient(135deg, #8b6f47, #6d5638);
+            position: absolute;
+            top: 30px;
+            left: 19px;
+            border-radius: 6px;
+        }
+
+        .lamp-stand {
+            width: 30px;
+            height: 8px;
+            background: linear-gradient(135deg, #8b6f47, #6d5638);
+            border-radius: 50%;
+            position: absolute;
+            bottom: 0;
+            left: 10px;
+        }
+
+        /* Bookshelf - Colorful books */
+        .bookshelf {
+            width: 90px;
+            height: 110px;
+        }
+
+        .shelf-frame {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #8b6f47, #6d5638);
+            border-radius: 8px;
+            position: relative;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .shelf-row {
+            position: absolute;
+            width: 85%;
+            height: 3px;
+            background: #6d5638;
+            left: 7.5%;
+        }
+
+        .shelf-row:nth-child(1) { top: 25%; }
+        .shelf-row:nth-child(2) { top: 50%; }
+        .shelf-row:nth-child(3) { top: 75%; }
+
+        .book {
+            position: absolute;
+            width: 8px;
+            height: 20px;
+            border-radius: 2px;
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .book:nth-child(4) { background: #e74c3c; top: 5%; left: 10%; }
+        .book:nth-child(5) { background: #3498db; top: 5%; left: 25%; }
+        .book:nth-child(6) { background: #2ecc71; top: 5%; left: 40%; }
+        .book:nth-child(7) { background: #f39c12; top: 5%; left: 55%; }
+        .book:nth-child(8) { background: #9b59b6; top: 5%; left: 70%; }
+
+        .book:nth-child(9) { background: #1abc9c; top: 30%; left: 15%; }
+        .book:nth-child(10) { background: #e67e22; top: 30%; left: 30%; }
+        .book:nth-child(11) { background: #34495e; top: 30%; left: 50%; }
+        .book:nth-child(12) { background: #c0392b; top: 30%; left: 65%; }
+
+        .book:nth-child(13) { background: #16a085; top: 55%; left: 20%; }
+        .book:nth-child(14) { background: #2980b9; top: 55%; left: 35%; }
+        .book:nth-child(15) { background: #8e44ad; top: 55%; left: 60%; }
+
+        /* Plant - Green with pot */
+        .plant {
+            width: 60px;
+            height: 80px;
+        }
+
+        .plant-pot {
+            width: 50px;
+            height: 30px;
+            background: linear-gradient(135deg, #c0392b, #a03020);
+            border-radius: 0 0 25px 25px;
+            position: absolute;
+            bottom: 0;
+            left: 5px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .plant-leaf {
+            position: absolute;
+            width: 20px;
+            height: 30px;
+            background: linear-gradient(135deg, #27ae60, #229954);
+            border-radius: 50% 0;
+            transform-origin: bottom;
+        }
+
+        .plant-leaf:nth-child(1) { bottom: 25px; left: 15px; transform: rotate(-20deg); }
+        .plant-leaf:nth-child(2) { bottom: 30px; left: 25px; transform: rotate(10deg); }
+        .plant-leaf:nth-child(3) { bottom: 35px; left: 20px; transform: rotate(-5deg); }
+
+        /* TV - Screen with glow */
+        .tv {
+            width: 100px;
+            height: 80px;
+        }
+
+        .tv-stand {
+            width: 80px;
+            height: 8px;
+            background: linear-gradient(135deg, #34495e, #2c3e50);
+            border-radius: 4px;
+            position: absolute;
+            bottom: 0;
+            left: 10px;
+        }
+
+        .tv-screen {
+            width: 90px;
+            height: 60px;
+            background: linear-gradient(135deg, #2c3e50, #1a252f);
+            border-radius: 8px;
+            position: absolute;
+            top: 0;
+            left: 5px;
+            border: 4px solid #34495e;
+            box-shadow: 
+                inset 0 0 20px rgba(52, 152, 219, 0.3),
+                0 0 30px rgba(52, 152, 219, 0.2);
+            animation: tvFlicker 4s ease-in-out infinite;
+        }
+
+        @keyframes tvFlicker {
+            0%, 100% { box-shadow: inset 0 0 20px rgba(52, 152, 219, 0.3), 0 0 30px rgba(52, 152, 219, 0.2); }
+            50% { box-shadow: inset 0 0 30px rgba(52, 152, 219, 0.5), 0 0 40px rgba(52, 152, 219, 0.3); }
+        }
+
+        /* Rug - Patterned floor decoration */
+        .rug {
+            width: 150px;
+            height: 100px;
+            z-index: 0 !important;
+        }
+
+        .rug-base {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #c0392b, #a03020);
+            border-radius: 15px;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .rug-pattern {
+            position: absolute;
+            inset: 10px;
+            border: 3px solid #f39c12;
+            border-radius: 10px;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(243, 156, 18, 0.3) 10px, rgba(243, 156, 18, 0.3) 20px),
+                repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(243, 156, 18, 0.3) 10px, rgba(243, 156, 18, 0.3) 20px);
+        }
+
+        /* Jukebox - Level 3, neon glow */
+        .jukebox {
+            width: 80px;
+            height: 120px;
+        }
+
+        .jukebox-body {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            border-radius: 15px 15px 8px 8px;
+            position: relative;
+            box-shadow: 
+                0 8px 0 #922b21,
+                0 0 40px rgba(231, 76, 60, 0.6);
+            animation: jukeboxGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes jukeboxGlow {
+            0%, 100% { box-shadow: 0 8px 0 #922b21, 0 0 40px rgba(231, 76, 60, 0.6); }
+            50% { box-shadow: 0 8px 0 #922b21, 0 0 60px rgba(231, 76, 60, 0.9), 0 0 80px rgba(241, 196, 15, 0.4); }
+        }
+
+        .jukebox-dome {
+            width: 60px;
+            height: 30px;
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            border-radius: 50% 50% 0 0;
+            position: absolute;
+            top: -15px;
+            left: 10px;
+            box-shadow: inset 0 -5px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .jukebox-lights {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: colorCycle 1.5s ease-in-out infinite;
+        }
+
+        @keyframes colorCycle {
+            0%, 100% { background: #e74c3c; box-shadow: 0 0 10px #e74c3c; }
+            33% { background: #f39c12; box-shadow: 0 0 10px #f39c12; }
+            66% { background: #3498db; box-shadow: 0 0 10px #3498db; }
+        }
+
+        .jukebox-lights:nth-child(3) { top: 40px; left: 15px; animation-delay: 0s; }
+        .jukebox-lights:nth-child(4) { top: 40px; right: 15px; animation-delay: 0.5s; }
+        .jukebox-lights:nth-child(5) { top: 60px; left: 15px; animation-delay: 1s; }
+        .jukebox-lights:nth-child(6) { top: 60px; right: 15px; animation-delay: 1.5s; }
+
+        /* Disco Ball - Level 5, rotating with light spots */
+        .disco-ball {
+            width: 60px;
+            height: 60px;
+        }
+
+        .disco-sphere {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #bdc3c7, #95a5a6);
+            border-radius: 50%;
+            position: absolute;
+            top: 10px;
+            left: 5px;
+            box-shadow: 
+                inset -5px -5px 10px rgba(0, 0, 0, 0.3),
+                inset 5px 5px 10px rgba(255, 255, 255, 0.5),
+                0 0 40px rgba(255, 255, 255, 0.6);
+            animation: discoRotate 4s linear infinite;
+            background-image: 
+                repeating-linear-gradient(0deg, transparent, transparent 5px, rgba(255, 255, 255, 0.3) 5px, rgba(255, 255, 255, 0.3) 10px),
+                repeating-linear-gradient(90deg, transparent, transparent 5px, rgba(255, 255, 255, 0.3) 5px, rgba(255, 255, 255, 0.3) 10px);
+        }
+
+        @keyframes discoRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .disco-chain {
+            width: 2px;
+            height: 15px;
+            background: #7f8c8d;
+            position: absolute;
+            top: 0;
+            left: 29px;
+        }
+
+        .disco-light-spot {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            animation: lightSpot 3s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes lightSpot {
+            0%, 100% { 
+                background: radial-gradient(circle, rgba(231, 76, 60, 0.4), transparent);
+                transform: scale(1);
+            }
+            50% { 
+                background: radial-gradient(circle, rgba(52, 152, 219, 0.4), transparent);
+                transform: scale(1.2);
+            }
+        }
+
+        .disco-light-spot:nth-child(3) { top: -20px; left: -30px; animation-delay: 0s; }
+        .disco-light-spot:nth-child(4) { top: -20px; right: -30px; animation-delay: 1s; }
+        .disco-light-spot:nth-child(5) { bottom: -20px; left: -30px; animation-delay: 2s; }
+
+        /* Fish Tank - Animated swimming fish */
+        .fish-tank {
+            width: 100px;
+            height: 90px;
+        }
+
+        .tank-glass {
+            width: 100%;
+            height: 80px;
+            background: linear-gradient(135deg, rgba(52, 152, 219, 0.3), rgba(41, 128, 185, 0.4));
+            border-radius: 15px;
+            position: relative;
+            border: 4px solid #34495e;
+            box-shadow: 
+                inset 0 0 30px rgba(52, 152, 219, 0.3),
+                0 8px 15px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .tank-water {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(52, 152, 219, 0.2), rgba(41, 128, 185, 0.4));
+            animation: waterFlow 3s ease-in-out infinite;
+        }
+
+        @keyframes waterFlow {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 0.8; }
+        }
+
+        .fish {
+            position: absolute;
+            font-size: 1.5rem;
+            animation: swim 5s ease-in-out infinite;
+        }
+
+        @keyframes swim {
+            0%, 100% { transform: translateX(0) scaleX(1); }
+            50% { transform: translateX(60px) scaleX(-1); }
+        }
+
+        .fish:nth-child(2) { top: 20%; left: 10%; animation-duration: 4s; animation-delay: 0s; }
+        .fish:nth-child(3) { top: 50%; left: 20%; animation-duration: 6s; animation-delay: 1s; }
+        .fish:nth-child(4) { top: 70%; left: 5%; animation-duration: 5s; animation-delay: 2s; }
+
+        .tank-gravel {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 15px;
+            background: linear-gradient(135deg, #7f8c8d, #95a5a6);
+            border-radius: 0 0 11px 11px;
+        }
+
+        .tank-stand {
+            width: 90px;
+            height: 12px;
+            background: linear-gradient(135deg, #34495e, #2c3e50);
+            border-radius: 6px;
+            position: absolute;
+            bottom: 0;
+            left: 5px;
+        }
+
+        /* Fireplace - Flickering flame */
+        .fireplace {
+            width: 110px;
+            height: 100px;
+        }
+
+        .fireplace-frame {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #8b6f47, #6d5638);
+            border-radius: 15px 15px 0 0;
+            position: relative;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .fireplace-opening {
+            position: absolute;
+            width: 70%;
+            height: 50%;
+            background: #1a1a1a;
+            top: 25%;
+            left: 15%;
+            border-radius: 10px 10px 0 0;
+            box-shadow: inset 0 0 30px rgba(230, 126, 34, 0.5);
+        }
+
+        .flame {
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 30px;
+            background: linear-gradient(to top, #e67e22, #f39c12, #f1c40f);
+            border-radius: 50% 50% 0 0;
+            animation: flicker 1.5s ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(230, 126, 34, 0.8);
+        }
+
+        @keyframes flicker {
+            0%, 100% { 
+                transform: translateX(-50%) scaleY(1);
+                opacity: 1;
+            }
+            50% { 
+                transform: translateX(-50%) scaleY(1.2) scaleX(0.9);
+                opacity: 0.8;
+            }
+        }
+
+        .flame:nth-child(2) { animation-delay: 0.3s; left: 40%; width: 15px; height: 25px; }
+        .flame:nth-child(3) { animation-delay: 0.6s; left: 60%; width: 15px; height: 25px; }
+
+        .fireplace-mantle {
+            position: absolute;
+            width: 105%;
+            height: 12px;
+            background: linear-gradient(135deg, #a0826d, #8b6f47);
+            top: 20%;
+            left: -2.5%;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Theme Selector Panel */
+        .theme-panel {
             position: fixed;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: linear-gradient(135deg, var(--accent-gold), var(--accent-teal));
-            color: var(--bg-deep);
-            border: none;
-            padding: 1rem;
-            border-radius: 12px;
-            cursor: pointer;
-            z-index: 95;
-            font-size: 1.2rem;
-            box-shadow: 0 4px 20px rgba(244, 197, 66, 0.3);
-            transition: all 0.3s ease;
+            top: 100px;
+            left: 20px;
+            background: rgba(13, 27, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 1.5rem;
+            z-index: 90;
+            min-width: 200px;
         }
 
-        .inventory-toggle:hover {
-            transform: translateY(-50%) scale(1.1);
-        }
-
-        .inventory-title {
+        .theme-panel h3 {
             font-family: 'Playfair Display', serif;
-            font-size: 1.3rem;
-            margin-bottom: 1.5rem;
             color: var(--accent-gold);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
         }
 
-        .inventory-items {
-            display: flex;
-            flex-direction: column;
+        .theme-option {
+            padding: 0.8rem 1rem;
+            background: var(--glass-bg);
+            border: 2px solid var(--glass-border);
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .theme-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-gold);
+        }
+
+        .theme-option.active {
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-warm));
+            color: var(--bg-deep);
+            border-color: transparent;
+        }
+
+        /* Inventory Panel */
+        .inventory-panel {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: rgba(13, 27, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 1.5rem;
+            z-index: 90;
+            width: 280px;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+
+        .inventory-panel.hidden {
+            display: none;
+        }
+
+        .inventory-panel h3 {
+            font-family: 'Playfair Display', serif;
+            color: var(--accent-gold);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 0.8rem;
         }
 
-        .inventory-item {
-            padding: 1rem;
+        .inventory-card {
             background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
+            border: 2px solid var(--glass-border);
             border-radius: 10px;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
+            padding: 0.8rem;
+            text-align: center;
+            cursor: grab;
             transition: all 0.3s ease;
+            position: relative;
         }
 
-        .inventory-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: var(--accent-teal);
+        .inventory-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            border-color: var(--accent-gold);
         }
 
-        .item-emoji {
-            font-size: 2rem;
+        .inventory-card.in-use {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
-        .item-info {
-            flex: 1;
+        .inventory-card.in-use::after {
+            content: '✓';
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            color: var(--accent-gold);
+            font-size: 1rem;
         }
 
-        .item-name {
+        .inventory-emoji {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .inventory-name {
+            font-size: 0.85rem;
             font-weight: 600;
             margin-bottom: 0.2rem;
         }
 
-        .item-desc {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
+        .inventory-level {
+            font-size: 0.7rem;
+            color: var(--accent-gold);
         }
 
-        /* Furniture Placement Modal */
-        .modal {
+        /* Remove button on placed items */
+        .remove-btn {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 25px;
+            height: 25px;
+            background: rgba(231, 76, 60, 0.9);
+            border: 2px solid #fff;
+            border-radius: 50%;
+            color: white;
+            font-size: 0.9rem;
+            cursor: pointer;
             display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            z-index: 200;
             align-items: center;
             justify-content: center;
+            z-index: 10;
+            transition: all 0.2s ease;
         }
 
-        .modal.active {
+        .furniture-item:hover .remove-btn {
             display: flex;
-        }
-
-        .modal-content {
-            background: var(--bg-mid);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 2rem;
-            max-width: 500px;
-            width: 90%;
-            max-height: 70vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .modal-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.5rem;
-            color: var(--accent-gold);
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            color: var(--text-primary);
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-        .modal-close:hover {
-            color: var(--accent-gold);
-        }
-
-        .modal-items {
-            display: flex;
-            flex-direction: column;
-            gap: 0.8rem;
-        }
-
-        .modal-item {
-            padding: 1rem;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .modal-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--accent-teal);
-            transform: translateX(5px);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 2rem;
-            color: var(--text-secondary);
-        }
-
-        .remove-btn {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.4);
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: all 0.3s ease;
         }
 
         .remove-btn:hover {
-            background: rgba(239, 68, 68, 0.3);
-            border-color: #ef4444;
+            background: #c0392b;
+            transform: scale(1.1);
+        }
+
+        /* Instructions */
+        .instructions {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(13, 27, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 1rem 2rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            z-index: 80;
+        }
+
+        .instructions.hidden {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .isometric-room {
+                transform: rotateX(60deg) rotateZ(45deg) scale(0.7);
+                margin-top: -50px;
+            }
+
+            .theme-panel, .inventory-panel {
+                width: 200px;
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .inventory-panel {
+                position: fixed;
+                top: auto;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                width: 100%;
+                max-height: 45vh;
+                border-radius: 20px 20px 0 0;
+                padding: 0.8rem 1rem;
+                z-index: 100;
+            }
+
+            .inventory-panel.hidden {
+                display: none;
+            }
+
+            .inventory-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 0.5rem;
+            }
+
+            .inventory-card {
+                padding: 0.4rem;
+            }
+
+            .inventory-emoji img {
+                width: 40px !important;
+            }
+
+            .inventory-name {
+                font-size: 0.65rem;
+            }
+
+            .inventory-level {
+                font-size: 0.55rem;
+            }
+
+            .isometric-room {
+                transform: rotateX(60deg) rotateZ(45deg) scale(0.55);
+                margin-top: -80px;
+            }
+
+            .room-container {
+                height: 50vh;
+            }
+
+            .top-bar {
+                flex-wrap: wrap;
+                padding: 0.5rem;
+            }
+
+            .nav-buttons {
+                gap: 0.3rem;
+            }
+
+            .nav-btn, .theme-btn, .share-btn {
+                font-size: 0.7rem;
+                padding: 0.3rem 0.5rem;
+            }
+
+            .apartment-title {
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
 <body>
     <!-- Top Navigation -->
     <div class="top-bar">
-        <div class="apartment-title">🏠 Your Apartment</div>
+        <div>
+            <span class="apartment-title" id="apartmentTitle">🏠 Your Apartment</span>
+        </div>
         <div class="nav-buttons">
+            <button class="theme-btn" id="themeToggle">
+                <i class="fas fa-palette"></i> Themes
+            </button>
+            <button class="share-btn" id="shareBtn" style="display: none;">
+                <i class="fas fa-share-alt"></i> Share
+            </button>
             <a href="profile.html" class="nav-btn">
                 <i class="fas fa-user"></i> Profile
             </a>
             <a href="index.html" class="nav-btn">
-                <i class="fas fa-map"></i> Town Map
+                <i class="fas fa-map"></i> Town
             </a>
         </div>
     </div>
 
-    <!-- Room View Container -->
+    <!-- Theme Selector Panel -->
+    <div class="theme-panel" id="themePanel" style="display: none;">
+        <h3>🎨 Room Themes</h3>
+        <div class="theme-option active" data-theme="cabin">
+            🪵 Cozy Cabin
+        </div>
+        <div class="theme-option" data-theme="loft">
+            🏙️ Modern Loft
+        </div>
+        <div class="theme-option" data-theme="ocean">
+            🌊 Ocean Breeze
+        </div>
+    </div>
+
+    <!-- Inventory Panel -->
+    <div class="inventory-panel" id="inventoryPanel">
+        <h3>📦 Furniture</h3>
+        <div class="inventory-grid" id="inventoryGrid">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+
+    <!-- Isometric Room -->
     <div class="apartment-container">
-        <div class="room-view livingroom" id="roomView">
-            <!-- Furniture spots will be positioned here -->
-        </div>
-    </div>
-
-    <!-- Room Navigation Tabs -->
-    <div class="room-tabs">
-        <div class="room-tab active" data-room="livingroom">
-            <i class="fas fa-couch"></i> Living Room
-        </div>
-        <div class="room-tab" data-room="bedroom">
-            <i class="fas fa-bed"></i> Bedroom
-        </div>
-        <div class="room-tab" data-room="kitchen">
-            <i class="fas fa-utensils"></i> Kitchen
-        </div>
-    </div>
-
-    <!-- Inventory Toggle Button -->
-    <button class="inventory-toggle" id="inventoryToggle">
-        <i class="fas fa-box-open"></i>
-    </button>
-
-    <!-- Inventory Sidebar -->
-    <div class="inventory-sidebar" id="inventorySidebar">
-        <div class="inventory-title">📦 Your Inventory</div>
-        <div class="inventory-items" id="inventoryItems">
-            <!-- Dynamic inventory items -->
-        </div>
-    </div>
-
-    <!-- Furniture Placement Modal -->
-    <div class="modal" id="placementModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title" id="modalTitle">Choose Furniture</div>
-                <button class="modal-close" onclick="closeModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-items" id="modalItems">
-                <!-- Dynamic available items -->
+        <div class="isometric-room" id="isometricRoom">
+            <div class="floor"></div>
+            <div class="wall-back"></div>
+            <div class="wall-left"></div>
+            <div class="furniture-container" id="furnitureContainer">
+                <!-- Furniture items placed here -->
             </div>
         </div>
     </div>
 
-    <script src="js/inventory.js"></script>
+    <!-- Instructions -->
+    <div class="instructions" id="instructions">
+        💡 Drag furniture from the right panel onto your room • Click themes to change the mood • Visit mode: Share your apartment!
+    </div>
+
     <script>
-        // Furniture spot definitions for each room
-        const ROOM_SPOTS = {
-            livingroom: [
-                { id: 'sofa-area', label: 'Sofa Area', x: '15%', y: '50%' },
-                { id: 'tv-wall', label: 'TV Wall', x: '70%', y: '45%' },
-                { id: 'corner-shelf', label: 'Corner Shelf', x: '80%', y: '20%' },
-                { id: 'lamp-spot', label: 'Lamp Spot', x: '25%', y: '25%' },
-                { id: 'center-table', label: 'Center Table', x: '40%', y: '55%' }
-            ],
-            bedroom: [
-                { id: 'bed-area', label: 'Bed Area', x: '60%', y: '50%' },
-                { id: 'bedside-left', label: 'Bedside Left', x: '35%', y: '50%' },
-                { id: 'bedside-right', label: 'Bedside Right', x: '80%', y: '50%' },
-                { id: 'dresser-spot', label: 'Dresser', x: '20%', y: '25%' },
-                { id: 'plant-corner', label: 'Plant Corner', x: '85%', y: '20%' }
-            ],
-            kitchen: [
-                { id: 'table-area', label: 'Dining Table', x: '30%', y: '60%' },
-                { id: 'counter-decor', label: 'Counter Decor', x: '70%', y: '40%' },
-                { id: 'corner-plant', label: 'Corner Plant', x: '15%', y: '25%' },
-                { id: 'shelf-spot', label: 'Wall Shelf', x: '50%', y: '25%' }
-            ]
+        // Furniture catalog with level requirements (using Nano Banana sprites!)
+        const FURNITURE_CATALOG = [
+            { id: 'sofa', name: 'Sofa', emoji: '🛋️', image: '/images/furniture/sofa.png?v=1770903060', level: 1 },
+            { id: 'bed', name: 'Bed', emoji: '🛏️', image: '/images/furniture/bed.png?v=1770903060', level: 1 },
+            { id: 'table', name: 'Table', emoji: '🪑', image: '/images/furniture/table.png?v=1770903060', level: 1 },
+            { id: 'lamp', name: 'Lamp', emoji: '💡', image: '/images/furniture/lamp.png?v=1770903060', level: 1 },
+            { id: 'bookshelf', name: 'Bookshelf', emoji: '📚', image: '/images/furniture/bookshelf.png?v=1770903060', level: 2 },
+            { id: 'plant', name: 'Plant', emoji: '🌿', image: '/images/furniture/plant.png?v=1770903060', level: 1 },
+            { id: 'tv', name: 'TV', emoji: '📺', image: '/images/furniture/tv.png?v=1770903060', level: 2 },
+            { id: 'rug', name: 'Rug', emoji: '🟥', image: '/images/furniture/rug.png?v=1770903060', level: 1 },
+            { id: 'jukebox', name: 'Jukebox', emoji: '🎵', image: '/images/furniture/jukebox.png?v=1770903060', level: 3 },
+            { id: 'discoball', name: 'Disco Ball', emoji: '🪩', image: '/images/furniture/discoball.png?v=1770903060', level: 5 },
+            { id: 'fishtank', name: 'Fish Tank', emoji: '🐠', image: '/images/furniture/fishtank.png?v=1770903060', level: 2 },
+            { id: 'fireplace', name: 'Fireplace', emoji: '🔥', image: '/images/furniture/fireplace.png?v=1770903060', level: 2 }
+        ];
+
+        // Room themes
+        const THEMES = {
+            cabin: {
+                floor: '#8b6f47',
+                wall: '#a0826d',
+                accent: '#c9a84c'
+            },
+            loft: {
+                floor: '#95a5a6',
+                wall: '#bdc3c7',
+                accent: '#34495e'
+            },
+            ocean: {
+                floor: '#f0d9b5',
+                wall: '#b8d4d4',
+                accent: '#40E0D0'
+            }
         };
 
-        let currentRoom = 'livingroom';
-        let currentSpot = null;
+        // State
+        let currentTheme = 'cabin';
+        let userLevel = 1;
+        let viewMode = 'own'; // 'own' or 'visit'
+        let visitingUser = null;
+        let placedFurniture = {}; // { furnitureId: { x, y } }
+        let socket = null;
+
+        // Grid snapping
+        const GRID_SIZE = 50;
+
+        function snapToGrid(value) {
+            return Math.round(value / GRID_SIZE) * GRID_SIZE;
+        }
+
+        // Check visit mode from URL
+        function checkVisitMode() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const user = urlParams.get('user');
+            const currentUser = localStorage.getItem('chifftown_username');
+
+            if (user && user !== currentUser) {
+                viewMode = 'visit';
+                visitingUser = user;
+                
+                document.getElementById('apartmentTitle').innerHTML = `🏠 ${user}'s Apartment <span class="view-mode-badge">👁️ Viewing</span>`;
+                document.getElementById('inventoryPanel').classList.add('hidden');
+                document.getElementById('instructions').classList.add('hidden');
+                document.getElementById('shareBtn').style.display = 'none';
+                document.getElementById('themeToggle').style.display = 'none';
+                
+                loadVisitorApartment(user);
+                return true;
+            } else {
+                document.getElementById('shareBtn').style.display = 'inline-block';
+                return false;
+            }
+        }
+
+        // Load visitor's apartment data
+        async function loadVisitorApartment(username) {
+            try {
+                const response = await fetch(`/api/user/${username}`);
+                if (response.ok) {
+                    const userData = await response.json();
+                    if (userData.apartmentData) {
+                        placedFurniture = userData.apartmentData.furniture || {};
+                        currentTheme = userData.apartmentData.theme || 'cabin';
+                        applyTheme(currentTheme);
+                        renderFurniture();
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading visitor apartment:', error);
+            }
+        }
+
+        // Initialize user data
+        async function initUser() {
+            const username = localStorage.getItem('chifftown_username');
+            if (!username || viewMode === 'visit') return;
+
+            try {
+                const response = await fetch(`/api/user/${username}`);
+                if (response.ok) {
+                    const userData = await response.json();
+                    userLevel = userData.level || 1;
+                    
+                    if (userData.apartmentData) {
+                        placedFurniture = userData.apartmentData.furniture || {};
+                        currentTheme = userData.apartmentData.theme || 'cabin';
+                        applyTheme(currentTheme);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+            }
+        }
+
+        // Save apartment data to server
+        function saveApartmentData() {
+            if (viewMode === 'visit' || !socket) return;
+
+            const username = localStorage.getItem('chifftown_username');
+            if (!username) return;
+
+            const apartmentData = {
+                furniture: placedFurniture,
+                theme: currentTheme
+            };
+
+            socket.emit('updateApartment', {
+                username: username,
+                apartmentData: apartmentData
+            });
+
+            // Also save to localStorage as backup
+            localStorage.setItem('chifftown_apartment', JSON.stringify(apartmentData));
+        }
+
+        // Apply theme
+        function applyTheme(themeName) {
+            const theme = THEMES[themeName];
+            if (!theme) return;
+
+            document.documentElement.style.setProperty('--theme-floor', theme.floor);
+            document.documentElement.style.setProperty('--theme-wall', theme.wall);
+            document.documentElement.style.setProperty('--theme-accent', theme.accent);
+
+            currentTheme = themeName;
+
+            // Update active theme button
+            document.querySelectorAll('.theme-option').forEach(opt => {
+                opt.classList.remove('active');
+                if (opt.dataset.theme === themeName) {
+                    opt.classList.add('active');
+                }
+            });
+
+            if (viewMode !== 'visit') {
+                saveApartmentData();
+            }
+        }
+
+        // Render inventory panel
+        function renderInventory() {
+            const grid = document.getElementById('inventoryGrid');
+            grid.innerHTML = '';
+
+            FURNITURE_CATALOG.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'inventory-card';
+                card.dataset.furnitureId = item.id;
+
+                // Check if item is placed
+                const isPlaced = placedFurniture.hasOwnProperty(item.id);
+                if (isPlaced) {
+                    card.classList.add('in-use');
+                }
+
+                // Check level requirement
+                const isLocked = userLevel < item.level;
+                if (isLocked) {
+                    card.classList.add('locked');
+                    card.style.cursor = 'not-allowed';
+                }
+
+                card.innerHTML = `
+                    <div class="inventory-emoji"><img src="${item.image}" alt="${item.name}" style="width: 60px; height: auto; display: block; margin: 0 auto;"></div>
+                    <div class="inventory-name">${item.name}</div>
+                    <div class="inventory-level">${isLocked ? `🔒 Level ${item.level}` : isPlaced ? 'Placed' : 'Available'}</div>
+                `;
+
+                // Make draggable if not locked and not placed
+                if (!isLocked && !isPlaced && viewMode !== 'visit') {
+                    card.draggable = true;
+                    card.addEventListener('dragstart', handleDragStart);
+                }
+
+                grid.appendChild(card);
+            });
+        }
+
+        // Render placed furniture
+        function renderFurniture() {
+            const container = document.getElementById('furnitureContainer');
+            container.innerHTML = '';
+
+            Object.entries(placedFurniture).forEach(([furnitureId, position]) => {
+                const item = FURNITURE_CATALOG.find(f => f.id === furnitureId);
+                if (!item) return;
+
+                const furnitureEl = document.createElement('div');
+                furnitureEl.className = `furniture-item ${furnitureId}`;
+                furnitureEl.dataset.furnitureId = furnitureId;
+                furnitureEl.style.left = position.x + 'px';
+                furnitureEl.style.top = position.y + 'px';
+                
+                // Use Nano Banana sprite image!
+                const img = document.createElement('img');
+                img.src = item.image;
+                img.alt = item.name;
+                img.style.width = '100px';
+                img.style.height = 'auto';
+                img.style.display = 'block';
+                img.style.pointerEvents = 'none'; // Let clicks pass through to parent
+                furnitureEl.appendChild(img);
+
+                // Add remove button (only in own mode)
+                if (viewMode !== 'visit') {
+                    const removeBtn = document.createElement('div');
+                    removeBtn.className = 'remove-btn';
+                    removeBtn.innerHTML = '×';
+                    removeBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        removeFurniture(furnitureId);
+                    });
+                    furnitureEl.appendChild(removeBtn);
+
+                    // Make draggable
+                    furnitureEl.draggable = true;
+                    furnitureEl.addEventListener('dragstart', handleFurnitureDragStart);
+                }
+
+                container.appendChild(furnitureEl);
+            });
+
+            renderInventory();
+        }
+
+        // Drag and drop handlers
+        let draggedItem = null;
+        let draggedFurnitureId = null;
+        let isDraggingPlaced = false;
+
+        function handleDragStart(e) {
+            draggedFurnitureId = e.target.dataset.furnitureId;
+            isDraggingPlaced = false;
+            e.dataTransfer.effectAllowed = 'copy';
+        }
+
+        function handleFurnitureDragStart(e) {
+            draggedItem = e.target;
+            draggedFurnitureId = e.target.dataset.furnitureId;
+            isDraggingPlaced = true;
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        document.getElementById('furnitureContainer').addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = isDraggingPlaced ? 'move' : 'copy';
+        });
+
+        document.getElementById('furnitureContainer').addEventListener('drop', (e) => {
+            e.preventDefault();
+
+            if (!draggedFurnitureId) return;
+
+            const container = document.getElementById('furnitureContainer');
+            const rect = container.getBoundingClientRect();
+            
+            let x = e.clientX - rect.left;
+            let y = e.clientY - rect.top;
+
+            // Snap to grid
+            x = snapToGrid(x);
+            y = snapToGrid(y);
+
+            // Constrain to container
+            x = Math.max(0, Math.min(x, 450));
+            y = Math.max(0, Math.min(y, 450));
+
+            placedFurniture[draggedFurnitureId] = { x, y };
+
+            if (draggedItem) {
+                draggedItem.classList.remove('dragging');
+            }
+
+            renderFurniture();
+            saveApartmentData();
+
+            draggedItem = null;
+            draggedFurnitureId = null;
+            isDraggingPlaced = false;
+        });
+
+        // Remove furniture
+        function removeFurniture(furnitureId) {
+            delete placedFurniture[furnitureId];
+            renderFurniture();
+            saveApartmentData();
+        }
+
+        // Share apartment
+        function shareApartment() {
+            const username = localStorage.getItem('chifftown_username') || 'guest';
+            const shareUrl = `${window.location.origin}/apartment.html?user=${encodeURIComponent(username)}`;
+            
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                alert('✨ Link copied! Share it with friends so they can visit your apartment.');
+            }).catch(() => {
+                prompt('Copy this link to share:', shareUrl);
+            });
+        }
+
+        // Event listeners
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const panel = document.getElementById('themePanel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        });
+
+        document.querySelectorAll('.theme-option').forEach(opt => {
+            opt.addEventListener('click', () => {
+                if (viewMode === 'visit') return;
+                applyTheme(opt.dataset.theme);
+            });
+        });
+
+        document.getElementById('shareBtn').addEventListener('click', shareApartment);
+
+        // Initialize socket connection
+        function initSocket() {
+            const username = localStorage.getItem('chifftown_username');
+            if (!username || viewMode === 'visit') return;
+
+            socket = io();
+
+            socket.on('connect', () => {
+                console.log('Connected to server');
+                socket.emit('register', username);
+            });
+
+            socket.on('apartmentUpdated', (data) => {
+                console.log('Apartment data updated on server');
+            });
+        }
 
         // Initialize
-        initInventory();
-        renderRoom(currentRoom);
-        updateInventorySidebar();
-
-        // Room tab switching
-        document.querySelectorAll('.room-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                const room = tab.dataset.room;
-                switchRoom(room);
-            });
-        });
-
-        function switchRoom(room) {
-            currentRoom = room;
+        async function init() {
+            const isVisiting = checkVisitMode();
             
-            // Update active tab
-            document.querySelectorAll('.room-tab').forEach(t => t.classList.remove('active'));
-            document.querySelector(`[data-room="${room}"]`).classList.add('active');
-            
-            // Update room view
-            const roomView = document.getElementById('roomView');
-            roomView.className = `room-view ${room}`;
-            
-            renderRoom(room);
-        }
-
-        function renderRoom(room) {
-            const roomView = document.getElementById('roomView');
-            roomView.innerHTML = '';
-            
-            const spots = ROOM_SPOTS[room];
-            const placed = getPlacedFurniture();
-            
-            spots.forEach(spot => {
-                const spotEl = document.createElement('div');
-                spotEl.className = 'furniture-spot';
-                spotEl.style.left = spot.x;
-                spotEl.style.top = spot.y;
-                
-                const placedItemId = placed[room]?.[spot.id];
-                
-                if (placedItemId) {
-                    const item = getItemById(placedItemId);
-                    spotEl.classList.add('filled');
-                    spotEl.innerHTML = `
-                        <div class="spot-emoji">${item.emoji}</div>
-                        <div class="spot-label">${item.name}</div>
-                        <button class="remove-btn" onclick="event.stopPropagation(); removePlacedItem('${room}', '${spot.id}')">
-                            Remove
-                        </button>
-                    `;
-                } else {
-                    spotEl.innerHTML = `
-                        <div class="empty-indicator">+</div>
-                        <div class="spot-label">${spot.label}</div>
-                    `;
-                }
-                
-                spotEl.addEventListener('click', () => {
-                    if (!placedItemId) {
-                        openPlacementModal(room, spot.id, spot.label);
-                    }
-                });
-                
-                roomView.appendChild(spotEl);
-            });
-        }
-
-        function openPlacementModal(room, spotId, spotLabel) {
-            currentSpot = { room, spotId };
-            
-            const modal = document.getElementById('placementModal');
-            const modalTitle = document.getElementById('modalTitle');
-            const modalItems = document.getElementById('modalItems');
-            
-            modalTitle.textContent = `Place in ${spotLabel}`;
-            
-            const availableItems = getAvailableItems();
-            
-            if (availableItems.length === 0) {
-                modalItems.innerHTML = `
-                    <div class="empty-state">
-                        <p>No furniture available!</p>
-                        <p style="margin-top: 1rem; font-size: 0.9rem;">All items are placed. Remove items to rearrange.</p>
-                    </div>
-                `;
-            } else {
-                modalItems.innerHTML = availableItems.map(item => `
-                    <div class="modal-item" onclick="placeItem('${item.id}')">
-                        <div class="item-emoji">${item.emoji}</div>
-                        <div class="item-info">
-                            <div class="item-name">${item.name}</div>
-                            <div class="item-desc">${item.description}</div>
-                        </div>
-                    </div>
-                `).join('');
+            if (!isVisiting) {
+                await initUser();
+                initSocket();
+                renderInventory();
             }
             
-            modal.classList.add('active');
+            renderFurniture();
         }
 
-        function closeModal() {
-            document.getElementById('placementModal').classList.remove('active');
-            currentSpot = null;
-        }
-
-        function placeItem(itemId) {
-            if (currentSpot) {
-                placeFurniture(currentSpot.room, currentSpot.spotId, itemId);
-                renderRoom(currentRoom);
-                updateInventorySidebar();
-                closeModal();
-            }
-        }
-
-        function removePlacedItem(room, spotId) {
-            removeFurniture(room, spotId);
-            renderRoom(currentRoom);
-            updateInventorySidebar();
-        }
-
-        function updateInventorySidebar() {
-            const container = document.getElementById('inventoryItems');
-            const inventory = getInventory();
-            const placed = getPlacedFurniture();
-            
-            // Get placed item IDs
-            const placedIds = new Set();
-            Object.values(placed).forEach(room => {
-                Object.values(room).forEach(id => placedIds.add(id));
-            });
-            
-            container.innerHTML = inventory.map(item => {
-                const isPlaced = placedIds.has(item.id);
-                return `
-                    <div class="inventory-item" style="opacity: ${isPlaced ? 0.5 : 1}">
-                        <div class="item-emoji">${item.emoji}</div>
-                        <div class="item-info">
-                            <div class="item-name">${item.name}</div>
-                            <div class="item-desc">${item.description}</div>
-                            ${isPlaced ? '<div style="font-size: 0.75rem; color: var(--accent-teal); margin-top: 0.2rem;">✓ Placed</div>' : ''}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // Inventory sidebar toggle
-        document.getElementById('inventoryToggle').addEventListener('click', () => {
-            document.getElementById('inventorySidebar').classList.toggle('open');
-        });
-
-        // Close modal on background click
-        document.getElementById('placementModal').addEventListener('click', (e) => {
-            if (e.target.id === 'placementModal') {
-                closeModal();
-            }
-        });
+        // Start the app
+        init();
     </script>
+    
+    <!-- ChiffTown Share Button -->
+    <script src="/js/share-button.js" data-share-message="Check out my apartment on ChiffTown! 🏠"></script>
 </body>
 </html>

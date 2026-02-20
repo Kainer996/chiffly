@@ -290,6 +290,38 @@
         .trivia-players { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; margin: 1rem 0; }
         .trivia-player-tag { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2); padding: 0.3rem 0.8rem; border-radius: 50px; font-size: 0.75rem; }
         
+        /* Single Player Games */
+        .snake-cell { aspect-ratio: 1; background: rgba(255,255,255,0.02); border-radius: 2px; }
+        .snake-cell.snake { background: var(--arcade-green); box-shadow: 0 0 5px var(--arcade-green); }
+        .snake-cell.food { background: #ef4444; box-shadow: 0 0 5px #ef4444; animation: pulse 0.5s ease infinite; }
+        
+        .memory-card {
+            aspect-ratio: 1; background: rgba(255,255,255,0.03); border: 2px solid rgba(34,197,94,0.15);
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; cursor: pointer; transition: all 0.3s; position: relative;
+        }
+        .memory-card::before {
+            content: '?'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+            background: rgba(34,197,94,0.1); border-radius: 10px; font-family: 'Press Start 2P', cursive;
+            font-size: 2rem; color: var(--arcade-green); transition: opacity 0.3s;
+        }
+        .memory-card.flipped::before { opacity: 0; pointer-events: none; }
+        .memory-card.matched { border-color: var(--arcade-lime); background: rgba(132,204,22,0.1); }
+        .memory-card:not(.flipped):not(.matched):hover { transform: scale(1.05); border-color: var(--arcade-green); }
+        
+        .leaderboard-entry {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.75rem 1rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(34,197,94,0.08);
+            border-radius: 12px; margin-bottom: 0.5rem; transition: all 0.2s;
+        }
+        .leaderboard-entry:hover { background: rgba(34,197,94,0.04); border-color: rgba(34,197,94,0.15); }
+        .leaderboard-entry .rank { font-family: 'Press Start 2P', cursive; font-size: 0.75rem; color: var(--arcade-green); min-width: 50px; }
+        .leaderboard-entry .rank.gold { color: #fbbf24; }
+        .leaderboard-entry .rank.silver { color: #94a3b8; }
+        .leaderboard-entry .rank.bronze { color: #f97316; }
+        .leaderboard-entry .name { flex: 1; font-size: 0.95rem; }
+        .leaderboard-entry .score { font-family: 'Press Start 2P', cursive; font-size: 0.7rem; color: var(--arcade-cyan); }
+        
         /* Rooms section */
         .rooms-section { padding: 3rem 0; border-top: 1px solid rgba(34,197,94,0.08); }
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-bottom: 3rem; }
@@ -343,6 +375,9 @@
             .rps-choice { width: 80px; height: 80px; }
         }
     </style>
+    <link rel="stylesheet" href="/css/quick-emotes.css?v=1">
+    <link rel="stylesheet" href="/css/loading-screen.css?v=1">
+    <link rel="stylesheet" href="/css/activity-feed.css?v=1">
 </head>
 <body>
     <!-- CRT Effects -->
@@ -392,8 +427,8 @@
     <section class="games-section" id="gameSelect">
         <div class="container">
             <div class="section-header">
-                <h2>CHOOSE YOUR GAME</h2>
-                <p>Pick a game to play with others online</p>
+                <h2>MULTIPLAYER GAMES</h2>
+                <p>Challenge other players online</p>
             </div>
             <div class="games-grid">
                 <div class="game-card" onclick="startGame('ttt')">
@@ -412,6 +447,55 @@
                     <div class="game-card-icon">🧠💡</div>
                     <h3>TRIVIA QUIZ</h3>
                     <p>10 questions from around the world. Test your knowledge!</p>
+                    <div class="play-tag">PLAY NOW</div>
+                </div>
+            </div>
+            
+            <div class="section-header" style="margin-top:3rem;">
+                <h2>SINGLE PLAYER GAMES</h2>
+                <p>Compete for the high score - climb the global leaderboard!</p>
+            </div>
+            <div class="games-grid">
+                <div class="game-card" onclick="startGame('snake')">
+                    <div class="game-card-icon">🐍🍎</div>
+                    <h3>SNAKE</h3>
+                    <p>Classic snake game. Eat food, grow long, don't crash!</p>
+                    <div class="play-tag">PLAY NOW</div>
+                </div>
+                <div class="game-card" onclick="startGame('memory')">
+                    <div class="game-card-icon">🃏💭</div>
+                    <h3>MEMORY MATCH</h3>
+                    <p>Match emoji pairs. Fewest moves + time bonus = high score!</p>
+                    <div class="play-tag">PLAY NOW</div>
+                </div>
+                <div class="game-card" onclick="startGame('reaction')">
+                    <div class="game-card-icon">⚡🎯</div>
+                    <h3>REACTION TEST</h3>
+                    <p>Click when the screen changes. Best of 5 rounds!</p>
+                    <div class="play-tag">PLAY NOW</div>
+                </div>
+                <div class="game-card" onclick="startGame('runner')">
+                    <div class="game-card-icon">🏃💨</div>
+                    <h3>ENDLESS RUNNER</h3>
+                    <p>Jump over obstacles. How far can you run?</p>
+                    <div class="play-tag">PLAY NOW</div>
+                </div>
+                <div class="game-card" onclick="startGame('wordScramble')">
+                    <div class="game-card-icon">🔤📝</div>
+                    <h3>WORD SCRAMBLE</h3>
+                    <p>Unscramble words against the clock. 30 seconds each!</p>
+                    <div class="play-tag">PLAY NOW</div>
+                </div>
+                <div class="game-card" onclick="startGame('breakout')">
+                    <div class="game-card-icon">🧱💥</div>
+                    <h3>BRICK BREAKER</h3>
+                    <p>Bounce the ball and smash all the bricks! Classic arcade fun!</p>
+                    <div class="play-tag">PLAY NOW</div>
+                </div>
+                <div class="game-card" onclick="startGame('pong')">
+                    <div class="game-card-icon">🏓⚡</div>
+                    <h3>NEON PONG</h3>
+                    <p>Classic paddle battle vs AI. Speed increases every point!</p>
                     <div class="play-tag">PLAY NOW</div>
                 </div>
             </div>
@@ -508,6 +592,159 @@
         </div>
     </section>
 
+    <!-- SNAKE GAME AREA -->
+    <section class="game-area" id="snakeArea">
+        <div class="container">
+            <button class="game-back-btn" onclick="leaveGame('snake')"><i class="fas fa-arrow-left"></i> Back to Games</button>
+            <div class="section-header"><h2>SNAKE</h2></div>
+            <div class="game-status" id="snakeStatus">Press START to begin!</div>
+            <div style="text-align:center;margin-bottom:1rem;">
+                <div style="font-family:'Press Start 2P',cursive;font-size:0.7rem;color:var(--arcade-green);margin-bottom:0.5rem;">SCORE: <span id="snakeScore">0</span></div>
+                <button class="arcade-btn" id="snakeStartBtn" onclick="startSnake()"><i class="fas fa-play"></i> START</button>
+            </div>
+            <div id="snakeBoard" style="display:grid;grid-template-columns:repeat(20,1fr);gap:1px;max-width:500px;margin:0 auto;background:#000;border:2px solid var(--arcade-green);aspect-ratio:1;"></div>
+            <div style="text-align:center;margin-top:1rem;"><p style="color:var(--arcade-text-dim);font-size:0.85rem;">Use ARROW KEYS to move</p></div>
+        </div>
+    </section>
+
+    <!-- MEMORY MATCH GAME AREA -->
+    <section class="game-area" id="memoryArea">
+        <div class="container">
+            <button class="game-back-btn" onclick="leaveGame('memory')"><i class="fas fa-arrow-left"></i> Back to Games</button>
+            <div class="section-header"><h2>MEMORY MATCH</h2></div>
+            <div class="game-status" id="memoryStatus">Match all pairs!</div>
+            <div style="text-align:center;margin-bottom:1rem;">
+                <div style="display:flex;gap:2rem;justify-content:center;font-family:'Press Start 2P',cursive;font-size:0.65rem;color:var(--arcade-green);margin-bottom:0.75rem;">
+                    <span>MOVES: <span id="memoryMoves">0</span></span>
+                    <span>TIME: <span id="memoryTime">0</span>s</span>
+                </div>
+                <button class="arcade-btn" id="memoryStartBtn" onclick="startMemory()"><i class="fas fa-play"></i> NEW GAME</button>
+            </div>
+            <div id="memoryBoard" style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;max-width:400px;margin:0 auto;"></div>
+        </div>
+    </section>
+
+    <!-- REACTION TEST GAME AREA -->
+    <section class="game-area" id="reactionArea">
+        <div class="container">
+            <button class="game-back-btn" onclick="leaveGame('reaction')"><i class="fas fa-arrow-left"></i> Back to Games</button>
+            <div class="section-header"><h2>REACTION SPEED TEST</h2></div>
+            <div class="game-status" id="reactionStatus">Click START when ready!</div>
+            <div style="text-align:center;margin-bottom:1rem;">
+                <div style="font-family:'Press Start 2P',cursive;font-size:0.65rem;color:var(--arcade-green);margin-bottom:0.75rem;">ROUND: <span id="reactionRound">0</span>/5 | AVG: <span id="reactionAvg">0</span>ms</div>
+                <button class="arcade-btn" id="reactionStartBtn" onclick="startReaction()"><i class="fas fa-play"></i> START TEST</button>
+            </div>
+            <div id="reactionBox" style="width:100%;max-width:600px;height:300px;margin:0 auto;background:rgba(255,255,255,0.03);border:2px solid rgba(34,197,94,0.2);border-radius:16px;display:flex;align-items:center;justify-content:center;font-family:'Press Start 2P',cursive;font-size:1rem;color:var(--arcade-text);cursor:pointer;transition:background 0.3s;"></div>
+        </div>
+    </section>
+
+    <!-- ENDLESS RUNNER GAME AREA -->
+    <section class="game-area" id="runnerArea">
+        <div class="container">
+            <button class="game-back-btn" onclick="leaveGame('runner')"><i class="fas fa-arrow-left"></i> Back to Games</button>
+            <div class="section-header"><h2>ENDLESS RUNNER</h2></div>
+            <div class="game-status" id="runnerStatus">Press SPACE or TAP to jump!</div>
+            <div style="text-align:center;margin-bottom:1rem;">
+                <div style="font-family:'Press Start 2P',cursive;font-size:0.7rem;color:var(--arcade-green);margin-bottom:0.75rem;">DISTANCE: <span id="runnerScore">0</span>m</div>
+                <button class="arcade-btn" id="runnerStartBtn" onclick="startRunner()"><i class="fas fa-play"></i> START RUN</button>
+            </div>
+            <div id="runnerGame" style="position:relative;width:100%;max-width:700px;height:200px;margin:0 auto;background:rgba(255,255,255,0.03);border:2px solid rgba(34,197,94,0.2);border-radius:16px;overflow:hidden;">
+                <div id="runnerPlayer" style="position:absolute;left:50px;bottom:20px;width:30px;height:30px;background:var(--arcade-green);border-radius:4px;"></div>
+                <div id="runnerGround" style="position:absolute;bottom:0;left:0;right:0;height:20px;background:rgba(34,197,94,0.1);"></div>
+            </div>
+            <div style="text-align:center;margin-top:1rem;"><p style="color:var(--arcade-text-dim);font-size:0.85rem;">Press SPACE or click to jump</p></div>
+        </div>
+    </section>
+
+    <!-- WORD SCRAMBLE GAME AREA -->
+    <section class="game-area" id="wordScrambleArea">
+        <div class="container">
+            <button class="game-back-btn" onclick="leaveGame('wordScramble')"><i class="fas fa-arrow-left"></i> Back to Games</button>
+            <div class="section-header"><h2>WORD SCRAMBLE</h2></div>
+            <div class="game-status" id="wordStatus">Unscramble the word!</div>
+            <div style="text-align:center;margin-bottom:1rem;">
+                <div style="display:flex;gap:2rem;justify-content:center;font-family:'Press Start 2P',cursive;font-size:0.65rem;color:var(--arcade-green);margin-bottom:0.75rem;">
+                    <span>SCORE: <span id="wordScore">0</span></span>
+                    <span>TIME: <span id="wordTimer">30</span>s</span>
+                </div>
+                <button class="arcade-btn" id="wordStartBtn" onclick="startWordScramble()"><i class="fas fa-play"></i> START</button>
+            </div>
+            <div id="wordGameArea" style="display:none;">
+                <div style="text-align:center;margin-bottom:1.5rem;">
+                    <div style="font-family:'Press Start 2P',cursive;font-size:1.5rem;color:var(--arcade-green);letter-spacing:0.3rem;margin-bottom:1rem;" id="scrambledWord"></div>
+                </div>
+                <div style="text-align:center;">
+                    <input type="text" id="wordInput" placeholder="Type your answer..." style="background:rgba(255,255,255,0.05);border:1px solid rgba(34,197,94,0.2);color:var(--arcade-text);padding:0.75rem 1.5rem;border-radius:12px;font-size:1rem;width:100%;max-width:400px;text-align:center;margin-bottom:0.75rem;">
+                    <br>
+                    <button class="arcade-btn" onclick="submitWord()"><i class="fas fa-check"></i> SUBMIT</button>
+                    <button class="arcade-btn secondary" onclick="skipWord()" style="margin-left:0.5rem;"><i class="fas fa-forward"></i> SKIP</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BRICK BREAKER GAME AREA -->
+    <section class="game-area" id="breakoutArea">
+        <div class="container">
+            <button class="game-back-btn" onclick="leaveGame('breakout')"><i class="fas fa-arrow-left"></i> Back to Games</button>
+            <div class="section-header"><h2>BRICK BREAKER</h2></div>
+            <div class="game-status" id="breakoutStatus">Click or tap to launch the ball!</div>
+            <div style="text-align:center;margin-bottom:1rem;">
+                <div style="display:flex;gap:2rem;justify-content:center;font-family:'Press Start 2P',cursive;font-size:0.65rem;color:var(--arcade-green);margin-bottom:0.75rem;">
+                    <span>SCORE: <span id="breakoutScore">0</span></span>
+                    <span>LIVES: <span id="breakoutLives">3</span></span>
+                    <span>LEVEL: <span id="breakoutLevel">1</span></span>
+                </div>
+                <button class="arcade-btn" id="breakoutStartBtn" onclick="startBreakout()"><i class="fas fa-play"></i> START</button>
+            </div>
+            <canvas id="breakoutCanvas" width="600" height="450" style="display:block;margin:0 auto;background:rgba(0,0,0,0.8);border:2px solid var(--arcade-green);border-radius:8px;max-width:100%;touch-action:none;"></canvas>
+            <div style="text-align:center;margin-top:1rem;color:var(--arcade-text-dim);font-size:0.8rem;">
+                <p>🖱️ Move mouse/finger to control paddle • 🚀 Click/tap to launch</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- PONG GAME AREA -->
+    <section class="game-area" id="pongArea">
+        <div class="container">
+            <button class="game-back-btn" onclick="leaveGame('pong')"><i class="fas fa-arrow-left"></i> Back to Games</button>
+            <div class="section-header"><h2>NEON PONG</h2></div>
+            <div class="game-status" id="pongStatus">Defeat the AI to earn points!</div>
+            <div style="text-align:center;margin-bottom:1rem;">
+                <div style="display:flex;gap:2rem;justify-content:center;font-family:'Press Start 2P',cursive;font-size:0.65rem;color:var(--arcade-green);margin-bottom:0.75rem;">
+                    <span>YOU: <span id="pongPlayerScore">0</span></span>
+                    <span>AI: <span id="pongAIScore">0</span></span>
+                </div>
+                <button class="arcade-btn" id="pongStartBtn" onclick="startPong()"><i class="fas fa-play"></i> START</button>
+            </div>
+            <canvas id="pongCanvas" width="600" height="400" style="display:block;margin:0 auto;background:rgba(0,0,0,0.8);border:2px solid var(--arcade-green);border-radius:8px;max-width:100%;touch-action:none;"></canvas>
+            <div style="text-align:center;margin-top:1rem;color:var(--arcade-text-dim);font-size:0.8rem;">
+                <p>🖱️ Move mouse/finger to control left paddle</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- LEADERBOARD PANEL -->
+    <section class="games-section" id="leaderboardSection" style="background:var(--arcade-deep);border-top:1px solid rgba(34,197,94,0.1);">
+        <div class="container">
+            <div class="section-header">
+                <h2>🏆 GLOBAL LEADERBOARD</h2>
+                <p>Top players across all single-player games</p>
+            </div>
+            <div style="display:flex;gap:0.5rem;justify-content:center;margin-bottom:2rem;flex-wrap:wrap;">
+                <button class="arcade-btn secondary" onclick="showLeaderboard('overall')">Overall Champions</button>
+                <button class="arcade-btn secondary" onclick="showLeaderboard('snake')">Snake</button>
+                <button class="arcade-btn secondary" onclick="showLeaderboard('memory')">Memory</button>
+                <button class="arcade-btn secondary" onclick="showLeaderboard('reaction')">Reaction</button>
+                <button class="arcade-btn secondary" onclick="showLeaderboard('runner')">Runner</button>
+                <button class="arcade-btn secondary" onclick="showLeaderboard('wordScramble')">Word Scramble</button>
+                <button class="arcade-btn secondary" onclick="showLeaderboard('breakout')">Brick Breaker</button>
+                <button class="arcade-btn secondary" onclick="showLeaderboard('pong')">Pong</button>
+            </div>
+            <div id="leaderboardDisplay" style="max-width:600px;margin:0 auto;"></div>
+        </div>
+    </section>
+
     <!-- Video Chat Rooms Section -->
     <section class="rooms-section" id="roomsSection">
         <div class="container">
@@ -546,6 +783,7 @@
     </footer>
 
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="/js/xp-client.js?v=1"></script>
     <script>
         let socket = null, pendingHost = null;
         let currentGameId = null, currentGameType = null;
@@ -560,6 +798,8 @@
             socket.on('connect', () => {
                 console.log('✅ Arcade connected');
                 socket.emit('get-room-list');
+                // Initialize XP System with this socket
+                if (window.XPSystem) window.XPSystem.init(socket);
             });
             
             // Room events
@@ -948,7 +1188,1163 @@
         function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
         function escapeAttr(t) { return t.replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
         
+        // === SINGLE PLAYER GAMES ===
+        
+        // Snake Game
+        let snakeGame = null;
+        function startSnake() {
+            if (snakeGame) snakeGame.stop();
+            document.getElementById('snakeStartBtn').style.display = 'none';
+            
+            const board = document.getElementById('snakeBoard');
+            board.innerHTML = '';
+            for (let i = 0; i < 400; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'snake-cell';
+                cell.dataset.index = i;
+                board.appendChild(cell);
+            }
+            
+            snakeGame = {
+                snake: [210, 211, 212],
+                direction: 'right',
+                food: null,
+                score: 0,
+                speed: 150,
+                interval: null,
+                stopped: false,
+                
+                spawnFood() {
+                    const empty = [];
+                    for (let i = 0; i < 400; i++) {
+                        if (!this.snake.includes(i)) empty.push(i);
+                    }
+                    this.food = empty[Math.floor(Math.random() * empty.length)];
+                    document.querySelector(`[data-index="${this.food}"]`).classList.add('food');
+                },
+                
+                move() {
+                    if (this.stopped) return;
+                    const head = this.snake[this.snake.length - 1];
+                    let newHead = head;
+                    
+                    if (this.direction === 'up') newHead = head - 20;
+                    if (this.direction === 'down') newHead = head + 20;
+                    if (this.direction === 'left') newHead = head - 1;
+                    if (this.direction === 'right') newHead = head + 1;
+                    
+                    // Check wall collision
+                    if (newHead < 0 || newHead >= 400 || 
+                        (this.direction === 'left' && head % 20 === 0) ||
+                        (this.direction === 'right' && head % 20 === 19)) {
+                        this.gameOver();
+                        return;
+                    }
+                    
+                    // Check self collision
+                    if (this.snake.includes(newHead)) {
+                        this.gameOver();
+                        return;
+                    }
+                    
+                    this.snake.push(newHead);
+                    
+                    // Check food
+                    if (newHead === this.food) {
+                        this.score++;
+                        document.getElementById('snakeScore').textContent = this.score;
+                        this.speed = Math.max(50, this.speed - 2);
+                        clearInterval(this.interval);
+                        this.interval = setInterval(() => this.move(), this.speed);
+                        this.spawnFood();
+                    } else {
+                        const tail = this.snake.shift();
+                        document.querySelector(`[data-index="${tail}"]`).classList.remove('snake');
+                    }
+                    
+                    document.querySelector(`[data-index="${newHead}"]`).classList.add('snake');
+                },
+                
+                async gameOver() {
+                    this.stopped = true;
+                    clearInterval(this.interval);
+                    document.getElementById('snakeStatus').textContent = `🎮 GAME OVER! Score: ${this.score}`;
+                    document.getElementById('snakeStartBtn').style.display = 'inline-flex';
+                    
+                    // Submit score
+                    const username = prompt('Enter your name for the leaderboard:');
+                    if (username && username.trim()) {
+                        await submitScore('snake', username.trim(), this.score);
+                    }
+                },
+                
+                stop() {
+                    this.stopped = true;
+                    if (this.interval) clearInterval(this.interval);
+                }
+            };
+            
+            snakeGame.spawnFood();
+            snakeGame.interval = setInterval(() => snakeGame.move(), snakeGame.speed);
+            document.getElementById('snakeStatus').textContent = '🐍 Use arrow keys to move!';
+            
+            // Arrow key controls
+            document.onkeydown = (e) => {
+                if (!snakeGame || snakeGame.stopped) return;
+                if (e.key === 'ArrowUp' && snakeGame.direction !== 'down') snakeGame.direction = 'up';
+                if (e.key === 'ArrowDown' && snakeGame.direction !== 'up') snakeGame.direction = 'down';
+                if (e.key === 'ArrowLeft' && snakeGame.direction !== 'right') snakeGame.direction = 'left';
+                if (e.key === 'ArrowRight' && snakeGame.direction !== 'left') snakeGame.direction = 'right';
+            };
+        }
+        
+        // Memory Match Game
+        let memoryGame = null;
+        const EMOJIS = ['🍎','🍊','🍋','🍌','🍉','🍇','🍓','🫐','🍒','🥝','🍑','🥭','🍍','🥥','🥑','🍆'];
+        
+        function startMemory() {
+            if (memoryGame) memoryGame.stop();
+            document.getElementById('memoryStartBtn').style.display = 'none';
+            
+            const pairs = EMOJIS.slice(0, 8).flatMap(e => [e, e]);
+            const shuffled = pairs.sort(() => Math.random() - 0.5);
+            
+            const board = document.getElementById('memoryBoard');
+            board.innerHTML = '';
+            shuffled.forEach((emoji, i) => {
+                const card = document.createElement('div');
+                card.className = 'memory-card';
+                card.innerHTML = `<span>${emoji}</span>`;
+                card.dataset.emoji = emoji;
+                card.dataset.index = i;
+                card.onclick = () => memoryGame && memoryGame.flip(i);
+                board.appendChild(card);
+            });
+            
+            memoryGame = {
+                flipped: [],
+                matched: [],
+                moves: 0,
+                startTime: Date.now(),
+                timer: null,
+                stopped: false,
+                
+                flip(index) {
+                    if (this.stopped || this.flipped.length >= 2 || this.flipped.includes(index) || this.matched.includes(index)) return;
+                    
+                    const card = document.querySelector(`.memory-card[data-index="${index}"]`);
+                    card.classList.add('flipped');
+                    this.flipped.push(index);
+                    
+                    if (this.flipped.length === 2) {
+                        this.moves++;
+                        document.getElementById('memoryMoves').textContent = this.moves;
+                        
+                        const [i1, i2] = this.flipped;
+                        const c1 = document.querySelector(`.memory-card[data-index="${i1}"]`);
+                        const c2 = document.querySelector(`.memory-card[data-index="${i2}"]`);
+                        
+                        if (c1.dataset.emoji === c2.dataset.emoji) {
+                            this.matched.push(i1, i2);
+                            c1.classList.add('matched');
+                            c2.classList.add('matched');
+                            this.flipped = [];
+                            
+                            if (this.matched.length === 16) {
+                                this.gameOver();
+                            }
+                        } else {
+                            setTimeout(() => {
+                                c1.classList.remove('flipped');
+                                c2.classList.remove('flipped');
+                                this.flipped = [];
+                            }, 800);
+                        }
+                    }
+                },
+                
+                async gameOver() {
+                    this.stopped = true;
+                    clearInterval(this.timer);
+                    const time = Math.floor((Date.now() - this.startTime) / 1000);
+                    const score = Math.max(0, 10000 - (this.moves * 50) - (time * 10));
+                    
+                    document.getElementById('memoryStatus').textContent = `🎉 Complete! Moves: ${this.moves} | Time: ${time}s`;
+                    document.getElementById('memoryStartBtn').style.display = 'inline-flex';
+                    
+                    const username = prompt(`Your score: ${score}\nEnter name for leaderboard:`);
+                    if (username && username.trim()) {
+                        await submitScore('memory', username.trim(), score);
+                    }
+                },
+                
+                stop() {
+                    this.stopped = true;
+                    if (this.timer) clearInterval(this.timer);
+                }
+            };
+            
+            // Start timer
+            memoryGame.timer = setInterval(() => {
+                if (memoryGame && !memoryGame.stopped) {
+                    const elapsed = Math.floor((Date.now() - memoryGame.startTime) / 1000);
+                    document.getElementById('memoryTime').textContent = elapsed;
+                }
+            }, 1000);
+            
+            document.getElementById('memoryStatus').textContent = '🃏 Find all matching pairs!';
+            document.getElementById('memoryMoves').textContent = '0';
+            document.getElementById('memoryTime').textContent = '0';
+        }
+        
+        // Reaction Speed Test
+        let reactionGame = null;
+        function startReaction() {
+            if (reactionGame) return;
+            document.getElementById('reactionStartBtn').style.display = 'none';
+            
+            reactionGame = {
+                round: 0,
+                times: [],
+                waitTime: null,
+                startTime: null,
+                box: document.getElementById('reactionBox'),
+                
+                nextRound() {
+                    this.round++;
+                    document.getElementById('reactionRound').textContent = this.round;
+                    document.getElementById('reactionStatus').textContent = '⏳ Wait for it...';
+                    this.box.style.background = 'rgba(255,255,255,0.03)';
+                    this.box.textContent = 'Wait...';
+                    this.box.onclick = () => this.tooEarly();
+                    
+                    this.waitTime = setTimeout(() => {
+                        this.box.style.background = 'var(--arcade-green)';
+                        this.box.textContent = 'CLICK NOW!';
+                        this.startTime = Date.now();
+                        this.box.onclick = () => this.click();
+                    }, 2000 + Math.random() * 3000);
+                },
+                
+                tooEarly() {
+                    clearTimeout(this.waitTime);
+                    this.box.style.background = 'rgba(239,68,68,0.2)';
+                    this.box.textContent = 'Too early!';
+                    this.box.onclick = null;
+                    setTimeout(() => this.nextRound(), 1500);
+                },
+                
+                click() {
+                    const time = Date.now() - this.startTime;
+                    this.times.push(time);
+                    this.box.style.background = 'rgba(34,197,94,0.2)';
+                    this.box.textContent = `${time}ms`;
+                    this.box.onclick = null;
+                    
+                    const avg = Math.round(this.times.reduce((a, b) => a + b, 0) / this.times.length);
+                    document.getElementById('reactionAvg').textContent = avg;
+                    
+                    if (this.round < 5) {
+                        setTimeout(() => this.nextRound(), 1500);
+                    } else {
+                        this.gameOver(avg);
+                    }
+                },
+                
+                async gameOver(avg) {
+                    document.getElementById('reactionStatus').textContent = `✅ Complete! Average: ${avg}ms`;
+                    document.getElementById('reactionStartBtn').style.display = 'inline-flex';
+                    this.box.onclick = null;
+                    
+                    const username = prompt(`Your average: ${avg}ms\nEnter name for leaderboard:`);
+                    if (username && username.trim()) {
+                        await submitScore('reaction', username.trim(), avg);
+                    }
+                    reactionGame = null;
+                }
+            };
+            
+            reactionGame.nextRound();
+        }
+        
+        // Endless Runner Game
+        let runnerGame = null;
+        function startRunner() {
+            if (runnerGame) runnerGame.stop();
+            document.getElementById('runnerStartBtn').style.display = 'none';
+            
+            const game = document.getElementById('runnerGame');
+            const player = document.getElementById('runnerPlayer');
+            game.innerHTML = '<div id="runnerPlayer" style="position:absolute;left:50px;bottom:20px;width:30px;height:30px;background:var(--arcade-green);border-radius:4px;"></div><div id="runnerGround" style="position:absolute;bottom:0;left:0;right:0;height:20px;background:rgba(34,197,94,0.1);"></div>';
+            
+            runnerGame = {
+                distance: 0,
+                jumping: false,
+                gravity: 0,
+                obstacles: [],
+                speed: 5,
+                interval: null,
+                spawnTimer: null,
+                stopped: false,
+                
+                jump() {
+                    if (this.jumping || this.stopped) return;
+                    this.jumping = true;
+                    this.gravity = -15;
+                },
+                
+                update() {
+                    if (this.stopped) return;
+                    
+                    // Update player
+                    const player = document.getElementById('runnerPlayer');
+                    if (!player) return;
+                    
+                    if (this.jumping) {
+                        let bottom = parseInt(player.style.bottom);
+                        bottom += this.gravity;
+                        this.gravity += 1;
+                        
+                        if (bottom <= 20) {
+                            bottom = 20;
+                            this.jumping = false;
+                            this.gravity = 0;
+                        }
+                        player.style.bottom = bottom + 'px';
+                    }
+                    
+                    // Update obstacles
+                    this.obstacles.forEach((obs, i) => {
+                        obs.x -= this.speed;
+                        obs.el.style.left = obs.x + 'px';
+                        
+                        // Check collision
+                        const playerBottom = parseInt(player.style.bottom);
+                        const playerLeft = 50;
+                        if (obs.x < playerLeft + 30 && obs.x + 20 > playerLeft && playerBottom < 40) {
+                            this.gameOver();
+                        }
+                        
+                        if (obs.x < -20) {
+                            obs.el.remove();
+                            this.obstacles.splice(i, 1);
+                            this.distance += 10;
+                            document.getElementById('runnerScore').textContent = this.distance;
+                        }
+                    });
+                    
+                    this.speed += 0.001;
+                },
+                
+                spawnObstacle() {
+                    if (this.stopped) return;
+                    const obs = document.createElement('div');
+                    obs.style.cssText = 'position:absolute;left:700px;bottom:20px;width:20px;height:20px;background:#ef4444;border-radius:4px;';
+                    document.getElementById('runnerGame').appendChild(obs);
+                    this.obstacles.push({ x: 700, el: obs });
+                },
+                
+                async gameOver() {
+                    this.stopped = true;
+                    clearInterval(this.interval);
+                    clearInterval(this.spawnTimer);
+                    document.getElementById('runnerStatus').textContent = `💥 Crashed! Distance: ${this.distance}m`;
+                    document.getElementById('runnerStartBtn').style.display = 'inline-flex';
+                    
+                    const username = prompt(`You ran ${this.distance}m!\nEnter name for leaderboard:`);
+                    if (username && username.trim()) {
+                        await submitScore('runner', username.trim(), this.distance);
+                    }
+                },
+                
+                stop() {
+                    this.stopped = true;
+                    if (this.interval) clearInterval(this.interval);
+                    if (this.spawnTimer) clearInterval(this.spawnTimer);
+                }
+            };
+            
+            runnerGame.interval = setInterval(() => runnerGame.update(), 30);
+            runnerGame.spawnTimer = setInterval(() => runnerGame.spawnObstacle(), 2000);
+            
+            document.getElementById('runnerStatus').textContent = '🏃 Running! Jump to avoid obstacles!';
+            document.getElementById('runnerScore').textContent = '0';
+            
+            document.onkeydown = (e) => {
+                if (e.code === 'Space' && runnerGame) {
+                    e.preventDefault();
+                    runnerGame.jump();
+                }
+            };
+            
+            document.getElementById('runnerGame').onclick = () => runnerGame && runnerGame.jump();
+        }
+        
+        // Word Scramble Game
+        let wordGame = null;
+        const WORDS = [
+            'PYTHON','JAVASCRIPT','DATABASE','FUNCTION','VARIABLE','ALGORITHM','DEVELOPER',
+            'COMPUTER','KEYBOARD','MONITOR','NETWORK','INTERNET','SOFTWARE','HARDWARE',
+            'BROWSER','WEBSITE','SECURITY','PASSWORD','FIREWALL','ENCRYPT','DOWNLOAD',
+            'UPLOAD','STREAMING','GAMING','VIRTUAL','DIGITAL','CODING','PROGRAMMING',
+            'INTERFACE','APPLICATION','MOBILE','TABLET','CLOUD','SERVER','CLIENT',
+            'DEBUGGING','TESTING','VERSION','PACKAGE','MODULE','LIBRARY','FRAMEWORK',
+            'SYNTAX','COMPILER','RUNTIME','MEMORY','STORAGE','PROCESSOR','GRAPHICS',
+            'ARTIFICIAL','MACHINE','LEARNING','NEURAL','QUANTUM','BLOCKCHAIN'
+        ];
+        
+        function startWordScramble() {
+            if (wordGame) wordGame.stop();
+            document.getElementById('wordStartBtn').style.display = 'none';
+            document.getElementById('wordGameArea').style.display = 'block';
+            
+            wordGame = {
+                score: 0,
+                currentWord: '',
+                scrambled: '',
+                timeLeft: 30,
+                timer: null,
+                stopped: false,
+                
+                newWord() {
+                    this.currentWord = WORDS[Math.floor(Math.random() * WORDS.length)];
+                    this.scrambled = this.currentWord.split('').sort(() => Math.random() - 0.5).join('');
+                    document.getElementById('scrambledWord').textContent = this.scrambled;
+                    document.getElementById('wordInput').value = '';
+                    document.getElementById('wordInput').focus();
+                    this.timeLeft = 30;
+                    document.getElementById('wordTimer').textContent = this.timeLeft;
+                },
+                
+                checkAnswer() {
+                    const answer = document.getElementById('wordInput').value.toUpperCase().trim();
+                    if (answer === this.currentWord) {
+                        this.score++;
+                        document.getElementById('wordScore').textContent = this.score;
+                        document.getElementById('wordStatus').textContent = '✅ Correct!';
+                        setTimeout(() => {
+                            document.getElementById('wordStatus').textContent = 'Unscramble the word!';
+                            this.newWord();
+                        }, 500);
+                    } else {
+                        document.getElementById('wordStatus').textContent = '❌ Wrong! Try again';
+                        setTimeout(() => {
+                            document.getElementById('wordStatus').textContent = 'Unscramble the word!';
+                        }, 1000);
+                    }
+                },
+                
+                skip() {
+                    this.newWord();
+                },
+                
+                tick() {
+                    this.timeLeft--;
+                    document.getElementById('wordTimer').textContent = this.timeLeft;
+                    if (this.timeLeft <= 0) {
+                        this.gameOver();
+                    }
+                },
+                
+                async gameOver() {
+                    this.stopped = true;
+                    clearInterval(this.timer);
+                    document.getElementById('wordGameArea').style.display = 'none';
+                    document.getElementById('wordStatus').textContent = `⏰ Time's up! Score: ${this.score}`;
+                    document.getElementById('wordStartBtn').style.display = 'inline-flex';
+                    
+                    const username = prompt(`You solved ${this.score} words!\nEnter name for leaderboard:`);
+                    if (username && username.trim()) {
+                        await submitScore('wordScramble', username.trim(), this.score);
+                    }
+                },
+                
+                stop() {
+                    this.stopped = true;
+                    if (this.timer) clearInterval(this.timer);
+                }
+            };
+            
+            wordGame.newWord();
+            wordGame.timer = setInterval(() => wordGame.tick(), 1000);
+            document.getElementById('wordStatus').textContent = 'Unscramble the word!';
+            document.getElementById('wordScore').textContent = '0';
+            
+            // Enter key to submit
+            document.getElementById('wordInput').onkeypress = (e) => {
+                if (e.key === 'Enter' && wordGame) wordGame.checkAnswer();
+            };
+        }
+        
+        function submitWord() {
+            if (wordGame) wordGame.checkAnswer();
+        }
+        
+        function skipWord() {
+            if (wordGame) wordGame.skip();
+        }
+        
+        // Submit score to leaderboard
+        async function submitScore(game, username, score) {
+            try {
+                const res = await fetch(`/api/leaderboard/${game}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, score })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(`🎉 Score submitted! Your rank: #${data.rank}${data.isTopTen ? ' (TOP 10!)' : ''}`);
+                    showLeaderboard(game);
+                }
+            } catch (err) {
+                console.error('Error submitting score:', err);
+            }
+        }
+        
+        // Show leaderboard
+        async function showLeaderboard(game) {
+            const display = document.getElementById('leaderboardDisplay');
+            display.innerHTML = '<div style="text-align:center;padding:2rem;"><i class="fas fa-spinner fa-spin" style="font-size:2rem;color:var(--arcade-green);"></i></div>';
+            
+            try {
+                const url = game === 'overall' ? '/api/leaderboard' : `/api/leaderboard/${game}`;
+                const res = await fetch(url);
+                const data = await res.json();
+                
+                if (!data.length) {
+                    display.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--arcade-text-dim);">No scores yet. Be the first!</div>';
+                    return;
+                }
+                
+                let title = game === 'overall' ? '👑 Overall Champions' : 
+                            game === 'snake' ? '🐍 Snake Masters' :
+                            game === 'memory' ? '🃏 Memory Champions' :
+                            game === 'reaction' ? '⚡ Lightning Reflexes' :
+                            game === 'runner' ? '🏃 Distance Records' :
+                            game === 'breakout' ? '🧱 Brick Breakers' :
+                            game === 'pong' ? '🏓 Pong Champions' :
+                            '🔤 Word Wizards';
+                
+                let html = `<h3 style="font-family:'Press Start 2P',cursive;font-size:0.9rem;color:var(--arcade-green);text-align:center;margin-bottom:1.5rem;">${title}</h3>`;
+                
+                data.forEach((entry, i) => {
+                    const rankClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+                    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
+                    
+                    if (game === 'overall') {
+                        html += `<div class="leaderboard-entry">
+                            <span class="rank ${rankClass}">${medal} #${i + 1}</span>
+                            <span class="name">${escapeHtml(entry.username)}</span>
+                            <span class="score">${entry.topPositions} 🏆 | ${entry.gamesPlayed} games</span>
+                        </div>`;
+                    } else {
+                        const scoreText = game === 'reaction' ? `${entry.score}ms` : `${entry.score}`;
+                        html += `<div class="leaderboard-entry">
+                            <span class="rank ${rankClass}">${medal} #${i + 1}</span>
+                            <span class="name">${escapeHtml(entry.username)}</span>
+                            <span class="score">${scoreText}</span>
+                        </div>`;
+                    }
+                });
+                
+                display.innerHTML = html;
+            } catch (err) {
+                console.error('Error loading leaderboard:', err);
+                display.innerHTML = '<div style="text-align:center;padding:2rem;color:#ef4444;">Error loading leaderboard</div>';
+            }
+        }
+        
+        // =====================================
+        // BRICK BREAKER GAME
+        // =====================================
+        let breakoutGame = null;
+        
+        function startBreakout() {
+            if (breakoutGame) breakoutGame.stop();
+            document.getElementById('breakoutStartBtn').style.display = 'none';
+            document.getElementById('breakoutStatus').textContent = 'Click or tap to launch the ball!';
+            
+            const canvas = document.getElementById('breakoutCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Responsive canvas sizing
+            const maxWidth = Math.min(600, window.innerWidth - 40);
+            const ratio = 600 / 450;
+            canvas.width = maxWidth;
+            canvas.height = maxWidth / ratio;
+            
+            const scale = canvas.width / 600;
+            
+            breakoutGame = {
+                canvas,
+                ctx,
+                scale,
+                score: 0,
+                lives: 3,
+                level: 1,
+                ballLaunched: false,
+                gameOver: false,
+                
+                // Paddle
+                paddle: {
+                    width: 90 * scale,
+                    height: 12 * scale,
+                    x: (canvas.width - 90 * scale) / 2,
+                    y: canvas.height - 30 * scale,
+                    speed: 8 * scale
+                },
+                
+                // Ball
+                ball: {
+                    radius: 8 * scale,
+                    x: canvas.width / 2,
+                    y: canvas.height - 45 * scale,
+                    dx: 4 * scale,
+                    dy: -4 * scale,
+                    speed: 4 * scale
+                },
+                
+                // Bricks
+                bricks: [],
+                brickRows: 5,
+                brickCols: 8,
+                brickWidth: 0,
+                brickHeight: 20 * scale,
+                brickPadding: 4 * scale,
+                brickTop: 50 * scale,
+                brickColors: ['#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4'],
+                
+                init() {
+                    this.brickWidth = (canvas.width - this.brickPadding * (this.brickCols + 1)) / this.brickCols;
+                    this.createBricks();
+                    this.bindEvents();
+                    this.loop();
+                },
+                
+                createBricks() {
+                    this.bricks = [];
+                    for (let r = 0; r < this.brickRows; r++) {
+                        for (let c = 0; c < this.brickCols; c++) {
+                            this.bricks.push({
+                                x: this.brickPadding + c * (this.brickWidth + this.brickPadding),
+                                y: this.brickTop + r * (this.brickHeight + this.brickPadding),
+                                width: this.brickWidth,
+                                height: this.brickHeight,
+                                color: this.brickColors[r % this.brickColors.length],
+                                alive: true,
+                                points: (this.brickRows - r) * 10
+                            });
+                        }
+                    }
+                },
+                
+                bindEvents() {
+                    // Mouse move
+                    this.mouseMoveHandler = (e) => {
+                        const rect = canvas.getBoundingClientRect();
+                        const mouseX = e.clientX - rect.left;
+                        this.paddle.x = Math.max(0, Math.min(canvas.width - this.paddle.width, mouseX - this.paddle.width / 2));
+                        if (!this.ballLaunched) {
+                            this.ball.x = this.paddle.x + this.paddle.width / 2;
+                        }
+                    };
+                    
+                    // Touch move
+                    this.touchMoveHandler = (e) => {
+                        e.preventDefault();
+                        const rect = canvas.getBoundingClientRect();
+                        const touchX = e.touches[0].clientX - rect.left;
+                        this.paddle.x = Math.max(0, Math.min(canvas.width - this.paddle.width, touchX - this.paddle.width / 2));
+                        if (!this.ballLaunched) {
+                            this.ball.x = this.paddle.x + this.paddle.width / 2;
+                        }
+                    };
+                    
+                    // Click/tap to launch
+                    this.launchHandler = () => {
+                        if (!this.ballLaunched && !this.gameOver) {
+                            this.ballLaunched = true;
+                            // Random angle
+                            const angle = (Math.random() * 60 - 30) * Math.PI / 180;
+                            this.ball.dx = Math.sin(angle) * this.ball.speed;
+                            this.ball.dy = -Math.cos(angle) * this.ball.speed;
+                            document.getElementById('breakoutStatus').textContent = 'Go! Break all the bricks!';
+                        }
+                    };
+                    
+                    canvas.addEventListener('mousemove', this.mouseMoveHandler);
+                    canvas.addEventListener('touchmove', this.touchMoveHandler, { passive: false });
+                    canvas.addEventListener('click', this.launchHandler);
+                    canvas.addEventListener('touchstart', this.launchHandler);
+                },
+                
+                update() {
+                    if (this.gameOver || !this.ballLaunched) return;
+                    
+                    // Move ball
+                    this.ball.x += this.ball.dx;
+                    this.ball.y += this.ball.dy;
+                    
+                    // Wall collision
+                    if (this.ball.x - this.ball.radius < 0 || this.ball.x + this.ball.radius > canvas.width) {
+                        this.ball.dx = -this.ball.dx;
+                    }
+                    if (this.ball.y - this.ball.radius < 0) {
+                        this.ball.dy = -this.ball.dy;
+                    }
+                    
+                    // Bottom - lose life
+                    if (this.ball.y + this.ball.radius > canvas.height) {
+                        this.lives--;
+                        document.getElementById('breakoutLives').textContent = this.lives;
+                        
+                        if (this.lives <= 0) {
+                            this.endGame();
+                            return;
+                        }
+                        
+                        // Reset ball
+                        this.ballLaunched = false;
+                        this.ball.x = this.paddle.x + this.paddle.width / 2;
+                        this.ball.y = canvas.height - 45 * this.scale;
+                        document.getElementById('breakoutStatus').textContent = `💔 Lost a life! ${this.lives} left. Click to launch.`;
+                    }
+                    
+                    // Paddle collision
+                    if (this.ball.y + this.ball.radius > this.paddle.y &&
+                        this.ball.y - this.ball.radius < this.paddle.y + this.paddle.height &&
+                        this.ball.x > this.paddle.x &&
+                        this.ball.x < this.paddle.x + this.paddle.width) {
+                        
+                        // Calculate hit position (-1 to 1)
+                        const hitPos = (this.ball.x - (this.paddle.x + this.paddle.width / 2)) / (this.paddle.width / 2);
+                        const angle = hitPos * 60 * Math.PI / 180;
+                        const speed = Math.sqrt(this.ball.dx * this.ball.dx + this.ball.dy * this.ball.dy);
+                        
+                        this.ball.dx = Math.sin(angle) * speed;
+                        this.ball.dy = -Math.abs(Math.cos(angle) * speed);
+                        this.ball.y = this.paddle.y - this.ball.radius;
+                    }
+                    
+                    // Brick collision
+                    for (const brick of this.bricks) {
+                        if (!brick.alive) continue;
+                        
+                        if (this.ball.x + this.ball.radius > brick.x &&
+                            this.ball.x - this.ball.radius < brick.x + brick.width &&
+                            this.ball.y + this.ball.radius > brick.y &&
+                            this.ball.y - this.ball.radius < brick.y + brick.height) {
+                            
+                            brick.alive = false;
+                            this.ball.dy = -this.ball.dy;
+                            this.score += brick.points;
+                            document.getElementById('breakoutScore').textContent = this.score;
+                            
+                            // Check win
+                            if (this.bricks.every(b => !b.alive)) {
+                                this.nextLevel();
+                            }
+                            break;
+                        }
+                    }
+                },
+                
+                nextLevel() {
+                    this.level++;
+                    document.getElementById('breakoutLevel').textContent = this.level;
+                    
+                    // Speed up ball
+                    this.ball.speed *= 1.1;
+                    
+                    // Reset ball position
+                    this.ballLaunched = false;
+                    this.ball.x = this.paddle.x + this.paddle.width / 2;
+                    this.ball.y = canvas.height - 45 * this.scale;
+                    
+                    // Add more rows
+                    this.brickRows = Math.min(7, 5 + Math.floor(this.level / 2));
+                    this.createBricks();
+                    
+                    document.getElementById('breakoutStatus').textContent = `🎉 Level ${this.level}! Click to continue.`;
+                },
+                
+                draw() {
+                    const ctx = this.ctx;
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Draw bricks
+                    for (const brick of this.bricks) {
+                        if (!brick.alive) continue;
+                        ctx.fillStyle = brick.color;
+                        ctx.shadowColor = brick.color;
+                        ctx.shadowBlur = 8;
+                        ctx.fillRect(brick.x, brick.y, brick.width, brick.height);
+                        ctx.shadowBlur = 0;
+                    }
+                    
+                    // Draw paddle
+                    ctx.fillStyle = '#22c55e';
+                    ctx.shadowColor = '#22c55e';
+                    ctx.shadowBlur = 15;
+                    ctx.fillRect(this.paddle.x, this.paddle.y, this.paddle.width, this.paddle.height);
+                    ctx.shadowBlur = 0;
+                    
+                    // Draw ball
+                    ctx.beginPath();
+                    ctx.arc(this.ball.x, this.ball.y, this.ball.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.shadowColor = '#ffffff';
+                    ctx.shadowBlur = 15;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    ctx.closePath();
+                },
+                
+                loop() {
+                    if (this.stopped) return;
+                    this.update();
+                    this.draw();
+                    this.animFrame = requestAnimationFrame(() => this.loop());
+                },
+                
+                async endGame() {
+                    this.gameOver = true;
+                    this.stopped = true;
+                    cancelAnimationFrame(this.animFrame);
+                    
+                    document.getElementById('breakoutStatus').textContent = `🎮 Game Over! Final Score: ${this.score}`;
+                    document.getElementById('breakoutStartBtn').style.display = 'inline-flex';
+                    document.getElementById('breakoutStartBtn').innerHTML = '<i class="fas fa-redo"></i> PLAY AGAIN';
+                    
+                    // Submit score
+                    const username = prompt('🏆 New high score! Enter your name:');
+                    if (username && username.trim()) {
+                        await submitScore('breakout', username.trim(), this.score);
+                        showLeaderboard('breakout');
+                    }
+                },
+                
+                stop() {
+                    this.stopped = true;
+                    cancelAnimationFrame(this.animFrame);
+                    canvas.removeEventListener('mousemove', this.mouseMoveHandler);
+                    canvas.removeEventListener('touchmove', this.touchMoveHandler);
+                    canvas.removeEventListener('click', this.launchHandler);
+                    canvas.removeEventListener('touchstart', this.launchHandler);
+                    
+                    // Reset UI
+                    document.getElementById('breakoutScore').textContent = '0';
+                    document.getElementById('breakoutLives').textContent = '3';
+                    document.getElementById('breakoutLevel').textContent = '1';
+                }
+            };
+            
+            breakoutGame.init();
+        }
+        
+        // =====================================
+        // NEON PONG GAME
+        // =====================================
+        let pongGame = null;
+        
+        function startPong() {
+            if (pongGame) pongGame.stop();
+            document.getElementById('pongStartBtn').style.display = 'none';
+            document.getElementById('pongStatus').textContent = 'First to 5 wins!';
+            document.getElementById('pongPlayerScore').textContent = '0';
+            document.getElementById('pongAIScore').textContent = '0';
+            
+            const canvas = document.getElementById('pongCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Responsive canvas
+            const maxWidth = Math.min(600, window.innerWidth - 40);
+            const ratio = 600 / 400;
+            canvas.width = maxWidth;
+            canvas.height = maxWidth / ratio;
+            
+            const scale = canvas.width / 600;
+            
+            pongGame = {
+                canvas,
+                ctx,
+                scale,
+                playerScore: 0,
+                aiScore: 0,
+                maxScore: 5,
+                stopped: false,
+                paused: false,
+                
+                // Paddles
+                paddleWidth: 12 * scale,
+                paddleHeight: 80 * scale,
+                paddleSpeed: 6 * scale,
+                
+                player: {
+                    x: 20 * scale,
+                    y: 0,
+                    targetY: 0
+                },
+                
+                ai: {
+                    x: 0,
+                    y: 0,
+                    speed: 3.5 * scale,
+                    reactionDelay: 0.15
+                },
+                
+                // Ball
+                ball: {
+                    x: 0,
+                    y: 0,
+                    radius: 10 * scale,
+                    dx: 5 * scale,
+                    dy: 3 * scale,
+                    baseSpeed: 5 * scale,
+                    maxSpeed: 12 * scale
+                },
+                
+                // Particles for trail effect
+                particles: [],
+                
+                init() {
+                    this.player.y = (canvas.height - this.paddleHeight) / 2;
+                    this.player.targetY = this.player.y;
+                    this.ai.x = canvas.width - 20 * scale - this.paddleWidth;
+                    this.ai.y = (canvas.height - this.paddleHeight) / 2;
+                    this.resetBall();
+                    this.bindEvents();
+                    this.loop();
+                },
+                
+                resetBall(towardsPlayer = Math.random() > 0.5) {
+                    this.ball.x = canvas.width / 2;
+                    this.ball.y = canvas.height / 2;
+                    
+                    const angle = (Math.random() * 60 - 30) * Math.PI / 180;
+                    const direction = towardsPlayer ? -1 : 1;
+                    this.ball.dx = Math.cos(angle) * this.ball.baseSpeed * direction;
+                    this.ball.dy = Math.sin(angle) * this.ball.baseSpeed;
+                    
+                    this.paused = true;
+                    setTimeout(() => { this.paused = false; }, 1000);
+                },
+                
+                bindEvents() {
+                    this.mouseMoveHandler = (e) => {
+                        const rect = canvas.getBoundingClientRect();
+                        const mouseY = e.clientY - rect.top;
+                        this.player.targetY = Math.max(0, Math.min(canvas.height - this.paddleHeight, mouseY - this.paddleHeight / 2));
+                    };
+                    
+                    this.touchMoveHandler = (e) => {
+                        e.preventDefault();
+                        const rect = canvas.getBoundingClientRect();
+                        const touchY = e.touches[0].clientY - rect.top;
+                        this.player.targetY = Math.max(0, Math.min(canvas.height - this.paddleHeight, touchY - this.paddleHeight / 2));
+                    };
+                    
+                    canvas.addEventListener('mousemove', this.mouseMoveHandler);
+                    canvas.addEventListener('touchmove', this.touchMoveHandler, { passive: false });
+                },
+                
+                update() {
+                    if (this.stopped || this.paused) return;
+                    
+                    // Smooth player paddle movement
+                    const diff = this.player.targetY - this.player.y;
+                    this.player.y += diff * 0.2;
+                    
+                    // AI paddle movement
+                    const aiTarget = this.ball.y - this.paddleHeight / 2;
+                    const aiDiff = aiTarget - this.ai.y;
+                    // Add some reaction delay / imperfection
+                    if (Math.abs(aiDiff) > 10 * this.scale) {
+                        this.ai.y += Math.sign(aiDiff) * Math.min(this.ai.speed, Math.abs(aiDiff));
+                    }
+                    this.ai.y = Math.max(0, Math.min(canvas.height - this.paddleHeight, this.ai.y));
+                    
+                    // Move ball
+                    this.ball.x += this.ball.dx;
+                    this.ball.y += this.ball.dy;
+                    
+                    // Add particle trail
+                    if (Math.random() > 0.5) {
+                        this.particles.push({
+                            x: this.ball.x,
+                            y: this.ball.y,
+                            alpha: 1,
+                            radius: this.ball.radius * 0.8
+                        });
+                    }
+                    
+                    // Update particles
+                    this.particles = this.particles.filter(p => {
+                        p.alpha -= 0.05;
+                        p.radius *= 0.95;
+                        return p.alpha > 0;
+                    });
+                    
+                    // Top/bottom wall collision
+                    if (this.ball.y - this.ball.radius < 0 || this.ball.y + this.ball.radius > canvas.height) {
+                        this.ball.dy = -this.ball.dy;
+                        this.ball.y = this.ball.y < canvas.height / 2 ? this.ball.radius : canvas.height - this.ball.radius;
+                    }
+                    
+                    // Player paddle collision
+                    if (this.ball.x - this.ball.radius < this.player.x + this.paddleWidth &&
+                        this.ball.x + this.ball.radius > this.player.x &&
+                        this.ball.y > this.player.y &&
+                        this.ball.y < this.player.y + this.paddleHeight) {
+                        
+                        const hitPos = (this.ball.y - (this.player.y + this.paddleHeight / 2)) / (this.paddleHeight / 2);
+                        const angle = hitPos * 60 * Math.PI / 180;
+                        const speed = Math.min(this.ball.maxSpeed, Math.sqrt(this.ball.dx * this.ball.dx + this.ball.dy * this.ball.dy) * 1.05);
+                        
+                        this.ball.dx = Math.abs(Math.cos(angle) * speed);
+                        this.ball.dy = Math.sin(angle) * speed;
+                        this.ball.x = this.player.x + this.paddleWidth + this.ball.radius;
+                    }
+                    
+                    // AI paddle collision
+                    if (this.ball.x + this.ball.radius > this.ai.x &&
+                        this.ball.x - this.ball.radius < this.ai.x + this.paddleWidth &&
+                        this.ball.y > this.ai.y &&
+                        this.ball.y < this.ai.y + this.paddleHeight) {
+                        
+                        const hitPos = (this.ball.y - (this.ai.y + this.paddleHeight / 2)) / (this.paddleHeight / 2);
+                        const angle = hitPos * 60 * Math.PI / 180;
+                        const speed = Math.min(this.ball.maxSpeed, Math.sqrt(this.ball.dx * this.ball.dx + this.ball.dy * this.ball.dy) * 1.05);
+                        
+                        this.ball.dx = -Math.abs(Math.cos(angle) * speed);
+                        this.ball.dy = Math.sin(angle) * speed;
+                        this.ball.x = this.ai.x - this.ball.radius;
+                    }
+                    
+                    // Scoring
+                    if (this.ball.x < 0) {
+                        this.aiScore++;
+                        document.getElementById('pongAIScore').textContent = this.aiScore;
+                        this.checkWin() || this.resetBall(true);
+                    } else if (this.ball.x > canvas.width) {
+                        this.playerScore++;
+                        document.getElementById('pongPlayerScore').textContent = this.playerScore;
+                        this.checkWin() || this.resetBall(false);
+                    }
+                },
+                
+                checkWin() {
+                    if (this.playerScore >= this.maxScore) {
+                        this.endGame(true);
+                        return true;
+                    } else if (this.aiScore >= this.maxScore) {
+                        this.endGame(false);
+                        return true;
+                    }
+                    return false;
+                },
+                
+                draw() {
+                    const ctx = this.ctx;
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Draw center line
+                    ctx.setLineDash([10, 10]);
+                    ctx.strokeStyle = 'rgba(34, 197, 94, 0.3)';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(canvas.width / 2, 0);
+                    ctx.lineTo(canvas.width / 2, canvas.height);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    
+                    // Draw particle trail
+                    this.particles.forEach(p => {
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                        ctx.fillStyle = `rgba(34, 197, 94, ${p.alpha * 0.5})`;
+                        ctx.fill();
+                    });
+                    
+                    // Draw paddles with glow
+                    ctx.shadowColor = '#22c55e';
+                    ctx.shadowBlur = 20;
+                    ctx.fillStyle = '#22c55e';
+                    ctx.fillRect(this.player.x, this.player.y, this.paddleWidth, this.paddleHeight);
+                    
+                    ctx.shadowColor = '#22d3ee';
+                    ctx.fillStyle = '#22d3ee';
+                    ctx.fillRect(this.ai.x, this.ai.y, this.paddleWidth, this.paddleHeight);
+                    ctx.shadowBlur = 0;
+                    
+                    // Draw ball with glow
+                    ctx.beginPath();
+                    ctx.arc(this.ball.x, this.ball.y, this.ball.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.shadowColor = '#ffffff';
+                    ctx.shadowBlur = 25;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    
+                    // Draw scores on canvas
+                    ctx.font = `bold ${32 * this.scale}px 'Press Start 2P', monospace`;
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(this.playerScore, canvas.width / 4, 60 * this.scale);
+                    ctx.fillText(this.aiScore, canvas.width * 3 / 4, 60 * this.scale);
+                },
+                
+                loop() {
+                    if (this.stopped) return;
+                    this.update();
+                    this.draw();
+                    this.animFrame = requestAnimationFrame(() => this.loop());
+                },
+                
+                async endGame(playerWon) {
+                    this.stopped = true;
+                    cancelAnimationFrame(this.animFrame);
+                    
+                    const status = playerWon ? '🏆 YOU WIN!' : '😢 AI WINS!';
+                    document.getElementById('pongStatus').textContent = status;
+                    document.getElementById('pongStartBtn').style.display = 'inline-flex';
+                    document.getElementById('pongStartBtn').innerHTML = '<i class="fas fa-redo"></i> PLAY AGAIN';
+                    
+                    if (playerWon) {
+                        // Calculate score based on AI score (fewer AI points = better)
+                        const score = (this.maxScore - this.aiScore) * 100 + Math.floor(Math.random() * 50);
+                        const username = prompt(`🏆 Victory! Score: ${score}\nEnter name for leaderboard:`);
+                        if (username && username.trim()) {
+                            await submitScore('pong', username.trim(), score);
+                            showLeaderboard('pong');
+                        }
+                    }
+                },
+                
+                stop() {
+                    this.stopped = true;
+                    cancelAnimationFrame(this.animFrame);
+                    canvas.removeEventListener('mousemove', this.mouseMoveHandler);
+                    canvas.removeEventListener('touchmove', this.touchMoveHandler);
+                }
+            };
+            
+            pongGame.init();
+        }
+        
+        // Load overall leaderboard on page load
+        setTimeout(() => showLeaderboard('overall'), 1000);
+        
         document.addEventListener('DOMContentLoaded', initSocket);
     </script>
+    
+    <!-- ChiffTown Share Button -->
+    <script src="/js/share-button.js" data-share-message="Challenge me at the Pixel Palace arcade! 🎮"></script>
+    
+    <!-- Quick Emotes & Loading Screen & Activity Feed -->
+    <script src="/js/quick-emotes.js?v=1"></script>
+    <script src="/js/loading-screen.js?v=1"></script>
+    <script src="/js/activity-feed.js?v=1"></script>
 </body>
 </html>

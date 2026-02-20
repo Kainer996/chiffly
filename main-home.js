@@ -10,6 +10,10 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeAuth();
     restoreUserSession();
     initializeSocket();
+    initializeParallax();
+    // Building locks now handled by Generation System
+    // initializeBuildingLocks();
+    initializeVisitorCounters();
 });
 
 // === Ambient Particle System (Stars/Fireflies) ===
@@ -137,24 +141,14 @@ function initializeVenueCards() {
             const href = this.getAttribute('href');
             const isExternal = this.getAttribute('target') === '_blank';
             
-            // Allow external links without auth check
+            // Allow external links to open naturally
             if (isExternal) return;
             
             e.preventDefault();
-            
-            const isSignedIn = localStorage.getItem('chiffly_signed_in') === 'true';
-            if (!isSignedIn) {
-                showNotification('Enter ChiffTown first to access venues!', 'warning');
-                const btn = document.getElementById('signInBtn');
-                if (btn) {
-                    btn.style.animation = 'pulse 0.6s ease 3';
-                    setTimeout(() => btn.style.animation = '', 2000);
-                }
-                return;
-            }
 
-            // Click animation
+            // Click animation then navigate
             this.style.opacity = '0.7';
+            this.style.transform = 'scale(0.95)';
             
             setTimeout(() => {
                 window.location.href = href;
@@ -168,21 +162,13 @@ function updateVenueAccessIndicators() {
     const hotspots = document.querySelectorAll('.map-hotspot');
     
     hotspots.forEach(hotspot => {
-        const isExternal = hotspot.getAttribute('target') === '_blank';
+        // All hotspots are always interactive - no locked state
+        hotspot.classList.remove('locked');
+        hotspot.style.opacity = '';
+        hotspot.style.filter = '';
+        hotspot.style.pointerEvents = '';
         
-        // Skip external links
-        if (isExternal) return;
-        
-        if (!isSignedIn) {
-            hotspot.classList.add('locked');
-            hotspot.style.opacity = '0.5';
-            hotspot.style.filter = 'grayscale(0.6)';
-            hotspot.style.pointerEvents = 'auto';
-        } else {
-            hotspot.classList.remove('locked');
-            hotspot.style.opacity = '';
-            hotspot.style.filter = '';
-            hotspot.style.pointerEvents = '';
+        if (true) { // Always active
         }
     });
     
@@ -200,21 +186,10 @@ function updateAccessMessage(isSignedIn) {
     const parent = container.parentElement;
     let msg = parent.querySelector('.access-message');
     
-    if (!isSignedIn) {
-        if (!msg) {
-            msg = document.createElement('div');
-            msg.className = 'access-message';
-            msg.innerHTML = `
-                <div class="access-message-content">
-                    <i class="fas fa-door-open"></i>
-                    <h3>Enter ChiffTown to Visit Venues</h3>
-                    <p>Sign in or walk in as a guest to explore the town</p>
-                </div>
-            `;
-            parent.insertBefore(msg, container);
-        }
-    } else {
-        if (msg) msg.remove();
+    // Always remove access gate message - map is always interactive
+    if (msg) msg.remove();
+    
+    if (false) { // Disabled - no auth gate on map
     }
 }
 
@@ -345,6 +320,11 @@ function initializeSocket() {
             animateNumber('totalUsers', stats.totalUsers || 0);
             animateNumber('activeRooms', stats.activeRooms || 0);
             animateNumber('liveStreams', stats.liveStreams || 0);
+
+            // Update venue visitor counters if available
+            if (stats.venueVisitors && window.updateVenueVisitors) {
+                window.updateVenueVisitors(stats.venueVisitors);
+            }
         });
 
         // Refresh stats periodically
@@ -767,6 +747,102 @@ function debounce(fn, wait) {
         clearTimeout(t);
         t = setTimeout(() => fn(...args), wait);
     };
+}
+
+// === Subtle Parallax on Scroll ===
+function initializeParallax() {
+    const layers = document.querySelectorAll('.parallax-layer');
+    if (!layers.length) return;
+
+    const mapContainer = document.querySelector('.interactive-map-container');
+    if (!mapContainer) return;
+
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            requestAnimationFrame(() => {
+                const rect = mapContainer.getBoundingClientRect();
+                const viewH = window.innerHeight;
+                // Only apply when map is in view
+                if (rect.bottom > 0 && rect.top < viewH) {
+                    const progress = (viewH - rect.top) / (viewH + rect.height);
+                    layers.forEach(layer => {
+                        const speed = parseFloat(layer.dataset.parallax) || 0.02;
+                        const offset = (progress - 0.5) * speed * viewH;
+                        layer.style.transform = `translateY(${offset}px) scale(1)`;
+                    });
+
+                    // Parallax for ambient elements too
+                    const ambientLayer = document.querySelector('.map-ambient-layer');
+                    if (ambientLayer) {
+                        const aOffset = (progress - 0.5) * 0.035 * viewH;
+                        ambientLayer.style.transform = `translateY(${aOffset}px)`;
+                    }
+                }
+                ticking = false;
+            });
+            ticking = true;
+        }
+    }, { passive: true });
+}
+
+// === Building Lock System ===
+function initializeBuildingLocks() {
+    const hotspots = document.querySelectorAll('.map-hotspot[data-unlock-level]');
+    const userXP = parseInt(localStorage.getItem('chiffly_user_xp') || '0');
+    const userLevel = Math.floor(userXP / 100) + 1;
+
+    hotspots.forEach(hotspot => {
+        const requiredLevel = parseInt(hotspot.dataset.unlockLevel) || 0;
+        if (requiredLevel > 0 && userLevel < requiredLevel) {
+            hotspot.classList.add('locked-building');
+            // Add lock overlay
+            const lockOverlay = document.createElement('div');
+            lockOverlay.className = 'lock-overlay';
+            lockOverlay.innerHTML = `
+                <div class="lock-icon"><i class="fas fa-lock"></i></div>
+                <div class="lock-level">Level ${requiredLevel}</div>
+            `;
+            hotspot.appendChild(lockOverlay);
+
+            // Prevent navigation
+            hotspot.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                showNotification(`Unlock at Level ${requiredLevel}! Keep exploring to level up.`, 'warning');
+            });
+        }
+    });
+}
+
+// === Visitor Counters ===
+function initializeVisitorCounters() {
+    // Update visitor badges when socket sends venue stats
+    window.updateVenueVisitors = function(venueStats) {
+        // venueStats = { tavern: 3, nightclub: 1, ... }
+        Object.entries(venueStats).forEach(([venueId, count]) => {
+            const badge = document.querySelector(`.visitor-badge[data-venue-id="${venueId}"]`);
+            if (badge) {
+                const span = badge.querySelector('span');
+                if (span) span.textContent = count;
+                badge.classList.toggle('has-visitors', count > 0);
+            }
+
+            // Also update tooltip visitor count
+            const hotspot = badge?.closest('.map-hotspot');
+            if (hotspot) {
+                const tooltipVisitors = hotspot.querySelector('.tooltip-visitors span');
+                if (tooltipVisitors) tooltipVisitors.textContent = count;
+            }
+        });
+    };
+
+    // Simulate some visitors for demo feel (will be overridden by real socket data)
+    const demoVisitors = {};
+    ['tavern', 'nightclub', 'cinema', 'arcade', 'lounge', 'adventure'].forEach(id => {
+        demoVisitors[id] = Math.random() > 0.5 ? Math.floor(Math.random() * 4) : 0;
+    });
+    window.updateVenueVisitors(demoVisitors);
 }
 
 console.log('🏘️ ChiffTown loaded successfully!');

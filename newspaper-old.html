@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Chifftown Chronicle — Town Newspaper</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-deep: #0a0a1a;
+            --bg-mid: #12122a;
+            --bg-surface: #1a1a3e;
+            --text-primary: #f0eef6;
+            --text-secondary: rgba(240, 238, 246, 0.65);
+            --text-muted: rgba(240, 238, 246, 0.4);
+            --accent-gold: #f4c542;
+            --accent-silver: #c0c0c0;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 0.75rem 0;
+            background: rgba(10, 10, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            text-decoration: none;
+            letter-spacing: 1px;
+        }
+
+        .back-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: var(--glass-border);
+            color: var(--text-primary);
+        }
+
+        /* Newspaper Header */
+        .newspaper-header {
+            margin-top: 80px;
+            padding: 3rem 0 2rem;
+            text-align: center;
+            border-bottom: 3px double var(--accent-gold);
+        }
+
+        .newspaper-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            color: var(--accent-gold);
+            margin-bottom: 0.5rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .newspaper-subtitle {
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            font-style: italic;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .newspaper-date {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .newspaper-edition {
+            font-family: 'Playfair Display', serif;
+            font-size: 0.9rem;
+            color: var(--accent-silver);
+            margin-top: 0.5rem;
+            font-weight: 600;
+        }
+
+        /* News Grid */
+        .news-section {
+            padding: 3rem 0;
+        }
+
+        .news-columns {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .main-column {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .side-column {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Article Cards */
+        .article {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .article:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .article-header {
+            margin-bottom: 1rem;
+        }
+
+        .article-category {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-silver));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .article-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+
+        .article-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .article-meta i {
+            color: var(--accent-gold);
+        }
+
+        .article-content {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .article-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.8;
+        }
+
+        /* Featured Article */
+        .featured-article {
+            background: linear-gradient(135deg, rgba(244, 197, 66, 0.08), rgba(192, 192, 192, 0.08));
+            border: 2px solid rgba(244, 197, 66, 0.2);
+        }
+
+        .featured-article .article-title {
+            font-size: 1.8rem;
+        }
+
+        /* Side Panel */
+        .side-panel {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .side-panel-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--glass-border);
+        }
+
+        .side-panel-item {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .side-panel-item:last-child {
+            border-bottom: none;
+        }
+
+        .side-panel-item-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .side-panel-item-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Stats Grid */
+        .stats-panel {
+            background: linear-gradient(135deg, rgba(244, 197, 66, 0.05), rgba(192, 192, 192, 0.05));
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+        }
+
+        .stat-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Gossip Styles */
+        .gossip-article {
+            background: linear-gradient(135deg, rgba(192, 192, 192, 0.08), rgba(244, 197, 66, 0.05));
+            border: 1px solid rgba(192, 192, 192, 0.15);
+        }
+
+        .gossip-article .article-title {
+            color: var(--accent-silver);
+        }
+
+        .gossip-tip-item {
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-left: 3px solid var(--accent-silver);
+            border-radius: 4px;
+            margin-bottom: 0.75rem;
+        }
+
+        .gossip-tip-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-style: italic;
+            margin-bottom: 0.5rem;
+        }
+
+        .gossip-tip-meta {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        /* Submit Form */
+        .submit-tip-form {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .char-counter {
+            text-align: right;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-silver));
+            border: none;
+            border-radius: 8px;
+            color: var(--bg-deep);
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(244, 197, 66, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Hot Takes */
+        .hot-take-item {
+            padding: 1rem;
+            background: linear-gradient(135deg, rgba(244, 197, 66, 0.05), rgba(192, 192, 192, 0.05));
+            border: 1px solid rgba(244, 197, 66, 0.15);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+        }
+
+        .hot-take-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            margin-bottom: 0.5rem;
+        }
+
+        .hot-take-winner {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .hot-take-stat {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+
+        .hot-take-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        @media (max-width: 900px) {
+            .news-columns {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">CHIFFTOWN</a>
+            <a href="/" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back to Town
+            </a>
+        </div>
+    </nav>
+
+    <!-- Newspaper Header -->
+    <header class="newspaper-header">
+        <div class="container">
+            <h1 class="newspaper-title">The Chifftown Chronicle</h1>
+            <p class="newspaper-subtitle">"All the News That's Fit to Stream"</p>
+            <p class="newspaper-date" id="currentDate">Loading...</p>
+            <p class="newspaper-edition" id="editionNumber">Loading edition...</p>
+        </div>
+    </header>
+
+    <!-- News Section -->
+    <section class="news-section">
+        <div class="container">
+            <div class="news-columns">
+                <!-- Main Column -->
+                <div class="main-column">
+                    <div id="featuredNews">
+                        <!-- Featured article will be inserted here -->
+                    </div>
+
+                    <div id="mainNews">
+                        <!-- Main news articles will be inserted here -->
+                    </div>
+                </div>
+
+                <!-- Side Column -->
+                <div class="side-column">
+                    <!-- Hot Takes -->
+                    <div class="side-panel">
+                        <h3 class="side-panel-title"><i class="fas fa-fire"></i> Hot Takes</h3>
+                        <div id="hotTakes">
+                            <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem;">Loading...</p>
+                        </div>
+                    </div>
+
+                    <!-- Submit Anonymous Tip -->
+                    <div class="side-panel">
+                        <h3 class="side-panel-title"><i class="fas fa-mask"></i> Submit Tip</h3>
+                        <form class="submit-tip-form" onsubmit="submitGossip(event)">
+                            <div class="form-group">
+                                <label class="form-label">Anonymous Tip (10-500 chars)</label>
+                                <textarea 
+                                    id="gossipInput" 
+                                    class="form-textarea" 
+                                    placeholder="Spill the tea... 👀"
+                                    maxlength="500"
+                                    required
+                                ></textarea>
+                                <div class="char-counter">
+                                    <span id="charCount">0</span>/500
+                                </div>
+                            </div>
+                            <button type="submit" class="submit-btn" id="submitBtn">
+                                <i class="fas fa-paper-plane"></i> Submit Tip
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Reader Tips (Gossip) -->
+                    <div class="side-panel">
+                        <h3 class="side-panel-title"><i class="fas fa-comments"></i> Reader Tips</h3>
+                        <div id="readerTips">
+                            <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem;">Loading...</p>
+                        </div>
+                    </div>
+
+                    <!-- Town Stats -->
+                    <div class="stats-panel">
+                        <h3 class="side-panel-title"><i class="fas fa-chart-line"></i> Town Statistics</h3>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-number" id="totalVisitors">0</div>
+                                <div class="stat-label">Total Visitors</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="activeToday">0</div>
+                                <div class="stat-label">Active Today</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="levelsGained">0</div>
+                                <div class="stat-label">Levels Gained</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="achievementsEarned">0</div>
+                                <div class="stat-label">Achievements</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Achievements -->
+                    <div class="side-panel">
+                        <h3 class="side-panel-title"><i class="fas fa-trophy"></i> Recent Achievements</h3>
+                        <div id="recentAchievements">
+                            <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem;">Loading...</p>
+                        </div>
+                    </div>
+
+                    <!-- Top Players -->
+                    <div class="side-panel">
+                        <h3 class="side-panel-title"><i class="fas fa-crown"></i> Top Citizens</h3>
+                        <div id="topPlayers">
+                            <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem;">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+        // Set current date
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        // Load edition number
+        async function loadEdition() {
+            try {
+                const res = await fetch('/api/edition');
+                const edition = await res.json();
+                document.getElementById('editionNumber').textContent = 
+                    `Vol. ${edition.volume}, Issue ${edition.issue}`;
+            } catch (error) {
+                console.error('Error loading edition:', error);
+            }
+        }
+
+        // Character counter for gossip input
+        const gossipInput = document.getElementById('gossipInput');
+        if (gossipInput) {
+            gossipInput.addEventListener('input', (e) => {
+                document.getElementById('charCount').textContent = e.target.value.length;
+            });
+        }
+
+        // Submit gossip tip
+        async function submitGossip(event) {
+            event.preventDefault();
+            
+            const tip = document.getElementById('gossipInput').value.trim();
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (tip.length < 10 || tip.length > 500) {
+                alert('Tip must be between 10-500 characters');
+                return;
+            }
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+            
+            try {
+                const response = await fetch('/api/gossip', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tip })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('✅ Your tip has been submitted anonymously!');
+                    document.getElementById('gossipInput').value = '';
+                    document.getElementById('charCount').textContent = '0';
+                    loadGossip(); // Refresh gossip
+                } else {
+                    alert('Failed to submit tip. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error submitting gossip:', error);
+                alert('Failed to submit tip. Please try again.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Tip';
+            }
+        }
+
+        // Load gossip tips
+        async function loadGossip() {
+            try {
+                const res = await fetch('/api/gossip?limit=10');
+                const tips = await res.json();
+                displayGossipTips(tips);
+            } catch (error) {
+                console.error('Error loading gossip:', error);
+            }
+        }
+
+        function displayGossipTips(tips) {
+            const container = document.getElementById('readerTips');
+            
+            if (tips.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 0.85rem;">No tips yet. Be the first!</p>';
+                return;
+            }
+            
+            container.innerHTML = tips.map(tip => `
+                <div class="gossip-tip-item">
+                    <div class="gossip-tip-text">"${escapeHtml(tip.tip)}"</div>
+                    <div class="gossip-tip-meta">
+                        — ${escapeHtml(tip.author)} • ${formatTime(tip.timestamp)}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Load hot takes
+        async function loadHotTakes() {
+            try {
+                const res = await fetch('/api/hot-takes');
+                const hotTakes = await res.json();
+                displayHotTakes(hotTakes);
+            } catch (error) {
+                console.error('Error loading hot takes:', error);
+            }
+        }
+
+        function displayHotTakes(hotTakes) {
+            const container = document.getElementById('hotTakes');
+            
+            if (hotTakes.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 0.85rem;">No data yet</p>';
+                return;
+            }
+            
+            container.innerHTML = hotTakes.slice(0, 5).map(take => `
+                <div class="hot-take-item">
+                    <div class="hot-take-title">${take.title}</div>
+                    <div class="hot-take-winner">${escapeHtml(take.winner)}</div>
+                    <div class="hot-take-stat">${escapeHtml(take.stat)}</div>
+                    <div class="hot-take-desc">${take.desc}</div>
+                </div>
+            `).join('');
+        }
+
+        // Generate news from activity data
+        async function loadNews() {
+            try {
+                const [activityRes, leaderboardRes] = await Promise.all([
+                    fetch('/api/activity?limit=100'),
+                    fetch('/api/leaderboard?limit=5')
+                ]);
+
+                const activity = await activityRes.json();
+                const leaderboard = await leaderboardRes.json();
+
+                generateNews(activity);
+                displayTopPlayers(leaderboard);
+                displayRecentAchievements(activity);
+                updateStats(activity, leaderboard);
+            } catch (error) {
+                console.error('Error loading news:', error);
+            }
+        }
+
+        function generateNews(activity) {
+            const news = [];
+
+            // Level ups (GOSSIP STYLE!)
+            const levelUps = activity.filter(a => a.type === 'level_up');
+            if (levelUps.length > 0) {
+                const latestLevel = levelUps[0];
+                const levelMilestone = latestLevel.level >= 10;
+                news.push({
+                    category: levelMilestone ? 'Breaking News' : 'Town Talk',
+                    title: levelMilestone 
+                        ? `SPOTTED: ${latestLevel.username} Hits Level ${latestLevel.level}! 👀`
+                        : `${latestLevel.username} Levels Up to ${latestLevel.level}`,
+                    content: levelMilestone
+                        ? `Word on the street is that ${latestLevel.username} has been GRINDING hard across Chifftown venues. Sources say they just hit Level ${latestLevel.level}! What are they training for? The competition is SHOOK. Our reporters caught them leaving the Arcade at 3 AM... dedication or obsession? You decide! 💪`
+                        : `${latestLevel.username} has reached Level ${latestLevel.level}! Rumor has it they've been making the rounds at the hottest spots in town. Keep climbing, champ! 🌟`,
+                    icon: levelMilestone ? '🔥' : '⬆️',
+                    time: formatTime(latestLevel.timestamp),
+                    featured: latestLevel.level >= 10,
+                    gossip: true
+                });
+            }
+
+            // Achievements (GOSSIP STYLE!)
+            const achievements = activity.filter(a => a.type === 'achievement').slice(0, 3);
+            achievements.forEach(ach => {
+                news.push({
+                    category: 'Achievement Alert',
+                    title: `${ach.username} Just Unlocked "${ach.achievementName}" 🏅`,
+                    content: `Our sources confirm that ${ach.username} has officially unlocked the coveted "${ach.achievementName}" achievement. They're not just playing around — they're DOMINATING. The whole town is talking about it. What's their secret? Drop by their stream and find out! 👑`,
+                    icon: '🏆',
+                    time: formatTime(ach.timestamp),
+                    gossip: true
+                });
+            });
+
+            // Generate venue activity summary
+            const venueActivity = generateVenueNews(activity);
+            news.push(...venueActivity);
+
+            // Display news
+            displayNews(news);
+        }
+
+        function generateVenueNews(activity) {
+            const news = [];
+            const today = new Date().setHours(0, 0, 0, 0);
+
+            // Count activity types
+            const todayActivity = activity.filter(a => new Date(a.timestamp).setHours(0, 0, 0, 0) === today);
+
+            if (todayActivity.length > 20) {
+                news.push({
+                    category: 'Town Events',
+                    title: `Bustling Activity: ${todayActivity.length} Events Today`,
+                    content: `Chifftown saw remarkable activity today with ${todayActivity.length} recorded events across all venues. From the Tavern to the Nightclub, our virtual town is thriving with engaged residents.`,
+                    icon: '🏘️',
+                    time: 'Today'
+                });
+            }
+
+            return news;
+        }
+
+        function displayNews(newsItems) {
+            const featured = newsItems.find(n => n.featured);
+            const mainNews = newsItems.filter(n => !n.featured).slice(0, 5);
+
+            // Featured article
+            if (featured) {
+                document.getElementById('featuredNews').innerHTML = `
+                    <article class="article featured-article ${featured.gossip ? 'gossip-article' : ''}">
+                        <div class="article-header">
+                            <div class="article-icon">${featured.icon}</div>
+                            <div class="article-category">${featured.category}</div>
+                            <h2 class="article-title">${escapeHtml(featured.title)}</h2>
+                            <div class="article-meta">
+                                <span><i class="fas fa-clock"></i> ${featured.time}</span>
+                                ${featured.gossip ? '<span><i class="fas fa-fire"></i> Hot Topic</span>' : ''}
+                            </div>
+                        </div>
+                        <div class="article-content">
+                            ${escapeHtml(featured.content)}
+                        </div>
+                    </article>
+                `;
+            }
+
+            // Main articles
+            document.getElementById('mainNews').innerHTML = mainNews.map(article => `
+                <article class="article ${article.gossip ? 'gossip-article' : ''}">
+                    <div class="article-header">
+                        <div class="article-icon">${article.icon}</div>
+                        <div class="article-category">${article.category}</div>
+                        <h2 class="article-title">${escapeHtml(article.title)}</h2>
+                        <div class="article-meta">
+                            <span><i class="fas fa-clock"></i> ${article.time}</span>
+                            ${article.gossip ? '<span><i class="fas fa-fire"></i> Gossip</span>' : ''}
+                        </div>
+                    </div>
+                    <div class="article-content">
+                        ${escapeHtml(article.content)}
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        function displayTopPlayers(leaderboard) {
+            if (leaderboard.length === 0) {
+                document.getElementById('topPlayers').innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 0.85rem;">No players yet</p>';
+                return;
+            }
+
+            document.getElementById('topPlayers').innerHTML = leaderboard.map((player, index) => `
+                <div class="side-panel-item">
+                    <div class="side-panel-item-title">
+                        ${index === 0 ? '👑' : index === 1 ? '🥈' : index === 2 ? '🥉' : ''}
+                        ${escapeHtml(player.username)}
+                    </div>
+                    <div class="side-panel-item-meta">
+                        Level ${player.level} • ${player.xp} XP
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function displayRecentAchievements(activity) {
+            const achievements = activity.filter(a => a.type === 'achievement').slice(0, 5);
+
+            if (achievements.length === 0) {
+                document.getElementById('recentAchievements').innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 0.85rem;">No achievements yet</p>';
+                return;
+            }
+
+            document.getElementById('recentAchievements').innerHTML = achievements.map(ach => `
+                <div class="side-panel-item">
+                    <div class="side-panel-item-title">
+                        ${escapeHtml(ach.achievementName)}
+                    </div>
+                    <div class="side-panel-item-meta">
+                        ${escapeHtml(ach.username)} • ${formatTime(ach.timestamp)}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateStats(activity, leaderboard) {
+            // Count unique users
+            const uniqueUsers = new Set(activity.map(a => a.username));
+            document.getElementById('totalVisitors').textContent = uniqueUsers.size;
+
+            // Today's active users
+            const today = new Date().setHours(0, 0, 0, 0);
+            const todayActivity = activity.filter(a => new Date(a.timestamp).setHours(0, 0, 0, 0) === today);
+            const activeToday = new Set(todayActivity.map(a => a.username));
+            document.getElementById('activeToday').textContent = activeToday.size;
+
+            // Level ups
+            const levelUps = activity.filter(a => a.type === 'level_up');
+            document.getElementById('levelsGained').textContent = levelUps.length;
+
+            // Achievements
+            const achievements = activity.filter(a => a.type === 'achievement');
+            document.getElementById('achievementsEarned').textContent = achievements.length;
+        }
+
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const days = Math.floor(hours / 24);
+
+            if (days > 0) return `${days} day${days > 1 ? 's' : ''} ago`;
+            if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+            return 'Just now';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Load all data on page load
+        loadEdition();
+        loadNews();
+        loadGossip();
+        loadHotTakes();
+
+        // Refresh every 5 minutes
+        setInterval(() => {
+            loadNews();
+            loadGossip();
+            loadHotTakes();
+        }, 5 * 60 * 1000);
+
+        // Setup real-time gossip updates
+        const socket = io();
+        socket.on('new-gossip', (tip) => {
+            console.log('New gossip received:', tip);
+            loadGossip(); // Refresh gossip list
+        });
+    </script>
+</body>
+</html>

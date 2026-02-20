@@ -1,0 +1,380 @@
+[
+  {
+    "username": "jaha",
+    "type": "xp_gain",
+    "amount": 20,
+    "reason": "Starting a streaming session",
+    "timestamp": 1770887792892
+  },
+  {
+    "username": "jaha",
+    "type": "achievement",
+    "achievementId": "first_steps",
+    "achievementName": "First Steps",
+    "timestamp": 1770887792892
+  },
+  {
+    "username": "jaha",
+    "type": "xp_gain",
+    "amount": 10,
+    "reason": "Joining jaha's Set",
+    "timestamp": 1770887792894
+  },
+  {
+    "username": "jaba",
+    "type": "xp_gain",
+    "amount": 20,
+    "reason": "Starting a streaming session",
+    "timestamp": 1770892773813
+  },
+  {
+    "username": "jaba",
+    "type": "achievement",
+    "achievementId": "first_steps",
+    "achievementName": "First Steps",
+    "timestamp": 1770892773814
+  },
+  {
+    "username": "jaba",
+    "type": "xp_gain",
+    "amount": 10,
+    "reason": "Joining Table 542fc8",
+    "timestamp": 1770892773816
+  },
+  {
+    "username": "baha",
+    "type": "xp_gain",
+    "amount": 20,
+    "reason": "Starting a streaming session",
+    "timestamp": 1770920368230
+  },
+  {
+    "username": "baha",
+    "type": "achievement",
+    "achievementId": "first_steps",
+    "achievementName": "First Steps",
+    "timestamp": 1770920368230
+  },
+  {
+    "username": "baha",
+    "type": "xp_gain",
+    "amount": 10,
+    "reason": "Joining baha's Table",
+    "timestamp": 1770920368231
+  },
+  {
+    "username": "hahaha",
+    "type": "xp_gain",
+    "amount": 20,
+    "reason": "Starting a streaming session",
+    "timestamp": 1771102150994
+  },
+  {
+    "username": "hahaha",
+    "type": "achievement",
+    "achievementId": "first_steps",
+    "achievementName": "First Steps",
+    "timestamp": 1771102150994
+  },
+  {
+    "username": "hahaha",
+    "type": "xp_gain",
+    "amount": 10,
+    "reason": "Joining hahaha's Table",
+    "timestamp": 1771102150995
+  },
+  {
+    "username": "hahaha",
+    "type": "xp_gain",
+    "amount": 20,
+    "reason": "Starting a streaming session",
+    "timestamp": 1771102153392
+  },
+  {
+    "username": "hahaha",
+    "type": "xp_gain",
+    "amount": 10,
+    "reason": "Joining Table e6f1f8",
+    "timestamp": 1771102153394
+  },
+  {
+    "username": "yaan",
+    "type": "xp_gain",
+    "amount": 20,
+    "reason": "Starting a streaming session",
+    "timestamp": 1771102431786
+  },
+  {
+    "username": "yaan",
+    "type": "achievement",
+    "achievementId": "first_steps",
+    "achievementName": "First Steps",
+    "timestamp": 1771102431786
+  },
+  {
+    "username": "yaan",
+    "type": "xp_gain",
+    "amount": 10,
+    "reason": "Joining yaan's Table",
+    "timestamp": 1771102431787
+  },
+  {
+    "username": "yaan",
+    "type": "xp_gain",
+    "amount": 2,
+    "reason": "Sending a message",
+    "timestamp": 1771102444258
+  },
+  {
+    "username": "Faith",
+    "type": "xp_gain",
+    "amount": 20,
+    "reason": "Starting a streaming session",
+    "timestamp": 1771102452750
+  },
+  {
+    "username": "Faith",
+    "type": "achievement",
+    "achievementId": "first_steps",
+    "achievementName": "First Steps",
+    "timestamp": 1771102452750
+  },
+  {
+    "username": "Faith",
+    "type": "xp_gain",
+    "amount": 10,
+    "reason": "Joining Faith's Table",
+    "timestamp": 1771102452750
+  },
+  {
+    "username": "crunch",
+    "type": "xp_gain",
+    "amount": 10,
+    "reason": "Joining yaan's Table",
+    "timestamp": 1771102458485
+  },
+  {
+    "username": "crunch",
+    "type": "achievement",
+    "achievementId": "first_steps",
+    "achievementName": "First Steps",
+    "timestamp": 1771102458485
+  },
+  {
+    "username": "Buns",
+    "type": "xp_gain",
+    "amount": 10,
+    "reason": "Joining Faith's Table",
+    "timestamp": 1771102464731
+  },
+  {
+    "username": "Buns",
+    "type": "achievement",
+    "achievementId": "first_steps",
+    "achievementName": "First Steps",
+    "timestamp": 1771102464731
+  },
+  {
+    "username": "Buns",
+    "type": "xp_gain",
+    "amount": 2,
+    "reason": "Sending a message",
+    "timestamp": 1771102484254
+  },
+  {
+    "username": "Buns",
+    "type": "xp_gain",
+    "amount": 10,
+    "reason": "Joining yaan's Table",
+    "timestamp": 1771102514908
+  },
+  {
+    "username": "Buns",
+    "type": "xp_gain",
+    "amount": 2,
+    "reason": "Sending a message",
+    "timestamp": 1771102545266
+  },
+  {
+    "username": "kikuh",
+    "type": "xp_gain",
+    "amount": 10,
+    "reason": "Joining yaan's Table",
+    "timestamp": 1771102561392
+  },
+  {
+    "username": "kikuh",
+    "type": "achievement",
+    "achievementId": "first_steps",
+    "achievementName": "First Steps",
+    "timestamp": 1771102561392
+  },
+  {
+    "username": "yaan",
+    "type": "xp_gain",
+    "amount": 2,
+    "reason": "Sending a message",
+    "timestamp": 1771102569109
+  },
+  {
+    "username": "Buns",
+    "type": "xp_gain",
+    "amount": 2,
+    "reason": "Sending a message",
+    "timestamp": 1771102575214
+  },
+  {
+    "username": "Buns",
+    "type": "xp_gain",
+    "amount": 2,
+    "reason": "Sending a message",
+    "timestamp": 1771102593992
+  },
+  {
+    "username": "crunch",
+    "type": "xp_gain",
+    "amount": 2,
+    "reason": "Sending a message",
+    "timestamp": 1771102615709
+  },
+  {
+    "username": "crunch",
+    "type": "xp_gain",
+    "amount": 2,
+    "reason": "Sending a message",
+    "timestamp": 1771102623026
+  },
+  {
+    "username": "Buns",
+    "type": "xp_gain",
+    "amount": 2,
+    "reason": "Sending a message",
+    "timestamp": 1771102646681
+  },
+  {
+    "username": "yaan",
+    "type": "xp_gain",
+    "amount": 2,
+    "reason": "Sending a message",
+    "timestamp": 1771102651580
+  },
+  {
+    "username": "crunch",
+    "type": "xp_gain",
+    "amount": 2,
+    "reason": "Sending a message",
+    "timestamp": 1771102655184
+  },
+  {
+    "username": "crunch",
+    "type": "xp_gain",
+    "amount": 2,
+    "reason": "Sending a message",
+    "timestamp": 1771102672475
+  },
+  {
+    "username": "Buns",
+    "type": "xp_gain",
+    "amount": 2,
+    "reason": "Sending a message",
+    "timestamp": 1771102703663
+  },
+  {
+    "username": "kikuh",
+    "type": "xp_gain",
+    "amount": 2,
+    "reason": "Sending a message",
+    "timestamp": 1771102707221
+  },
+  {
+    "username": "crunch",
+    "type": "xp_gain",
+    "amount": 2,
+    "reason": "Sending a message",
+    "timestamp": 1771102734537
+  },
+  {
+    "username": "crunch",
+    "type": "xp_gain",
+    "amount": 1,
+    "reason": "Chatting with Acquaintance Buns",
+    "timestamp": 1771102734537
+  },
+  {
+    "username": "crunch",
+    "type": "xp_gain",
+    "amount": 2,
+    "reason": "Sending a message",
+    "timestamp": 1771102739737
+  },
+  {
+    "username": "crunch",
+    "type": "xp_gain",
+    "amount": 1,
+    "reason": "Chatting with Acquaintance Buns",
+    "timestamp": 1771102739738
+  },
+  {
+    "username": "Buns",
+    "type": "xp_gain",
+    "amount": 2,
+    "reason": "Sending a message",
+    "timestamp": 1771102783033
+  },
+  {
+    "username": "Buns",
+    "type": "xp_gain",
+    "amount": 1,
+    "reason": "Chatting with Acquaintance crunch",
+    "timestamp": 1771102783034
+  },
+  {
+    "username": "yaan",
+    "type": "xp_gain",
+    "amount": 2,
+    "reason": "Sending a message",
+    "timestamp": 1771102894940
+  },
+  {
+    "username": "hcc",
+    "type": "xp_gain",
+    "amount": 20,
+    "reason": "Starting a streaming session",
+    "timestamp": 1771524080744
+  },
+  {
+    "username": "hcc",
+    "type": "achievement",
+    "achievementId": "first_steps",
+    "achievementName": "First Steps",
+    "timestamp": 1771524080744
+  },
+  {
+    "username": "hcc",
+    "type": "xp_gain",
+    "amount": 10,
+    "reason": "Joining hcc's Table",
+    "timestamp": 1771524080745
+  },
+  {
+    "username": "hvc",
+    "type": "xp_gain",
+    "amount": 20,
+    "reason": "Starting a streaming session",
+    "timestamp": 1771524121229
+  },
+  {
+    "username": "hvc",
+    "type": "achievement",
+    "achievementId": "first_steps",
+    "achievementName": "First Steps",
+    "timestamp": 1771524121229
+  },
+  {
+    "username": "hvc",
+    "type": "xp_gain",
+    "amount": 10,
+    "reason": "Joining hvc's Set",
+    "timestamp": 1771524121230
+  }
+]

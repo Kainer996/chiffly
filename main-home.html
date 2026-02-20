@@ -58,36 +58,111 @@
                 </div>
                 
                 <div class="interactive-map-container">
-                    <img src="/images/chifftown-map-iso.png" alt="Chifftown City Map" class="city-map-image">
+                    <img src="/images/chifftown-map-iso.png" alt="Chifftown City Map" class="city-map-image parallax-layer" data-parallax="0.02">
                     
-                    <!-- Hotspot Overlays -->
-                    <a href="/questing.html" class="map-hotspot adventure-hotspot" data-venue="Adventure Guild">
+                    <!-- Ambient Layer: Clouds, Birds, Smoke -->
+                    <div class="map-ambient-layer">
+                        <!-- Clouds -->
+                        <div class="ambient-cloud cloud-1"><svg viewBox="0 0 120 50"><ellipse cx="60" cy="30" rx="50" ry="18"/><ellipse cx="35" cy="25" rx="30" ry="14"/><ellipse cx="85" cy="28" rx="28" ry="12"/></svg></div>
+                        <div class="ambient-cloud cloud-2"><svg viewBox="0 0 90 38"><ellipse cx="45" cy="22" rx="38" ry="14"/><ellipse cx="25" cy="20" rx="22" ry="10"/><ellipse cx="65" cy="22" rx="20" ry="9"/></svg></div>
+                        <div class="ambient-cloud cloud-3"><svg viewBox="0 0 150 55"><ellipse cx="75" cy="32" rx="58" ry="20"/><ellipse cx="45" cy="28" rx="35" ry="16"/><ellipse cx="110" cy="30" rx="30" ry="13"/></svg></div>
+                        
+                        <!-- Birds -->
+                        <div class="ambient-bird bird-1"><div class="bird-wing bird-wing-left"></div><div class="bird-wing bird-wing-right"></div></div>
+                        <div class="ambient-bird bird-2"><div class="bird-wing bird-wing-left"></div><div class="bird-wing bird-wing-right"></div></div>
+                        <div class="ambient-bird bird-3"><div class="bird-wing bird-wing-left"></div><div class="bird-wing bird-wing-right"></div></div>
+                        
+                        <!-- Chimney Smoke -->
+                        <div class="chimney-smoke" style="left: 27%; top: 12%;">
+                            <div class="smoke-puff"></div><div class="smoke-puff"></div><div class="smoke-puff"></div>
+                        </div>
+                        <div class="chimney-smoke" style="left: 45%; top: 10%;">
+                            <div class="smoke-puff"></div><div class="smoke-puff"></div><div class="smoke-puff"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Hotspot Overlays with Enhanced Tooltips -->
+                    <a href="/questing.html" class="map-hotspot adventure-hotspot" data-venue="Adventure Guild" data-venue-desc="Embark on real-world quests and adventures" data-unlock-level="0">
                         <div class="hotspot-glow"></div>
+                        <div class="visitor-badge" data-venue-id="adventure"><i class="fas fa-user"></i> <span>0</span></div>
+                        <div class="venue-tooltip">
+                            <div class="tooltip-name">Adventure Guild</div>
+                            <div class="tooltip-desc">Embark on real-world quests and adventures</div>
+                            <div class="tooltip-stats">
+                                <div class="tooltip-visitors"><i class="fas fa-users"></i> <span>0</span> online</div>
+                                <div class="tooltip-status"><div class="status-dot"></div> Open</div>
+                            </div>
+                        </div>
                         <div class="hotspot-label">Adventure Guild</div>
                     </a>
                     
-                    <a href="/pub.html" class="map-hotspot tavern-hotspot" data-venue="The Chiff Inn">
+                    <a href="/pub.html" class="map-hotspot tavern-hotspot" data-venue="The Chiff Inn" data-venue-desc="Cosy tavern — grab a drink and chat" data-unlock-level="0">
                         <div class="hotspot-glow"></div>
+                        <div class="visitor-badge" data-venue-id="tavern"><i class="fas fa-user"></i> <span>0</span></div>
+                        <div class="venue-tooltip">
+                            <div class="tooltip-name">The Chiff Inn</div>
+                            <div class="tooltip-desc">Cosy tavern — grab a drink and chat</div>
+                            <div class="tooltip-stats">
+                                <div class="tooltip-visitors"><i class="fas fa-users"></i> <span>0</span> online</div>
+                                <div class="tooltip-status"><div class="status-dot"></div> Open</div>
+                            </div>
+                        </div>
                         <div class="hotspot-label">The Chiff Inn</div>
                     </a>
                     
-                    <a href="/nightclub.html" class="map-hotspot nightclub-hotspot" data-venue="Neon Pulse">
+                    <a href="/nightclub.html" class="map-hotspot nightclub-hotspot" data-venue="Neon Pulse" data-venue-desc="Dance floor with live DJ sets and neon vibes" data-unlock-level="0">
                         <div class="hotspot-glow"></div>
+                        <div class="visitor-badge" data-venue-id="nightclub"><i class="fas fa-user"></i> <span>0</span></div>
+                        <div class="venue-tooltip">
+                            <div class="tooltip-name">Neon Pulse</div>
+                            <div class="tooltip-desc">Dance floor with live DJ sets and neon vibes</div>
+                            <div class="tooltip-stats">
+                                <div class="tooltip-visitors"><i class="fas fa-users"></i> <span>0</span> online</div>
+                                <div class="tooltip-status"><div class="status-dot"></div> Open</div>
+                            </div>
+                        </div>
                         <div class="hotspot-label">Neon Pulse</div>
                     </a>
                     
-                    <a href="/cinema.html" class="map-hotspot cinema-hotspot" data-venue="Starlight Cinema">
+                    <a href="/cinema.html" class="map-hotspot cinema-hotspot" data-venue="Starlight Cinema" data-venue-desc="Watch movies together in art-deco style" data-unlock-level="0">
                         <div class="hotspot-glow"></div>
+                        <div class="visitor-badge" data-venue-id="cinema"><i class="fas fa-user"></i> <span>0</span></div>
+                        <div class="venue-tooltip">
+                            <div class="tooltip-name">Starlight Cinema</div>
+                            <div class="tooltip-desc">Watch movies together in art-deco style</div>
+                            <div class="tooltip-stats">
+                                <div class="tooltip-visitors"><i class="fas fa-users"></i> <span>0</span> online</div>
+                                <div class="tooltip-status"><div class="status-dot"></div> Open</div>
+                            </div>
+                        </div>
                         <div class="hotspot-label">Starlight Cinema</div>
                     </a>
                     
-                    <a href="/games.html" class="map-hotspot arcade-hotspot" data-venue="Pixel Palace">
+                    <a href="/games.html" class="map-hotspot arcade-hotspot" data-venue="Pixel Palace" data-venue-desc="Retro arcade games and multiplayer fun" data-unlock-level="0">
                         <div class="hotspot-glow"></div>
+                        <div class="visitor-badge" data-venue-id="arcade"><i class="fas fa-user"></i> <span>0</span></div>
+                        <div class="venue-tooltip">
+                            <div class="tooltip-name">Pixel Palace</div>
+                            <div class="tooltip-desc">Retro arcade games and multiplayer fun</div>
+                            <div class="tooltip-stats">
+                                <div class="tooltip-visitors"><i class="fas fa-users"></i> <span>0</span> online</div>
+                                <div class="tooltip-status"><div class="status-dot"></div> Open</div>
+                            </div>
+                        </div>
                         <div class="hotspot-label">Pixel Palace</div>
                     </a>
                     
-                    <a href="/lounge.html" class="map-hotspot lounge-hotspot" data-venue="Velvet Sky">
+                    <a href="/lounge.html" class="map-hotspot lounge-hotspot" data-venue="Velvet Sky" data-venue-desc="Chill lounge with ambient music and conversation" data-unlock-level="0">
                         <div class="hotspot-glow"></div>
+                        <div class="visitor-badge" data-venue-id="lounge"><i class="fas fa-user"></i> <span>0</span></div>
+                        <div class="venue-tooltip">
+                            <div class="tooltip-name">Velvet Sky</div>
+                            <div class="tooltip-desc">Chill lounge with ambient music and conversation</div>
+                            <div class="tooltip-stats">
+                                <div class="tooltip-visitors"><i class="fas fa-users"></i> <span>0</span> online</div>
+                                <div class="tooltip-status"><div class="status-dot"></div> Open</div>
+                            </div>
+                        </div>
                         <div class="hotspot-label">Velvet Sky</div>
                     </a>
                     

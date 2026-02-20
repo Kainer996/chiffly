@@ -255,6 +255,33 @@
         .empty-state h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 0.75rem; }
         .empty-state p { color: var(--cinema-text-dim); margin-bottom: 1.5rem; max-width: 400px; margin-left: auto; margin-right: auto; }
         
+        /* Movie Showings */
+        .showings-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; margin-bottom: 2rem; }
+        .showing-card {
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(239,68,68,0.08);
+            border-radius: 16px; padding: 1.5rem; transition: all 0.3s ease; position: relative; overflow: hidden;
+        }
+        .showing-card.now-showing {
+            border-color: var(--cinema-gold); background: rgba(251,191,36,0.05);
+            box-shadow: 0 0 20px rgba(251,191,36,0.2);
+        }
+        .showing-card.now-showing::before {
+            content: 'NOW SHOWING'; position: absolute; top: 10px; right: -30px;
+            background: var(--cinema-gold); color: #0c0a09; padding: 0.3rem 2.5rem;
+            font-size: 0.65rem; font-weight: 700; transform: rotate(45deg);
+            font-family: 'Playfair Display', serif; letter-spacing: 1px;
+        }
+        .showing-card:hover { background: rgba(239,68,68,0.04); border-color: rgba(239,68,68,0.2); transform: translateY(-3px); }
+        .showing-time { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--cinema-gold); }
+        .showing-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin-bottom: 0.75rem; }
+        .showing-desc { color: var(--cinema-text-dim); font-size: 0.88rem; margin-bottom: 1rem; line-height: 1.5; }
+        .showing-countdown {
+            font-family: 'Playfair Display', serif; font-size: 0.85rem; color: var(--cinema-red);
+            padding: 0.5rem; background: rgba(239,68,68,0.05); border-radius: 8px; text-align: center;
+        }
+        .showing-actions { margin-top: 1rem; display: flex; gap: 0.5rem; }
+        .showing-actions button { flex: 1; padding: 0.5rem; font-size: 0.85rem; }
+        
         .footer { background: rgba(5,3,3,0.95); border-top: 1px solid rgba(239,68,68,0.06); padding: 3rem 0 1.25rem; }
         .footer-content { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-bottom: 2rem; }
         .footer-section h3 { font-family: 'Playfair Display', serif; margin-bottom: 0.75rem; font-size: 1.1rem; }
@@ -276,6 +303,9 @@
             .film-strip { display: none; }
         }
     </style>
+    <link rel="stylesheet" href="/css/quick-emotes.css?v=1">
+    <link rel="stylesheet" href="/css/loading-screen.css?v=1">
+    <link rel="stylesheet" href="/css/activity-feed.css?v=1">
 </head>
 <body>
     <nav class="navbar">
@@ -321,8 +351,46 @@
                 <div class="stat-card"><i class="fas fa-film"></i><div class="stat-number" id="activeRooms">0</div><div class="stat-label">Screenings</div></div>
                 <div class="stat-card"><i class="fas fa-broadcast-tower"></i><div class="stat-number" id="liveStreams">0</div><div class="stat-label">Live Now</div></div>
             </div>
+            
+            <!-- Upcoming Movie Showings -->
             <div class="section-header">
-                <h2>Now Showing</h2>
+                <h2>📽️ Upcoming Showings</h2>
+                <p>Scheduled movies - don't miss the show!</p>
+            </div>
+            <div style="text-align:center;margin-bottom:2rem;">
+                <button class="cinema-btn secondary" onclick="toggleScheduleForm()"><i class="fas fa-calendar-plus"></i> Schedule a Showing</button>
+            </div>
+            
+            <!-- Schedule Form (hidden by default) -->
+            <div id="scheduleForm" style="display:none;max-width:500px;margin:0 auto 2rem;background:rgba(255,255,255,0.02);border:1px solid rgba(239,68,68,0.1);border-radius:16px;padding:2rem;">
+                <h3 style="font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:1rem;text-align:center;">Schedule a Movie</h3>
+                <div style="margin-bottom:1rem;">
+                    <label style="display:block;margin-bottom:0.5rem;font-size:0.9rem;color:var(--cinema-text-dim);">Movie Name</label>
+                    <input type="text" id="movieName" placeholder="e.g. The Matrix" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(239,68,68,0.2);color:var(--cinema-text);padding:0.75rem;border-radius:8px;font-size:1rem;">
+                </div>
+                <div style="margin-bottom:1rem;">
+                    <label style="display:block;margin-bottom:0.5rem;font-size:0.9rem;color:var(--cinema-text-dim);">Showtime</label>
+                    <input type="datetime-local" id="showtime" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(239,68,68,0.2);color:var(--cinema-text);padding:0.75rem;border-radius:8px;font-size:1rem;">
+                </div>
+                <div style="margin-bottom:1rem;">
+                    <label style="display:block;margin-bottom:0.5rem;font-size:0.9rem;color:var(--cinema-text-dim);">Description (optional)</label>
+                    <textarea id="movieDesc" placeholder="What's it about?" rows="3" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(239,68,68,0.2);color:var(--cinema-text);padding:0.75rem;border-radius:8px;font-size:0.95rem;resize:vertical;"></textarea>
+                </div>
+                <div style="margin-bottom:1rem;">
+                    <label style="display:block;margin-bottom:0.5rem;font-size:0.9rem;color:var(--cinema-text-dim);">Duration (minutes)</label>
+                    <input type="number" id="movieDuration" value="120" min="30" max="300" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(239,68,68,0.2);color:var(--cinema-text);padding:0.75rem;border-radius:8px;font-size:1rem;">
+                </div>
+                <div style="display:flex;gap:0.75rem;">
+                    <button class="cinema-btn" onclick="scheduleShowing()" style="flex:1;"><i class="fas fa-check"></i> Schedule</button>
+                    <button class="cinema-btn secondary" onclick="toggleScheduleForm()" style="flex:1;"><i class="fas fa-times"></i> Cancel</button>
+                </div>
+            </div>
+            
+            <!-- Showings List -->
+            <div id="showingsList" style="margin-bottom:3rem;"></div>
+            
+            <div class="section-header" style="border-top:1px solid rgba(239,68,68,0.08);padding-top:3rem;">
+                <h2>Live Screening Rooms</h2>
                 <p>Join a screening or host your own watch party</p>
             </div>
             <div id="roomsList" class="rooms-grid"></div>
@@ -347,8 +415,11 @@
     </footer>
 
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="/js/xp-client.js?v=1"></script>
     <script>
         let socket = null, pendingHost = null;
+        let showingsInterval = null;
+        
         function createRoom() {
             const u = prompt('Your name for the screening?');
             if (!u?.trim()) return;
@@ -363,14 +434,136 @@
             window.location.href = `pub-stream.html?v=${Date.now()}&room=${id}&username=${encodeURIComponent(u.trim())}&host=0&type=cinema`;
         }
         function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+        
+        // Movie Showings Functions
+        function toggleScheduleForm() {
+            const form = document.getElementById('scheduleForm');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+            
+            // Set default time to 1 hour from now
+            if (form.style.display === 'block') {
+                const now = new Date();
+                now.setHours(now.getHours() + 1);
+                now.setMinutes(0);
+                const formatted = now.toISOString().slice(0, 16);
+                document.getElementById('showtime').value = formatted;
+            }
+        }
+        
+        async function scheduleShowing() {
+            const movieName = document.getElementById('movieName').value.trim();
+            const showtime = document.getElementById('showtime').value;
+            const description = document.getElementById('movieDesc').value.trim();
+            const duration = parseInt(document.getElementById('movieDuration').value);
+            
+            if (!movieName || !showtime) {
+                alert('Please enter movie name and showtime!');
+                return;
+            }
+            
+            try {
+                const res = await fetch('/api/showings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        movieName,
+                        time: new Date(showtime).toISOString(),
+                        description,
+                        duration
+                    })
+                });
+                
+                const data = await res.json();
+                if (data.id) {
+                    alert(`✅ "${movieName}" scheduled successfully!`);
+                    toggleScheduleForm();
+                    document.getElementById('movieName').value = '';
+                    document.getElementById('movieDesc').value = '';
+                    document.getElementById('movieDuration').value = '120';
+                    loadShowings();
+                }
+            } catch (err) {
+                console.error('Error scheduling showing:', err);
+                alert('Failed to schedule showing. Please try again.');
+            }
+        }
+        
+        async function loadShowings() {
+            try {
+                const res = await fetch('/api/showings');
+                const showings = await res.json();
+                displayShowings(showings);
+            } catch (err) {
+                console.error('Error loading showings:', err);
+            }
+        }
+        
+        function displayShowings(showings) {
+            const container = document.getElementById('showingsList');
+            
+            if (!showings || showings.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--cinema-text-dim);"><i class="fas fa-film" style="font-size:2rem;margin-bottom:0.75rem;opacity:0.4;display:block;"></i>No upcoming showings. Be the first to schedule one!</div>';
+                return;
+            }
+            
+            const now = Date.now();
+            const html = showings.map(showing => {
+                const showTime = new Date(showing.time).getTime();
+                const endTime = showTime + (showing.duration || 120) * 60 * 1000;
+                const isNowShowing = now >= showTime && now <= endTime;
+                const timeUntil = showTime - now;
+                
+                let countdown = '';
+                if (isNowShowing) {
+                    const remaining = Math.floor((endTime - now) / 60000);
+                    countdown = `🎬 NOW SHOWING (${remaining} min remaining)`;
+                } else if (timeUntil > 0) {
+                    const days = Math.floor(timeUntil / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((timeUntil % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeUntil % (1000 * 60 * 60)) / (1000 * 60));
+                    
+                    if (days > 0) countdown = `Starts in ${days}d ${hours}h`;
+                    else if (hours > 0) countdown = `Starts in ${hours}h ${minutes}m`;
+                    else countdown = `Starts in ${minutes} minutes`;
+                } else {
+                    countdown = 'Ended';
+                }
+                
+                const showDate = new Date(showing.time);
+                const dateStr = showDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                const timeStr = showDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+                
+                return `
+                    <div class="showing-card ${isNowShowing ? 'now-showing' : ''}">
+                        <div class="showing-time">${dateStr} @ ${timeStr}</div>
+                        <div class="showing-title">🎬 ${escapeHtml(showing.movieName)}</div>
+                        ${showing.description ? `<div class="showing-desc">${escapeHtml(showing.description)}</div>` : ''}
+                        <div class="showing-countdown">${countdown}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = `<div class="showings-grid">${html}</div>`;
+        }
+        
         function init() {
             const url = ['localhost','127.0.0.1'].includes(location.hostname) ? 'http://localhost:3000' : location.origin;
             socket = io(url, { transports: ['websocket','polling'], timeout: 5000, forceNew: true });
-            socket.on('connect', () => socket.emit('get-room-list'));
+            socket.on('connect', () => {
+                socket.emit('get-room-list');
+                loadShowings();
+                if (window.XPSystem) window.XPSystem.init(socket);
+            });
             socket.on('room-list', d => { const filtered = d.rooms.filter(r => r.type === 'cinema'); updateList(filtered); updateStats(d.stats); });
             socket.on('room-created', r => { const u = pendingHost||'Host'; pendingHost=null; setTimeout(()=>window.location.href=`pub-stream.html?v=${Date.now()}&room=${r.id}&username=${encodeURIComponent(u)}&host=1&type=cinema`,400); });
             socket.on('room-updated', () => socket.emit('get-room-list'));
+            socket.on('new-showing', () => loadShowings());
+            socket.on('showing-cancelled', () => loadShowings());
+            
+            // Update countdown timers every minute
+            showingsInterval = setInterval(loadShowings, 60000);
         }
+        
         function updateList(rooms) {
             const l=document.getElementById('roomsList'),e=document.getElementById('noRooms');
             if(!rooms.length){l.style.display='none';e.style.display='block';return;}
@@ -380,5 +573,13 @@
         function updateStats(s) { document.getElementById('totalUsers').textContent=s.totalUsers||0; document.getElementById('activeRooms').textContent=s.activeRooms||0; document.getElementById('liveStreams').textContent=s.liveStreams||0; }
         document.addEventListener('DOMContentLoaded', init);
     </script>
+    
+    <!-- ChiffTown Share Button -->
+    <script src="/js/share-button.js" data-share-message="Movie time at Starlight Cinema! 🎬"></script>
+    
+    <!-- Quick Emotes & Loading Screen & Activity Feed -->
+    <script src="/js/quick-emotes.js?v=1"></script>
+    <script src="/js/loading-screen.js?v=1"></script>
+    <script src="/js/activity-feed.js?v=1"></script>
 </body>
 </html>

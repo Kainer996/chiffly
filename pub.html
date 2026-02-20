@@ -678,6 +678,9 @@
             .pubs-grid { grid-template-columns: 1fr; }
         }
     </style>
+    <link rel="stylesheet" href="/css/quick-emotes.css?v=1">
+    <link rel="stylesheet" href="/css/loading-screen.css?v=1">
+    <link rel="stylesheet" href="/css/activity-feed.css?v=1">
 </head>
 <body>
     <!-- Navigation -->
@@ -788,6 +791,41 @@
         </div>
     </section>
 
+    <!-- Pub Jukebox - Spotify -->
+    <section class="pub-section" style="padding-top: 0;">
+        <div class="container">
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(217,119,6,0.15); border-radius: 20px; padding: 2rem; margin-bottom: 2rem;">
+                <div class="section-header" style="text-align: center;">
+                    <h2><i class="fas fa-record-vinyl" style="color: var(--tavern-amber);"></i> Pub Jukebox</h2>
+                    <p>Paste a Spotify link to play some tunes by the fire</p>
+                </div>
+                
+                <div style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                    <input type="text" id="spotifyInput" placeholder="Paste a Spotify track, album or playlist URL..." style="flex:1; min-width: 250px; background: rgba(255,255,255,0.04); border: 1px solid rgba(217,119,6,0.2); border-radius: 12px; padding: 0.75rem 1rem; color: var(--tavern-text); font-size: 0.9rem; font-family: inherit;">
+                    <button onclick="loadSpotifyEmbed()" class="pub-btn" style="padding: 0.75rem 1.5rem;">
+                        <i class="fas fa-play"></i> Play
+                    </button>
+                </div>
+                
+                <div id="spotifyCustomPlayer" style="margin-bottom: 1.5rem; display: none;">
+                    <div style="border-radius: 12px; overflow: hidden;" id="spotifyEmbedContainer"></div>
+                </div>
+                
+                <div style="margin-bottom: 0.5rem;">
+                    <h4 style="font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--tavern-text-secondary); margin-bottom: 1rem;"><i class="fas fa-fire" style="color: var(--tavern-amber);"></i> House Favourites</h4>
+                    <div style="display: grid; gap: 1rem;">
+                        <div style="border-radius: 12px; overflow: hidden;">
+                            <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZF1DX4E3UdUs7fUx?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                        </div>
+                        <div style="border-radius: 12px; overflow: hidden;">
+                            <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZF1DWZd79rJ6a7lp?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
@@ -819,7 +857,36 @@
         </div>
     </footer>
 
+    <script>
+        function loadSpotifyEmbed() {
+            const input = document.getElementById('spotifyInput');
+            const url = input.value.trim();
+            if (!url) return;
+            
+            const match = url.match(/open\.spotify\.com\/(track|album|playlist|episode|show)\/([a-zA-Z0-9]+)/);
+            if (!match) {
+                alert('Please paste a valid Spotify URL (track, album, or playlist)');
+                return;
+            }
+            
+            const type = match[1];
+            const id = match[2];
+            const embedUrl = `https://open.spotify.com/embed/${type}/${id}?utm_source=generator&theme=0`;
+            const height = (type === 'track') ? '152' : '352';
+            
+            const container = document.getElementById('spotifyEmbedContainer');
+            container.innerHTML = `<iframe style="border-radius:12px" src="${embedUrl}" width="100%" height="${height}" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
+            document.getElementById('spotifyCustomPlayer').style.display = 'block';
+            input.value = '';
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const input = document.getElementById('spotifyInput');
+            if (input) input.addEventListener('keydown', (e) => { if (e.key === 'Enter') loadSpotifyEmbed(); });
+        });
+    </script>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="/js/xp-client.js?v=1"></script>
     <script>
         let socket = null;
         let pendingHostUsername = null;
@@ -849,7 +916,11 @@
         function initializeSocket() {
             const url = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:3000' : window.location.origin;
             socket = io(url, { transports: ['websocket', 'polling'], timeout: 5000, forceNew: true });
-            socket.on('connect', () => { console.log('✅ Connected'); socket.emit('get-room-list'); });
+            socket.on('connect', () => {
+                console.log('✅ Connected');
+                socket.emit('get-room-list');
+                if (window.XPSystem) window.XPSystem.init(socket);
+            });
             socket.on('room-list', (data) => { data.rooms = data.rooms.filter(r => r.type === 'pub');
                 updatePubsList(data.rooms.filter(r => r.type === 'pub'));
                 updateStats(data.stats);
@@ -895,5 +966,13 @@
 
         document.addEventListener('DOMContentLoaded', initializeSocket);
     </script>
+    
+    <!-- ChiffTown Share Button -->
+    <script src="/js/share-button.js" data-share-message="Come grab a drink with me at The Chiff Inn! 🍺"></script>
+    
+    <!-- Quick Emotes & Loading Screen & Activity Feed -->
+    <script src="/js/quick-emotes.js?v=1"></script>
+    <script src="/js/loading-screen.js?v=1"></script>
+    <script src="/js/activity-feed.js?v=1"></script>
 </body>
 </html>

@@ -36,7 +36,7 @@
         }
 
         .profile-container {
-            max-width: 900px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 2rem 0;
         }
@@ -79,185 +79,71 @@
             gap: 0.5rem;
         }
 
-        /* Profile Photo Section */
-        .photo-section {
+        /* XP & Level Display */
+        .xp-header {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 1rem;
+            justify-content: space-between;
+            gap: 2rem;
+            flex-wrap: wrap;
             margin-bottom: 2rem;
         }
 
-        .profile-photo {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
+        .level-badge {
+            font-size: 3rem;
+            font-weight: 700;
+            font-family: 'Playfair Display', serif;
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-teal));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .xp-progress {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .xp-bar {
+            width: 100%;
+            height: 30px;
             background: var(--glass-bg);
-            border: 3px solid var(--accent-gold);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
             overflow: hidden;
+            position: relative;
+            margin-bottom: 0.5rem;
+        }
+
+        .xp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-gold), var(--accent-teal));
+            transition: width 0.5s ease;
             position: relative;
         }
 
-        .profile-photo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        .xp-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
         }
 
-        .profile-photo-placeholder {
-            font-size: 4rem;
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .xp-text {
+            font-size: 0.9rem;
             color: var(--text-secondary);
         }
 
-        .photo-upload-btn {
-            padding: 0.8rem 1.5rem;
-            background: linear-gradient(135deg, var(--accent-gold), var(--accent-teal));
-            color: var(--bg-deep);
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .photo-upload-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 20px rgba(244, 197, 66, 0.4);
-        }
-
-        #photoInput {
-            display: none;
-        }
-
-        /* Form Fields */
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: var(--text-primary);
-        }
-
-        .form-input,
-        .form-textarea,
-        .form-select {
-            width: 100%;
-            padding: 0.9rem 1.2rem;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 10px;
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-input:focus,
-        .form-textarea:focus,
-        .form-select:focus {
-            outline: none;
-            border-color: var(--accent-teal);
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        .form-textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        /* Tags Section */
-        .tags-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.8rem;
-            margin-top: 1rem;
-        }
-
-        .tag {
-            padding: 0.6rem 1.2rem;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
-        }
-
-        .tag:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .tag.active {
-            background: linear-gradient(135deg, var(--accent-gold), var(--accent-teal));
-            color: var(--bg-deep);
-            border-color: transparent;
-            font-weight: 600;
-        }
-
-        /* Theme Colors */
-        .theme-colors {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .theme-color {
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
-            cursor: pointer;
-            border: 3px solid transparent;
-            transition: all 0.3s ease;
-        }
-
-        .theme-color:hover {
-            transform: scale(1.1);
-        }
-
-        .theme-color.active {
-            border-color: white;
-            box-shadow: 0 0 20px currentColor;
-        }
-
-        .theme-gold { background: linear-gradient(135deg, #f4c542, #d4af37); }
-        .theme-teal { background: linear-gradient(135deg, #40E0D0, #20B2AA); }
-        .theme-blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
-        .theme-silver { background: linear-gradient(135deg, #c0c0c0, #808080); }
-        .theme-emerald { background: linear-gradient(135deg, #10b981, #059669); }
-        .theme-amber { background: linear-gradient(135deg, #f59e0b, #d97706); }
-
-        /* Social Links */
-        .social-inputs {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-        }
-
-        .social-input-group {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .social-icon {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 8px;
-            flex-shrink: 0;
-        }
-
-        /* Stats Section */
+        /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -271,6 +157,12 @@
             border-radius: 12px;
             padding: 1.5rem;
             text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
         }
 
         .stat-value {
@@ -285,50 +177,174 @@
             color: var(--text-secondary);
         }
 
-        /* Action Buttons */
-        .action-buttons {
-            display: flex;
+        /* Achievements */
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 1rem;
-            margin-top: 2rem;
-            flex-wrap: wrap;
         }
 
-        .btn {
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--accent-gold), var(--accent-teal));
-            color: var(--bg-deep);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(244, 197, 66, 0.4);
-        }
-
-        .btn-secondary {
+        .achievement-card {
             background: var(--glass-bg);
-            color: var(--text-primary);
             border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.2rem;
+            text-align: center;
+            transition: all 0.3s ease;
         }
 
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--accent-teal);
+        .achievement-card.unlocked {
+            background: linear-gradient(135deg, rgba(244, 197, 66, 0.1), rgba(64, 224, 208, 0.1));
+            border-color: var(--accent-gold);
         }
 
-        /* Back to Town */
+        .achievement-card.locked {
+            opacity: 0.4;
+        }
+
+        .achievement-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .achievement-name {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .achievement-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Leaderboard */
+        .leaderboard-list {
+            list-style: none;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            margin-bottom: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .leaderboard-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .leaderboard-item.current-user {
+            border-color: var(--accent-gold);
+            background: rgba(244, 197, 66, 0.05);
+        }
+
+        .leaderboard-rank {
+            font-size: 1.5rem;
+            font-weight: 700;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .leaderboard-rank.top1 { color: #FFD700; }
+        .leaderboard-rank.top2 { color: #C0C0C0; }
+        .leaderboard-rank.top3 { color: #CD7F32; }
+
+        .leaderboard-info {
+            flex: 1;
+        }
+
+        .leaderboard-name {
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .leaderboard-stats {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .leaderboard-xp {
+            font-weight: 600;
+            color: var(--accent-teal);
+        }
+
+        /* Activity Feed */
+        .activity-feed {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            border-left: 3px solid var(--accent-teal);
+            margin-bottom: 1rem;
+            background: var(--glass-bg);
+            border-radius: 8px;
+        }
+
+        .activity-icon {
+            font-size: 1.5rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--glass-bg);
+            border-radius: 10px;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-text {
+            margin-bottom: 0.3rem;
+        }
+
+        .activity-time {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Inventory */
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+        }
+
+        .inventory-item {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .inventory-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: scale(1.05);
+        }
+
+        .inventory-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .inventory-name {
+            font-size: 0.85rem;
+        }
+
+        /* Back Button */
         .back-link {
             position: fixed;
             top: 2rem;
@@ -352,34 +368,41 @@
             color: var(--accent-gold);
         }
 
-        .save-indicator {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            padding: 1rem 1.5rem;
-            background: rgba(34, 197, 94, 0.2);
-            border: 1px solid rgba(34, 197, 94, 0.4);
-            border-radius: 10px;
-            color: #22c55e;
-            display: none;
-            align-items: center;
-            gap: 0.5rem;
+        /* Responsive */
+        @media (max-width: 768px) {
+            .profile-container {
+                padding: 1rem;
+            }
+
+            .xp-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
 
-        .save-indicator.show {
-            display: flex;
-            animation: slideIn 0.3s ease;
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
         }
 
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--glass-border);
+            border-top-color: var(--accent-gold);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -392,289 +415,339 @@
     <div class="profile-container">
         <div class="profile-header">
             <h1 class="profile-title">YOUR PROFILE</h1>
-            <p class="profile-subtitle">Customize your ChiffTown identity</p>
+            <p class="profile-subtitle">Track your progress in Chifftown</p>
         </div>
 
-        <!-- Profile Photo & Basic Info -->
-        <div class="profile-card">
-            <div class="photo-section">
-                <div class="profile-photo" id="profilePhoto">
-                    <div class="profile-photo-placeholder">
-                        <i class="fas fa-user-circle"></i>
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 1rem;">Loading your profile...</p>
+        </div>
+
+        <div id="profileContent" style="display: none;">
+            <!-- XP & Level -->
+            <div class="profile-card">
+                <div class="xp-header">
+                    <div>
+                        <div class="level-badge" id="levelBadge">Level 1</div>
+                        <p style="color: var(--text-secondary); margin-top: 0.5rem;">
+                            <span id="username">Traveler</span>
+                        </p>
+                    </div>
+                    <div class="xp-progress">
+                        <div class="xp-bar">
+                            <div class="xp-fill" id="xpFill" style="width: 0%"></div>
+                        </div>
+                        <div class="xp-text">
+                            <span id="currentXp">0</span> / <span id="maxXp">100</span> XP
+                            <span style="float: right; color: var(--accent-teal);" id="nextLevel">Next: Level 2</span>
+                        </div>
                     </div>
                 </div>
-                <input type="file" id="photoInput" accept="image/*">
-                <button class="photo-upload-btn" onclick="document.getElementById('photoInput').click()">
-                    <i class="fas fa-camera"></i> Upload Photo
-                </button>
-            </div>
 
-            <div class="form-group">
-                <label class="form-label">Display Name</label>
-                <input type="text" class="form-input" id="displayName" placeholder="Enter your name" maxlength="30">
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Bio</label>
-                <textarea class="form-textarea" id="bio" placeholder="Tell us about yourself..." maxlength="200"></textarea>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Mood Status</label>
-                <input type="text" class="form-input" id="moodStatus" placeholder="How are you feeling?" maxlength="50">
-            </div>
-        </div>
-
-        <!-- Interests -->
-        <div class="profile-card">
-            <h2 class="section-title">
-                <i class="fas fa-heart"></i>
-                Into
-            </h2>
-            <div class="tags-container" id="interestTags">
-                <!-- Generated dynamically -->
-            </div>
-        </div>
-
-        <!-- Preferences -->
-        <div class="profile-card">
-            <h2 class="section-title">
-                <i class="fas fa-sliders-h"></i>
-                Preferences
-            </h2>
-
-            <div class="form-group">
-                <label class="form-label">Favourite Drink</label>
-                <select class="form-select" id="favouriteDrink">
-                    <option value="">Select a drink...</option>
-                    <option value="beer">🍺 Beer</option>
-                    <option value="wine">🍷 Wine</option>
-                    <option value="cocktail">🍸 Cocktail</option>
-                    <option value="whisky">🥃 Whisky</option>
-                    <option value="non-alcoholic">🥤 Non-alcoholic</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Profile Theme Colour</label>
-                <div class="theme-colors">
-                    <div class="theme-color theme-gold" data-theme="gold"></div>
-                    <div class="theme-color theme-teal" data-theme="teal"></div>
-                    <div class="theme-color theme-blue" data-theme="blue"></div>
-                    <div class="theme-color theme-silver" data-theme="silver"></div>
-                    <div class="theme-color theme-emerald" data-theme="emerald"></div>
-                    <div class="theme-color theme-amber" data-theme="amber"></div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="statRoomsJoined">0</div>
+                        <div class="stat-label">Rooms Joined</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statMessages">0</div>
+                        <div class="stat-label">Messages Sent</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statTipsSent">0</div>
+                        <div class="stat-label">Tips Sent</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statGamesPlayed">0</div>
+                        <div class="stat-label">Games Played</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statVenuesVisited">0</div>
+                        <div class="stat-label">Venues Visited</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statAchievements">0</div>
+                        <div class="stat-label">Achievements</div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Social Links -->
-        <div class="profile-card">
-            <h2 class="section-title">
-                <i class="fas fa-link"></i>
-                Social Links
-            </h2>
-            <div class="social-inputs">
-                <div class="social-input-group">
-                    <div class="social-icon"><i class="fab fa-twitter"></i></div>
-                    <input type="text" class="form-input" id="socialX" placeholder="@username">
+            <!-- Two Column Layout -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                <!-- Left Column: Achievements & Inventory -->
+                <div>
+                    <!-- Achievements -->
+                    <div class="profile-card">
+                        <h2 class="section-title">
+                            <i class="fas fa-trophy"></i>
+                            Achievements
+                        </h2>
+                        <div class="achievements-grid" id="achievementsGrid">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Inventory -->
+                    <div class="profile-card">
+                        <h2 class="section-title">
+                            <i class="fas fa-box"></i>
+                            Inventory
+                        </h2>
+                        <div class="inventory-grid" id="inventoryGrid">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
                 </div>
-                <div class="social-input-group">
-                    <div class="social-icon"><i class="fab fa-discord"></i></div>
-                    <input type="text" class="form-input" id="socialDiscord" placeholder="username#0000">
-                </div>
-                <div class="social-input-group">
-                    <div class="social-icon"><i class="fab fa-instagram"></i></div>
-                    <input type="text" class="form-input" id="socialInstagram" placeholder="@username">
+
+                <!-- Right Column: Leaderboard & Activity -->
+                <div>
+                    <!-- Leaderboard -->
+                    <div class="profile-card">
+                        <h2 class="section-title">
+                            <i class="fas fa-crown"></i>
+                            Leaderboard
+                        </h2>
+                        <ul class="leaderboard-list" id="leaderboardList">
+                            <!-- Populated by JS -->
+                        </ul>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="profile-card">
+                        <h2 class="section-title">
+                            <i class="fas fa-history"></i>
+                            Recent Activity
+                        </h2>
+                        <div class="activity-feed" id="activityFeed">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Stats -->
-        <div class="profile-card">
-            <h2 class="section-title">
-                <i class="fas fa-chart-line"></i>
-                Your Stats
-            </h2>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-value" id="statDays">0</div>
-                    <div class="stat-label">Days in Town</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="statRooms">0</div>
-                    <div class="stat-label">Rooms Visited</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="statFurniture">0</div>
-                    <div class="stat-label">Furniture Owned</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="action-buttons">
-            <button class="btn btn-primary" onclick="saveProfile()">
-                <i class="fas fa-save"></i>
-                Save Profile
-            </button>
-            <a href="apartment.html" class="btn btn-secondary">
-                <i class="fas fa-home"></i>
-                My Apartment
-            </a>
-            <a href="index.html" class="btn btn-secondary">
-                <i class="fas fa-map"></i>
-                Town Map
-            </a>
         </div>
     </div>
 
-    <div class="save-indicator" id="saveIndicator">
-        <i class="fas fa-check-circle"></i>
-        Profile saved!
-    </div>
-
-    <script src="js/inventory.js"></script>
     <script>
-        const INTEREST_TAGS = [
-            'Music', 'Gaming', 'Movies', 'Sports', 'Art', 'Photography',
-            'Cooking', 'Travel', 'Reading', 'Fitness', 'Technology', 'Fashion'
-        ];
-
-        const PROFILE_KEY = 'chifftown_profile';
-
-        // Load profile on page load
-        window.addEventListener('DOMContentLoaded', loadProfile);
-
-        function loadProfile() {
-            const profile = getProfile();
+        // Get username from localStorage or URL
+        function getUsername() {
+            const params = new URLSearchParams(window.location.search);
+            const urlUsername = params.get('username');
             
-            // Load photo
-            if (profile.photo) {
-                document.getElementById('profilePhoto').innerHTML = `<img src="${profile.photo}" alt="Profile">`;
+            if (urlUsername) {
+                return urlUsername;
             }
             
-            // Load basic info
-            document.getElementById('displayName').value = profile.displayName || '';
-            document.getElementById('bio').value = profile.bio || '';
-            document.getElementById('moodStatus').value = profile.mood || '';
-            
-            // Load interests
-            renderInterestTags(profile.interests || []);
-            
-            // Load preferences
-            document.getElementById('favouriteDrink').value = profile.drink || '';
-            
-            // Load theme
-            const theme = profile.theme || 'gold';
-            document.querySelectorAll('.theme-color').forEach(el => {
-                el.classList.toggle('active', el.dataset.theme === theme);
-            });
-            
-            // Load social links
-            document.getElementById('socialX').value = profile.social?.x || '';
-            document.getElementById('socialDiscord').value = profile.social?.discord || '';
-            document.getElementById('socialInstagram').value = profile.social?.instagram || '';
-            
-            // Update stats
-            updateStats();
+            // Try localStorage
+            try {
+                const user = JSON.parse(localStorage.getItem('chifftown_user') || '{}');
+                return user.username || user.displayName || null;
+            } catch (e) {
+                return null;
+            }
         }
 
-        function getProfile() {
-            const data = localStorage.getItem(PROFILE_KEY);
-            return data ? JSON.parse(data) : {};
+        const currentUsername = getUsername();
+
+        if (!currentUsername) {
+            document.getElementById('loading').innerHTML = `
+                <p style="color: var(--accent-gold); font-size: 1.2rem; margin-bottom: 1rem;">
+                    <i class="fas fa-user-slash"></i>
+                </p>
+                <p>Please set a username first!</p>
+                <p style="margin-top: 1rem;">
+                    <a href="index.html" style="color: var(--accent-teal); text-decoration: none;">
+                        Go to homepage
+                    </a>
+                </p>
+            `;
+        } else {
+            loadProfile(currentUsername);
         }
 
-        function saveProfile() {
-            const profile = {
-                photo: document.querySelector('#profilePhoto img')?.src || null,
-                displayName: document.getElementById('displayName').value,
-                bio: document.getElementById('bio').value,
-                mood: document.getElementById('moodStatus').value,
-                interests: Array.from(document.querySelectorAll('#interestTags .tag.active'))
-                    .map(tag => tag.textContent),
-                drink: document.getElementById('favouriteDrink').value,
-                theme: document.querySelector('.theme-color.active')?.dataset.theme || 'gold',
-                social: {
-                    x: document.getElementById('socialX').value,
-                    discord: document.getElementById('socialDiscord').value,
-                    instagram: document.getElementById('socialInstagram').value
-                },
-                joinedDate: getProfile().joinedDate || Date.now()
+        async function loadProfile(username) {
+            try {
+                // Fetch user stats
+                const statsRes = await fetch(`/api/user/${username}`);
+                if (!statsRes.ok) throw new Error('User not found');
+                const stats = await statsRes.json();
+
+                // Fetch leaderboard
+                const leaderboardRes = await fetch('/api/leaderboard');
+                const leaderboard = await leaderboardRes.json();
+
+                // Fetch activity
+                const activityRes = await fetch(`/api/activity/${username}`);
+                const activity = await activityRes.json();
+
+                // Populate profile
+                populateProfile(stats, leaderboard, activity);
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('profileContent').style.display = 'block';
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                document.getElementById('loading').innerHTML = `
+                    <p style="color: #ff6b6b;">Failed to load profile</p>
+                    <p style="margin-top: 0.5rem; font-size: 0.9rem;">${error.message}</p>
+                `;
+            }
+        }
+
+        function populateProfile(stats, leaderboard, activity) {
+            // Header
+            document.getElementById('username').textContent = stats.username;
+            document.getElementById('levelBadge').textContent = `Level ${stats.level}`;
+
+            // XP Progress
+            const { level, xpInLevel, xpForNextLevel } = stats.levelData;
+            const xpPercent = (xpInLevel / xpForNextLevel) * 100;
+            document.getElementById('xpFill').style.width = `${xpPercent}%`;
+            document.getElementById('currentXp').textContent = xpInLevel;
+            document.getElementById('maxXp').textContent = xpForNextLevel;
+            document.getElementById('nextLevel').textContent = `Next: Level ${level + 1}`;
+
+            // Stats
+            document.getElementById('statRoomsJoined').textContent = stats.stats.roomsJoined;
+            document.getElementById('statMessages').textContent = stats.stats.messagesSent;
+            document.getElementById('statTipsSent').textContent = stats.stats.tipsSent;
+            document.getElementById('statGamesPlayed').textContent = stats.stats.gamesPlayed;
+            document.getElementById('statVenuesVisited').textContent = stats.stats.venuesVisited.length;
+            document.getElementById('statAchievements').textContent = stats.achievements.length;
+
+            // Achievements
+            populateAchievements(stats.achievements);
+
+            // Inventory
+            populateInventory(stats.inventory);
+
+            // Leaderboard
+            populateLeaderboard(leaderboard, stats.username);
+
+            // Activity
+            populateActivity(activity);
+        }
+
+        function populateAchievements(unlockedAchievements) {
+            const allAchievements = [
+                { id: 'first_steps', name: 'First Steps', desc: 'Join your first room', icon: '👋' },
+                { id: 'chatterer', name: 'Chatterer', desc: 'Send 50 messages', icon: '💬' },
+                { id: 'social_butterfly', name: 'Social Butterfly', desc: 'Visit 5 different venues', icon: '🦋' },
+                { id: 'generous_tipper', name: 'Generous Tipper', desc: 'Send 10 tips', icon: '💰' },
+                { id: 'streaming_star', name: 'Streaming Star', desc: 'Stream 5 sessions', icon: '⭐' },
+                { id: 'arcade_master', name: 'Arcade Master', desc: 'Play 20 arcade games', icon: '🎮' },
+                { id: 'town_veteran', name: 'Town Veteran', desc: 'Reach level 10', icon: '🏅' },
+                { id: 'legend', name: 'Chifftown Legend', desc: 'Reach level 25', icon: '👑' }
+            ];
+
+            const grid = document.getElementById('achievementsGrid');
+            grid.innerHTML = allAchievements.map(ach => {
+                const unlocked = unlockedAchievements.some(u => u.id === ach.id);
+                return `
+                    <div class="achievement-card ${unlocked ? 'unlocked' : 'locked'}">
+                        <div class="achievement-icon">${ach.icon}</div>
+                        <div class="achievement-name">${ach.name}</div>
+                        <div class="achievement-desc">${ach.desc}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function populateInventory(inventory) {
+            const grid = document.getElementById('inventoryGrid');
+            
+            if (!inventory || inventory.length === 0) {
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary);">No items yet</p>';
+                return;
+            }
+
+            const itemIcons = {
+                'First Steps': '👋',
+                'Chatterer': '💬',
+                'Social Butterfly': '🦋',
+                'Generous Tipper': '💰',
+                'Streaming Star': '⭐',
+                'Arcade Master': '🎮',
+                'Town Veteran': '🏅',
+                'Chifftown Legend': '👑'
             };
-            
-            localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
-            showSaveIndicator();
-        }
 
-        function showSaveIndicator() {
-            const indicator = document.getElementById('saveIndicator');
-            indicator.classList.add('show');
-            setTimeout(() => {
-                indicator.classList.remove('show');
-            }, 2000);
-        }
-
-        function renderInterestTags(activeInterests) {
-            const container = document.getElementById('interestTags');
-            container.innerHTML = INTEREST_TAGS.map(tag => `
-                <div class="tag ${activeInterests.includes(tag) ? 'active' : ''}" onclick="toggleTag(this)">
-                    ${tag}
+            grid.innerHTML = inventory.map(item => `
+                <div class="inventory-item">
+                    <div class="inventory-icon">${itemIcons[item] || '🎁'}</div>
+                    <div class="inventory-name">${item}</div>
                 </div>
             `).join('');
         }
 
-        function toggleTag(element) {
-            element.classList.toggle('active');
+        function populateLeaderboard(leaderboard, currentUser) {
+            const list = document.getElementById('leaderboardList');
+            list.innerHTML = leaderboard.map((user, index) => {
+                const rank = index + 1;
+                const isCurrentUser = user.username === currentUser;
+                const rankClass = rank === 1 ? 'top1' : rank === 2 ? 'top2' : rank === 3 ? 'top3' : '';
+                
+                return `
+                    <li class="leaderboard-item ${isCurrentUser ? 'current-user' : ''}">
+                        <div class="leaderboard-rank ${rankClass}">#${rank}</div>
+                        <div class="leaderboard-info">
+                            <div class="leaderboard-name">${user.username}</div>
+                            <div class="leaderboard-stats">
+                                Level ${user.level} • ${user.achievements} achievements
+                            </div>
+                        </div>
+                        <div class="leaderboard-xp">${user.xp.toLocaleString()} XP</div>
+                    </li>
+                `;
+            }).join('');
         }
 
-        // Photo upload
-        document.getElementById('photoInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('profilePhoto').innerHTML = `<img src="${e.target.result}" alt="Profile">`;
-                };
-                reader.readAsDataURL(file);
+        function populateActivity(activity) {
+            const feed = document.getElementById('activityFeed');
+            
+            if (!activity || activity.length === 0) {
+                feed.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No recent activity</p>';
+                return;
             }
-        });
 
-        // Theme color selection
-        document.querySelectorAll('.theme-color').forEach(el => {
-            el.addEventListener('click', function() {
-                document.querySelectorAll('.theme-color').forEach(e => e.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
+            const activityIcons = {
+                xp_gain: '✨',
+                level_up: '🎉',
+                achievement: '🏆'
+            };
 
-        // Auto-save on change
-        const inputs = document.querySelectorAll('input, textarea, select');
-        inputs.forEach(input => {
-            input.addEventListener('change', saveProfile);
-        });
-
-        function updateStats() {
-            const profile = getProfile();
-            const inventory = getInventory();
-            const placed = getPlacedFurniture();
-            
-            // Days in town
-            const joinedDate = profile.joinedDate || Date.now();
-            const days = Math.floor((Date.now() - joinedDate) / (1000 * 60 * 60 * 24));
-            document.getElementById('statDays').textContent = days;
-            
-            // Rooms visited (simulate - can be enhanced)
-            const visited = new Set();
-            Object.keys(placed).forEach(room => {
-                if (Object.keys(placed[room]).length > 0) {
-                    visited.add(room);
+            feed.innerHTML = activity.map(act => {
+                const icon = activityIcons[act.type] || '📝';
+                let text = '';
+                
+                if (act.type === 'xp_gain') {
+                    text = `Gained <strong>${act.amount} XP</strong> for ${act.reason}`;
+                } else if (act.type === 'level_up') {
+                    text = `<strong>Leveled up to Level ${act.level}!</strong>`;
+                } else if (act.type === 'achievement') {
+                    text = `Unlocked achievement: <strong>${act.achievementName}</strong>`;
                 }
-            });
-            document.getElementById('statRooms').textContent = visited.size;
+
+                const timeAgo = getTimeAgo(act.timestamp);
+
+                return `
+                    <div class="activity-item">
+                        <div class="activity-icon">${icon}</div>
+                        <div class="activity-content">
+                            <div class="activity-text">${text}</div>
+                            <div class="activity-time">${timeAgo}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getTimeAgo(timestamp) {
+            const seconds = Math.floor((Date.now() - timestamp) / 1000);
             
-            // Furniture owned
-            document.getElementById('statFurniture').textContent = inventory.length;
+            if (seconds < 60) return 'Just now';
+            if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes ago`;
+            if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`;
+            return `${Math.floor(seconds / 86400)} days ago`;
         }
     </script>
 </body>

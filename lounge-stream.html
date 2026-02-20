@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lounge Stream - Chifftown</title>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        params.set('type', 'lounge');
+        window.location.href = 'pub-stream.html?' + params.toString();
+    </script>
+</head>
+<body style="background: #0a2540; color: #0891b2; font-family: serif; text-align: center; padding: 3rem;">
+    <h1 style="color: #06b6d4;">🛋️ Lounge Loading...</h1>
+    <script src="/js/chat-enhancements.js?v=1"></script>
+</body>
+</html>

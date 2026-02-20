@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Apartment — ChiffTown</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-deep: #0a0a1a;
+            --bg-mid: #12122a;
+            --bg-surface: #1a1a3e;
+            --text-primary: #f0eef6;
+            --text-secondary: rgba(240, 238, 246, 0.65);
+            --accent-gold: #f4c542;
+            --accent-teal: #40E0D0;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Room View Container */
+        .apartment-container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .room-view {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+            transition: opacity 0.5s ease;
+        }
+
+        .room-view.livingroom {
+            background: url('/images/apartment-livingroom.png') center/cover no-repeat;
+        }
+        .room-view.bedroom {
+            background: url('/images/apartment-bedroom.png') center/cover no-repeat;
+        }
+        .room-view.kitchen {
+            background: url('/images/apartment-kitchen.png') center/cover no-repeat;
+        }
+
+        /* Top Navigation Bar */
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: rgba(10, 10, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            z-index: 100;
+        }
+
+        .apartment-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            letter-spacing: 1px;
+        }
+        
+        .view-mode-badge {
+            display: inline-block;
+            background: rgba(244, 197, 66, 0.15);
+            border: 1px solid rgba(244, 197, 66, 0.3);
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: var(--accent-gold);
+            margin-left: 1rem;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-btn {
+            padding: 0.6rem 1.2rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-teal);
+            color: var(--accent-teal);
+        }
+
+        /* Room Tabs */
+        .room-tabs {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            background: rgba(10, 10, 26, 0.9);
+            backdrop-filter: blur(20px);
+            padding: 1rem 1.5rem;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            z-index: 50;
+        }
+
+        .room-tab {
+            padding: 0.8rem 1.5rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .room-tab.active {
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-teal));
+            color: var(--bg-deep);
+            border-color: transparent;
+            font-weight: 600;
+        }
+
+        .room-tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+
+        /* Furniture Placement Hotspots */
+        .furniture-spot {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            background: rgba(244, 197, 66, 0.15);
+            border: 2px dashed rgba(244, 197, 66, 0.4);
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+        }
+
+        .furniture-spot:hover {
+            opacity: 1;
+            background: rgba(244, 197, 66, 0.25);
+            border-color: rgba(244, 197, 66, 0.8);
+            transform: scale(1.05);
+        }
+
+        .furniture-spot.filled {
+            background: rgba(64, 224, 208, 0.2);
+            border-color: rgba(64, 224, 208, 0.6);
+            border-style: solid;
+        }
+
+        .spot-label {
+            font-size: 0.8rem;
+            color: var(--text-primary);
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .spot-emoji {
+            font-size: 2.5rem;
+        }
+
+        .empty-indicator {
+            font-size: 1.5rem;
+            color: var(--accent-gold);
+        }
+
+        /* Inventory Sidebar */
+        .inventory-sidebar {
+            position: fixed;
+            right: -350px;
+            top: 70px;
+            bottom: 0;
+            width: 350px;
+            background: rgba(10, 10, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid var(--glass-border);
+            padding: 2rem;
+            overflow-y: auto;
+            transition: right 0.4s ease;
+            z-index: 90;
+        }
+
+        .inventory-sidebar.open {
+            right: 0;
+        }
+
+        .inventory-toggle {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-teal));
+            color: var(--bg-deep);
+            border: none;
+            padding: 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            z-index: 95;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 20px rgba(244, 197, 66, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .inventory-toggle:hover {
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .inventory-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent-gold);
+        }
+
+        .inventory-items {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .inventory-item {
+            padding: 1rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .inventory-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--accent-teal);
+        }
+
+        .item-emoji {
+            font-size: 2rem;
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .item-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Furniture Placement Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-mid);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--accent-gold);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--accent-gold);
+        }
+
+        .modal-items {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .modal-item {
+            padding: 1rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-teal);
+            transform: translateX(5px);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .remove-btn {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .remove-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+            border-color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation -->
+    <div class="top-bar">
+        <div class="apartment-title">🏠 Your Apartment</div>
+        <div class="nav-buttons">
+            <a href="profile.html" class="nav-btn">
+                <i class="fas fa-user"></i> Profile
+            </a>
+            <a href="index.html" class="nav-btn">
+                <i class="fas fa-map"></i> Town Map
+            </a>
+        </div>
+    </div>
+
+    <!-- Room View Container -->
+    <div class="apartment-container">
+        <div class="room-view livingroom" id="roomView">
+            <!-- Furniture spots will be positioned here -->
+        </div>
+    </div>
+
+    <!-- Room Navigation Tabs -->
+    <div class="room-tabs">
+        <div class="room-tab active" data-room="livingroom">
+            <i class="fas fa-couch"></i> Living Room
+        </div>
+        <div class="room-tab" data-room="bedroom">
+            <i class="fas fa-bed"></i> Bedroom
+        </div>
+        <div class="room-tab" data-room="kitchen">
+            <i class="fas fa-utensils"></i> Kitchen
+        </div>
+    </div>
+
+    <!-- Inventory Toggle Button -->
+    <button class="inventory-toggle" id="inventoryToggle">
+        <i class="fas fa-box-open"></i>
+    </button>
+
+    <!-- Inventory Sidebar -->
+    <div class="inventory-sidebar" id="inventorySidebar">
+        <div class="inventory-title">📦 Your Inventory</div>
+        <div class="inventory-items" id="inventoryItems">
+            <!-- Dynamic inventory items -->
+        </div>
+    </div>
+
+    <!-- Furniture Placement Modal -->
+    <div class="modal" id="placementModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">Choose Furniture</div>
+                <button class="modal-close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-items" id="modalItems">
+                <!-- Dynamic available items -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/inventory.js"></script>
+    <script>
+        // Furniture spot definitions for each room
+        const ROOM_SPOTS = {
+            livingroom: [
+                { id: 'sofa-area', label: 'Sofa Area', x: '15%', y: '50%' },
+                { id: 'tv-wall', label: 'TV Wall', x: '70%', y: '45%' },
+                { id: 'corner-shelf', label: 'Corner Shelf', x: '80%', y: '20%' },
+                { id: 'lamp-spot', label: 'Lamp Spot', x: '25%', y: '25%' },
+                { id: 'center-table', label: 'Center Table', x: '40%', y: '55%' }
+            ],
+            bedroom: [
+                { id: 'bed-area', label: 'Bed Area', x: '60%', y: '50%' },
+                { id: 'bedside-left', label: 'Bedside Left', x: '35%', y: '50%' },
+                { id: 'bedside-right', label: 'Bedside Right', x: '80%', y: '50%' },
+                { id: 'dresser-spot', label: 'Dresser', x: '20%', y: '25%' },
+                { id: 'plant-corner', label: 'Plant Corner', x: '85%', y: '20%' }
+            ],
+            kitchen: [
+                { id: 'table-area', label: 'Dining Table', x: '30%', y: '60%' },
+                { id: 'counter-decor', label: 'Counter Decor', x: '70%', y: '40%' },
+                { id: 'corner-plant', label: 'Corner Plant', x: '15%', y: '25%' },
+                { id: 'shelf-spot', label: 'Wall Shelf', x: '50%', y: '25%' }
+            ]
+        };
+
+        let currentRoom = 'livingroom';
+        let currentSpot = null;
+        let viewMode = 'own'; // 'own' or 'visit'
+        let visitingUser = null;
+
+        // Check URL parameters for visiting mode
+        function checkVisitMode() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const user = urlParams.get('user');
+            
+            if (user && user !== localStorage.getItem('chifftown_username')) {
+                viewMode = 'visit';
+                visitingUser = user;
+                
+                // Update UI for visit mode
+                document.getElementById('apartmentTitle').innerHTML = `
+                    ${user}'s Apartment
+                    <span class="view-mode-badge">👁️ Viewing</span>
+                `;
+                
+                // Hide edit buttons
+                document.getElementById('inventorySidebar').style.display = 'none';
+                
+                // Load their apartment data
+                loadVisitorApartment(user);
+                
+                return true;
+            } else {
+                // Own apartment - show share button
+                document.getElementById('shareBtn').style.display = 'inline-block';
+                return false;
+            }
+        }
+
+        function shareApartment() {
+            const username = localStorage.getItem('chifftown_username') || 'guest';
+            const shareUrl = `${window.location.origin}/apartment.html?user=${encodeURIComponent(username)}`;
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                alert('Link copied! Share this with others to let them visit your apartment.');
+            }).catch(() => {
+                prompt('Copy this link to share your apartment:', shareUrl);
+            });
+        }
+
+        function loadVisitorApartment(username) {
+            // Try to load from server-side storage (future enhancement)
+            // For now, load from localStorage with a prefixed key
+            const visitorKey = `chifftown_placed_${username}`;
+            const visitorData = localStorage.getItem(visitorKey);
+            
+            if (visitorData) {
+                // Temporarily store visitor's placement data
+                localStorage.setItem('temp_visitor_placed', visitorData);
+            }
+        }
+
+        // Override getPlacedFurniture for visit mode
+        const originalGetPlaced = getPlacedFurniture;
+        getPlacedFurniture = function() {
+            if (viewMode === 'visit') {
+                const tempData = localStorage.getItem('temp_visitor_placed');
+                return tempData ? JSON.parse(tempData) : {};
+            }
+            return originalGetPlaced();
+        };
+
+        // Initialize
+        async function init() {
+            const isVisiting = checkVisitMode();
+            
+            if (!isVisiting) {
+                await initInventory();
+                updateInventorySidebar();
+            }
+            
+            renderRoom(currentRoom);
+        }
+
+        init();
+        updateInventorySidebar();
+
+        // Room tab switching
+        document.querySelectorAll('.room-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const room = tab.dataset.room;
+                switchRoom(room);
+            });
+        });
+
+        function switchRoom(room) {
+            currentRoom = room;
+            
+            // Update active tab
+            document.querySelectorAll('.room-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[data-room="${room}"]`).classList.add('active');
+            
+            // Update room view
+            const roomView = document.getElementById('roomView');
+            roomView.className = `room-view ${room}`;
+            
+            renderRoom(room);
+        }
+
+        function renderRoom(room) {
+            const roomView = document.getElementById('roomView');
+            roomView.innerHTML = '';
+            
+            const spots = ROOM_SPOTS[room];
+            const placed = getPlacedFurniture();
+            
+            spots.forEach(spot => {
+                const spotEl = document.createElement('div');
+                spotEl.className = 'furniture-spot';
+                spotEl.style.left = spot.x;
+                spotEl.style.top = spot.y;
+                
+                const placedItemId = placed[room]?.[spot.id];
+                
+                if (placedItemId) {
+                    const item = getItemById(placedItemId);
+                    spotEl.classList.add('filled');
+                    spotEl.innerHTML = `
+                        <div class="spot-emoji">${item.emoji}</div>
+                        <div class="spot-label">${item.name}</div>
+                        <button class="remove-btn" onclick="event.stopPropagation(); removePlacedItem('${room}', '${spot.id}')">
+                            Remove
+                        </button>
+                    `;
+                } else {
+                    spotEl.innerHTML = `
+                        <div class="empty-indicator">+</div>
+                        <div class="spot-label">${spot.label}</div>
+                    `;
+                }
+                
+                spotEl.addEventListener('click', () => {
+                    if (!placedItemId) {
+                        openPlacementModal(room, spot.id, spot.label);
+                    }
+                });
+                
+                roomView.appendChild(spotEl);
+            });
+        }
+
+        function openPlacementModal(room, spotId, spotLabel) {
+            currentSpot = { room, spotId };
+            
+            const modal = document.getElementById('placementModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalItems = document.getElementById('modalItems');
+            
+            modalTitle.textContent = `Place in ${spotLabel}`;
+            
+            const availableItems = getAvailableItems();
+            
+            if (availableItems.length === 0) {
+                modalItems.innerHTML = `
+                    <div class="empty-state">
+                        <p>No furniture available!</p>
+                        <p style="margin-top: 1rem; font-size: 0.9rem;">All items are placed. Remove items to rearrange.</p>
+                    </div>
+                `;
+            } else {
+                modalItems.innerHTML = availableItems.map(item => `
+                    <div class="modal-item" onclick="placeItem('${item.id}')">
+                        <div class="item-emoji">${item.emoji}</div>
+                        <div class="item-info">
+                            <div class="item-name">${item.name}</div>
+                            <div class="item-desc">${item.description}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('placementModal').classList.remove('active');
+            currentSpot = null;
+        }
+
+        function placeItem(itemId) {
+            if (currentSpot) {
+                placeFurniture(currentSpot.room, currentSpot.spotId, itemId);
+                renderRoom(currentRoom);
+                updateInventorySidebar();
+                closeModal();
+            }
+        }
+
+        function removePlacedItem(room, spotId) {
+            removeFurniture(room, spotId);
+            renderRoom(currentRoom);
+            updateInventorySidebar();
+        }
+
+        function updateInventorySidebar() {
+            const container = document.getElementById('inventoryItems');
+            const inventory = getInventory();
+            const placed = getPlacedFurniture();
+            
+            // Get placed item IDs
+            const placedIds = new Set();
+            Object.values(placed).forEach(room => {
+                Object.values(room).forEach(id => placedIds.add(id));
+            });
+            
+            container.innerHTML = inventory.map(item => {
+                const isPlaced = placedIds.has(item.id);
+                return `
+                    <div class="inventory-item" style="opacity: ${isPlaced ? 0.5 : 1}">
+                        <div class="item-emoji">${item.emoji}</div>
+                        <div class="item-info">
+                            <div class="item-name">${item.name}</div>
+                            <div class="item-desc">${item.description}</div>
+                            ${isPlaced ? '<div style="font-size: 0.75rem; color: var(--accent-teal); margin-top: 0.2rem;">✓ Placed</div>' : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Inventory sidebar toggle
+        document.getElementById('inventoryToggle').addEventListener('click', () => {
+            document.getElementById('inventorySidebar').classList.toggle('open');
+        });
+
+        // Close modal on background click
+        document.getElementById('placementModal').addEventListener('click', (e) => {
+            if (e.target.id === 'placementModal') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

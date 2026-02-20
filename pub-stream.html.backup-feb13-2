@@ -1,0 +1,3668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pub Stream - Chiffly</title>
+    <link rel="stylesheet" href="main-home-styles.css?v=5">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: #1a1a1a;
+            color: white;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .stream-container {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            grid-template-rows: auto 1fr auto;
+            height: 100vh;
+            gap: 1rem;
+            padding: 1rem;
+        }
+
+        .stream-header {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .pub-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .pub-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #ed8936, #dd6b20);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .pub-details h2 {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+        }
+
+        .pub-details p {
+            margin: 0;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        .stream-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .theme-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-right: 1rem;
+            padding-right: 1rem;
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .theme-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .theme-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .theme-btn.active {
+            background: linear-gradient(135deg, #ed8936, #dd6b20);
+            border-color: #ed8936;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .control-btn.active {
+            background: linear-gradient(135deg, #ed8936, #dd6b20);
+        }
+
+        .control-btn.danger {
+            background: linear-gradient(135deg, #e53e3e, #c53030);
+        }
+
+        .main-video-area {
+            background: #2d3748;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .host-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: linear-gradient(135deg, #2d3748, #1a202c);
+        }
+
+        .video-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #2d3748, #1a202c);
+            color: white;
+        }
+
+        .video-placeholder i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .video-placeholder h3 {
+            margin: 0 0 0.5rem 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .video-placeholder p {
+            margin: 0;
+            opacity: 0.7;
+            text-align: center;
+        }
+
+        .live-indicator {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: #e53e3e;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .live-indicator.active {
+            display: flex;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .chat-area {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .chat-header h3 {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.1rem;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            max-height: calc(100vh - 300px);
+        }
+
+        .chat-message {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid #ed8936;
+        }
+
+        .message-author {
+            font-weight: 600;
+            color: #ed8936;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .message-text {
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .message-time {
+            font-size: 0.8rem;
+            opacity: 0.5;
+            margin-top: 0.25rem;
+        }
+
+        .chat-input-area {
+            padding: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .chat-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .chat-send-btn {
+            background: linear-gradient(135deg, #ed8936, #dd6b20);
+            border: none;
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chat-send-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .participants-area {
+            grid-column: 1 / -1;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+        }
+
+        .participants-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .participants-header h3 {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.1rem;
+        }
+
+        .participants-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 1rem;
+        }
+
+        .participant-slot {
+            aspect-ratio: 16/9;
+            background: #2d3748;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .participant-slot:hover {
+            border-color: #ed8936;
+        }
+
+        .participant-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .participant-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #2d3748, #1a202c);
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .participant-placeholder i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .participant-placeholder span {
+            font-size: 0.8rem;
+        }
+
+        .participant-name {
+            position: absolute;
+            bottom: 0.5rem;
+            left: 0.5rem;
+            right: 0.5rem;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .leave-slot-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .leave-slot-btn:hover {
+            background: rgba(220, 53, 69, 1);
+            transform: scale(1.1);
+        }
+
+        .participant-slot:not(.participant-slot:has(.participant-placeholder)):hover .participant-name {
+            opacity: 0.7;
+        }
+
+        /* Enhanced hover effects for clickable slots */
+        .participant-slot .participant-placeholder {
+            transition: all 0.3s ease;
+        }
+
+        .participant-slot:hover .participant-placeholder {
+            background: linear-gradient(135deg, #3d4852, #2d3748);
+            transform: scale(1.02);
+        }
+
+        /* Click to play overlay for mobile autoplay restrictions */
+        .click-to-play-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .click-to-play-overlay:hover,
+        .click-to-play-overlay:active {
+            background: rgba(0, 0, 0, 0.95);
+            transform: scale(1.02);
+        }
+
+        .click-to-play-overlay i {
+            font-size: 4rem;
+            color: #ed8936;
+            margin-bottom: 1rem;
+            animation: pulse 2s infinite;
+            text-shadow: 0 0 20px rgba(237, 137, 54, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .click-to-play-overlay:hover i {
+            color: #ff9f47;
+            transform: scale(1.1);
+        }
+
+        .click-to-play-overlay span {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: center;
+            padding: 0 1rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .click-to-play-overlay .subtitle {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 0.5rem;
+            text-align: center;
+            padding: 0 1rem;
+        }
+
+        /* Enhanced pulse animation */
+        @keyframes pulse {
+            0%, 100% { 
+                opacity: 1; 
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 0.7; 
+                transform: scale(1.05);
+            }
+        }
+
+        .clickable-slot .participant-placeholder {
+            border: 2px dashed rgba(237, 137, 54, 0.3);
+        }
+
+        .clickable-slot:hover .participant-placeholder {
+            border-color: rgba(237, 137, 54, 0.6);
+            background: linear-gradient(135deg, rgba(237, 137, 54, 0.1), rgba(221, 107, 32, 0.1));
+        }
+
+        .connecting-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            background: rgba(0, 0, 0, 0.7);
+            padding: 1rem;
+            border-radius: 8px;
+            z-index: 5;
+        }
+
+        .connecting-indicator i {
+            font-size: 1.5rem;
+            color: #ed8936;
+        }
+
+        .connecting-indicator span {
+            font-size: 0.8rem;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @media (max-width: 1024px) {
+            .stream-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr auto auto;
+            }
+
+            .chat-area {
+                order: 3;
+                max-height: 300px;
+            }
+
+            .participants-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stream-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr auto auto;
+                gap: 0.5rem;
+                padding: 0.5rem;
+            }
+
+            .stream-header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .stream-controls {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                justify-content: center;
+            }
+
+            .control-btn {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.8rem;
+                min-width: 80px;
+            }
+
+            .control-btn span {
+                display: none;
+            }
+
+            .control-btn i {
+                margin: 0;
+            }
+
+            .theme-selector {
+                order: -1;
+                width: 100%;
+                justify-content: center;
+                margin: 0;
+                padding: 0;
+                border: none;
+            }
+
+            .theme-btn {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.7rem;
+            }
+
+            .chat-area {
+                order: 3;
+            }
+
+            .participants-area {
+                order: 4;
+            }
+
+            /* Show camera switch button on mobile when camera is on */
+            #switchCameraBtn {
+                background: rgba(255, 255, 255, 0.15);
+                border-color: rgba(255, 255, 255, 0.3);
+            }
+
+            #switchCameraBtn:hover {
+                background: rgba(255, 255, 255, 0.25);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stream-container {
+                padding: 0.25rem;
+                gap: 0.25rem;
+            }
+
+            .stream-header {
+                padding: 0.75rem;
+            }
+
+            .pub-details h2 {
+                font-size: 1.2rem;
+            }
+
+            .pub-details p {
+                font-size: 0.8rem;
+            }
+
+            .control-btn {
+                padding: 0.4rem 0.6rem;
+                min-width: 60px;
+            }
+
+            .theme-btn {
+                padding: 0.3rem 0.5rem;
+                font-size: 0.65rem;
+            }
+        }
+
+        /* Cyberpunk Theme */
+        body.cyberpunk {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0033 50%, #000a1a 100%);
+        }
+
+        body.cyberpunk .stream-header {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+        }
+
+        body.cyberpunk .pub-icon {
+            background: linear-gradient(135deg, #00ffff, #ff00ff);
+        }
+
+        body.cyberpunk .control-btn.active {
+            background: linear-gradient(135deg, #00ffff, #ff00ff);
+        }
+
+        body.cyberpunk .theme-btn.active {
+            background: linear-gradient(135deg, #00ffff, #ff00ff);
+        }
+
+        body.cyberpunk .main-video-area {
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+        }
+
+        body.cyberpunk .video-placeholder {
+            background: linear-gradient(135deg, #001122, #002244);
+        }
+
+        body.cyberpunk .chat-area {
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        body.cyberpunk .chat-message {
+            background: rgba(0, 255, 255, 0.1);
+            border-left: 3px solid #00ffff;
+        }
+
+        body.cyberpunk .message-author {
+            color: #00ffff;
+        }
+
+        body.cyberpunk .chat-send-btn {
+            background: linear-gradient(135deg, #00ffff, #ff00ff);
+        }
+
+        body.cyberpunk .participants-area {
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        body.cyberpunk .participant-slot {
+            border: 2px solid rgba(0, 255, 255, 0.2);
+        }
+
+        body.cyberpunk .participant-slot:hover {
+            border-color: #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+
+        body.cyberpunk .participant-placeholder {
+            background: linear-gradient(135deg, #001122, #002244);
+        }
+
+        /* Medieval Theme */
+        body.medieval {
+            background: linear-gradient(135deg, #2d1810 0%, #4a2c17 50%, #1a0f08 100%);
+        }
+
+        body.medieval .stream-header {
+            background: rgba(139, 69, 19, 0.3);
+            border: 1px solid rgba(218, 165, 32, 0.5);
+            box-shadow: 0 0 20px rgba(218, 165, 32, 0.2);
+        }
+
+        body.medieval .pub-icon {
+            background: linear-gradient(135deg, #daa520, #b8860b);
+        }
+
+        body.medieval .control-btn.active {
+            background: linear-gradient(135deg, #daa520, #b8860b);
+        }
+
+        body.medieval .theme-btn.active {
+            background: linear-gradient(135deg, #daa520, #b8860b);
+        }
+
+        body.medieval .main-video-area {
+            border: 2px solid rgba(218, 165, 32, 0.4);
+            box-shadow: 0 0 30px rgba(218, 165, 32, 0.2);
+        }
+
+        body.medieval .video-placeholder {
+            background: linear-gradient(135deg, #3d2817, #2d1810);
+        }
+
+        body.medieval .chat-area {
+            background: rgba(139, 69, 19, 0.2);
+            border: 1px solid rgba(218, 165, 32, 0.3);
+        }
+
+        body.medieval .chat-message {
+            background: rgba(139, 69, 19, 0.3);
+            border-left: 3px solid #daa520;
+        }
+
+        body.medieval .message-author {
+            color: #daa520;
+        }
+
+        body.medieval .chat-send-btn {
+            background: linear-gradient(135deg, #daa520, #b8860b);
+        }
+
+        body.medieval .participants-area {
+            background: rgba(139, 69, 19, 0.2);
+            border: 1px solid rgba(218, 165, 32, 0.3);
+        }
+
+        body.medieval .participant-slot {
+            border: 2px solid rgba(218, 165, 32, 0.3);
+        }
+
+        body.medieval .participant-slot:hover {
+            border-color: #daa520;
+            box-shadow: 0 0 15px rgba(218, 165, 32, 0.3);
+        }
+
+        body.medieval .participant-placeholder {
+            background: linear-gradient(135deg, #3d2817, #2d1810);
+        }
+
+        /* Beach Bar Theme */
+        body.beach {
+            background: linear-gradient(135deg, #87ceeb 0%, #20b2aa 30%, #f0e68c 70%, #daa520 100%);
+        }
+
+        body.beach .stream-header {
+            background: rgba(32, 178, 170, 0.3);
+            border: 1px solid rgba(135, 206, 235, 0.5);
+            box-shadow: 0 0 20px rgba(135, 206, 235, 0.3);
+        }
+
+        body.beach .pub-icon {
+            background: linear-gradient(135deg, #20b2aa, #87ceeb);
+        }
+
+        body.beach .control-btn.active {
+            background: linear-gradient(135deg, #20b2aa, #87ceeb);
+        }
+
+        body.beach .theme-btn.active {
+            background: linear-gradient(135deg, #20b2aa, #87ceeb);
+        }
+
+        body.beach .main-video-area {
+            border: 2px solid rgba(135, 206, 235, 0.5);
+            box-shadow: 0 0 30px rgba(135, 206, 235, 0.3);
+        }
+
+        body.beach .video-placeholder {
+            background: linear-gradient(135deg, #4682b4, #20b2aa);
+        }
+
+        body.beach .chat-area {
+            background: rgba(135, 206, 235, 0.2);
+            border: 1px solid rgba(32, 178, 170, 0.4);
+        }
+
+        body.beach .chat-message {
+            background: rgba(135, 206, 235, 0.3);
+            border-left: 3px solid #20b2aa;
+        }
+
+        body.beach .message-author {
+            color: #20b2aa;
+        }
+
+        body.beach .chat-send-btn {
+            background: linear-gradient(135deg, #20b2aa, #87ceeb);
+        }
+
+        body.beach .participants-area {
+            background: rgba(135, 206, 235, 0.2);
+            border: 1px solid rgba(32, 178, 170, 0.4);
+        }
+
+        body.beach .participant-slot {
+            border: 2px solid rgba(135, 206, 235, 0.4);
+        }
+
+        body.beach .participant-slot:hover {
+            border-color: #20b2aa;
+            box-shadow: 0 0 15px rgba(32, 178, 170, 0.4);
+        }
+
+        body.beach .participant-placeholder {
+            background: linear-gradient(135deg, #4682b4, #20b2aa);
+        }
+
+        /* Beach theme decorative elements */
+        body.beach::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="sun" cx="80%" cy="20%"><stop offset="0%" stop-color="%23ffd700" stop-opacity="0.3"/><stop offset="100%" stop-color="%23ffd700" stop-opacity="0"/></radialGradient></defs><circle cx="800" cy="200" r="100" fill="url(%23sun)"/></svg>');
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Cyberpunk decorative elements */
+        body.cyberpunk::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><linearGradient id="neon" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%2300ffff" stop-opacity="0.1"/><stop offset="50%" stop-color="%23ff00ff" stop-opacity="0.1"/><stop offset="100%" stop-color="%2300ffff" stop-opacity="0.1"/></linearGradient></defs><rect x="0" y="0" width="100" height="1000" fill="url(%23neon)"/><rect x="200" y="0" width="50" height="1000" fill="url(%23neon)"/><rect x="400" y="0" width="75" height="1000" fill="url(%23neon)"/></svg>');
+            pointer-events: none;
+            z-index: -1;
+            animation: cyberpunkGlow 3s ease-in-out infinite alternate;
+        }
+
+        /* Medieval decorative elements */
+        body.medieval::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="torch" cx="50%" cy="50%"><stop offset="0%" stop-color="%23daa520" stop-opacity="0.2"/><stop offset="100%" stop-color="%23daa520" stop-opacity="0"/></radialGradient></defs><circle cx="100" cy="100" r="80" fill="url(%23torch)"/><circle cx="900" cy="200" r="60" fill="url(%23torch)"/><circle cx="200" cy="800" r="70" fill="url(%23torch)"/></svg>');
+            pointer-events: none;
+            z-index: -1;
+            animation: torchFlicker 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes cyberpunkGlow {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes torchFlicker {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .participants-area, .chat-area {
+            padding: 4px 0 !important;
+            margin: 0 !important;
+            border: none !important;
+            border-radius: 6px !important;
+        }
+        .participants-grid {
+            gap: 4px !important;
+        }
+        .participant-slot {
+            margin: 0 !important;
+            padding: 2px !important;
+            border-radius: 6px !important;
+            border: 1px solid #333 !important;
+            min-width: 0 !important;
+            min-height: 0 !important;
+            background: #181818 !important;
+        }
+        .participant-video, .participant-slot video {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            border-radius: 4px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        .chat-messages {
+            padding: 2px 4px !important;
+            font-size: 1em !important;
+        }
+        @media (max-width: 768px) {
+            .participants-area, .chat-area {
+                padding: 2px 0 !important;
+            }
+            .participant-slot {
+                padding: 1px !important;
+                border-radius: 4px !important;
+            }
+            .chat-messages {
+                font-size: 1.1em !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="debug-log-container" style="position: fixed; top: 0; left: 0; right: 0; background: rgba(0,0,0,0.8); color: #fff; padding: 5px; font-size: 10px; z-index: 99999; max-height: 30vh; overflow-y: scroll; font-family: monospace; display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 5px; border-bottom: 1px solid #555;">
+            <h4 style="margin: 0; padding: 0;">Live Diagnostics</h4>
+            <button onclick="document.getElementById('debug-log-container').style.display='none'" style="background: #555; border: none; color: #fff; cursor: pointer;">Close</button>
+        </div>
+        <div id="debug-log"></div>
+    </div>
+
+    <!-- Theme selection modal -->
+    <div id="themeModal" class="modal">
+        <!-- Add your theme selection content here -->
+    </div>
+
+    <!-- Back Button -->
+    <button class="back-btn" onclick="window.location.href='pub.html'">
+        <i class="fas fa-arrow-left"></i>
+    </button>
+
+    <div class="stream-container">
+        <!-- Header -->
+        <div class="stream-header">
+            <div class="pub-info">
+                <div class="pub-icon">
+                    <i class="fas fa-wine-glass"></i>
+                </div>
+                <div class="pub-details">
+                    <h2 id="pubName">My Cozy Pub</h2>
+                    <p id="pubDescription">Welcome to our virtual pub! Grab a drink and chat.</p>
+                </div>
+            </div>
+            <div class="stream-controls" id="mainStreamControls">
+                <div class="theme-selector">
+                    <button class="theme-btn active" onclick="setTheme('default')">Default</button>
+                    <button class="theme-btn" onclick="setTheme('cyberpunk')">Cyberpunk</button>
+                    <button class="theme-btn" onclick="setTheme('medieval')">Medieval</button>
+                    <button class="theme-btn" onclick="setTheme('beach')">Beach Bar</button>
+                </div>
+                <button class="control-btn" id="micBtn" onclick="toggleMic()">
+                    <i class="fas fa-microphone"></i>
+                    <span>Mic</span>
+                </button>
+                <button class="control-btn" id="cameraBtn" onclick="toggleCamera()">
+                    <i class="fas fa-video"></i>
+                    <span>Camera</span>
+                </button>
+                <button class="control-btn" id="switchCameraBtn" onclick="switchCamera()" style="display: none;">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>Back Cam</span>
+                </button>
+                <button class="control-btn" id="startStreamBtn" onclick="startStream()">
+                    <i class="fas fa-broadcast-tower"></i>
+                    <span>Start Stream</span>
+                </button>
+                <button class="control-btn danger" onclick="leavePub()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Leave</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Video Area -->
+        <div class="main-video-area">
+            <video id="hostVideo" class="host-video" autoplay muted playsinline style="display: none;"></video>
+            <div class="video-placeholder" id="videoPlaceholder">
+                <i class="fas fa-video-slash"></i>
+                <h3>Camera Off</h3>
+                <p>Click "Camera" to start your video stream</p>
+            </div>
+            <div class="live-indicator" id="liveIndicator">
+                <div class="live-dot"></div>
+                LIVE
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="chat-area">
+            <div class="chat-header">
+                <i class="fas fa-comments"></i>
+                <h3>Pub Chat</h3>
+                <span id="userCount">(1 person)</span>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="chat-message">
+                    <div class="message-author">System</div>
+                    <div class="message-text">Welcome to the pub! Start chatting with other patrons.</div>
+                    <div class="message-time">Just now</div>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <div style="display:flex;align-items:center;gap:6px;padding:0 8px 4px;">
+                    <span id="coinBalance" style="font-size:12px;color:#f4c542;cursor:default;" title="Your coins">🪙 <span id="coinCount">100</span></span>
+                    <button id="tipBtn" onclick="openTipModal()" style="background:linear-gradient(135deg,#f4c542,#ff8c42);border:none;border-radius:12px;padding:4px 10px;font-size:11px;color:#1a0e05;font-weight:700;cursor:pointer;display:none;" title="Tip the caster">💰 Tip</button>
+                    <span id="totalTipsWrap" style="font-size:12px;color:#f4c542;margin-left:auto;display:none;">Tips: 🪙 <span id="totalTips">0</span></span>
+                </div>
+                <div class="chat-input-container">
+                    <input type="text" class="chat-input" id="chatInput" placeholder="Type your message..." maxlength="500">
+                    <button class="chat-send-btn" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- Tip Modal -->
+            <div id="tipModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;justify-content:center;align-items:center;">
+                <div style="background:#1a1025;border:2px solid #f4c542;border-radius:16px;padding:24px;max-width:320px;width:90%;text-align:center;position:relative;">
+                    <button onclick="closeTipModal()" style="position:absolute;top:8px;right:12px;background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">&times;</button>
+                    <h3 style="color:#f4c542;margin:0 0 8px;">💰 Send a Tip</h3>
+                    <p style="color:#aaa;font-size:13px;margin:0 0 16px;">Your balance: 🪙 <span id="tipModalBalance">100</span></p>
+                    <div id="tipAmounts" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:16px;">
+                        <button class="tip-amount-btn" onclick="sendTip(1)" style="background:#2a1f3a;border:1px solid #f4c542;color:#f4c542;border-radius:10px;padding:8px 16px;font-size:14px;cursor:pointer;font-weight:600;">🪙 1</button>
+                        <button class="tip-amount-btn" onclick="sendTip(5)" style="background:#2a1f3a;border:1px solid #f4c542;color:#f4c542;border-radius:10px;padding:8px 16px;font-size:14px;cursor:pointer;font-weight:600;">🪙 5</button>
+                        <button class="tip-amount-btn" onclick="sendTip(10)" style="background:#2a1f3a;border:1px solid #f4c542;color:#f4c542;border-radius:10px;padding:8px 16px;font-size:14px;cursor:pointer;font-weight:600;">🪙 10</button>
+                        <button class="tip-amount-btn" onclick="sendTip(50)" style="background:#2a1f3a;border:1px solid #f4c542;color:#f4c542;border-radius:10px;padding:8px 16px;font-size:14px;cursor:pointer;font-weight:600;">🪙 50</button>
+                        <button class="tip-amount-btn" onclick="sendTip(100)" style="background:#2a1f3a;border:1px solid #f4c542;color:#f4c542;border-radius:10px;padding:8px 16px;font-size:14px;cursor:pointer;font-weight:600;">🪙 100</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Tip animation container -->
+            <div id="tipAnimContainer" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9998;overflow:hidden;"></div>
+        </div>
+
+        <!-- Participants Area -->
+        <div class="participants-area">
+            <div class="participants-header">
+                <i class="fas fa-users"></i>
+                <h3>Participants</h3>
+                <span id="participantCount">(0/6 slots)</span>
+            </div>
+            <div class="participants-grid">
+                <div class="participant-slot" id="participant1">
+                    <div class="participant-placeholder">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Empty Slot</span>
+                    </div>
+                </div>
+                <div class="participant-slot" id="participant2">
+                    <div class="participant-placeholder">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Empty Slot</span>
+                    </div>
+                </div>
+                <div class="participant-slot" id="participant3">
+                    <div class="participant-placeholder">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Empty Slot</span>
+                    </div>
+                </div>
+                <div class="participant-slot" id="participant4">
+                    <div class="participant-placeholder">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Empty Slot</span>
+                    </div>
+                </div>
+                <div class="participant-slot" id="participant5">
+                    <div class="participant-placeholder">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Empty Slot</span>
+                    </div>
+                </div>
+                <div class="participant-slot" id="participant6">
+                    <div class="participant-placeholder">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Empty Slot</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <!-- Global XP / Leveling system -->
+    <script src="xp-system.js?v=1"></script>
+    <script>
+        // =================================================================================
+        // GLOBAL VARIABLES
+        // =================================================================================
+        let socket = null;
+        let isHost = false;
+        let streamerId = null;
+        let localStream = null;
+        let isStreaming = false;
+        let isCameraOn = false;
+        let isMicOn = false;
+        let currentTheme = 'default';
+        let currentFacingMode = 'user';
+        let currentRoom = null;
+        let currentUser = null;
+        let peerConnections = new Map();
+        let remoteStreams = new Map();
+        let allParticipants = new Set();
+        
+        // =================================================================================
+        // DIAGNOSTIC LOGGING
+        // =================================================================================
+        const isDebugMode = true; // Set to true to see detailed logs in chat
+
+        function logToChat(message, level = 'info') {
+            const logContainer = document.getElementById('debug-log');
+            if (logContainer) {
+                const d = new Date();
+                const timestamp = `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}.${String(d.getMilliseconds()).padStart(3, '0')}`;
+                
+                const p = document.createElement('p');
+                p.style.margin = '2px 0';
+                p.style.borderBottom = '1px solid #444';
+                p.style.paddingBottom = '2px';
+                
+                let icon = '💬';
+                if (level === 'error') { icon = '❌'; p.style.color = '#ff8a8a'; }
+                if (level === 'warn') { icon = '⚠️'; p.style.color = '#ffdca8'; }
+                if (level === 'success') { icon = '✅'; p.style.color = '#a8ffb1'; }
+                if (level === 'net') { icon = '🌐'; p.style.color = '#a8dfff'; }
+                
+                p.innerHTML = `<strong>[${timestamp}]</strong> ${icon} ${message}`;
+                logContainer.appendChild(p);
+                logContainer.scrollTop = logContainer.scrollHeight;
+            }
+
+            console.log(`[${level.toUpperCase()}] ${message}`);
+        }
+
+        // Add an immediate log to confirm script version
+        setTimeout(() => logToChat('DIAGNOSTIC SCRIPT v3 LOADED', 'success'), 100);
+
+        // =================================================================================
+        // CLICK-TO-PLAY OVERLAY FUNCTIONS FOR MOBILE AUTOPLAY RESTRICTIONS
+        // =================================================================================
+        function showClickToPlayOverlay(videoElement) {
+            logToChat('Showing click-to-play overlay for mobile autoplay restrictions', 'warn');
+            
+            // Remove any existing overlay
+            hideClickToPlayOverlay(videoElement);
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'click-to-play-overlay';
+            overlay.innerHTML = `
+                <i class="fas fa-play-circle"></i>
+                <span>Tap to play video</span>
+                <div class="subtitle">Your browser requires user interaction to play videos</div>
+            `;
+            
+            // Also add a direct click handler to the video element as backup
+            const videoClickHandler = async (event) => {
+                event.preventDefault();
+                logToChat('🖱️ Direct video click detected', 'info');
+                try {
+                    videoElement.muted = true;
+                    await videoElement.play();
+                    logToChat('✅ Video playing from direct click!', 'success');
+                    hideClickToPlayOverlay(videoElement);
+                    videoElement.removeEventListener('click', videoClickHandler);
+                } catch (error) {
+                    logToChat(`❌ Direct video click failed: ${error.name}`, 'error');
+                }
+            };
+            videoElement.addEventListener('click', videoClickHandler);
+            
+            // Position overlay relative to video's parent
+            const parent = videoElement.parentElement;
+            if (parent) {
+                parent.style.position = 'relative';
+                parent.appendChild(overlay);
+                
+                // Add click handler with enhanced debugging
+                overlay.addEventListener('click', async (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    
+                    logToChat('🖱️ User clicked to play video', 'info');
+                    logToChat(`📊 Video element state: readyState=${videoElement.readyState}, srcObject=${!!videoElement.srcObject}`, 'info');
+                    
+                    try {
+                        // Ensure video element has proper attributes
+                        videoElement.muted = true;
+                        videoElement.playsInline = true;
+                        videoElement.autoplay = true;
+                        videoElement.controls = false;
+                        
+                        // Check if video has a source
+                        if (!videoElement.srcObject) {
+                            logToChat('⚠️ Video has no srcObject, this might be the issue', 'warn');
+                            // Try to find and use any available stream
+                            if (window.localStream) {
+                                logToChat('🔄 Attempting to set localStream as srcObject', 'info');
+                                videoElement.srcObject = window.localStream;
+                            }
+                        }
+                        
+                        logToChat('▶️ Attempting to play video after user click...', 'info');
+                        await videoElement.play();
+                        
+                        logToChat('✅ Video playing successfully after user interaction!', 'success');
+                        addChatMessage('System', '🎬 Video started! Click video again to unmute.', true);
+                        hideClickToPlayOverlay(videoElement);
+                        
+                        // Add unmute option after successful play
+                        setTimeout(() => {
+                            videoElement.onclick = () => {
+                                videoElement.muted = false;
+                                logToChat('🔊 Video unmuted by user', 'info');
+                                addChatMessage('System', '🔊 Video unmuted! You can now hear the audio.', true);
+                                videoElement.onclick = null;
+                            };
+                        }, 1000);
+                        
+                    } catch (error) {
+                        logToChat(`❌ Video play failed even after user interaction: ${error.name} - ${error.message}`, 'error');
+                        logToChat(`📊 Video state after error: readyState=${videoElement.readyState}, paused=${videoElement.paused}`, 'error');
+                        
+                        // Try alternative approach - reload the video source
+                        if (videoElement.srcObject) {
+                            logToChat('🔄 Trying to reload video source...', 'info');
+                            const currentSrc = videoElement.srcObject;
+                            videoElement.srcObject = null;
+                            setTimeout(() => {
+                                videoElement.srcObject = currentSrc;
+                                videoElement.play().catch(e => logToChat(`❌ Reload attempt failed: ${e.name}`, 'error'));
+                            }, 100);
+                        }
+                    }
+                });
+            }
+        }
+
+        function hideClickToPlayOverlay(videoElement) {
+            const parent = videoElement.parentElement;
+            if (parent) {
+                const existingOverlay = parent.querySelector('.click-to-play-overlay');
+                if (existingOverlay) {
+                    existingOverlay.remove();
+                    logToChat('Removed click-to-play overlay', 'info');
+                }
+            }
+        }
+
+        // =================================================================================
+        // CORE INITIALIZATION
+        // =================================================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            logToChat('Page loaded, initializing...', 'info');
+            initializeSocketConnection();
+            initializeTheme();
+            
+            // CRITICAL: Initialize camera/mic stream on page load
+            setTimeout(async () => {
+                logToChat('Initializing camera and microphone...', 'info');
+                try {
+                    await initializePubStream();
+                    logToChat('Camera/microphone initialized successfully!', 'success');
+                } catch (error) {
+                    logToChat(`Camera/microphone initialization failed: ${error.message}`, 'error');
+                }
+            }, 1000);
+        });
+
+        function initializeTheme() {
+            // Theme will be set from server room-state for viewers
+            // For hosts, use saved theme or default
+            const urlParams = new URLSearchParams(window.location.search);
+            const hostParam = urlParams.get('host');
+            const isHostInit = hostParam === '1' || hostParam === 'true' || hostParam === 'True';
+            if (isHostInit) {
+                const savedTheme = localStorage.getItem('pubTheme') || 'default';
+                setTheme(savedTheme, true);
+            }
+            // Viewers will get theme from room-state event
+        }
+
+        // Store the venue type from URL
+        let venueType = 'pub';
+
+        function initializeSocketConnection() {
+            // Get URL parameters with fallback parsing
+            const urlParams = new URLSearchParams(window.location.search);
+            const roomId = urlParams.get('room');
+            const username = urlParams.get('username');
+            const hostParam = urlParams.get('host');
+            venueType = urlParams.get('type') || 'pub';
+            
+            // BULLETPROOF HOST DETECTION
+            isHost = hostParam === '1' || hostParam === 'true' || hostParam === 'True';
+            
+            // CRITICAL DEBUG: Log all parameters
+            console.log('🔍 === URL PARAMETER DEBUG ===');
+            console.log('Raw URL:', window.location.href);
+            console.log('Room ID:', roomId);
+            console.log('Username:', username);
+            console.log('Host param (raw):', hostParam);
+            console.log('IsHost (computed):', isHost);
+            console.log('🔍 === END PARAMETER DEBUG ===');
+
+            if (!roomId || !username) {
+                showError('Missing room or username parameters. Redirecting...');
+                const redirectMap = { pub: 'pub.html', nightclub: 'nightclub.html', cinema: 'cinema.html', lounge: 'lounge.html', arcade: 'games.html', questing: 'questing.html' };
+                setTimeout(() => {
+                    window.location.href = redirectMap[venueType] || 'pub.html';
+                }, 3000);
+                return;
+            }
+
+            currentRoom = roomId;
+            currentUser = username;
+            
+            // CRITICAL: Show user role prominently
+            console.log(`🎭 USER ROLE: ${isHost ? '👑 HOST/BROADCASTER' : '👤 PARTICIPANT/VIEWER'}`);
+            addChatMessage('System', `You joined as: ${isHost ? '👑 Host (Broadcaster)' : '👤 Participant (Viewer)'}`, true);
+
+            // Initialize socket connection  
+            const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const socketUrl = isLocalhost ? 'http://localhost:3000' : window.location.origin;
+            
+            console.log('Connecting to socket at:', socketUrl);
+            socket = io(socketUrl, {
+                transports: ['websocket', 'polling'],
+                timeout: 5000,
+                forceNew: true
+            });
+
+            socket.on('connect', () => {
+                console.log('✅ Connected to pub server successfully!');
+                console.log('Socket ID:', socket.id);
+                addChatMessage('System', 'Connected to pub server!', true);
+                
+                // Join the room
+                console.log('Joining room:', currentRoom, 'as', currentUser, isHost ? '(host)' : '(guest)');
+                socket.emit('join-room', {
+                    roomId: currentRoom,
+                    username: currentUser,
+                    isStreamer: isHost,
+                    roomType: venueType
+                });
+
+                // Initialize tipping system
+                initTipping();
+
+                // Award XP for entering the pub room
+                if (window.xpSystem) {
+                    const xpAmount = isHost ? 25 : 10; // Hosts get more XP for organising
+                    xpSystem.addXp(currentUser, xpAmount, 'entering the pub');
+                }
+            });
+
+            socket.on('disconnect', () => {
+                console.log('❌ Disconnected from pub server');
+                addChatMessage('System', 'Disconnected from server. Trying to reconnect...', true);
+            });
+
+            socket.on('connect_error', (error) => {
+                console.error('❌ Socket connection error:', error);
+                console.error('Error type:', error.type);
+                console.error('Error description:', error.description);
+                addChatMessage('System', `Connection error: ${error.message}`, true);
+            });
+
+            socket.on('error', (error) => {
+                console.error('❌ Socket error:', error);
+                addChatMessage('System', `Socket error: ${error.message}`, true);
+            });
+
+            socket.on('room-state', (data) => {
+                console.log('🎯 ROOM STATE RECEIVED:', data);
+                const { streamer, participants, messages } = data;
+                
+                // Apply theme from server (for viewers)
+                if (data.theme && !isHost) {
+                    console.log('🎨 Applying room theme from server:', data.theme);
+                    setTheme(data.theme, true);
+                }
+                
+                // BULLETPROOF STREAMER ID DETECTION
+                const oldStreamerId = streamerId;
+                streamerId = streamer ? streamer.id : null;
+                
+                console.log('🎥 === CRITICAL BROADCASTER DETECTION ===');
+                console.log(`🎥 Streamer object:`, streamer);
+                console.log(`🎥 StreamerId (old): ${oldStreamerId ? oldStreamerId.substring(0,8) : 'none'}`);
+                console.log(`🎥 StreamerId (new): ${streamerId ? streamerId.substring(0,8) : 'none'}`);
+                console.log(`🎥 My socket ID: ${socket.id.substring(0,8)}`);
+                console.log(`🎥 My role: ${isHost ? 'HOST' : 'PARTICIPANT'}`);
+                console.log(`🎥 Am I the streamer?: ${streamerId === socket.id}`);
+                console.log(`🎥 Should I see broadcaster video?: ${!isHost && streamerId && streamerId !== socket.id}`);
+                console.log(`🎥 Participants in room: ${participants.length}`);
+                participants.forEach((p, i) => {
+                    console.log(`🎥 → Participant ${i+1}: ${p.username} (${p.id.substring(0,8)})`);
+                });
+                console.log('🎥 === END BROADCASTER DETECTION ===');
+                
+                // Track all participants
+                allParticipants.clear();
+                if (streamer) allParticipants.add(streamer.id);
+                participants.forEach(p => allParticipants.add(p.id));
+                
+                // Update participant count
+                const totalParticipants = participants.length + (streamer ? 1 : 0);
+                document.getElementById('participantCount').textContent = `${totalParticipants} patron${totalParticipants !== 1 ? 's' : ''}`;
+                
+                // Display existing messages
+                messages.forEach(message => {
+                    displayChatMessage(message);
+                });
+
+                // ENHANCED: Setup WebRTC connections with proper logging
+                if (isHost && participants.length > 0) {
+                    console.log('🎥 HOST: Setting up connections to participants...');
+                    addChatMessage('System', `📹 Setting up camera connections to ${participants.length} participant(s)...`, true);
+                    
+                    // Host: create connections to all participants (they'll manually choose slots)
+                    participants.forEach(participant => {
+                        if (participant.id !== socket.id) {
+                            console.log(`🎥 HOST: Creating connection to participant ${participant.id.substring(0,8)}`);
+                            createPeerConnection(participant.id);
+                        }
+                    });
+                    // Add tracks if we have them and camera/mic are on
+                    setTimeout(() => {
+                        console.log('🎥 HOST: Updating peer connections with tracks...');
+                        updatePeerConnections();
+                        
+                        // CRITICAL: If host already has camera on, force immediate negotiation
+                        if (isCameraOn) {
+                            console.log('🎥 HOST: Camera already on, forcing immediate broadcast to all participants...');
+                            addChatMessage('System', '📹 Broadcasting camera to participants!', true);
+                            for (const [userId, pc] of peerConnections.entries()) {
+                                if (pc.signalingState === 'stable') {
+                                    setTimeout(() => {
+                                        pc.dispatchEvent(new Event('negotiationneeded'));
+                                    }, 100);
+                                }
+                            }
+                        }
+                    }, 300); // Slightly longer delay for stability
+                } else if (!isHost && streamerId) {
+                    console.log('🎥 PARTICIPANT: Setting up connection to HOST...');
+                    addChatMessage('System', '📹 Connecting to broadcaster camera...', true);
+                    
+                    // Participant: create connection to host to see their main video
+                    if (streamer.id !== socket.id) {
+                        console.log(`🎥 PARTICIPANT: Creating CRITICAL connection to streamer ${streamer.id.substring(0,8)}`);
+                        createPeerConnection(streamer.id);
+                        
+                        // CRITICAL: Also create connections to other participants for potential slot interactions
+                        participants.forEach(participant => {
+                            if (participant.id !== socket.id) {
+                                console.log(`🎥 PARTICIPANT: Creating connection to other participant ${participant.id.substring(0,8)}`);
+                                createPeerConnection(participant.id);
+                            }
+                        });
+                        
+                        // Add tracks if we have them and camera/mic are on
+                        setTimeout(() => {
+                            console.log('🎥 PARTICIPANT: Updating peer connections with tracks...');
+                            updatePeerConnections();
+                        }, 300);
+                        
+                        // SUPER CRITICAL FIX: Multiple aggressive attempts to connect to broadcaster
+                        const connectToBroadcaster = () => {
+                            if (!isHost && streamerId) {
+                                const hostConnection = peerConnections.get(streamerId);
+                                if (hostConnection) {
+                                    console.log(`🎥 BROADCASTER CONNECTION STATUS: ${hostConnection.connectionState}/${hostConnection.signalingState}/${hostConnection.iceConnectionState}`);
+                                    console.log('🎥 PARTICIPANT: DEMANDING broadcaster video stream...');
+                                    
+                                    // Force connection to request video from host
+                                    if (hostConnection.signalingState === 'stable') {
+                                        hostConnection.dispatchEvent(new Event('negotiationneeded'));
+                                    }
+                                    
+                                    if (hostConnection.connectionState !== 'connected') {
+                                        console.log('🎥 Connection not established yet, will retry...');
+                                    }
+                                } else {
+                                    console.warn('🎥 ❌ NO BROADCASTER CONNECTION FOUND! Creating emergency connection...');
+                                    // Emergency: recreate connection
+                                    createPeerConnection(streamerId);
+                                    setTimeout(() => {
+                                        updatePeerConnections();
+                                    }, 100);
+                                }
+                            }
+                        };
+                        
+                        // Multiple connection attempts with increasing delays
+                        setTimeout(connectToBroadcaster, 500);
+                        setTimeout(connectToBroadcaster, 1000);
+                        setTimeout(connectToBroadcaster, 2000);
+                        setTimeout(connectToBroadcaster, 4000);
+                        setTimeout(connectToBroadcaster, 8000);
+                    } else {
+                        console.warn('🎥 ❌ PARTICIPANT: Streamer is me? This should not happen!');
+                        addChatMessage('System', '⚠️ Broadcaster detection error. Please refresh.', true);
+                    }
+                } else if (!isHost && !streamerId) {
+                    console.log('🎥 PARTICIPANT: No broadcaster in room yet, waiting...');
+                    addChatMessage('System', '⏳ Waiting for broadcaster to join...', true);
+                } else {
+                    console.log('🎥 HOST: No participants yet, waiting...');
+                    addChatMessage('System', '⏳ Waiting for participants to join...', true);
+                }
+
+                // Show welcome message
+                showWelcomeMessage();
+                
+                // Setup participant slot click handlers for guests
+                setupParticipantSlotHandlers();
+                
+                // Start connection health monitoring
+                startConnectionHealthCheck();
+
+                // Update main stream controls visibility
+                updateMainControlsVisibility();
+                
+                // DEBUGGING: Log post-setup status with longer delay to ensure everything is set up
+                setTimeout(() => {
+                    console.log('🎥 === POST-SETUP CONNECTION AUDIT ===');
+                    console.log(`🎥 My role: ${isHost ? 'HOST/BROADCASTER' : 'PARTICIPANT/VIEWER'}`);
+                    console.log(`🎥 Broadcaster ID: ${streamerId ? streamerId.substring(0,8) : 'none'}`);
+                    console.log(`🎥 Total peer connections: ${peerConnections.size}`);
+                    console.log(`🎥 Total remote streams: ${remoteStreams.size}`);
+                    
+                    // Show connection status for each peer
+                    for (const [userId, pc] of peerConnections.entries()) {
+                        const isThisBroadcaster = userId === streamerId;
+                        console.log(`🎥 → ${userId.substring(0,8)} ${isThisBroadcaster ? '(BROADCASTER)' : '(participant)'}: ${pc.connectionState}/${pc.signalingState}/${pc.iceConnectionState}`);
+                        
+                        // Check if we have a stream from them
+                        const hasStream = remoteStreams.has(userId);
+                        console.log(`🎥   Stream received: ${hasStream ? '✅' : '❌'}`);
+                        
+                        if (hasStream) {
+                            const stream = remoteStreams.get(userId);
+                            const videoTracks = stream.getVideoTracks();
+                            console.log(`🎥   Video tracks: ${videoTracks.length}`);
+                            videoTracks.forEach((track, i) => {
+                                console.log(`🎥     Track ${i}: ${track.enabled ? 'enabled' : 'disabled'}, ${track.readyState}`);
+                            });
+                        }
+                    }
+                    
+                    // CRITICAL: Check if participant should see broadcaster video but doesn't
+                    if (!isHost && streamerId && remoteStreams.has(streamerId)) {
+                        const hostVideo = document.getElementById('hostVideo');
+                        const videoPlaceholder = document.getElementById('videoPlaceholder');
+                        
+                        console.log('🎥 === MAIN VIDEO STATUS ===');
+                        console.log(`🎥 Host video element exists: ${!!hostVideo}`);
+                        console.log(`🎥 Host video visible: ${hostVideo ? (hostVideo.style.display !== 'none') : 'N/A'}`);
+                        console.log(`🎥 Video placeholder visible: ${videoPlaceholder ? (videoPlaceholder.style.display !== 'none') : 'N/A'}`);
+                        console.log(`🎥 Host video has srcObject: ${hostVideo ? !!hostVideo.srcObject : 'N/A'}`);
+                        
+                        // EMERGENCY FIX: If we have the broadcaster's stream but video is not showing
+                        if (hostVideo && (!hostVideo.srcObject || hostVideo.style.display === 'none')) {
+                            console.log('🎥 🚨 EMERGENCY: Broadcaster stream available but not displayed! Fixing...');
+                            const broadcasterStream = remoteStreams.get(streamerId);
+                            displayRemoteVideo(streamerId, broadcasterStream);
+                            addChatMessage('System', '🔧 Fixed broadcaster video display!', true);
+                        }
+                    }
+                    
+                    console.log('🎥 === END CONNECTION AUDIT ===');
+                }, 6000);
+            });
+
+            // Handle live theme changes from host
+            socket.on('theme-changed', (data) => {
+                console.log('🎨 Theme changed by host:', data.theme);
+                setTheme(data.theme, false);
+            });
+
+            // Handle tip received
+            socket.on('tip-received', (data) => {
+                console.log('💰 Tip received:', data);
+                showTipAnimation(data.from, data.amount);
+                addChatMessage('System', `💰 ${data.from} tipped ${data.amount} coins to ${data.to}!`, true);
+                // Update total tips display
+                const totalTipsEl = document.getElementById('totalTips');
+                if (totalTipsEl) {
+                    const current = parseInt(totalTipsEl.textContent) || 0;
+                    totalTipsEl.textContent = current + data.amount;
+                }
+            });
+
+            socket.on('user-joined', (data) => {
+                const { userId, username, isStreamer } = data;
+                console.log(`🎯 USER JOINED: ${username} (${userId.substring(0,8)}), isStreamer: ${isStreamer}`);
+                addChatMessage('System', `${username} ${isStreamer ? 'started hosting' : 'joined'} the table!`, true);
+                updateParticipantCount();
+
+                // Track new participant
+                allParticipants.add(userId);
+                if (isStreamer) {
+                    streamerId = userId;
+                    console.log(`🎥 NEW STREAMER: ${userId.substring(0,8)}`);
+                }
+
+                // Create WebRTC connection for new user and add any existing tracks
+                if (userId !== socket.id) {
+                    console.log(`🎥 Creating connection to new user: ${userId.substring(0,8)}`);
+                    createPeerConnection(userId);
+                    
+                    // CRITICAL FIX: If I'm the host and have camera/mic on, immediately share tracks
+                    if (isHost && (isCameraOn || isMicOn)) {
+                        console.log(`🎥 HOST: Camera/mic on - immediately sharing with new participant ${userId.substring(0,8)}`);
+                        console.log(`🎥 HOST: Current state - Camera: ${isCameraOn}, Mic: ${isMicOn}`);
+                        
+                        setTimeout(() => {
+                            updatePeerConnections();
+                            
+                            // SUPER CRITICAL: Force immediate negotiation with the new user
+                            const pc = peerConnections.get(userId);
+                            if (pc && pc.signalingState === 'stable') {
+                                console.log(`🎥 HOST: Forcing immediate negotiation with new participant`);
+                                pc.dispatchEvent(new Event('negotiationneeded'));
+                                
+                                // Add a message so host knows they're broadcasting
+                                if (isCameraOn) {
+                                    addChatMessage('System', `📹 Broadcasting camera to new participant!`, true);
+                                }
+                            } else {
+                                console.warn(`🎥 HOST: Cannot negotiate - peer connection state: ${pc ? pc.signalingState : 'none'}`);
+                            }
+                        }, 200);
+                    } else if (!isHost && streamerId === userId) {
+                        // If I'm a participant and the new user is the streamer/host
+                        console.log(`🎥 PARTICIPANT: Streamer joined! Requesting their video...`);
+                        setTimeout(() => {
+                            const pc = peerConnections.get(userId);
+                            if (pc && pc.signalingState === 'stable') {
+                                pc.dispatchEvent(new Event('negotiationneeded'));
+                                addChatMessage('System', '📹 Host joined! Requesting camera feed...', true);
+                            }
+                        }, 300);
+                    } else {
+                        // Add tracks if we have them and camera/mic are on
+                        setTimeout(() => {
+                            updatePeerConnections();
+                        }, 100);
+                    }
+                }
+            });
+
+            socket.on('user-left', (data) => {
+                const { userId, username } = data;
+                addChatMessage('System', `${username} left the table.`, true);
+                updateParticipantCount();
+
+                // Remove from participant tracking
+                allParticipants.delete(userId);
+                if (streamerId === userId) streamerId = null;
+
+                // Clean up WebRTC connection
+                if (peerConnections.has(userId)) {
+                    console.log('🧹 Cleaning up peer connection for user:', userId);
+                    peerConnections.get(userId).close();
+                    peerConnections.delete(userId);
+                }
+                if (remoteStreams.has(userId)) {
+                    console.log('🧹 Cleaning up remote stream for user:', userId);
+                    remoteStreams.delete(userId);
+                }
+                
+                // Clean up any slots occupied by this user
+                const userSlots = document.querySelectorAll(`[data-occupied-by="${userId}"]`);
+                userSlots.forEach(slot => {
+                    slot.innerHTML = `
+                        <div class="participant-placeholder">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Empty Slot</span>
+                        </div>
+                    `;
+                    slot.removeAttribute('data-occupied-by');
+                    console.log('🧹 Cleaned up slot for user:', userId);
+                });
+            });
+
+            socket.on('chat-message', (message) => {
+                displayChatMessage(message);
+            });
+
+            // WebRTC signaling
+            socket.on('offer', (data) => {
+                handleOffer(data);
+            });
+
+            socket.on('answer', (data) => {
+                handleAnswer(data);
+            });
+
+            socket.on('ice-candidate', (data) => {
+                handleIceCandidate(data);
+            });
+
+            // Handle slot join/leave events
+            socket.on('user-joined-slot', (data) => {
+                handleUserJoinedSlot(data);
+            });
+
+            socket.on('user-left-slot', (data) => {
+                handleUserLeftSlot(data);
+            });
+            
+            socket.on('slot-join-confirmed', (data) => {
+                handleSlotJoinConfirmed(data);
+            });
+        }
+
+        function updateParticipantCount() {
+            // This would be updated by the server in a real implementation
+            // For now, we'll just increment/decrement as needed
+        }
+
+        function displayChatMessage(message) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'chat-message';
+            
+            const time = new Date(message.timestamp || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            messageDiv.innerHTML = `
+                <div class="message-author" style="${message.isStreamer ? 'color: #f39c12;' : ''}">${message.username}</div>
+                <div class="message-text">${message.text}</div>
+                <div class="message-time">${time}</div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function setTheme(theme, silent = false) {
+            // Remove all theme classes
+            document.body.classList.remove('cyberpunk', 'medieval', 'beach');
+            
+            // Remove active class from all theme buttons
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Apply new theme
+            if (theme !== 'default') {
+                document.body.classList.add(theme);
+            }
+            
+            // Set active button
+            const activeBtn = Array.from(document.querySelectorAll('.theme-btn')).find(btn => 
+                btn.textContent.toLowerCase().includes(theme) || 
+                (theme === 'default' && btn.textContent === 'Default')
+            );
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+            
+            // Update pub name and description based on theme
+            const pubName = document.getElementById('pubName');
+            const pubDescription = document.getElementById('pubDescription');
+            
+            const themeData = {
+                'default': {
+                    name: 'My Cozy Pub',
+                    description: 'Welcome to our virtual pub! Grab a drink and chat.',
+                    displayName: 'Default'
+                },
+                'cyberpunk': {
+                    name: 'Neon Nexus Bar',
+                    description: 'Welcome to the future! Jack in and connect with fellow netrunners.',
+                    displayName: 'Cyberpunk'
+                },
+                'medieval': {
+                    name: 'The Dragon\'s Tavern',
+                    description: 'Gather \'round the hearth, brave adventurers! Share tales of your quests.',
+                    displayName: 'Medieval'
+                },
+                'beach': {
+                    name: 'Paradise Tiki Bar',
+                    description: 'Aloha! Relax with tropical drinks and ocean vibes. 🌺🏖️',
+                    displayName: 'Beach Bar'
+                }
+            };
+            
+            const currentThemeData = themeData[theme];
+            pubName.textContent = currentThemeData.name;
+            pubDescription.textContent = currentThemeData.description;
+            
+            currentTheme = theme;
+            
+            // Save theme preference
+            localStorage.setItem('pubTheme', theme);
+            
+            // If host changes theme, broadcast to viewers via server
+            if (!silent && isHost && typeof socket !== 'undefined' && socket && socket.connected) {
+                socket.emit('set-theme', { theme: theme });
+            }
+            
+            // Add theme change message to chat (only if not silent initialization)
+            if (!silent) {
+                addChatMessage('System', `Pub theme changed to ${currentThemeData.displayName}! Welcome to ${currentThemeData.name}!`, true);
+            }
+            
+            console.log(`Theme changed to: ${theme}`);
+        }
+
+        async function initializePubStream() {
+            logToChat('Starting camera/microphone initialization...', 'info');
+            
+            try {
+                // Mobile-friendly camera constraints with better compatibility
+                const constraints = {
+                    video: {
+                        width: { ideal: 640, max: 1280 },
+                        height: { ideal: 480, max: 720 },
+                        frameRate: { ideal: 15, max: 30 }, // Lower frameRate for mobile stability
+                        facingMode: 'user' // Front camera by default on mobile
+                    },
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true,
+                        sampleRate: 48000
+                    }
+                };
+
+                logToChat('Requesting camera and microphone permissions...', 'info');
+                
+                // Request camera and microphone permissions
+                localStream = await navigator.mediaDevices.getUserMedia(constraints);
+                
+                logToChat('Media stream obtained successfully!', 'success');
+                logToChat(`Video tracks: ${localStream.getVideoTracks().length}`, 'info');
+                logToChat(`Audio tracks: ${localStream.getAudioTracks().length}`, 'info');
+                
+                // Initially turn off camera and mic
+                localStream.getVideoTracks().forEach(track => {
+                    track.enabled = false;
+                    console.log('Video track settings:', track.getSettings());
+                });
+                localStream.getAudioTracks().forEach(track => track.enabled = false);
+                
+            } catch (error) {
+                logToChat(`Initial camera request failed: ${error.name} - ${error.message}`, 'error');
+                
+                // Try fallback constraints for older mobile devices
+                try {
+                    logToChat('Trying fallback constraints...', 'warn');
+                    const fallbackConstraints = {
+                        video: {
+                            facingMode: 'user',
+                            width: { min: 320, ideal: 480, max: 640 },
+                            height: { min: 240, ideal: 360, max: 480 },
+                            frameRate: { max: 15 } // Very conservative for older devices
+                        },
+                        audio: {
+                            echoCancellation: true,
+                            noiseSuppression: true
+                        }
+                    };
+                    
+                    localStream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
+                    console.log('Fallback media stream obtained successfully');
+                    
+                    // Initially turn off camera and mic
+                    localStream.getVideoTracks().forEach(track => track.enabled = false);
+                    localStream.getAudioTracks().forEach(track => track.enabled = false);
+                    
+                } catch (fallbackError) {
+                    console.error('Fallback also failed:', fallbackError);
+                    
+                    // Try basic constraints as last resort
+                    try {
+                        console.log('Trying basic constraints...');
+                        localStream = await navigator.mediaDevices.getUserMedia({
+                            video: true,
+                            audio: true
+                        });
+                        console.log('Basic media stream obtained successfully');
+                        
+                        // Initially turn off camera and mic
+                        localStream.getVideoTracks().forEach(track => track.enabled = false);
+                        localStream.getAudioTracks().forEach(track => track.enabled = false);
+                        
+                    } catch (basicError) {
+                        console.error('All attempts failed:', basicError);
+                        showError('Unable to access camera/microphone. Please check permissions and try refreshing the page.');
+                        
+                        // Show detailed error message for mobile users
+                        if (/Mobi|Android/i.test(navigator.userAgent)) {
+                            showError('Mobile tip: Make sure to allow camera access when prompted, and try using Chrome or Safari.');
+                        }
+                    }
+                }
+            }
+        }
+
+        function toggleMic() {
+            const micBtn = document.getElementById('micBtn');
+            const micIcon = micBtn.querySelector('i');
+            
+            if (localStream) {
+                isMicOn = !isMicOn;
+                localStream.getAudioTracks().forEach(track => track.enabled = isMicOn);
+                
+                // Update peer connections when mic state changes
+                updatePeerConnections();
+                
+                if (isMicOn) {
+                    micBtn.classList.add('active');
+                    micIcon.className = 'fas fa-microphone';
+                } else {
+                    micBtn.classList.remove('active');
+                    micIcon.className = 'fas fa-microphone-slash';
+                }
+            }
+        }
+
+        function ensureAllPeerConnections() {
+            // Use comprehensive participant tracking
+            const allConnectedUsers = new Set();
+            
+            // Add all tracked participants except myself
+            allParticipants.forEach(userId => {
+                if (userId !== socket.id) {
+                    allConnectedUsers.add(userId);
+                }
+            });
+            
+            // Also add users from slots (in case tracking missed any)
+            for (let i = 1; i <= 6; i++) {
+                const slot = document.getElementById(`participant${i}`);
+                const occupiedBy = slot?.getAttribute('data-occupied-by');
+                if (occupiedBy && occupiedBy !== socket.id) {
+                    allConnectedUsers.add(occupiedBy);
+                }
+            }
+            
+            // Create peer connections for any missing users
+            allConnectedUsers.forEach(userId => {
+                if (!peerConnections.has(userId)) {
+                    console.log(`Creating missing peer connection for user: ${userId}`);
+                    createPeerConnection(userId);
+                } else {
+                    // Check if existing connection is healthy
+                    const pc = peerConnections.get(userId);
+                    if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') {
+                        console.log(`Recreating unhealthy connection to user: ${userId} (state: ${pc.connectionState})`);
+                        pc.close();
+                        peerConnections.delete(userId);
+                        createPeerConnection(userId);
+                    }
+                }
+            });
+        }
+
+        async function updatePeerConnections() {
+            console.log(`🎥 🔄 UPDATING TRACKS for ${peerConnections.size} peers. Camera: ${isCameraOn}, Mic: ${isMicOn}, isHost: ${isHost}`);
+            if (!localStream) {
+                console.warn("UpdatePeerConnections called but localStream is not ready.");
+                return;
+            }
+
+            // Ensure we have peer connections to all relevant users
+            ensureAllPeerConnections();
+
+            let trackChanges = false;
+
+            for (const [userId, pc] of peerConnections.entries()) {
+                console.log(`🎥 Processing peer connection for ${userId.substring(0,8)}, state: ${pc.connectionState}/${pc.signalingState}`);
+                
+                const videoTrack = localStream.getVideoTracks()[0];
+                const audioTrack = localStream.getAudioTracks()[0];
+
+                // Log track states for debugging
+                if (videoTrack) {
+                    console.log(`🎥 Video track state: enabled=${videoTrack.enabled}, readyState=${videoTrack.readyState}`);
+                }
+                if (audioTrack) {
+                    console.log(`🎤 Audio track state: enabled=${audioTrack.enabled}, readyState=${audioTrack.readyState}`);
+                }
+
+                // --- Manage Video Track ---
+                const videoSender = pc.getSenders().find(s => s.track && s.track.kind === "video");
+
+                if (isCameraOn && videoTrack && videoTrack.readyState === 'live') {
+                    if (!videoSender) {
+                        console.log(`🎥 ➕ [Video] Adding NEW track for ${userId.substring(0,8)}`);
+                        try {
+                            pc.addTrack(videoTrack, localStream);
+                            trackChanges = true;
+                            console.log(`🎥 ✅ Successfully added video track for ${userId.substring(0,8)}`);
+                        } catch (e) {
+                            console.error(`🎥 ❌ Failed to add video track for ${userId.substring(0,8)}:`, e);
+                        }
+                    } else if (videoSender.track !== videoTrack) {
+                        console.log(`🎥 🔄 [Video] Replacing track for ${userId.substring(0,8)}`);
+                        try {
+                            await videoSender.replaceTrack(videoTrack);
+                            console.log(`🎥 ✅ Successfully replaced video track for ${userId.substring(0,8)}`);
+                        } catch (e) {
+                            console.error(`🎥 ❌ Failed to replace video track for ${userId.substring(0,8)}:`, e);
+                        }
+                    } else {
+                        console.log(`🎥 ✅ Video track already correct for ${userId.substring(0,8)}`);
+                    }
+                } else if (!isCameraOn && videoSender) {
+                    console.log(`🎥 ➖ [Video] Removing track for ${userId.substring(0,8)}`);
+                    try {
+                        pc.removeTrack(videoSender);
+                        trackChanges = true;
+                        console.log(`🎥 ✅ Successfully removed video track for ${userId.substring(0,8)}`);
+                    } catch (e) {
+                        console.error(`🎥 ❌ Failed to remove video track for ${userId.substring(0,8)}:`, e);
+                    }
+                }
+
+                // --- Manage Audio Track ---
+                const audioSender = pc.getSenders().find(s => s.track && s.track.kind === "audio");
+
+                if (isMicOn && audioTrack && audioTrack.readyState === 'live') {
+                    if (!audioSender) {
+                        console.log(`🎤 ➕ [Audio] Adding NEW track for ${userId.substring(0,8)}`);
+                        try {
+                            pc.addTrack(audioTrack, localStream);
+                            trackChanges = true;
+                            console.log(`🎤 ✅ Successfully added audio track for ${userId.substring(0,8)}`);
+                        } catch (e) {
+                            console.error(`🎤 ❌ Failed to add audio track for ${userId.substring(0,8)}:`, e);
+                        }
+                    } else if (audioSender.track !== audioTrack) {
+                        console.log(`🎤 🔄 [Audio] Replacing track for ${userId.substring(0,8)}`);
+                        try {
+                            await audioSender.replaceTrack(audioTrack);
+                            console.log(`🎤 ✅ Successfully replaced audio track for ${userId.substring(0,8)}`);
+                        } catch (e) {
+                            console.error(`🎤 ❌ Failed to replace audio track for ${userId.substring(0,8)}:`, e);
+                        }
+                    }
+                } else if (!isMicOn && audioSender) {
+                    console.log(`[Audio] Removing track for ${userId}`);
+                    try {
+                        pc.removeTrack(audioSender);
+                        trackChanges = true;
+                    } catch (e) {
+                        console.error(`Failed to remove audio track for ${userId}:`, e);
+                    }
+                }
+            }
+
+            console.log(`Track update complete. Changes made: ${trackChanges}`);
+        }
+
+        function logConnectionStatus() {
+            console.log('=== CONNECTION STATUS ===');
+            console.log(`Total participants tracked: ${allParticipants.size}`);
+            console.log(`Total peer connections: ${peerConnections.size}`);
+            console.log(`Total remote streams: ${remoteStreams.size}`);
+            console.log(`Is Host: ${isHost}, Streamer ID: ${streamerId}`);
+            console.log(`Camera On: ${isCameraOn}, Mic On: ${isMicOn}`);
+            console.log(`Local Stream: ${localStream ? 'Available' : 'None'}`);
+            
+            if (localStream) {
+                console.log(`Local Video Tracks: ${localStream.getVideoTracks().length}`);
+                console.log(`Local Audio Tracks: ${localStream.getAudioTracks().length}`);
+                localStream.getVideoTracks().forEach((track, i) => {
+                    console.log(`  Video Track ${i}: enabled=${track.enabled}, state=${track.readyState}`);
+                });
+            }
+            
+            peerConnections.forEach((pc, userId) => {
+                const hasVideo = pc.getSenders().some(s => s.track && s.track.kind === 'video');
+                const hasAudio = pc.getSenders().some(s => s.track && s.track.kind === 'audio');
+                const remoteStream = remoteStreams.get(userId);
+                console.log(`${userId.substring(0,8)}: ${pc.connectionState}/${pc.signalingState}/${pc.iceConnectionState} - Send: V:${hasVideo} A:${hasAudio} - Receive: ${remoteStream ? 'Yes' : 'No'}`);
+                
+                if (remoteStream) {
+                    console.log(`  Remote tracks: Video:${remoteStream.getVideoTracks().length} Audio:${remoteStream.getAudioTracks().length}`);
+                }
+            });
+            
+            console.log('=== END STATUS ===');
+        }
+        
+        // Add a global function to help debug from browser console
+        window.debugConnections = logConnectionStatus;
+        
+        // Add a function to force track addition for debugging
+        window.forceAddTracks = function() {
+            console.log('🔧 FORCE ADDING TRACKS TO ALL CONNECTIONS...');
+            if (!localStream) {
+                console.log('🔧 No local stream available');
+                return;
+            }
+            
+            peerConnections.forEach((pc, userId) => {
+                console.log(`🔧 Force adding tracks to ${userId.substring(0,8)}`);
+                try {
+                    // Remove existing tracks
+                    pc.getSenders().forEach(sender => {
+                        if (sender.track) {
+                            pc.removeTrack(sender);
+                        }
+                    });
+                    
+                    // Add fresh tracks
+                    localStream.getTracks().forEach(track => {
+                        console.log(`🔧 Adding ${track.kind} track (enabled: ${track.enabled})`);
+                        pc.addTrack(track, localStream);
+                    });
+                    
+                    // Force renegotiation
+                    if (pc.signalingState === 'stable') {
+                        pc.dispatchEvent(new Event('negotiationneeded'));
+                    }
+                } catch (e) {
+                    console.error(`🔧 Error force adding tracks:`, e);
+                }
+            });
+        };
+
+        async function switchCamera() {
+            if (!localStream) {
+                showError('No camera stream available');
+                return;
+            }
+
+            try {
+                // Stop current video tracks
+                localStream.getVideoTracks().forEach(track => track.stop());
+                
+                // Switch facing mode
+                currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+                
+                console.log(`Switching to ${currentFacingMode} camera...`);
+                
+                // Get new video stream with switched camera
+                const newVideoStream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: currentFacingMode,
+                        width: { ideal: 1280, max: 1920 },
+                        height: { ideal: 720, max: 1080 },
+                        frameRate: { ideal: 30, max: 60 }
+                    }
+                });
+                
+                // Replace video track in existing stream
+                const newVideoTrack = newVideoStream.getVideoTracks()[0];
+                const audioTracks = localStream.getAudioTracks();
+                
+                // Create new stream with new video track and existing audio
+                localStream = new MediaStream([newVideoTrack, ...audioTracks]);
+                
+                // Update video element if camera is on
+                if (isCameraOn) {
+                    const hostVideo = document.getElementById('hostVideo');
+                    hostVideo.srcObject = localStream;
+                }
+                
+                // Update switch button text
+                const switchBtn = document.getElementById('switchCameraBtn');
+                if (switchBtn) {
+                    switchBtn.innerHTML = `<i class="fas fa-sync-alt"></i><span>${currentFacingMode === 'user' ? 'Back Cam' : 'Front Cam'}</span>`;
+                }
+                
+                console.log('Camera switched successfully');
+                
+            } catch (error) {
+                console.error('Error switching camera:', error);
+                showError('Unable to switch camera. This device may only have one camera.');
+                
+                // Revert facing mode if switch failed
+                currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+            }
+        }
+
+        async function toggleCamera() {
+            logToChat(`Toggle camera called. Current state: ${isCameraOn ? 'ON' : 'OFF'}`, 'info');
+            
+            const cameraBtn = document.getElementById('cameraBtn');
+            const cameraIcon = cameraBtn.querySelector('i');
+            const hostVideo = document.getElementById('hostVideo');
+            const videoPlaceholder = document.getElementById('videoPlaceholder');
+            
+            // If localStream doesn't exist, try to initialize it first
+            if (!localStream) {
+                logToChat('Local stream not found, attempting to initialize...', 'warn');
+                try {
+                    await initializePubStream();
+                    logToChat('Stream initialization successful!', 'success');
+                } catch (error) {
+                    logToChat(`Stream initialization failed: ${error.message}`, 'error');
+                    showError('Camera not available. Please refresh the page and allow camera access.');
+                    return;
+                }
+            }
+            
+            if (localStream) {
+                isCameraOn = !isCameraOn;
+                localStream.getVideoTracks().forEach(track => track.enabled = isCameraOn);
+                
+                console.log(`🎥 Camera toggled: ${isCameraOn ? 'ON' : 'OFF'}, isHost: ${isHost}`);
+                
+                if (isCameraOn) {
+                    cameraBtn.classList.add('active');
+                    cameraIcon.className = 'fas fa-video';
+                    
+                    // Show local video if user is host OR if they're in a participant slot
+                    const userSlot = document.querySelector(`[data-occupied-by="${socket.id}"]`);
+                    if (isHost) {
+                        hostVideo.srcObject = localStream;
+                        hostVideo.style.display = 'block';
+                        videoPlaceholder.style.display = 'none';
+                        
+                        // CRITICAL FIX: Ensure host video is properly transmitted to all participants
+                        console.log('🎥 HOST CAMERA ON - Broadcasting to all participants...');
+                        
+                        // Notify server that host started streaming
+                        socket.emit('host-stream-started', { roomId: currentRoom });
+                        
+                        // Add chat message so participants know host is streaming
+                        addChatMessage('System', '📹 Host has turned on their camera!', true);
+                    } else if (userSlot) {
+                        // User is in a participant slot, update that slot's video
+                        const slotVideo = userSlot.querySelector('video');
+                        if (slotVideo) {
+                            slotVideo.srcObject = localStream;
+                        }
+                    }
+                    
+                    // Show camera switch button on mobile
+                    const switchBtn = document.getElementById('switchCameraBtn');
+                    if (switchBtn && /Mobi|Android/i.test(navigator.userAgent)) {
+                        switchBtn.style.display = 'flex';
+                    }
+                } else {
+                    cameraBtn.classList.remove('active');
+                    cameraIcon.className = 'fas fa-video-slash';
+                    
+                    // Only hide local video if user is host
+                    if (isHost) {
+                        hostVideo.style.display = 'none';
+                        videoPlaceholder.style.display = 'flex';
+                        videoPlaceholder.innerHTML = `
+                            <i class="fas fa-video-slash"></i>
+                            <h3>Camera Off</h3>
+                            <p>Click "Camera" to start your video stream</p>
+                        `;
+                        
+                        // Notify server that host stopped streaming
+                        socket.emit('host-stream-stopped', { roomId: currentRoom });
+                        
+                        addChatMessage('System', '📹 Host has turned off their camera.', true);
+                    }
+                    
+                    // Hide camera switch button when camera is off
+                    const switchBtn = document.getElementById('switchCameraBtn');
+                    if (switchBtn) {
+                        switchBtn.style.display = 'none';
+                    }
+                }
+                
+                // CRITICAL FIX: Update peer connections AFTER local display is set
+                updatePeerConnections();
+                
+                // ENHANCED: Force immediate negotiation for all connections
+                setTimeout(() => {
+                    console.log(`🎥 Forcing immediate renegotiation for ${peerConnections.size} connections...`);
+                    for (const [userId, pc] of peerConnections.entries()) {
+                        if (pc.connectionState === 'connected' || pc.connectionState === 'new' || pc.connectionState === 'connecting') {
+                            console.log(`🎥 Triggering renegotiation with ${userId.substring(0,8)}, state: ${pc.connectionState}/${pc.signalingState}`);
+                            if (pc.signalingState === 'stable') {
+                                pc.dispatchEvent(new Event('negotiationneeded'));
+                            }
+                        }
+                    }
+                }, 200); // Reduced delay for faster response
+                
+            } else {
+                showError('Camera not available. Please refresh the page and allow camera access.');
+            }
+        }
+
+        function startStream() {
+            const startBtn = document.getElementById('startStreamBtn');
+            const liveIndicator = document.getElementById('liveIndicator');
+            
+            if (!isStreaming) {
+                isStreaming = true;
+                startBtn.innerHTML = '<i class="fas fa-stop"></i><span>Stop Stream</span>';
+                startBtn.classList.add('danger');
+                liveIndicator.classList.add('active');
+                
+                // Notify server that streaming is active
+                if (socket) {
+                    socket.emit('chat-message', {
+                        text: '📺 Started the pub stream! 🍻'
+                    });
+                }
+                
+                // Award XP for broadcasting
+                if (window.xpSystem && isHost) {
+                    xpSystem.addXp(currentUser, 50, 'starting a broadcast');
+                }
+                
+                console.log('Stream started');
+            } else {
+                isStreaming = false;
+                startBtn.innerHTML = '<i class="fas fa-broadcast-tower"></i><span>Start Stream</span>';
+                startBtn.classList.remove('danger');
+                liveIndicator.classList.remove('active');
+                
+                // Notify server that streaming stopped
+                if (socket) {
+                    socket.emit('chat-message', {
+                        text: '📺 Ended the pub stream. Thanks for watching! 🍻'
+                    });
+                }
+                
+                console.log('Stream stopped');
+            }
+        }
+
+        // === TIPPING SYSTEM ===
+        function initTipping() {
+            // Initialize coin balance from localStorage
+            let balance = parseInt(localStorage.getItem('chifftown_coins'));
+            if (isNaN(balance)) {
+                balance = 100; // Free starting coins
+                localStorage.setItem('chifftown_coins', balance);
+            }
+            updateCoinDisplay(balance);
+            
+            // Show tip button for viewers (non-hosts)
+            if (!isHost) {
+                document.getElementById('tipBtn').style.display = 'inline-block';
+            }
+            // Show total tips for hosts
+            if (isHost) {
+                document.getElementById('totalTipsWrap').style.display = 'inline';
+            }
+        }
+        
+        function updateCoinDisplay(balance) {
+            document.getElementById('coinCount').textContent = balance;
+            const modalBal = document.getElementById('tipModalBalance');
+            if (modalBal) modalBal.textContent = balance;
+        }
+        
+        function openTipModal() {
+            const modal = document.getElementById('tipModal');
+            const balance = parseInt(localStorage.getItem('chifftown_coins')) || 0;
+            updateCoinDisplay(balance);
+            modal.style.display = 'flex';
+        }
+        
+        function closeTipModal() {
+            document.getElementById('tipModal').style.display = 'none';
+        }
+        
+        function sendTip(amount) {
+            let balance = parseInt(localStorage.getItem('chifftown_coins')) || 0;
+            if (balance < amount) {
+                addChatMessage('System', '❌ Not enough coins!', true);
+                return;
+            }
+            balance -= amount;
+            localStorage.setItem('chifftown_coins', balance);
+            updateCoinDisplay(balance);
+            
+            // Send to server
+            if (socket && socket.connected) {
+                socket.emit('send-tip', { amount: amount });
+            }
+            closeTipModal();
+        }
+        
+        function showTipAnimation(fromUser, amount) {
+            const container = document.getElementById('tipAnimContainer');
+            if (!container) return;
+            
+            // Create floating coin elements
+            const numCoins = Math.min(amount, 20);
+            for (let i = 0; i < numCoins; i++) {
+                setTimeout(() => {
+                    const coin = document.createElement('div');
+                    coin.textContent = '🪙';
+                    coin.style.cssText = `
+                        position: absolute;
+                        font-size: ${16 + Math.random() * 16}px;
+                        left: ${30 + Math.random() * 40}%;
+                        bottom: -30px;
+                        animation: coinFloat ${1.5 + Math.random()}s ease-out forwards;
+                        pointer-events: none;
+                    `;
+                    container.appendChild(coin);
+                    setTimeout(() => coin.remove(), 3000);
+                }, i * 80);
+            }
+            
+            // Show notification
+            const notif = document.createElement('div');
+            notif.style.cssText = `
+                position: fixed; top: 20%; left: 50%; transform: translateX(-50%);
+                background: linear-gradient(135deg, #f4c542, #ff8c42);
+                color: #1a0e05; font-weight: 800; font-size: 18px;
+                padding: 12px 24px; border-radius: 16px;
+                z-index: 9999; box-shadow: 0 4px 20px rgba(244,197,66,0.5);
+                animation: tipNotifPop 2.5s ease forwards;
+                pointer-events: none; text-align: center;
+            `;
+            notif.textContent = `💰 ${fromUser} tipped ${amount} coin${amount !== 1 ? 's' : ''}!`;
+            document.body.appendChild(notif);
+            setTimeout(() => notif.remove(), 3000);
+        }
+        
+        // Add CSS keyframes for tip animations
+        (function() {
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes coinFloat {
+                    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+                    100% { transform: translateY(-60vh) rotate(720deg); opacity: 0; }
+                }
+                @keyframes tipNotifPop {
+                    0% { transform: translateX(-50%) scale(0.5); opacity: 0; }
+                    15% { transform: translateX(-50%) scale(1.1); opacity: 1; }
+                    25% { transform: translateX(-50%) scale(1); opacity: 1; }
+                    80% { transform: translateX(-50%) scale(1); opacity: 1; }
+                    100% { transform: translateX(-50%) scale(0.8); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+        })();
+
+        function sendMessage() {
+            const chatInput = document.getElementById('chatInput');
+            const message = chatInput.value.trim();
+            
+            if (message && socket && currentRoom) {
+                socket.emit('chat-message', {
+                    text: message
+                });
+                chatInput.value = '';
+            }
+        }
+
+        function addChatMessage(author, text, isSystem = false) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'chat-message';
+            
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            messageDiv.innerHTML = `
+                <div class="message-author" style="${isSystem ? 'color: #4299e1;' : ''}">${author}</div>
+                <div class="message-text">${text}</div>
+                <div class="message-time">${timeString}</div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function leavePub() {
+            if (confirm('Are you sure you want to leave the pub?')) {
+                // Clean up WebRTC connections
+                peerConnections.forEach((peerConnection, userId) => {
+                    peerConnection.close();
+                });
+                peerConnections.clear();
+                remoteStreams.clear();
+                
+                // Clean up streams
+                if (localStream) {
+                    localStream.getTracks().forEach(track => track.stop());
+                }
+                
+                // Disconnect from socket
+                if (socket) {
+                    socket.disconnect();
+                }
+                
+                // Redirect back to pub list
+                window.location.href = 'pub.html';
+            }
+        }
+
+        function showError(message) {
+            addChatMessage('System', `Error: ${message}`, true);
+        }
+
+        function showMobileCameraTips() {
+            const tips = [
+                "📱 Mobile Camera Tips:",
+                "• Make sure to allow camera access when prompted",
+                "• Try refreshing the page if camera doesn't work",
+                "• Use Chrome or Safari for best compatibility",
+                "• Check if another app is using your camera",
+                "• Try switching between front/back cameras",
+                "• Ensure you have good lighting for better quality"
+            ];
+            
+            tips.forEach((tip, index) => {
+                setTimeout(() => {
+                    addChatMessage('System', tip, true);
+                }, index * 1000);
+            });
+        }
+
+        // Add mobile camera tips button for troubleshooting
+        function addMobileTipsButton() {
+            if (/Mobi|Android/i.test(navigator.userAgent)) {
+                const chatMessages = document.getElementById('chatMessages');
+                const tipsButton = document.createElement('div');
+                tipsButton.className = 'chat-message';
+                tipsButton.style.cursor = 'pointer';
+                tipsButton.style.background = 'rgba(66, 153, 225, 0.2)';
+                tipsButton.style.border = '1px solid #4299e1';
+                tipsButton.onclick = showMobileCameraTips;
+                
+                tipsButton.innerHTML = `
+                    <div class="message-author" style="color: #4299e1;">System</div>
+                    <div class="message-text">📱 Having camera issues? Click here for mobile tips!</div>
+                    <div class="message-time">Help</div>
+                `;
+                
+                chatMessages.appendChild(tipsButton);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        }
+
+        // Handle Enter key in chat input
+        document.getElementById('chatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Handle when other users join/leave slots
+        function handleUserJoinedSlot(data) {
+            const { userId, username, slotNumber } = data;
+            console.log(`User ${username} joined slot ${slotNumber}`);
+            
+            const slot = document.getElementById(`participant${slotNumber}`);
+            if (!slot) return;
+
+            // SIMPLIFIED APPROACH: Always recreate connection for clean state
+            if (peerConnections.has(userId)) {
+                peerConnections.get(userId).close();
+                peerConnections.delete(userId);
+                remoteStreams.delete(userId);
+            }
+
+            // Create fresh peer connection 
+            const pc = createPeerConnection(userId);
+            
+            // SIMPLE FIX: Host always sends their stream to participants
+            if (isHost && localStream && isCameraOn) {
+                setTimeout(async () => {
+                    try {
+                        // Add host's tracks directly to the connection
+                        localStream.getTracks().forEach(track => {
+                            pc.addTrack(track, localStream);
+                        });
+                        
+                        // Create offer immediately
+                        const offer = await pc.createOffer();
+                        await pc.setLocalDescription(offer);
+                        socket.emit('offer', { target: userId, offer: offer });
+                        console.log(`Host sent offer to participant ${userId.substring(0,8)}`);
+                        
+                    } catch (e) {
+                        console.error(`Failed to create offer for ${userId.substring(0,8)}:`, e);
+                    }
+                }, 500);
+            }
+
+            // Clear the slot first
+            slot.innerHTML = `
+                <video autoplay muted playsinline class="participant-video" style="display: none;"></video>
+                <div class="participant-name">${username}</div>
+                <div class="connecting-indicator">
+                    <i class="fas fa-circle-notch fa-spin"></i>
+                    <span>Connecting camera...</span>
+                    <div class="connection-tips" style="font-size: 0.7rem; margin-top: 0.5rem; opacity: 0.7;">
+                        On mobile? Make sure camera permissions are enabled.
+                    </div>
+                </div>
+            `;
+            slot.setAttribute('data-occupied-by', userId);
+            
+            // Find the user's video stream
+            const remoteStream = remoteStreams.get(userId);
+            if (remoteStream) {
+                // Stream is available, show it immediately
+                const video = slot.querySelector('video');
+                const connectingIndicator = slot.querySelector('.connecting-indicator');
+                
+                video.srcObject = remoteStream;
+                video.style.display = 'block';
+                if (connectingIndicator) {
+                    connectingIndicator.remove();
+                }
+                
+                console.log(`Stream displayed for ${username} in slot ${slotNumber}`);
+            } else {
+                // Stream not yet available, will be shown when received
+                console.log(`Stream not yet available for user ${userId}, showing connecting indicator`);
+                
+                // Set up multiple retries to check for stream with more aggressive timing
+                let retryCount = 0;
+                const maxRetries = 15; // Increased retries
+                const retryInterval = setInterval(() => {
+                    const currentSlot = document.getElementById(`participant${slotNumber}`);
+                    const currentConnecting = currentSlot?.querySelector('.connecting-indicator');
+                    
+                    if (currentConnecting && currentSlot?.getAttribute('data-occupied-by') === userId) {
+                        // Check again for the stream
+                        const stream = remoteStreams.get(userId);
+                        if (stream) {
+                            const video = currentSlot.querySelector('video');
+                            if (video) {
+                                video.srcObject = stream;
+                                video.style.display = 'block';
+                                currentConnecting.remove();
+                                clearInterval(retryInterval);
+                                console.log(`Stream connected for ${username} in slot ${slotNumber} after ${retryCount + 1} attempts`);
+                                return;
+                            }
+                        }
+                        
+                        // Try to reconnect if peer connection failed
+                        const pc = peerConnections.get(userId);
+                        if (pc && (pc.connectionState === 'failed' || pc.connectionState === 'disconnected')) {
+                            console.log(`Peer connection failed for ${userId}, attempting to reconnect...`);
+                            pc.close();
+                            createPeerConnection(userId);
+                            setTimeout(() => updatePeerConnections(), 100);
+                        }
+                    } else {
+                        // Slot no longer exists or user changed, stop retrying
+                        clearInterval(retryInterval);
+                        return;
+                    }
+                    
+                    retryCount++;
+                    if (retryCount >= maxRetries) {
+                        clearInterval(retryInterval);
+                        console.log(`Max retries reached for ${username} in slot ${slotNumber}`);
+                        
+                        // Final attempt: recreate connection if still stuck
+                        const currentSlot = document.getElementById(`participant${slotNumber}`);
+                        if (currentSlot?.querySelector('.connecting-indicator')) {
+                            console.log(`Final attempt: recreating connection for ${userId}`);
+                            const pc = peerConnections.get(userId);
+                            if (pc) {
+                                pc.close();
+                                createPeerConnection(userId);
+                                setTimeout(() => updatePeerConnections(), 100);
+                            }
+                        }
+                    }
+                }, 800); // Check every 800ms for faster response
+            }
+        }
+
+        function handleUserLeftSlot(data) {
+            const { userId, username, slotNumber } = data;
+            console.log(`User ${username} left slot ${slotNumber}`);
+            
+            const slot = document.getElementById(`participant${slotNumber}`);
+            if (slot && slot.getAttribute('data-occupied-by') === userId) {
+                // Reset slot to empty state
+                slot.innerHTML = `
+                    <div class="participant-placeholder">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Empty Slot</span>
+                    </div>
+                `;
+                slot.removeAttribute('data-occupied-by');
+            }
+        }
+        
+        async function handleSlotJoinConfirmed(data) {
+            const { slotNumber } = data;
+            console.log('🎥 PARTICIPANT: Starting bulletproof video track transmission...');
+            
+            // BULLETPROOF FIX: Multiple approaches to ensure participant video reaches host
+            let attempts = 0;
+            const maxAttempts = 3;
+            
+            const sendParticipantVideo = async () => {
+                attempts++;
+                console.log(`🎥 ATTEMPT ${attempts}: Sending participant video to all connections...`);
+                
+                for (const [userId, pc] of peerConnections.entries()) {
+                    try {
+                        console.log(`🎥 Processing connection to ${userId.substring(0,8)}`);
+                        console.log(`🎥 Connection state: ${pc.connectionState}, Signaling: ${pc.signalingState}`);
+                        
+                        if (localStream && isCameraOn) {
+                            // FORCE ADD TRACKS - Replace any existing ones
+                            const videoTrack = localStream.getVideoTracks()[0];
+                            const audioTrack = localStream.getAudioTracks()[0];
+                            
+                            console.log(`🎥 Video track: ${videoTrack ? 'Available' : 'Missing'}, enabled: ${videoTrack?.enabled}`);
+                            console.log(`🎥 Audio track: ${audioTrack ? 'Available' : 'Missing'}, enabled: ${audioTrack?.enabled}`);
+                            
+                            // Remove existing senders first
+                            const senders = pc.getSenders();
+                            for (const sender of senders) {
+                                if (sender.track) {
+                                    console.log(`🎥 Removing existing ${sender.track.kind} sender`);
+                                    pc.removeTrack(sender);
+                                }
+                            }
+                            
+                            // Add fresh tracks
+                            if (videoTrack) {
+                                pc.addTrack(videoTrack, localStream);
+                                console.log(`🎥 ✅ Added fresh video track to ${userId.substring(0,8)}`);
+                            }
+                            if (audioTrack) {
+                                pc.addTrack(audioTrack, localStream);
+                                console.log(`🎥 ✅ Added fresh audio track to ${userId.substring(0,8)}`);
+                            }
+                            
+                            // FORCE RENEGOTIATION - Multiple methods
+                            if (pc.signalingState === 'stable') {
+                                console.log(`🎥 🚀 CREATING RENEGOTIATION OFFER for ${userId.substring(0,8)}`);
+                                
+                                // Method 1: Direct offer creation
+                                const offer = await pc.createOffer();
+                                await pc.setLocalDescription(offer);
+                                
+                                console.log(`🎥 📡 SENDING OFFER - Video in SDP: ${offer.sdp.includes('m=video')}`);
+                                socket.emit('offer', {
+                                    target: userId,
+                                    offer: offer
+                                });
+                                
+                                // Method 2: Also trigger negotiationneeded as backup
+                                setTimeout(() => {
+                                    if (pc.signalingState === 'stable') {
+                                        pc.dispatchEvent(new Event('negotiationneeded'));
+                                    }
+                                }, 100);
+                                
+                                console.log(`🎥 ✅ SENT RENEGOTIATION OFFER to ${userId.substring(0,8)}`);
+                            } else {
+                                console.log(`🎥 ⚠️ Cannot renegotiate now, state: ${pc.signalingState}`);
+                            }
+                        }
+                    } catch (e) {
+                        console.error(`🎥 ❌ Error with ${userId.substring(0,8)}:`, e);
+                    }
+                }
+                
+                // RETRY MECHANISM - Try again if needed
+                if (attempts < maxAttempts) {
+                    setTimeout(() => {
+                        console.log(`🎥 🔄 Retrying in 2 seconds... (attempt ${attempts + 1}/${maxAttempts})`);
+                        sendParticipantVideo();
+                    }, 2000);
+                }
+            };
+            
+            // Start the process after a delay to ensure everything is ready
+            setTimeout(sendParticipantVideo, 1000);
+        }
+
+        // Make functions globally available for onclick handlers
+        window.leaveSlot = leaveSlot;
+
+        // Welcome message after socket connection
+        function showWelcomeMessage() {
+            if (isHost) {
+                setTimeout(() => {
+                    addChatMessage('System', '🍻 Welcome to your pub! Others can join by visiting the pub page and clicking on your pub table.', true);
+                    setTimeout(() => {
+                        addChatMessage('System', '💡 Tip: Turn on your camera and start the stream to let people know you\'re here!', true);
+                    }, 2000);
+                }, 1000);
+            } else {
+                setTimeout(() => {
+                    addChatMessage('System', `🍻 Welcome ${currentUser}! You've joined the pub table.`, true);
+                    setTimeout(() => {
+                        addChatMessage('System', '💡 Tip: Turn on your camera and mic to join the conversation!', true);
+                    }, 2000);
+                }, 1000);
+            }
+        }
+        
+        // Periodic connection health check
+        function startConnectionHealthCheck() {
+            setInterval(() => {
+                // Check for stuck connections and slots showing "Connecting"
+                document.querySelectorAll('.connecting-indicator').forEach(indicator => {
+                    const slot = indicator.closest('[id^="participant"]');
+                    if (slot) {
+                        const userId = slot.getAttribute('data-occupied-by');
+                        if (userId) {
+                            const pc = peerConnections.get(userId);
+                            const remoteStream = remoteStreams.get(userId);
+                            
+                            // If we have a remote stream but still showing connecting, fix it
+                            if (remoteStream && remoteStream.getVideoTracks().length > 0) {
+                                console.log(`🔧 Health check: Found stuck slot for ${userId}, fixing...`);
+                                const video = slot.querySelector('video');
+                                if (video) {
+                                    video.srcObject = remoteStream;
+                                    video.style.display = 'block';
+                                    indicator.remove();
+                                }
+                            }
+                            // If connection is failed, try to restart it
+                            else if (pc && (pc.connectionState === 'failed' || pc.iceConnectionState === 'failed')) {
+                                console.log(`🔧 Health check: Restarting failed connection for ${userId}`);
+                                pc.close();
+                                peerConnections.delete(userId);
+                                remoteStreams.delete(userId);
+                                createPeerConnection(userId);
+                                setTimeout(() => updatePeerConnections(), 100);
+                            }
+                        }
+                    }
+                });
+                
+                // Check for stuck connections
+                peerConnections.forEach((pc, userId) => {
+                    const userSlot = document.querySelector(`[data-occupied-by="${userId}"]`);
+                    const connectingIndicator = userSlot?.querySelector('.connecting-indicator');
+                    
+                    // If we see a connecting indicator for more than 10 seconds, try to recover
+                    if (connectingIndicator) {
+                        const connectionAge = Date.now() - (pc.connectionStartTime || Date.now());
+                        if (connectionAge > 10000) { // 10 seconds
+                            console.log(`Connection to ${userId} stuck for ${connectionAge}ms, attempting recovery...`);
+                            
+                            // Try to restart the connection
+                            pc.close();
+                            peerConnections.delete(userId);
+                            remoteStreams.delete(userId);
+                            
+                            // Recreate connection
+                            setTimeout(() => {
+                                createPeerConnection(userId);
+                                updatePeerConnections();
+                            }, 1000);
+                        }
+                    }
+                });
+            }, 5000); // Check every 5 seconds
+        }
+
+        // WebRTC functions
+        function createPeerConnection(userId) {
+            logToChat(`Creating peer connection to: ${userId.substring(0,8)}`, 'net');
+            
+            // ENHANCED ICE server configuration for NAT traversal across different networks
+            const iceServers = [
+                // Google STUN servers
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:stun1.l.google.com:19302' },
+                
+                // Our own TURN server for NAT traversal
+                {
+                    urls: 'turn:13.49.240.95:3478',
+                    username: 'chiffly',
+                    credential: 'chiffly2026secure'
+                },
+                {
+                    urls: 'turn:13.49.240.95:3478?transport=tcp',
+                    username: 'chiffly',
+                    credential: 'chiffly2026secure'
+                }
+            ];
+            
+            logToChat(`Using ${iceServers.length} ICE servers (including TURN).`, 'net');
+            
+            const peerConnection = new RTCPeerConnection({
+                iceServers: iceServers,
+                iceCandidatePoolSize: 10,
+                bundlePolicy: 'max-bundle',
+                rtcpMuxPolicy: 'require',
+                iceTransportPolicy: 'all'
+            });
+            
+            // SIMPLE FIX: No complex transceiver setup - let WebRTC handle it automatically
+            
+            let isNegotiating = false;
+            peerConnection.onnegotiationneeded = async () => {
+                if (isNegotiating) {
+                    console.log(`Skipping negotiation for ${userId}, already in progress.`);
+                    return;
+                }
+                
+                // Check if we have any tracks to negotiate
+                const senders = peerConnection.getSenders();
+                const hasActiveTracks = senders.some(sender => sender.track && sender.track.readyState === 'live');
+                
+                if (!hasActiveTracks) {
+                    console.log(`Skipping negotiation for ${userId}, no active tracks to send`);
+                    return;
+                }
+                
+                try {
+                    isNegotiating = true;
+                    console.log(`Negotiation needed for ${userId}, creating offer...`);
+                    console.log(`Tracks to send: ${senders.filter(s => s.track).map(s => s.track.kind).join(', ')}`);
+                    
+                    // Only proceed if connection is stable
+                    if (peerConnection.signalingState === 'stable') {
+                        const offer = await peerConnection.createOffer();
+                        await peerConnection.setLocalDescription(offer);
+                        socket.emit('offer', {
+                            target: userId,
+                            offer: peerConnection.localDescription
+                        });
+                        console.log(`Offer sent to ${userId} with ${senders.filter(s => s.track).length} tracks`);
+                    } else {
+                        console.log(`Skipping offer creation for ${userId}, signaling state: ${peerConnection.signalingState}`);
+                    }
+                } catch (err) {
+                    console.error(`Failed to create offer for ${userId}:`, err);
+                } finally {
+                    isNegotiating = false;
+                }
+            };
+
+            peerConnections.set(userId, peerConnection);
+            peerConnection.connectionStartTime = Date.now();
+
+            // DO NOT ADD TRACKS HERE. They will be added by updatePeerConnections.
+
+            // Handle remote stream
+            peerConnection.ontrack = (event) => {
+                console.log('🎬 🔥 ONTRACK EVENT FIRED! Received remote stream from:', userId.substring(0,8));
+                console.log('🎬 Event details:', {
+                    streams: event.streams.length,
+                    track: event.track.kind,
+                    trackEnabled: event.track.enabled,
+                    trackState: event.track.readyState
+                });
+                
+                const [remoteStream] = event.streams;
+                remoteStreams.set(userId, remoteStream);
+                
+                // Log track details for debugging
+                remoteStream.getTracks().forEach((track, index) => {
+                    console.log(`🎬 Track ${index} from ${userId.substring(0,8)}: ${track.kind}, enabled: ${track.enabled}, state: ${track.readyState}`);
+                });
+                
+                console.log(`🎬 🚀 FORCING DISPLAY of stream from ${userId.substring(0,8)}...`);
+                
+                // AGGRESSIVE DISPLAY ATTEMPTS - Force show the video
+                const forceDisplayVideo = () => {
+                displayRemoteVideo(userId, remoteStream);
+                
+                    // Also force update any stuck connecting indicators
+                    const userSlot = document.querySelector(`[data-occupied-by="${userId}"]`);
+                    if (userSlot) {
+                        const connectingIndicator = userSlot.querySelector('.connecting-indicator');
+                        if (connectingIndicator) {
+                            console.log(`🎬 💥 FORCE REMOVING connecting indicator for ${userId.substring(0,8)}`);
+                            const video = userSlot.querySelector('video');
+                            if (video) {
+                                video.srcObject = remoteStream;
+                                video.style.display = 'block';
+                                connectingIndicator.remove();
+                                console.log(`🎬 ✅ SUCCESSFULLY DISPLAYED participant video!`);
+                            }
+                        }
+                    }
+                };
+                
+                // Multiple aggressive attempts
+                forceDisplayVideo();
+                setTimeout(forceDisplayVideo, 100);
+                setTimeout(forceDisplayVideo, 500);
+                setTimeout(forceDisplayVideo, 1000);
+                setTimeout(forceDisplayVideo, 2000);
+            };
+
+            // Handle ICE candidates with enhanced logging
+            peerConnection.onicecandidate = (event) => {
+                if (event.candidate) {
+                    logToChat(`ICE candidate found: ${event.candidate.type}`, 'net');
+                    
+                    socket.emit('ice-candidate', {
+                        target: userId,
+                        candidate: event.candidate
+                    });
+                } else {
+                    logToChat(`ICE gathering complete for ${userId.substring(0,8)}`, 'success');
+                }
+            };
+
+            // Handle connection state changes with NAT traversal diagnostics
+            peerConnection.onconnectionstatechange = () => {
+                const state = peerConnection.connectionState;
+                const iceState = peerConnection.iceConnectionState;
+                logToChat(`Connection to ${userId.substring(0,8)}: ${state} (ICE: ${iceState})`, 'net');
+                
+                if (state === 'failed') {
+                    logToChat(`Connection to ${userId.substring(0,8)} failed!`, 'error');
+                }
+            };
+            
+            // Handle ICE connection state changes with detailed NAT diagnostics
+            peerConnection.oniceconnectionstatechange = () => {
+                const iceState = peerConnection.iceConnectionState;
+                logToChat(`ICE State: ${iceState}`, 'net');
+
+                if (iceState === 'failed') {
+                    logToChat('ICE connection failed - likely NAT/firewall issue.', 'error');
+                    logToChat('Retrying with TURN...', 'warn');
+                } else if (iceState === 'disconnected') {
+                    logToChat('ICE disconnected.', 'warn');
+                }
+            };
+
+            return peerConnection;
+        }
+
+        async function handleOffer(data) {
+            const { offer, sender } = data;
+            logToChat(`Received offer from ${sender.substring(0,8)}`, 'info');
+            
+            let peerConnection = peerConnections.get(sender);
+            if (!peerConnection) {
+                logToChat(`Creating new peer connection for offer from ${sender.substring(0,8)}`, 'info');
+                peerConnection = createPeerConnection(sender);
+            }
+
+            try {
+                await peerConnection.setRemoteDescription(offer);
+                logToChat(`Set remote description for ${sender.substring(0,8)}`, 'success');
+
+                const answer = await peerConnection.createAnswer();
+                await peerConnection.setLocalDescription(answer);
+                logToChat(`Created answer for ${sender.substring(0,8)}`, 'success');
+                
+                socket.emit('answer', {
+                    target: sender,
+                    answer: answer
+                });
+            } catch (error) {
+                logToChat(`Error handling offer: ${error.message}`, 'error');
+            }
+        }
+
+        async function handleAnswer(data) {
+            const { answer, sender } = data;
+            logToChat(`Received answer from ${sender.substring(0,8)}`, 'info');
+            
+            const peerConnection = peerConnections.get(sender);
+            if (peerConnection) {
+                try {
+                    await peerConnection.setRemoteDescription(answer);
+                    logToChat(`Set remote description for answer from ${sender.substring(0,8)}`, 'success');
+                } catch (error) {
+                    logToChat(`Error handling answer: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        async function handleIceCandidate(data) {
+            const { candidate, sender } = data;
+            logToChat(`Received ICE candidate from ${sender.substring(0,8)}`, 'net');
+            
+            const peerConnection = peerConnections.get(sender);
+            if (peerConnection) {
+                try {
+                    await peerConnection.addIceCandidate(candidate);
+                } catch (error) {
+                    logToChat(`Error adding ICE candidate: ${error.message}`, 'error');
+                }
+            } else {
+                logToChat(`No peer connection for ${sender.substring(0,8)} to add ICE candidate.`, 'warn');
+            }
+        }
+
+        function displayRemoteVideo(userId, stream) {
+            logToChat(`Attempting to display video from ${userId.substring(0,8)}`, 'info');
+
+            const videoTracks = stream.getVideoTracks();
+            if (videoTracks.length === 0) {
+                logToChat(`No video tracks in stream from ${userId}`, 'warn');
+                return;
+            }
+            
+            console.log(`✅ Stream from ${userId} has ${videoTracks.length} video track(s)`);
+            videoTracks.forEach((track, i) => {
+                console.log(`📹 Track ${i}: enabled=${track.enabled}, readyState=${track.readyState}, muted=${track.muted}`);
+            });
+
+            // BULLETPROOF BROADCASTER DETECTION: Multiple ways to determine if this is the broadcaster
+            const isBroadcasterStream = (
+                (!isHost && userId === streamerId) || // Standard check
+                (!isHost && streamerId === null && allParticipants.size === 2) || // Emergency: only 2 people, other must be host
+                (!isHost && stream.getVideoTracks().length > 0 && remoteStreams.size === 1) // Emergency: first video stream received
+            );
+
+            console.log(`🎥 BROADCASTING CHECK for ${userId.substring(0,8)}:`);
+            console.log(`🎥 → Standard check (!isHost && userId === streamerId): ${!isHost && userId === streamerId}`);
+            console.log(`🎥 → Emergency check (2 people): ${!isHost && streamerId === null && allParticipants.size === 2}`);
+            console.log(`🎥 → Emergency check (first video): ${!isHost && stream.getVideoTracks().length > 0 && remoteStreams.size === 1}`);
+            console.log(`🎥 → FINAL DECISION: ${isBroadcasterStream ? 'BROADCASTER STREAM' : 'participant stream'}`);
+
+            // CRITICAL FIX: If I am a participant, and this stream is from the broadcaster, show it in the main video.
+            if (isBroadcasterStream) {
+                logToChat(`Displaying ${userId.substring(0,8)}'s stream in main video area.`, 'success');
+                const hostVideo = document.getElementById('hostVideo');
+                const videoPlaceholder = document.getElementById('videoPlaceholder');
+                
+                if (hostVideo && videoPlaceholder) {
+                    console.log('🎥 Setting host video source and making visible...');
+                    
+                    // CRITICAL: Clear any existing source first
+                    hostVideo.srcObject = null;
+                    
+                    // Small delay to ensure clean state
+                    setTimeout(() => {
+                        hostVideo.srcObject = stream;
+                        hostVideo.style.display = 'block';
+                        videoPlaceholder.style.display = 'none';
+                        
+                        // Set video properties for better mobile compatibility
+                        hostVideo.playsInline = true;
+                        hostVideo.muted = true; // Start muted for autoplay compatibility
+                        hostVideo.autoplay = true;
+                        
+                        // ENHANCED: Multiple attempts to ensure video plays with mobile fallback
+                        let playAttempts = 0;
+                        const maxAttempts = 3;
+                        
+                        const playVideo = async () => {
+                            try {
+                                playAttempts++;
+                                logToChat(`Attempting to play host video... (attempt ${playAttempts})`, 'info');
+                                
+                                // Force video properties before each attempt
+                                hostVideo.muted = true;
+                                hostVideo.playsInline = true;
+                                hostVideo.autoplay = true;
+                                
+                                await hostVideo.play();
+                                logToChat('✅ Host video playing successfully!', 'success');
+                                addChatMessage('System', '📹 Host camera connected! Click video to unmute.', true);
+                                hideClickToPlayOverlay(hostVideo);
+                                
+                                // Add click handler to unmute
+                                hostVideo.onclick = () => {
+                                    hostVideo.muted = false;
+                                    hostVideo.onclick = null; // Remove handler after first click
+                                    addChatMessage('System', '🔊 Video unmuted!', true);
+                                };
+                            } catch (e) {
+                                logToChat(`❌ Host video play failed: ${e.name} - ${e.message}`, 'error');
+                                
+                                if (playAttempts >= maxAttempts) {
+                                    logToChat('❌ All autoplay attempts failed - showing click-to-play overlay', 'warn');
+                                    showClickToPlayOverlay(hostVideo);
+                                    addChatMessage('System', '📱 Tap the video to start playback (mobile browser restriction)', true);
+                                } else {
+                                    // Try again after a short delay
+                                    setTimeout(playVideo, 500);
+                                }
+                            }
+                        };
+                        
+                        // Start first play attempt
+                        playVideo();
+                    }, 100);
+                }
+                return;
+            }
+
+            // BULLETPROOF PARTICIPANT VIDEO DISPLAY
+            const userSlot = document.querySelector(`[data-occupied-by="${userId}"]`);
+            if (userSlot) {
+                console.log(`🎯 FOUND SLOT for ${userId.substring(0,8)}, forcing video display...`);
+                
+                const video = userSlot.querySelector('video');
+                const connectingIndicator = userSlot.querySelector('.connecting-indicator');
+
+                if (video) {
+                    // FORCE VIDEO DISPLAY - Multiple approaches
+                    console.log(`🚀 FORCE SETTING video source for ${userId.substring(0,8)}`);
+                    
+                    // Method 1: Set srcObject directly
+                    video.srcObject = stream;
+                    video.style.display = 'block';
+                    video.style.width = '100%';
+                    video.style.height = '100%';
+                    video.style.objectFit = 'cover';
+                    video.autoplay = true;
+                    video.playsInline = true;
+                    video.muted = false; // Unmute to ensure it plays
+                    
+                    // Remove connecting indicator immediately
+                    if (connectingIndicator) {
+                        console.log(`💥 REMOVING connecting indicator for ${userId.substring(0,8)}`);
+                        connectingIndicator.remove();
+                    }
+                    
+                    // FORCE PLAY VIDEO - Multiple attempts with mobile fallback
+                    let participantPlayAttempts = 0;
+                    const maxParticipantAttempts = 3;
+                    
+                    const forcePlay = async () => {
+                        try {
+                            participantPlayAttempts++;
+                            logToChat(`▶️ Attempting to play participant video... (attempt ${participantPlayAttempts})`, 'info');
+                            
+                            // Force video properties
+                            video.muted = true;
+                            video.playsInline = true;
+                            video.autoplay = true;
+                            
+                            await video.play();
+                            logToChat(`✅ Participant video playing successfully!`, 'success');
+                            addChatMessage('System', `📹 ${userId.substring(0,4)}'s camera connected!`, true);
+                            hideClickToPlayOverlay(video);
+                        } catch (e) {
+                            logToChat(`❌ Participant video play failed: ${e.name}`, 'error');
+                            
+                            if (participantPlayAttempts >= maxParticipantAttempts) {
+                                logToChat('❌ All participant video autoplay attempts failed - showing click-to-play overlay', 'warn');
+                                showClickToPlayOverlay(video);
+                            } else {
+                                // Try again after a short delay
+                                setTimeout(forcePlay, 500);
+                            }
+                        }
+                    };
+                    
+                    // Start first play attempt
+                    forcePlay();
+                    
+                    // BACKUP: Recreate video element if needed
+                        setTimeout(() => {
+                        if (video.readyState === 0) {
+                            console.log(`🔄 Video not ready, recreating element for ${userId.substring(0,8)}`);
+                            const newVideo = document.createElement('video');
+                            newVideo.srcObject = stream;
+                            newVideo.autoplay = true;
+                            newVideo.muted = true;
+                            newVideo.playsInline = true;
+                            newVideo.style.width = '100%';
+                            newVideo.style.height = '100%';
+                            newVideo.style.objectFit = 'cover';
+                            newVideo.className = 'participant-video';
+                            
+                            video.parentNode.replaceChild(newVideo, video);
+                            newVideo.play().catch(e => console.error("Recreated video play failed:", e));
+                            console.log(`🔄 Recreated video element for ${userId.substring(0,8)}`);
+                        }
+                    }, 2000);
+                    
+            } else {
+                    console.log(`❌ No video element found in slot for ${userId.substring(0,8)}`);
+                }
+            } else {
+                console.log(`❌ No slot found for user ${userId.substring(0,8)}, storing stream for later.`);
+                remoteStreams.set(userId, stream);
+            }
+        }
+
+        function addParticipantVideo(userId, stream, targetSlotNumber = null) {
+            let targetSlot = null;
+            
+            if (targetSlotNumber) {
+                // Use specific slot if requested
+                targetSlot = document.getElementById(`participant${targetSlotNumber}`);
+            } else {
+                // Find first empty slot
+                for (let i = 1; i <= 6; i++) {
+                    const slot = document.getElementById(`participant${i}`);
+                    if (slot && slot.querySelector('.participant-placeholder')) {
+                        targetSlot = slot;
+                        break;
+                    }
+                }
+            }
+            
+            if (targetSlot) {
+                const slotNumber = targetSlot.id.replace('participant', '');
+                targetSlot.innerHTML = `
+                    <video autoplay muted playsinline class="participant-video"></video>
+                    <div class="participant-name">Patron ${slotNumber}</div>
+                `;
+                const video = targetSlot.querySelector('video');
+                video.srcObject = stream;
+                video.setAttribute('data-user-id', userId);
+                
+                // Store which slot this user is in
+                targetSlot.setAttribute('data-occupied-by', userId);
+            }
+        }
+
+        function setupParticipantSlotHandlers() {
+            // Add click handlers to participant slots for guests
+            if (!isHost) {
+                for (let i = 1; i <= 6; i++) {
+                    const slot = document.getElementById(`participant${i}`);
+                    if (slot) {
+                        slot.addEventListener('click', () => handleSlotClick(i));
+                        slot.style.cursor = 'pointer';
+                        slot.classList.add('clickable-slot');
+                        
+                        // Add hover effect for empty slots
+                        slot.addEventListener('mouseenter', () => {
+                            if (slot.querySelector('.participant-placeholder')) {
+                                slot.querySelector('.participant-placeholder').innerHTML = `
+                                    <i class="fas fa-video"></i>
+                                    <span>Click to join with camera</span>
+                                `;
+                            }
+                        });
+                        
+                        slot.addEventListener('mouseleave', () => {
+                            if (slot.querySelector('.participant-placeholder')) {
+                                slot.querySelector('.participant-placeholder').innerHTML = `
+                                    <i class="fas fa-user-plus"></i>
+                                    <span>Empty Slot</span>
+                                `;
+                            }
+                        });
+                    }
+                }
+                
+                // Add instruction message for participants
+                setTimeout(() => {
+                    addChatMessage('System', '💡 Tip: Click on any empty slot to join with your camera!', true);
+                }, 3000);
+            }
+        }
+
+        async function handleSlotClick(slotNumber) {
+            const slot = document.getElementById(`participant${slotNumber}`);
+            
+            // Check if slot is empty and user isn't already in a slot
+            if (!slot.querySelector('.participant-placeholder')) {
+                addChatMessage('System', 'This slot is already occupied!', true);
+                return;
+            }
+            
+            // Check if user is already in another slot
+            const existingSlot = document.querySelector(`[data-occupied-by="${socket.id}"]`);
+            if (existingSlot) {
+                addChatMessage('System', 'You are already in a camera slot! Leave your current slot first.', true);
+                return;
+            }
+            
+            try {
+                // Request camera access if not already available
+                if (!localStream || !isCameraOn) {
+                    await requestCameraAccess();
+                }
+                
+                // Wait a moment to ensure stream is fully ready
+                await new Promise(resolve => setTimeout(resolve, 200));
+                
+                // Show user's video in the selected slot (NOT in main window)
+                slot.innerHTML = `
+                    <video autoplay muted playsinline class="participant-video"></video>
+                    <div class="participant-name">You (Patron ${slotNumber})</div>
+                    <button class="leave-slot-btn" onclick="leaveSlot(${slotNumber})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="participant-controls">
+                        <button class="participant-control-btn" id="participantCamBtn" onclick="toggleCamera()">
+                            <i class="fas fa-video"></i>
+                        </button>
+                        <button class="participant-control-btn" id="participantMicBtn" onclick="toggleMic()">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                    </div>
+                `;
+                
+                const video = slot.querySelector('video');
+                video.srcObject = localStream;
+                slot.setAttribute('data-occupied-by', socket.id);
+                
+                // Enable camera if not already on
+                if (!isCameraOn) {
+                    // Turn on camera but ensure main window still shows broadcaster
+                    isCameraOn = true;
+                    const cameraBtn = document.getElementById('cameraBtn');
+                    const cameraIcon = cameraBtn.querySelector('i');
+                    cameraBtn.classList.add('active');
+                    cameraIcon.className = 'fas fa-video';
+                    
+                    // Enable video track
+                    if (localStream) {
+                        localStream.getVideoTracks().forEach(track => {
+                            track.enabled = true;
+                            console.log(`🎥 Enabled video track for slot join: ${track.label}, enabled: ${track.enabled}`);
+                        });
+                    }
+                }
+                
+                // Also enable microphone for better communication
+                if (!isMicOn) {
+                    isMicOn = true;
+                    const micBtn = document.getElementById('micBtn');
+                    const micIcon = micBtn.querySelector('i');
+                    micBtn.classList.add('active');
+                    micIcon.className = 'fas fa-microphone';
+                    
+                    if (localStream) {
+                        localStream.getAudioTracks().forEach(track => {
+                            track.enabled = true;
+                            console.log(`🎥 Enabled audio track for slot join: ${track.label}, enabled: ${track.enabled}`);
+                        });
+                    }
+                }
+
+                // Notify server and other users that this user joined a slot FIRST
+                socket.emit('join-slot', { slotNumber });
+
+                // Log connection states periodically for debugging
+                setTimeout(() => {
+                    console.log('🎥 Participant joined slot, checking connection states...');
+                    for (const [userId, pc] of peerConnections.entries()) {
+                        console.log(`🎥 Connection ${userId.substring(0,8)}: ${pc.connectionState}/${pc.signalingState}/${pc.iceConnectionState}`);
+                    }
+                }, 2000);
+                
+                addChatMessage('System', `You joined the conversation in slot ${slotNumber}! 📹`, true);
+                
+                // Award XP for going on camera
+                if (window.xpSystem) {
+                    xpSystem.addXp(currentUser, 15, 'going on camera');
+                }
+                
+            } catch (error) {
+                console.error('Error accessing camera:', error);
+                addChatMessage('System', 'Could not access camera. Please allow camera permissions and try again.', true);
+            }
+        }
+
+        async function requestCameraAccess() {
+            if (!localStream) {
+                // Initialize camera access
+                await initializePubStream();
+            }
+        }
+
+        function leaveSlot(slotNumber) {
+            const slot = document.getElementById(`participant${slotNumber}`);
+            if (slot && slot.getAttribute('data-occupied-by') === socket.id) {
+                // Reset slot to empty state
+                slot.innerHTML = `
+                    <div class="participant-placeholder">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Empty Slot</span>
+                    </div>
+                `;
+                slot.removeAttribute('data-occupied-by');
+                
+                // Notify server and other users that this user left a slot
+                socket.emit('leave-slot', { slotNumber });
+                
+                // Turn off camera
+                if (isCameraOn) {
+                    toggleCamera();
+                }
+                
+                addChatMessage('System', `You left camera slot ${slotNumber}.`, true);
+            }
+        }
+
+        // Add debug button for easier access
+        window.debugParticipantConnections = function() {
+            console.log('=== PARTICIPANT CONNECTION DEBUG ===');
+            console.log(`Current user ID: ${socket.id}`);
+            console.log(`Is Host: ${isHost}`);
+            console.log(`Streamer ID: ${streamerId}`);
+            
+            // Check participant slots
+            for (let i = 1; i <= 6; i++) {
+                const slot = document.getElementById(`participant${i}`);
+                const occupiedBy = slot?.getAttribute('data-occupied-by');
+                const hasConnecting = slot?.querySelector('.connecting-indicator');
+                
+                if (occupiedBy) {
+                    console.log(`Slot ${i}: Occupied by ${occupiedBy.substring(0,8)}, Connecting: ${!!hasConnecting}`);
+                    
+                    const pc = peerConnections.get(occupiedBy);
+                    const remoteStream = remoteStreams.get(occupiedBy);
+                    
+                    if (pc) {
+                        console.log(`  Peer Connection: ${pc.connectionState}/${pc.signalingState}/${pc.iceConnectionState}`);
+                        console.log(`  Remote Stream: ${remoteStream ? 'Available' : 'Missing'}`);
+                        
+                        if (remoteStream) {
+                            console.log(`  Remote Video Tracks: ${remoteStream.getVideoTracks().length}`);
+                            remoteStream.getVideoTracks().forEach((track, idx) => {
+                                console.log(`    Track ${idx}: enabled=${track.enabled}, state=${track.readyState}`);
+                            });
+                        }
+                    } else {
+                        console.log(`  No peer connection found!`);
+                    }
+                }
+            }
+            console.log('=== END DEBUG ===');
+        };
+
+        // Hide main stream controls for participants
+        function updateMainControlsVisibility() {
+            const controls = document.getElementById('mainStreamControls');
+            if (!isHost && controls) {
+                controls.style.display = 'none';
+            } else if (isHost && controls) {
+                controls.style.display = '';
+            }
+        }
+
+        // Network diagnostics function for troubleshooting NAT/firewall issues
+        async function runNetworkDiagnostics() {
+            logToChat('Running network diagnostics...', 'info');
+            
+            try {
+                // Test STUN/TURN server connectivity
+                const testPC = new RTCPeerConnection({
+                    iceServers: [
+                        { urls: 'stun:stun.l.google.com:19302' },
+                        {
+                            urls: 'turn:13.49.240.95:3478',
+                            username: 'chiffly',
+                            credential: 'chiffly2026secure'
+                        }
+                    ]
+                });
+                
+                let hasSrflx = false;
+                let hasRelay = false;
+                
+                testPC.onicecandidate = (event) => {
+                    if (event.candidate) {
+                        logToChat(`Diagnostic Candidate: ${event.candidate.type}`, 'net');
+                        if (event.candidate.type === 'srflx') hasSrflx = true;
+                        if (event.candidate.type === 'relay') hasRelay = true;
+                    }
+                };
+                
+                testPC.createDataChannel('diagnostics');
+                await testPC.createOffer();
+                
+                setTimeout(() => {
+                    logToChat('--- Diagnostics Complete ---', 'info');
+                    if (hasSrflx) {
+                        logToChat('STUN server connection: SUCCESSFUL (Direct connection possible)', 'success');
+                    } else {
+                        logToChat('STUN server connection: FAILED (Cannot find public IP)', 'error');
+                    }
+                    if (hasRelay) {
+                        logToChat('TURN server connection: SUCCESSFUL (Relay connection possible)', 'success');
+                    } else {
+                        logToChat('TURN server connection: FAILED (Relay connection NOT possible)', 'error');
+                        logToChat('The failure of TURN servers is the most likely cause of the problem.', 'warn');
+                    }
+                    testPC.close();
+                }, 3000);
+                
+            } catch (error) {
+                logToChat(`Diagnostics error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Make diagnostics available globally
+        window.runNetworkDiagnostics = runNetworkDiagnostics;
+        
+        // Auto-run diagnostics if connection issues detected
+        function autoRunDiagnosticsOnFailure() {
+            // This function is currently disabled to avoid log spam,
+            // but can be re-enabled for deeper debugging.
+            return;
+            
+            let failureCount = 0;
+            const originalCreatePeerConnection = createPeerConnection;
+            
+            createPeerConnection = function(userId) {
+                const pc = originalCreatePeerConnection(userId);
+                const originalOnIceStateChange = pc.oniceconnectionstatechange;
+                
+                pc.oniceconnectionstatechange = function() {
+                    if (originalOnIceStateChange) originalOnIceStateChange();
+                    
+                    if (pc.iceConnectionState === 'failed') {
+                        failureCount++;
+                        if (failureCount === 1) {
+                            logToChat('Connection issues detected. Auto-running diagnostics...', 'warn');
+                            setTimeout(runNetworkDiagnostics, 1000);
+                        }
+                    }
+                };
+                
+                return pc;
+            };
+        }
+        
+        // Initialize auto-diagnostics
+        autoRunDiagnosticsOnFailure();
+    </script>
+    
+    <!-- ChiffTown Share Button -->
+    <script src="/js/share-button.js" data-share-message="Come grab a drink with me at The Chiff Inn! 🍺"></script>
+</body>
+</html> 

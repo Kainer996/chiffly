@@ -7,8 +7,20 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="preload" href="/images/chifftown-map-wide.png" as="image">
-    <link rel="stylesheet" href="main-home-styles.css?v=25">
+    <link rel="stylesheet" href="main-home-styles.css?v=26">
     <link rel="stylesheet" href="css/town-buildings.css?v=1">
+    <link rel="stylesheet" href="css/town-animations.css?v=1">
+    <link rel="stylesheet" href="css/mobile-map.css?v=2">
+    <link rel="stylesheet" href="css/mobile-fullscreen.css?v=1">
+    <link rel="stylesheet" href="css/weather-system.css?v=1">
+    <link rel="stylesheet" href="css/daily-challenges.css?v=1">
+    <link rel="stylesheet" href="css/generation-system.css?v=1">
+    <link rel="stylesheet" href="css/unlock-preview.css?v=1">
+    <link rel="stylesheet" href="css/social-sidebar.css?v=1">
+    <link rel="stylesheet" href="css/loading-screen.css?v=1">
+    <link rel="stylesheet" href="css/activity-feed.css?v=1">
+    <link rel="stylesheet" href="css/profile-system.css?v=1">
+    <link rel="stylesheet" href="css/shop-system.css?v=1">
 </head>
 <body>
     <!-- Ambient particles canvas -->
@@ -24,6 +36,9 @@
                 <div class="nav-links">
                     <a href="#venues" class="nav-link">Venues</a>
                     <a href="#features" class="nav-link">Features</a>
+                    <a href="achievements.html" class="nav-link"><i class="fas fa-trophy" style="margin-right: 4px;"></i> Achievements</a>
+                    <a href="challenges.html" class="nav-link"><i class="fas fa-tasks" style="margin-right: 4px;"></i> Challenges</a>
+                    <a href="newspaper.html" class="nav-link"><img src="/images/buildings/newspaper-icon.png?v=1770906861" alt="News" style="width: 20px; height: auto; vertical-align: middle; margin-right: 4px;"> News</a>
                     <a href="#about" class="nav-link">About</a>
                 </div>
                 <div class="auth-section">
@@ -43,9 +58,13 @@
                             </div>
                         </div>
                         <div class="menu-divider"></div>
-                        <a href="profile.html" class="menu-item">
+                        <a href="#" class="menu-item" onclick="if(window.ProfileSystem)ProfileSystem.openProfile()">
                             <i class="fas fa-user-cog"></i>
                             Profile Settings
+                        </a>
+                        <a href="#" class="menu-item" onclick="if(window.ShopSystem)ShopSystem.openShop()">
+                            <i class="fas fa-store"></i>
+                            Marketplace
                         </a>
                         <a href="#" class="menu-item">
                             <i class="fas fa-bell"></i>
@@ -65,6 +84,14 @@
             </div>
         </div>
     </nav>
+
+    <!-- Town Events Banner -->
+    <div id="eventsBanner" class="events-banner" style="display: none;">
+        <div class="events-ticker">
+            <i class="fas fa-calendar-star"></i>
+            <span id="eventText">No events currently</span>
+        </div>
+    </div>
 
     <!-- Hero Section — Town Centre -->
     <section class="hero">
@@ -216,8 +243,72 @@
                 <span class="inline-dot">·</span>
                 <span class="inline-stat"><span class="inline-num" id="liveStreams">0</span> live</span>
             </div>
+            <!-- CTA Buttons -->
+            <div class="hero-cta-row">
+                <button class="cta-start-room" onclick="openInviteModal()">
+                    <i class="fas fa-plus-circle"></i> Start a Room
+                </button>
+                <button class="cta-invite-friend" onclick="openInviteModal()">
+                    <i class="fas fa-user-plus"></i> Invite a Friend
+                </button>
+            </div>
         </div>
     </section>
+
+    <!-- Floating Invite FAB -->
+    <button class="fab-invite" onclick="openInviteModal()" title="Invite a Friend">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <!-- Invite Modal -->
+    <div class="invite-modal-overlay" id="inviteModal" style="display:none;" onclick="if(event.target===this)closeInviteModal()">
+        <div class="invite-modal">
+            <button class="invite-modal-close" onclick="closeInviteModal()"><i class="fas fa-times"></i></button>
+            <h2 class="invite-modal-title">Start a Room</h2>
+            <p class="invite-modal-sub">Pick a venue and invite your friends</p>
+            <div class="invite-venue-grid" id="inviteVenueGrid">
+                <button class="invite-venue-btn selected" data-venue="pub" data-url="/pub.html" onclick="selectVenue(this)">
+                    <i class="fas fa-beer-mug-empty"></i><span>Tavern</span>
+                </button>
+                <button class="invite-venue-btn" data-venue="nightclub" data-url="/nightclub.html" onclick="selectVenue(this)">
+                    <i class="fas fa-music"></i><span>Nightclub</span>
+                </button>
+                <button class="invite-venue-btn" data-venue="cinema" data-url="/cinema.html" onclick="selectVenue(this)">
+                    <i class="fas fa-film"></i><span>Cinema</span>
+                </button>
+                <button class="invite-venue-btn" data-venue="lounge" data-url="/lounge.html" onclick="selectVenue(this)">
+                    <i class="fas fa-couch"></i><span>Lounge</span>
+                </button>
+                <button class="invite-venue-btn" data-venue="arcade" data-url="/games.html" onclick="selectVenue(this)">
+                    <i class="fas fa-gamepad"></i><span>Arcade</span>
+                </button>
+                <button class="invite-venue-btn" data-venue="casino" data-url="/casino.html" onclick="selectVenue(this)">
+                    <i class="fas fa-dice"></i><span>Casino</span>
+                </button>
+            </div>
+            <div class="invite-link-section">
+                <label class="invite-link-label">Your invite link</label>
+                <div class="invite-link-row">
+                    <input type="text" class="invite-link-input" id="inviteLinkInput" readonly>
+                    <button class="invite-copy-btn" onclick="copyInviteLink()"><i class="fas fa-copy"></i> Copy</button>
+                </div>
+            </div>
+            <button class="invite-go-btn" id="goToRoomBtn" onclick="goToRoom()">
+                <i class="fas fa-door-open"></i> Enter Room
+            </button>
+            <div class="invite-share-row">
+                <a class="invite-share-btn whatsapp" id="shareWhatsApp" href="#" target="_blank">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                </a>
+                <a class="invite-share-btn sms" id="shareSMS" href="#">
+                    <i class="fas fa-comment-sms"></i> Text
+                </a>
+                <button class="invite-share-btn native" onclick="nativeShare()">
+                    <i class="fas fa-share-nodes"></i> Share
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Venues Section — Town Map -->
     <section id="venues" class="venues-section">
@@ -242,7 +333,7 @@
                         </div>
                     </div>
                     <div class="hud-right">
-                        <div class="hud-currency">
+                        <div class="hud-currency clickable" onclick="if(window.ShopSystem)ShopSystem.openShop()" title="Open Marketplace">
                             <span class="hud-coin">🪙</span>
                             <span class="hud-coin-amount" id="hudCoins">250</span>
                         </div>
@@ -254,6 +345,21 @@
                         <button class="fs-exit-btn" onclick="toggleMapFullscreen()"><i class="fas fa-compress"></i></button>
                     </div>
                 </div>
+                
+                <!-- Daily Challenges Widget -->
+                <div class="challenges-widget" id="challengesWidget">
+                    <div class="challenges-widget-header">
+                        <span class="challenges-widget-title">🎯 Daily Challenges</span>
+                        <a href="challenges.html" class="challenges-widget-link">View All</a>
+                    </div>
+                    <div id="challengesList" class="challenges-list">
+                        <!-- Challenges will be populated by JS -->
+                        <div class="challenge-mini-loading">
+                            <i class="fas fa-spinner fa-spin"></i> Loading challenges...
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="edit-toolbar" id="editToolbar">
                     <span class="edit-label">✏️ Edit Mode</span>
                     <button onclick="TownEngine.resetLayout()">Reset</button>
@@ -305,48 +411,77 @@
                     <div class="hotspot-glow"></div>
                     <div class="hotspot-label">🏠 Your Apartment</div>
                 </a>
+                
+                <a href="/casino.html" class="map-hotspot casino-hotspot" data-venue="The Golden Dice">
+                    <div class="hotspot-glow"></div>
+                    <div class="hotspot-label">🎰 Casino</div>
+                </a>
+
+                <!-- Gen 4 Hotspots -->
+                <a href="/observatory.html" class="map-hotspot hotspot-observatory" data-building="observatory" data-tooltip="Starfire Observatory">
+                    <div class="hotspot-glow"></div>
+                    <div class="hotspot-label">Starfire Observatory</div>
+                </a>
+                <a href="/chronos.html" class="map-hotspot hotspot-chronos" data-building="chronos" data-tooltip="The Chronos Club">
+                    <div class="hotspot-glow"></div>
+                    <div class="hotspot-label">The Chronos Club</div>
+                </a>
+                <a href="/aetherium.html" class="map-hotspot hotspot-aetherium" data-building="aetherium" data-tooltip="The Aetherium Lab">
+                    <div class="hotspot-glow"></div>
+                    <div class="hotspot-label">The Aetherium Lab</div>
+                </a>
             </div>
             <!-- Venue Quick List -->
             <div class="venue-list">
                 <a href="/pub.html" class="venue-item">
-                    <span class="venue-icon">🍺</span>
+                    <span class="venue-icon"><img src="/images/buildings/tavern.png?v=1770903060" alt="Tavern" style="width: 95px; height: auto;"></span>
                     <span class="venue-name">The Chiff Inn</span>
                     <span class="venue-desc">Cozy pub vibes</span>
                 </a>
                 <a href="/nightclub.html" class="venue-item">
-                    <span class="venue-icon">🎵</span>
+                    <span class="venue-icon"><img src="/images/buildings/nightclub.png?v=1770903060" alt="Nightclub" style="width: 95px; height: auto;"></span>
                     <span class="venue-name">Neon Pulse</span>
                     <span class="venue-desc">Dance & party</span>
                 </a>
+                <a href="/newspaper.html" class="venue-item">
+                    <span class="venue-icon"><img src="/images/buildings/newspaper-icon.png?v=1770906861" alt="Newspaper" style="width: 95px; height: auto;"></span>
+                    <span class="venue-name">The Chronicle</span>
+                    <span class="venue-desc">Town newspaper</span>
+                </a>
                 <a href="/cinema.html" class="venue-item">
-                    <span class="venue-icon">🎬</span>
+                    <span class="venue-icon"><img src="/images/buildings/cinema.png?v=1770903060" alt="Cinema" style="width: 95px; height: auto;"></span>
                     <span class="venue-name">Starlight Cinema</span>
                     <span class="venue-desc">Watch together</span>
                 </a>
                 <a href="/games.html" class="venue-item">
-                    <span class="venue-icon">🎮</span>
+                    <span class="venue-icon"><img src="/images/buildings/arcade.png?v=1770903060" alt="Arcade" style="width: 95px; height: auto;"></span>
                     <span class="venue-name">Pixel Palace</span>
                     <span class="venue-desc">Retro arcade</span>
                 </a>
                 <a href="/lounge.html" class="venue-item">
-                    <span class="venue-icon">🛋️</span>
+                    <span class="venue-icon"><img src="/images/buildings/lounge.png?v=1770903060" alt="Lounge" style="width: 95px; height: auto;"></span>
                     <span class="venue-name">Velvet Sky</span>
                     <span class="venue-desc">Chill & chat</span>
                 </a>
                 <a href="/questing.html" class="venue-item">
-                    <span class="venue-icon">⚔️</span>
+                    <span class="venue-icon"><img src="/images/buildings/adventure.png?v=1770903060" alt="Adventure Guild" style="width: 95px; height: auto;"></span>
                     <span class="venue-name">Adventure Guild</span>
                     <span class="venue-desc">Quests & stories</span>
                 </a>
                 <a href="/apartment.html" class="venue-item">
-                    <span class="venue-icon">🏠</span>
+                    <span class="venue-icon"><img src="/images/buildings/apartment.png?v=1770903060" alt="Apartment" style="width: 95px; height: auto;"></span>
                     <span class="venue-name">Your Apartment</span>
                     <span class="venue-desc">Your own space</span>
                 </a>
                 <a href="/wellness.html" class="venue-item">
-                    <span class="venue-icon">🧘</span>
+                    <span class="venue-icon"><img src="/images/buildings/wellness.png?v=1770903060" alt="Wellness" style="width: 95px; height: auto;"></span>
                     <span class="venue-name">Wellness Centre</span>
                     <span class="venue-desc">Feel good science</span>
+                </a>
+                <a href="/casino.html" class="venue-item">
+                    <span class="venue-icon"><img src="/images/buildings/casino.png?v=1770903060" alt="Casino" style="width: 95px; height: auto;"></span>
+                    <span class="venue-name">The Golden Dice</span>
+                    <span class="venue-desc">Test your luck</span>
                 </a>
                 <a href="/profile.html" class="venue-item">
                     <span class="venue-icon">👤</span>
@@ -367,30 +502,18 @@
             </div>
             <div class="features-grid">
                 <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-video"></i>
-                    </div>
                     <h3>Live Video Chat</h3>
                     <p>WebRTC-powered face-to-face conversations with crystal-clear quality.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-palette"></i>
-                    </div>
                     <h3>Themed Venues</h3>
                     <p>Every room has its own atmosphere — from cozy pubs to electric nightclubs.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-comments"></i>
-                    </div>
                     <h3>Real-time Chat</h3>
                     <p>Text chat alongside video for sharing links, reactions, and banter.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-mobile-screen"></i>
-                    </div>
                     <h3>Works Everywhere</h3>
                     <p>Desktop, mobile, tablet — jump in from wherever you are.</p>
                 </div>
@@ -410,19 +533,15 @@
                 </div>
                 <div class="about-visual">
                     <div class="about-card">
-                        <div class="about-card-icon"><i class="fas fa-mug-hot"></i></div>
                         <span>6 Unique Venues</span>
                     </div>
                     <div class="about-card">
-                        <div class="about-card-icon"><i class="fas fa-video"></i></div>
                         <span>HD Video Chat</span>
                     </div>
                     <div class="about-card">
-                        <div class="about-card-icon"><i class="fas fa-bolt"></i></div>
                         <span>Instant Access</span>
                     </div>
                     <div class="about-card">
-                        <div class="about-card-icon"><i class="fas fa-lock"></i></div>
                         <span>Private Rooms</span>
                     </div>
                 </div>
@@ -532,12 +651,134 @@
         }
     </style>
 
+    <style>
+    /* === CTA Buttons in Hero === */
+    .hero-cta-row { display: flex; gap: 14px; margin-top: 28px; justify-content: center; flex-wrap: wrap; }
+    .cta-start-room, .cta-invite-friend {
+        font-family: 'Inter', sans-serif; font-weight: 600; font-size: 1rem;
+        border: none; border-radius: 12px; padding: 14px 28px; cursor: pointer;
+        display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s ease;
+        letter-spacing: 0.5px;
+    }
+    .cta-start-room {
+        background: linear-gradient(135deg, #c9a84c 0%, #e0c068 100%);
+        color: #0a0a1a; box-shadow: 0 4px 24px rgba(201,168,76,0.35);
+    }
+    .cta-start-room:hover { transform: translateY(-2px); box-shadow: 0 6px 32px rgba(201,168,76,0.5); }
+    .cta-invite-friend {
+        background: linear-gradient(135deg, #2a9d8f 0%, #3ab8a8 100%);
+        color: #fff; box-shadow: 0 4px 24px rgba(42,157,143,0.3);
+    }
+    .cta-invite-friend:hover { transform: translateY(-2px); box-shadow: 0 6px 32px rgba(42,157,143,0.45); }
+
+    /* === Floating FAB === */
+    .fab-invite {
+        position: fixed; bottom: 28px; right: 28px; z-index: 9000;
+        width: 58px; height: 58px; border-radius: 50%; border: none; cursor: pointer;
+        background: linear-gradient(135deg, #c9a84c 0%, #e0c068 100%);
+        color: #0a0a1a; font-size: 1.5rem;
+        box-shadow: 0 4px 20px rgba(201,168,76,0.4);
+        transition: all 0.3s ease;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .fab-invite:hover { transform: scale(1.1) rotate(90deg); box-shadow: 0 6px 28px rgba(201,168,76,0.6); }
+
+    /* === Invite Modal === */
+    .invite-modal-overlay {
+        position: fixed; inset: 0; z-index: 10000;
+        background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
+        display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+    .invite-modal {
+        background: linear-gradient(170deg, #0f1a2e 0%, #0a0f1e 100%);
+        border: 1px solid rgba(201,168,76,0.2); border-radius: 20px;
+        padding: 36px 32px; max-width: 480px; width: 100%; position: relative;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+        animation: modalIn 0.3s ease;
+    }
+    @keyframes modalIn { from { opacity:0; transform: scale(0.92) translateY(20px); } to { opacity:1; transform: scale(1) translateY(0); } }
+    .invite-modal-close {
+        position: absolute; top: 14px; right: 16px; background: none; border: none;
+        color: rgba(255,255,255,0.4); font-size: 1.2rem; cursor: pointer; transition: color 0.2s;
+    }
+    .invite-modal-close:hover { color: #fff; }
+    .invite-modal-title {
+        font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700;
+        color: #c9a84c; margin: 0 0 4px; text-align: center;
+    }
+    .invite-modal-sub {
+        font-family: 'Inter', sans-serif; color: rgba(255,255,255,0.5);
+        font-size: 0.9rem; text-align: center; margin: 0 0 24px;
+    }
+    .invite-venue-grid {
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px;
+    }
+    .invite-venue-btn {
+        background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 12px; padding: 14px 8px; cursor: pointer; transition: all 0.2s;
+        display: flex; flex-direction: column; align-items: center; gap: 6px;
+        color: rgba(255,255,255,0.6); font-family: 'Inter', sans-serif; font-size: 0.8rem;
+    }
+    .invite-venue-btn i { font-size: 1.3rem; }
+    .invite-venue-btn:hover { background: rgba(42,157,143,0.1); border-color: rgba(42,157,143,0.3); color: #fff; }
+    .invite-venue-btn.selected {
+        background: rgba(201,168,76,0.12); border-color: rgba(201,168,76,0.5);
+        color: #c9a84c;
+    }
+    .invite-link-section { margin-bottom: 20px; }
+    .invite-link-label { font-family: 'Inter', sans-serif; font-size: 0.8rem; color: rgba(255,255,255,0.4); margin-bottom: 8px; display: block; }
+    .invite-link-row { display: flex; gap: 8px; }
+    .invite-link-input {
+        flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 10px; padding: 12px 14px; color: #fff; font-family: 'Inter', sans-serif;
+        font-size: 0.85rem; outline: none;
+    }
+    .invite-copy-btn {
+        background: linear-gradient(135deg, #c9a84c, #e0c068); color: #0a0a1a;
+        border: none; border-radius: 10px; padding: 12px 18px; cursor: pointer;
+        font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.85rem;
+        display: flex; align-items: center; gap: 6px; transition: all 0.2s; white-space: nowrap;
+    }
+    .invite-copy-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(201,168,76,0.3); }
+    .invite-go-btn {
+        width: 100%; padding: 14px; margin-bottom: 16px; border: none; border-radius: 12px; cursor: pointer;
+        background: linear-gradient(135deg, #c9a84c 0%, #e8c84a 100%); color: #0a0e1a; font-size: 1.1rem;
+        font-weight: 700; font-family: 'Inter', sans-serif; letter-spacing: 0.5px;
+        display: flex; align-items: center; justify-content: center; gap: 10px;
+        transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(201,168,76,0.4);
+    }
+    .invite-go-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(201,168,76,0.6); }
+    .invite-share-row { display: flex; gap: 10px; justify-content: center; }
+    .invite-share-btn {
+        border: none; border-radius: 10px; padding: 10px 18px; cursor: pointer;
+        font-family: 'Inter', sans-serif; font-weight: 500; font-size: 0.85rem;
+        display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;
+        text-decoration: none;
+    }
+    .invite-share-btn.whatsapp { background: #25d366; color: #fff; }
+    .invite-share-btn.sms { background: #2a9d8f; color: #fff; }
+    .invite-share-btn.native { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.1); }
+    .invite-share-btn:hover { transform: translateY(-1px); filter: brightness(1.1); }
+    @media (max-width: 500px) {
+        .invite-venue-grid { grid-template-columns: repeat(2, 1fr); }
+        .invite-modal { padding: 28px 20px; }
+        .hero-cta-row { flex-direction: column; align-items: center; }
+        .cta-start-room, .cta-invite-friend { width: 100%; max-width: 280px; justify-content: center; }
+    }
+    </style>
+
     <!-- Scripts -->
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <script src="xp-system.js?v=1"></script>
-    <script src="main-home.js?v=11"></script>
+    <script src="js/xp-client.js?v=1"></script>
+    <script src="js/xp-engine.js?v=1"></script>
+    <script src="js/events.js?v=1"></script>
+    <script src="main-home.js?v=12"></script>
+    <script src="js/live-occupancy.js?v=1"></script>
+    <script src="js/interactive-map.js?v=1"></script>
+    <script src="js/mobile-map.js?v=2"></script>
     <script>
     // === TOWN ALIVE ANIMATIONS ===
     (function() {
@@ -612,6 +853,7 @@
                     <div class="aircraft-light red" style="left:6px;top:-1px;width:2px;height:2px;"></div>
                 `;
             } else {
+
                 // Plane: white + red + green wingtip lights
                 el.innerHTML = `
                     <div class="aircraft-body" style="width:8px;height:2px;"></div>
@@ -632,6 +874,7 @@
             }, duration * 1000 + 500);
 
             // Schedule next aircraft: 15-35 seconds
+
             setTimeout(spawnAircraft, 15000 + Math.random() * 20000);
         }
 
@@ -760,7 +1003,82 @@ function toggleEdit() {
     }
 }
 </script>
+<script>
+// === INVITE MODAL LOGIC ===
+function generateInviteCode() {
+    return Array.from(crypto.getRandomValues(new Uint8Array(4)))
+        .map(b => b.toString(36)).join('').substring(0, 8).toUpperCase();
+}
+
+let currentInviteCode = generateInviteCode();
+let currentVenueUrl = '/pub.html';
+
+function getInviteLink() {
+    return window.location.origin + currentVenueUrl + '?invite=' + currentInviteCode;
+}
+
+function goToRoom() {
+    const link = getInviteLink();
+    window.location.href = link;
+}
+
+function selectVenue(btn) {
+    document.querySelectorAll('.invite-venue-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    currentVenueUrl = btn.dataset.url;
+    currentInviteCode = generateInviteCode();
+    updateInviteLink();
+}
+
+function updateInviteLink() {
+    const link = getInviteLink();
+    document.getElementById('inviteLinkInput').value = link;
+    const msg = encodeURIComponent('Join me on ChiffTown! ' + link);
+    document.getElementById('shareWhatsApp').href = 'https://wa.me/?text=' + msg;
+    document.getElementById('shareSMS').href = 'sms:?body=' + msg;
+}
+
+function openInviteModal() {
+    currentInviteCode = generateInviteCode();
+    updateInviteLink();
+    document.getElementById('inviteModal').style.display = 'flex';
+}
+
+function closeInviteModal() {
+    document.getElementById('inviteModal').style.display = 'none';
+}
+
+function copyInviteLink() {
+    const input = document.getElementById('inviteLinkInput');
+    navigator.clipboard.writeText(input.value).then(() => {
+        const btn = document.querySelector('.invite-copy-btn');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        setTimeout(() => btn.innerHTML = orig, 2000);
+    });
+}
+
+function nativeShare() {
+    if (navigator.share) {
+        navigator.share({ title: 'Join me on ChiffTown!', url: getInviteLink() });
+    } else {
+        copyInviteLink();
+    }
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeInviteModal(); });
+</script>
 <script src="/js/town-engine.js?v=1"></script>
+<script src="/js/weather-system.js?v=1"></script>
+<script src="/js/ambient-life.js?v=1"></script>
+<script src="/js/daily-challenges.js?v=1"></script>
+<script src="/js/generation-system.js?v=1"></script>
+<script src="/js/unlock-preview.js?v=1"></script>
+<script src="/js/social-system.js?v=1"></script>
+<script src="/js/loading-screen.js?v=1"></script>
+<script src="/js/activity-feed.js?v=1"></script>
+<script src="/js/profile-system.js?v=1"></script>
+<script src="/js/shop-system.js?v=1"></script>
 <script>
     // Town engine ready but disabled until we have proper isometric sprites
     // TownEngine.init('mapContainer');

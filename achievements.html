@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Achievements — Chifftown</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="main-home-styles.css?v=26">
+    <style>
+        body {
+            background: linear-gradient(170deg, #0f1a2e 0%, #0a0f1e 100%);
+            min-height: 100vh;
+            color: #f0eef6;
+            font-family: 'Inter', sans-serif;
+            padding-top: 80px;
+        }
+
+        .achievements-header {
+            text-align: center;
+            padding: 3rem 2rem 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .achievements-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: #c9a84c;
+            margin-bottom: 0.5rem;
+        }
+
+        .achievements-header p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.1rem;
+        }
+
+        .achievements-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(201, 168, 76, 0.2);
+            border-radius: 15px;
+            padding: 1.5rem 2rem;
+            text-align: center;
+            min-width: 150px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #c9a84c;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        .achievements-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .achievement-category {
+            margin-bottom: 3rem;
+        }
+
+        .category-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: #40E0D0;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .category-title i {
+            font-size: 1.2rem;
+        }
+
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .achievement-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .achievement-card.unlocked {
+            border-color: rgba(201, 168, 76, 0.4);
+            background: rgba(201, 168, 76, 0.05);
+        }
+
+        .achievement-card.locked {
+            opacity: 0.6;
+        }
+
+        .achievement-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(64, 224, 208, 0.3);
+        }
+
+        .achievement-card.unlocked:hover {
+            border-color: rgba(201, 168, 76, 0.6);
+        }
+
+        .achievement-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+            filter: grayscale(100%);
+            opacity: 0.4;
+            transition: all 0.3s ease;
+        }
+
+        .achievement-card.unlocked .achievement-icon {
+            filter: grayscale(0%);
+            opacity: 1;
+            animation: bounce 0.6s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        .achievement-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #f0eef6;
+            margin-bottom: 0.5rem;
+        }
+
+        .achievement-card.unlocked .achievement-name {
+            color: #c9a84c;
+        }
+
+        .achievement-desc {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .achievement-reward {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: rgba(64, 224, 208, 0.8);
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .achievement-card.unlocked .achievement-reward {
+            color: #40E0D0;
+        }
+
+        .locked-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .unlocked-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: linear-gradient(135deg, #c9a84c, #e0c068);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: #0a0a1a;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 100px;
+            left: 2rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #f0eef6;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            background: rgba(64, 224, 208, 0.1);
+            border-color: rgba(64, 224, 208, 0.3);
+            transform: translateX(-3px);
+        }
+
+        .progress-bar-container {
+            background: rgba(255, 255, 255, 0.05);
+            height: 8px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0 2rem;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #40E0D0, #c9a84c);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        @media (max-width: 768px) {
+            .achievements-stats {
+                gap: 1rem;
+            }
+            
+            .stat-card {
+                min-width: 120px;
+                padding: 1rem 1.5rem;
+            }
+            
+            .achievements-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .back-btn {
+                left: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-btn">
+        <i class="fas fa-arrow-left"></i> Back to Town
+    </a>
+
+    <div class="achievements-header">
+        <h1>🏆 Achievements</h1>
+        <p>Track your progress and unlock rewards as you explore Chifftown</p>
+        
+        <div class="achievements-stats">
+            <div class="stat-card">
+                <div class="stat-value" id="unlockedCount">0</div>
+                <div class="stat-label">Unlocked</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalCount">0</div>
+                <div class="stat-label">Total</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="completionPercent">0%</div>
+                <div class="stat-label">Completion</div>
+            </div>
+        </div>
+        
+        <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="completionBar" style="width: 0%"></div>
+        </div>
+    </div>
+
+    <div class="achievements-container">
+        <div class="achievement-category">
+            <h2 class="category-title">
+                <i class="fas fa-map-marked-alt"></i>
+                Exploration
+            </h2>
+            <div class="achievements-grid" id="explorationAchievements"></div>
+        </div>
+
+        <div class="achievement-category">
+            <h2 class="category-title">
+                <i class="fas fa-clock"></i>
+                Time-Based
+            </h2>
+            <div class="achievements-grid" id="timeAchievements"></div>
+        </div>
+
+        <div class="achievement-category">
+            <h2 class="category-title">
+                <i class="fas fa-star"></i>
+                Engagement
+            </h2>
+            <div class="achievements-grid" id="engagementAchievements"></div>
+        </div>
+
+        <div class="achievement-category">
+            <h2 class="category-title">
+                <i class="fas fa-trophy"></i>
+                Progression
+            </h2>
+            <div class="achievements-grid" id="progressionAchievements"></div>
+        </div>
+    </div>
+
+    <script src="js/xp-engine.js"></script>
+    <script>
+        // Wait for XP Engine to initialize
+        window.addEventListener('load', () => {
+            setTimeout(renderAchievements, 500);
+        });
+
+        function renderAchievements() {
+            if (!window.XPEngine) {
+                console.error('XP Engine not loaded');
+                setTimeout(renderAchievements, 500);
+                return;
+            }
+
+            const allAchievements = window.XPEngine.getAchievements();
+            const unlockedAchievements = window.XPEngine.getUnlockedAchievements();
+            const unlockedIds = unlockedAchievements.map(a => a.id);
+
+            // Categories
+            const categories = {
+                exploration: ['first_visit', 'explorer', 'local'],
+                time: ['night_owl', 'early_bird', 'dedicated', 'marathoner'],
+                engagement: ['weatherman', 'fullscreen_fan', 'inviter', 'daily_visitor'],
+                progression: ['level_5', 'level_10', 'level_25']
+            };
+
+            // Update stats
+            document.getElementById('unlockedCount').textContent = unlockedIds.length;
+            document.getElementById('totalCount').textContent = allAchievements.length;
+            const percent = Math.round((unlockedIds.length / allAchievements.length) * 100);
+            document.getElementById('completionPercent').textContent = percent + '%';
+            document.getElementById('completionBar').style.width = percent + '%';
+
+            // Render categories
+            Object.entries(categories).forEach(([category, achievementIds]) => {
+                const container = document.getElementById(`${category}Achievements`);
+                achievementIds.forEach(id => {
+                    const achievement = allAchievements.find(a => a.id === id);
+                    if (!achievement) return;
+                    
+                    const isUnlocked = unlockedIds.includes(id);
+                    
+                    const card = document.createElement('div');
+                    card.className = `achievement-card ${isUnlocked ? 'unlocked' : 'locked'}`;
+                    card.innerHTML = `
+                        <span class="achievement-icon">${achievement.icon}</span>
+                        ${isUnlocked ? 
+                            '<span class="unlocked-badge"><i class="fas fa-check"></i> Unlocked</span>' :
+                            '<span class="locked-badge"><i class="fas fa-lock"></i> Locked</span>'
+                        }
+                        <div class="achievement-name">${achievement.name}</div>
+                        <div class="achievement-desc">${achievement.desc}</div>
+                        ${achievement.xp > 0 ? `
+                            <div class="achievement-reward">
+                                <i class="fas fa-star"></i>
+                                <span>+${achievement.xp} XP</span>
+                            </div>
+                        ` : ''}
+                    `;
+                    
+                    container.appendChild(card);
+                });
+            });
+        }
+    </script>
+</body>
+</html>

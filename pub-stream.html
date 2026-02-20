@@ -955,9 +955,206 @@
             }
         }
     </style>
+
+        /* === VENUE-THEMED BACKGROUNDS === */
+        
+        /* Pub/Tavern - warm wood atmosphere */
+        body.theme-pub::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(
+                135deg,
+                rgba(26, 14, 5, 0.95) 0%,
+                rgba(51, 26, 12, 0.9) 50%,
+                rgba(26, 14, 5, 0.95) 100%
+            );
+            z-index: -1;
+        }
+        
+        /* Nightclub - neon cyan/blue vibes */
+        body.theme-nightclub {
+            background: #050510;
+        }
+        body.theme-nightclub::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(
+                180deg,
+                rgba(5, 5, 16, 0.95) 0%,
+                rgba(8, 45, 82, 0.9) 30%,
+                rgba(0, 80, 120, 0.85) 50%,
+                rgba(8, 45, 82, 0.9) 70%,
+                rgba(5, 5, 16, 0.95) 100%
+            );
+            z-index: -1;
+        }
+        body.theme-nightclub::after {
+            content: '';
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40%;
+            background: 
+                linear-gradient(rgba(0, 206, 209, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 206, 209, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            transform: perspective(600px) rotateX(60deg);
+            transform-origin: bottom;
+            z-index: -1;
+            opacity: 0.6;
+        }
+        
+        /* Cinema - theater curtains and dim lighting */
+        body.theme-cinema {
+            background: #0c0a09;
+        }
+        body.theme-cinema::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(
+                to bottom,
+                rgba(12, 10, 9, 0.98) 0%,
+                rgba(28, 25, 23, 0.9) 30%,
+                rgba(15, 10, 10, 0.95) 100%
+            );
+            z-index: -1;
+        }
+        body.theme-cinema::after {
+            content: '🎬';
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 3rem;
+            opacity: 0.1;
+            z-index: 0;
+        }
+        
+        /* Arcade - retro gaming aesthetic */
+        body.theme-arcade {
+            background: #021a0a;
+        }
+        body.theme-arcade::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(
+                135deg,
+                rgba(2, 26, 10, 0.95) 0%,
+                rgba(8, 40, 20, 0.9) 50%,
+                rgba(2, 26, 10, 0.95) 100%
+            );
+            z-index: -1;
+        }
+        body.theme-arcade::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(34, 197, 94, 0.03) 0px,
+                    transparent 1px,
+                    transparent 2px,
+                    rgba(34, 197, 94, 0.03) 3px
+                );
+            z-index: -1;
+            animation: scanlines 8s linear infinite;
+        }
+        @keyframes scanlines {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(4px); }
+        }
+        
+        /* Lounge - sophisticated teal/blue */
+        body.theme-lounge {
+            background: #0a2540;
+        }
+        body.theme-lounge::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(
+                180deg,
+                rgba(10, 37, 64, 0.95) 0%,
+                rgba(15, 58, 82, 0.9) 35%,
+                rgba(8, 45, 70, 0.92) 70%,
+                rgba(10, 37, 64, 0.95) 100%
+            );
+            z-index: -1;
+        }
+        body.theme-lounge::after {
+            content: '';
+            position: fixed;
+            top: 20%;
+            left: 10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(8, 145, 178, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+        }
+        
+        /* Adventure Guild - fantasy quest theme */
+        body.theme-adventure {
+            background: #071525;
+        }
+        body.theme-adventure::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(
+                180deg,
+                rgba(7, 21, 37, 0.95) 0%,
+                rgba(15, 35, 60, 0.9) 40%,
+                rgba(20, 40, 70, 0.88) 60%,
+                rgba(7, 21, 37, 0.95) 100%
+            );
+            z-index: -1;
+        }
+        
+        /* Stream header theming */
+        .theme-nightclub .stream-header {
+            background: rgba(0, 206, 209, 0.08);
+            border-color: rgba(0, 206, 209, 0.2);
+        }
+        
+        .theme-cinema .stream-header {
+            background: rgba(239, 68, 68, 0.08);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+        
+        .theme-arcade .stream-header {
+            background: rgba(34, 197, 94, 0.08);
+            border-color: rgba(34, 197, 94, 0.2);
+        }
+        
+        .theme-lounge .stream-header {
+            background: rgba(8, 145, 178, 0.08);
+            border-color: rgba(8, 145, 178, 0.2);
+        }
+        
+        .theme-adventure .stream-header {
+            background: rgba(59, 130, 246, 0.08);
+            border-color: rgba(59, 130, 246, 0.2);
+        }
 </head>
+
+    <script>
+        // Apply venue theme based on URL parameter
+        (function() {
+            const params = new URLSearchParams(window.location.search);
+            const venueType = params.get('type') || 'pub';
+            document.body.classList.add('theme-' + venueType);
+            console.log('🎨 Venue theme applied:', venueType);
+        })();
+    </script>
 <body>
-    <div id="debug-log-container" style="position: fixed; top: 0; left: 0; right: 0; background: rgba(0,0,0,0.8); color: #fff; padding: 5px; font-size: 10px; z-index: 99999; max-height: 30vh; overflow-y: scroll; font-family: monospace; display: block;">
+    <div id="debug-log-container" style="position: fixed; top: 0; left: 0; right: 0; background: rgba(0,0,0,0.8); color: #fff; padding: 5px; font-size: 10px; z-index: 99999; max-height: 30vh; overflow-y: scroll; font-family: monospace; display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 5px; border-bottom: 1px solid #555;">
             <h4 style="margin: 0; padding: 0;">Live Diagnostics</h4>
             <button onclick="document.getElementById('debug-log-container').style.display='none'" style="background: #555; border: none; color: #fff; cursor: pointer;">Close</button>
@@ -1769,18 +1966,33 @@
 
         function displayChatMessage(message) {
             const chatMessages = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'chat-message';
             
-            const time = new Date(message.timestamp || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            // Use enhanced chat if available
+            if (window.ChatEnhancements) {
+                const msgData = {
+                    id: message.id || Date.now() + Math.random().toString(36).substr(2, 9),
+                    username: message.username,
+                    text: message.text,
+                    timestamp: message.timestamp,
+                    isStreamer: message.isStreamer,
+                    isSystem: false,
+                    isTip: message.text && message.text.includes('tipped')
+                };
+                const messageDiv = ChatEnhancements.createEnhancedMessage(msgData, window.currentUsername || username);
+                chatMessages.appendChild(messageDiv);
+            } else {
+                // Fallback to basic display
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'chat-message';
+                const time = new Date(message.timestamp || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                messageDiv.innerHTML = `
+                    <div class="message-author" style="${message.isStreamer ? 'color: #f39c12;' : ''}">${message.username}</div>
+                    <div class="message-text">${message.text}</div>
+                    <div class="message-time">${time}</div>
+                `;
+                chatMessages.appendChild(messageDiv);
+            }
             
-            messageDiv.innerHTML = `
-                <div class="message-author" style="${message.isStreamer ? 'color: #f39c12;' : ''}">${message.username}</div>
-                <div class="message-text">${message.text}</div>
-                <div class="message-time">${time}</div>
-            `;
-            
-            chatMessages.appendChild(messageDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
@@ -2499,19 +2711,33 @@
 
         function addChatMessage(author, text, isSystem = false) {
             const chatMessages = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'chat-message';
             
-            const now = new Date();
-            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            // Use enhanced chat if available
+            if (window.ChatEnhancements) {
+                const msgData = {
+                    id: Date.now() + Math.random().toString(36).substr(2, 9),
+                    username: author,
+                    text: text,
+                    timestamp: Date.now(),
+                    isSystem: isSystem,
+                    isTip: text && text.includes('tipped')
+                };
+                const messageDiv = ChatEnhancements.createEnhancedMessage(msgData, window.currentUsername || username);
+                chatMessages.appendChild(messageDiv);
+            } else {
+                // Fallback to basic display
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'chat-message';
+                const now = new Date();
+                const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                messageDiv.innerHTML = `
+                    <div class="message-author" style="${isSystem ? 'color: #4299e1;' : ''}">${author}</div>
+                    <div class="message-text">${text}</div>
+                    <div class="message-time">${timeString}</div>
+                `;
+                chatMessages.appendChild(messageDiv);
+            }
             
-            messageDiv.innerHTML = `
-                <div class="message-author" style="${isSystem ? 'color: #4299e1;' : ''}">${author}</div>
-                <div class="message-text">${text}</div>
-                <div class="message-time">${timeString}</div>
-            `;
-            
-            chatMessages.appendChild(messageDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
@@ -3661,5 +3887,11 @@
         // Initialize auto-diagnostics
         autoRunDiagnosticsOnFailure();
     </script>
+    
+    <!-- Chat Enhancements -->
+    <script src="/js/chat-enhancements.js?v=1"></script>
+    
+    <!-- ChiffTown Share Button -->
+    <script src="/js/share-button.js" data-share-message="Come grab a drink with me at The Chiff Inn! 🍺"></script>
 </body>
 </html> 
