@@ -550,6 +550,18 @@ app.get('/api/activities/recent', (req, res) => {
 });
 
 // Shop purchase endpoint
+// Award coins (for weather events, etc.)
+app.post('/api/coins/award', async (req, res) => {
+  const { username, amount, reason } = req.body;
+  if (!username || !amount) return res.status(400).json({ error: 'Missing fields' });
+  if (!userSystem.loaded) return res.status(503).json({ error: 'System not ready' });
+  const user = userSystem.users[username];
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  userSystem.updateCoins(username, amount);
+  logActivity('coin_bonus', { user: username, amount, reason: reason || 'bonus' });
+  res.json({ success: true, newBalance: userSystem.getCoins(username) });
+});
+
 app.post('/api/shop/buy', async (req, res) => {
   const { username, itemId } = req.body;
   
