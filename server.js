@@ -1879,6 +1879,17 @@ io.on('connection', (socket) => {
     socket.emit('apartmentUpdated', { success: true });
   });
 
+  // Town Chat (global map chat)
+  socket.on('town-chat', (data) => {
+    if (!data || !data.username || !data.message) return;
+    const msg = {
+      username: data.username.substring(0, 25),
+      message: data.message.substring(0, 300),
+      timestamp: Date.now()
+    };
+    io.emit('town-chat-msg', msg);
+  });
+
   // Handle disconnection
   socket.on('disconnect', () => {
     const user = users.get(socket.id);
