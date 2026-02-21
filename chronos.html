@@ -3,35 +3,828 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Chronos Club - ChiffTown</title>
-    <link rel="stylesheet" href="main-home-styles.css?v=26">
+    <title>The Chronos Club — ChiffTown</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --chrono-void: #050a14;
+            --chrono-dark: #0a1628;
+            --chrono-surface: #0f1d35;
+            --chrono-glass: rgba(15, 29, 53, 0.7);
+            --time-gold: #c9a84c;
+            --time-teal: #00bcd4;
+            --time-blue: #1e88e5;
+            --time-silver: #b0bec5;
+            --text-primary: #f0eef6;
+            --text-dim: rgba(240, 238, 246, 0.5);
+            --glass-border: rgba(255,255,255,0.06);
+        }
+
         body {
+            font-family: 'Inter', sans-serif;
+            background: var(--chrono-void);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: 
+                radial-gradient(ellipse at 20% 50%, rgba(0,188,212,0.06) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 30%, rgba(201,168,76,0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(30,136,229,0.04) 0%, transparent 50%);
+            z-index: 0;
+        }
+
+        /* Navbar */
+        .navbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            padding: 0.75rem 2rem;
+            background: rgba(5, 10, 20, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 188, 212, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .navbar a { color: var(--text-primary); text-decoration: none; }
+        .nav-brand {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--time-gold);
+        }
+        .back-link {
+            display: flex; align-items: center; gap: 8px;
+            color: var(--time-teal);
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+        .back-link:hover { color: #fff; }
+
+        /* Content */
+        .content { position: relative; z-index: 1; padding-top: 80px; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 3rem 0 2rem;
+        }
+        .hero-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+            animation: pendulum 3s ease-in-out infinite;
+        }
+        @keyframes pendulum {
+            0%, 100% { transform: rotate(-8deg); }
+            50% { transform: rotate(8deg); }
+        }
+        .hero h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--time-gold), var(--time-teal));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        .hero p {
+            color: var(--text-dim);
+            font-size: 1.05rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 2.5rem;
+        }
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--time-gold);
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title i { color: var(--time-teal); }
+
+        /* World Clocks */
+        .clocks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .clock-card {
+            background: var(--chrono-glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.2rem;
+            text-align: center;
+            backdrop-filter: blur(8px);
+            transition: border-color 0.3s, transform 0.2s;
+        }
+        .clock-card:hover {
+            border-color: rgba(0,188,212,0.3);
+            transform: translateY(-2px);
+        }
+        .clock-city {
+            font-size: 0.8rem;
+            color: var(--time-silver);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 0.5rem;
+        }
+        .clock-time {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--time-teal);
+            letter-spacing: 2px;
+        }
+        .clock-date {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-top: 4px;
+        }
+        .clock-flag {
+            font-size: 1.5rem;
+            margin-bottom: 6px;
+        }
+
+        /* Analog Clock */
+        .analog-clock {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            border: 2px solid rgba(0,188,212,0.3);
+            background: radial-gradient(circle, rgba(15,29,53,0.9), rgba(5,10,20,0.95));
+            position: relative;
+            margin: 0 auto 2rem;
+            box-shadow: 0 0 30px rgba(0,188,212,0.1), inset 0 0 30px rgba(0,0,0,0.3);
+        }
+        .clock-center {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 10px; height: 10px;
+            background: var(--time-gold);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+        .clock-hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom center;
+            border-radius: 4px;
+        }
+        .hand-hour {
+            width: 4px;
+            height: 55px;
+            background: var(--text-primary);
+            margin-left: -2px;
+        }
+        .hand-minute {
+            width: 3px;
+            height: 75px;
+            background: var(--time-teal);
+            margin-left: -1.5px;
+        }
+        .hand-second {
+            width: 1.5px;
+            height: 85px;
+            background: var(--time-gold);
+            margin-left: -0.75px;
+        }
+        .clock-marker {
+            position: absolute;
+            width: 2px;
+            height: 10px;
+            background: rgba(255,255,255,0.3);
+            top: 8px;
+            left: 50%;
+            margin-left: -1px;
+            transform-origin: center 102px;
+        }
+        .clock-marker.major {
+            height: 16px;
+            width: 3px;
+            margin-left: -1.5px;
+            background: var(--time-silver);
+        }
+
+        /* Countdown */
+        .countdown-card {
+            background: linear-gradient(135deg, var(--chrono-glass), rgba(201,168,76,0.05));
+            border: 1px solid rgba(201,168,76,0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .countdown-event-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            color: var(--time-gold);
+            margin-bottom: 0.5rem;
+        }
+        .countdown-event-desc {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            margin-bottom: 1.2rem;
+        }
+        .countdown-digits {
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 100vh;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .countdown-unit {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(0,188,212,0.15);
+            border-radius: 12px;
+            padding: 0.8rem 1.2rem;
+            min-width: 70px;
+        }
+        .countdown-number {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--time-teal);
+        }
+        .countdown-label {
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+
+        /* Time Capsules */
+        .capsule-form {
+            background: var(--chrono-glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .capsule-form h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            color: var(--time-teal);
+            margin-bottom: 1rem;
+        }
+        .form-row {
+            display: flex;
+            gap: 0.8rem;
+            margin-bottom: 0.8rem;
+            flex-wrap: wrap;
+        }
+        .form-input {
+            flex: 1;
+            min-width: 180px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 0.7rem 1rem;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .form-input:focus { border-color: var(--time-teal); }
+        .form-input::placeholder { color: var(--text-dim); }
+        textarea.form-input { min-height: 80px; resize: vertical; }
+        select.form-input {
+            appearance: none;
+            cursor: pointer;
+        }
+        .btn-send {
+            background: linear-gradient(135deg, var(--time-teal), var(--time-blue));
             color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 0.7rem 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+        .btn-send:hover { opacity: 0.9; }
+        .btn-send:active { transform: scale(0.97); }
+
+        .capsules-list { display: flex; flex-direction: column; gap: 1rem; }
+
+        .capsule-item {
+            background: var(--chrono-glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            padding: 1.2rem 1.5rem;
+            backdrop-filter: blur(6px);
+            transition: border-color 0.3s;
+        }
+        .capsule-item.locked {
+            border-color: rgba(201,168,76,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        .capsule-item.locked::after {
+            content: '🔒';
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.2rem;
+        }
+        .capsule-item.unlocked {
+            border-color: rgba(0,188,212,0.3);
+            animation: capsule-glow 2s ease-in-out infinite alternate;
+        }
+        @keyframes capsule-glow {
+            from { box-shadow: 0 0 10px rgba(0,188,212,0.05); }
+            to { box-shadow: 0 0 20px rgba(0,188,212,0.15); }
+        }
+        .capsule-author {
+            font-weight: 600;
+            color: var(--time-teal);
+            font-size: 0.85rem;
+        }
+        .capsule-date {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-top: 2px;
+        }
+        .capsule-message {
+            margin-top: 0.6rem;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .capsule-locked-msg {
+            color: var(--time-gold);
+            font-style: italic;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+        .capsule-timer {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            color: var(--time-gold);
+            margin-top: 0.3rem;
+        }
+
+        /* Stopwatch */
+        .stopwatch-area {
+            background: var(--chrono-glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
             text-align: center;
         }
-        .container {
-            border: 2px solid #4fc3f7;
-            padding: 40px;
-            border-radius: 20px;
-            background: rgba(15, 23, 42, 0.9);
-        }
-        h1 {
+        .stopwatch-display {
+            font-family: 'Orbitron', sans-serif;
             font-size: 3rem;
-            color: #ffc107;
+            font-weight: 700;
+            color: var(--time-teal);
+            letter-spacing: 3px;
+            margin: 1rem 0;
+        }
+        .stopwatch-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+        .sw-btn {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-primary);
+            border-radius: 10px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        .sw-btn:hover { border-color: var(--time-teal); }
+        .sw-btn.active { background: var(--time-teal); color: #fff; border-color: var(--time-teal); }
+        .sw-btn.danger { border-color: rgba(244,67,54,0.3); }
+        .sw-btn.danger:hover { background: rgba(244,67,54,0.2); border-color: #f44336; }
+
+        /* Fun facts */
+        .time-fact {
+            background: linear-gradient(135deg, rgba(201,168,76,0.05), rgba(0,188,212,0.05));
+            border: 1px solid rgba(201,168,76,0.15);
+            border-radius: 14px;
+            padding: 1.2rem 1.5rem;
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            margin-top: 2rem;
+            text-align: center;
+        }
+        .time-fact .fact-icon { font-size: 1.5rem; margin-bottom: 0.5rem; display: block; }
+        .time-fact strong { color: var(--time-gold); }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 3rem 0;
+            color: var(--text-dim);
+            font-size: 0.8rem;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 1.8rem; }
+            .analog-clock { width: 160px; height: 160px; }
+            .hand-hour { height: 40px; }
+            .hand-minute { height: 55px; }
+            .hand-second { height: 62px; }
+            .clock-marker { transform-origin: center 72px; top: 6px; }
+            .clocks-grid { grid-template-columns: repeat(2, 1fr); }
+            .countdown-number { font-size: 1.4rem; }
+            .stopwatch-display { font-size: 2.2rem; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>⌛ The Chronos Club</h1>
-        <p>This venue is under construction and will be available soon.</p>
-        <p>Unlocks at Level 20.</p>
-        <a href="/" style="color: #4fc3f7;">Return to ChiffTown</a>
+    <nav class="navbar">
+        <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> Back to Town</a>
+        <span class="nav-brand">⌛ THE CHRONOS CLUB</span>
+        <span></span>
+    </nav>
+
+    <div class="content">
+        <div class="container">
+            <!-- Hero -->
+            <div class="hero">
+                <div class="hero-icon">⌛</div>
+                <h1>THE CHRONOS CLUB</h1>
+                <p>Where time stands still... or moves however you want it to.</p>
+            </div>
+
+            <!-- Analog Clock -->
+            <div class="analog-clock" id="analogClock">
+                <div class="clock-center"></div>
+                <div class="clock-hand hand-hour" id="hourHand"></div>
+                <div class="clock-hand hand-minute" id="minuteHand"></div>
+                <div class="clock-hand hand-second" id="secondHand"></div>
+            </div>
+
+            <!-- World Clocks -->
+            <div class="section">
+                <div class="section-title"><i class="fas fa-globe"></i> World Clocks</div>
+                <div class="clocks-grid" id="clocksGrid"></div>
+            </div>
+
+            <!-- Community Countdown -->
+            <div class="section">
+                <div class="section-title"><i class="fas fa-hourglass-half"></i> Event Countdowns</div>
+                <div id="countdownContainer"></div>
+            </div>
+
+            <!-- Time Capsules -->
+            <div class="section">
+                <div class="section-title"><i class="fas fa-vault"></i> Time Capsules</div>
+                <div class="capsule-form">
+                    <h3>💌 Seal a Message in Time</h3>
+                    <div class="form-row">
+                        <input type="text" class="form-input" id="capsuleAuthor" placeholder="Your name" maxlength="30">
+                        <select class="form-input" id="capsuleDelay" style="max-width:200px;">
+                            <option value="300000">Opens in 5 minutes</option>
+                            <option value="3600000">Opens in 1 hour</option>
+                            <option value="86400000">Opens in 1 day</option>
+                            <option value="604800000">Opens in 1 week</option>
+                            <option value="2592000000">Opens in 1 month</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <textarea class="form-input" id="capsuleMessage" placeholder="Write your message to the future..." maxlength="500"></textarea>
+                    </div>
+                    <button class="btn-send" onclick="submitCapsule()">🔒 Seal Time Capsule</button>
+                </div>
+                <div class="capsules-list" id="capsulesList"></div>
+            </div>
+
+            <!-- Stopwatch -->
+            <div class="section">
+                <div class="section-title"><i class="fas fa-stopwatch"></i> Stopwatch</div>
+                <div class="stopwatch-area">
+                    <div class="stopwatch-display" id="stopwatchDisplay">00:00.000</div>
+                    <div class="stopwatch-buttons">
+                        <button class="sw-btn" id="swStart" onclick="toggleStopwatch()">▶ Start</button>
+                        <button class="sw-btn" id="swLap" onclick="lapStopwatch()">⏱ Lap</button>
+                        <button class="sw-btn danger" id="swReset" onclick="resetStopwatch()">↺ Reset</button>
+                    </div>
+                    <div id="lapList" style="margin-top:1rem; font-size:0.8rem; color:var(--text-dim);"></div>
+                </div>
+            </div>
+
+            <!-- Time Fact -->
+            <div class="time-fact" id="timeFact"></div>
+
+            <div class="footer">⌛ The Chronos Club — ChiffTown</div>
+        </div>
     </div>
+
+    <script>
+    // ============================
+    // WORLD CLOCKS
+    // ============================
+    const CITIES = [
+        { name: 'London', tz: 'Europe/London', flag: '🇬🇧' },
+        { name: 'New York', tz: 'America/New_York', flag: '🇺🇸' },
+        { name: 'Tokyo', tz: 'Asia/Tokyo', flag: '🇯🇵' },
+        { name: 'Sydney', tz: 'Australia/Sydney', flag: '🇦🇺' },
+        { name: 'Dubai', tz: 'Asia/Dubai', flag: '🇦🇪' },
+        { name: 'Paris', tz: 'Europe/Paris', flag: '🇫🇷' },
+        { name: 'Los Angeles', tz: 'America/Los_Angeles', flag: '🇺🇸' },
+        { name: 'Singapore', tz: 'Asia/Singapore', flag: '🇸🇬' },
+    ];
+
+    function renderClocks() {
+        const grid = document.getElementById('clocksGrid');
+        grid.innerHTML = CITIES.map(c => `
+            <div class="clock-card" id="clock-${c.name.replace(/\s/g,'')}">
+                <div class="clock-flag">${c.flag}</div>
+                <div class="clock-city">${c.name}</div>
+                <div class="clock-time" data-tz="${c.tz}">--:--:--</div>
+                <div class="clock-date" data-tz-date="${c.tz}"></div>
+            </div>
+        `).join('');
+    }
+
+    function updateClocks() {
+        const now = new Date();
+        document.querySelectorAll('.clock-time[data-tz]').forEach(el => {
+            el.textContent = now.toLocaleTimeString('en-GB', { timeZone: el.dataset.tz, hour:'2-digit', minute:'2-digit', second:'2-digit', hour12: false });
+        });
+        document.querySelectorAll('.clock-date[data-tz-date]').forEach(el => {
+            el.textContent = now.toLocaleDateString('en-GB', { timeZone: el.dataset.tzDate, weekday:'short', month:'short', day:'numeric' });
+        });
+    }
+
+    // ============================
+    // ANALOG CLOCK
+    // ============================
+    function initAnalogClock() {
+        const clock = document.getElementById('analogClock');
+        // Add markers
+        for (let i = 0; i < 12; i++) {
+            const marker = document.createElement('div');
+            marker.className = 'clock-marker' + (i % 3 === 0 ? ' major' : '');
+            marker.style.transform = `rotate(${i * 30}deg)`;
+            clock.appendChild(marker);
+        }
+    }
+
+    function updateAnalogClock() {
+        const now = new Date();
+        const h = now.getHours() % 12, m = now.getMinutes(), s = now.getSeconds(), ms = now.getMilliseconds();
+        const secDeg = (s + ms/1000) * 6;
+        const minDeg = (m + s/60) * 6;
+        const hrDeg = (h + m/60) * 30;
+        document.getElementById('secondHand').style.transform = `rotate(${secDeg}deg)`;
+        document.getElementById('minuteHand').style.transform = `rotate(${minDeg}deg)`;
+        document.getElementById('hourHand').style.transform = `rotate(${hrDeg}deg)`;
+    }
+
+    // ============================
+    // COUNTDOWNS
+    // ============================
+    const EVENTS = [
+        { name: '🎄 Christmas 2026', date: new Date('2026-12-25T00:00:00Z'), desc: 'Ho ho ho!' },
+        { name: '🎆 New Year 2027', date: new Date('2027-01-01T00:00:00Z'), desc: 'Ring in the new year' },
+        { name: '🎃 Halloween 2026', date: new Date('2026-10-31T00:00:00Z'), desc: 'Spooky season' },
+        { name: '☀️ Summer Solstice', date: new Date('2026-06-21T00:00:00Z'), desc: 'Longest day of the year' },
+    ];
+
+    function renderCountdowns() {
+        const container = document.getElementById('countdownContainer');
+        // Show only future events
+        const now = Date.now();
+        const future = EVENTS.filter(e => e.date.getTime() > now).sort((a,b) => a.date - b.date).slice(0, 3);
+        
+        container.innerHTML = future.map((e, i) => `
+            <div class="countdown-card" id="countdown-${i}">
+                <div class="countdown-event-name">${e.name}</div>
+                <div class="countdown-event-desc">${e.desc}</div>
+                <div class="countdown-digits" data-target="${e.date.getTime()}">
+                    <div class="countdown-unit"><div class="countdown-number cd-days">--</div><div class="countdown-label">Days</div></div>
+                    <div class="countdown-unit"><div class="countdown-number cd-hours">--</div><div class="countdown-label">Hours</div></div>
+                    <div class="countdown-unit"><div class="countdown-number cd-mins">--</div><div class="countdown-label">Mins</div></div>
+                    <div class="countdown-unit"><div class="countdown-number cd-secs">--</div><div class="countdown-label">Secs</div></div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function updateCountdowns() {
+        const now = Date.now();
+        document.querySelectorAll('.countdown-digits[data-target]').forEach(el => {
+            const target = parseInt(el.dataset.target);
+            const diff = Math.max(0, target - now);
+            const d = Math.floor(diff / 86400000);
+            const h = Math.floor((diff % 86400000) / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            el.querySelector('.cd-days').textContent = String(d).padStart(2, '0');
+            el.querySelector('.cd-hours').textContent = String(h).padStart(2, '0');
+            el.querySelector('.cd-mins').textContent = String(m).padStart(2, '0');
+            el.querySelector('.cd-secs').textContent = String(s).padStart(2, '0');
+        });
+    }
+
+    // ============================
+    // TIME CAPSULES
+    // ============================
+    const CAPSULE_KEY = 'chifftown_time_capsules';
+
+    function getCapsules() {
+        try { return JSON.parse(localStorage.getItem(CAPSULE_KEY) || '[]'); } catch(e) { return []; }
+    }
+    function saveCapsules(capsules) {
+        localStorage.setItem(CAPSULE_KEY, JSON.stringify(capsules));
+    }
+
+    function submitCapsule() {
+        const author = document.getElementById('capsuleAuthor').value.trim() || 'Anonymous';
+        const message = document.getElementById('capsuleMessage').value.trim();
+        const delay = parseInt(document.getElementById('capsuleDelay').value);
+
+        if (!message) return alert('Write a message first!');
+
+        const capsule = {
+            id: Date.now().toString(36),
+            author,
+            message,
+            createdAt: Date.now(),
+            unlocksAt: Date.now() + delay
+        };
+
+        const capsules = getCapsules();
+        capsules.unshift(capsule);
+        // Keep max 50
+        if (capsules.length > 50) capsules.length = 50;
+        saveCapsules(capsules);
+
+        document.getElementById('capsuleMessage').value = '';
+        renderCapsules();
+    }
+
+    function renderCapsules() {
+        const list = document.getElementById('capsulesList');
+        const capsules = getCapsules();
+        const now = Date.now();
+
+        if (capsules.length === 0) {
+            list.innerHTML = '<p style="color:var(--text-dim);text-align:center;padding:2rem;">No time capsules yet. Be the first to seal one!</p>';
+            return;
+        }
+
+        list.innerHTML = capsules.slice(0, 20).map(c => {
+            const unlocked = now >= c.unlocksAt;
+            const remaining = c.unlocksAt - now;
+            let timeStr = '';
+            if (!unlocked) {
+                if (remaining > 86400000) timeStr = Math.ceil(remaining / 86400000) + ' days';
+                else if (remaining > 3600000) timeStr = Math.ceil(remaining / 3600000) + ' hours';
+                else if (remaining > 60000) timeStr = Math.ceil(remaining / 60000) + ' minutes';
+                else timeStr = Math.ceil(remaining / 1000) + ' seconds';
+            }
+
+            return `
+                <div class="capsule-item ${unlocked ? 'unlocked' : 'locked'}">
+                    <div class="capsule-author">${escHtml(c.author)}</div>
+                    <div class="capsule-date">Sealed ${new Date(c.createdAt).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })}</div>
+                    ${unlocked
+                        ? `<div class="capsule-message">${escHtml(c.message)}</div>`
+                        : `<div class="capsule-locked-msg">🔒 This capsule opens in ${timeStr}...</div>
+                           <div class="capsule-timer">${new Date(c.unlocksAt).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })}</div>`
+                    }
+                </div>
+            `;
+        }).join('');
+    }
+
+    function escHtml(s) {
+        const d = document.createElement('div');
+        d.textContent = s;
+        return d.innerHTML;
+    }
+
+    // ============================
+    // STOPWATCH
+    // ============================
+    let swRunning = false, swStart = 0, swElapsed = 0, swTimer = null, swLaps = [];
+
+    function toggleStopwatch() {
+        if (swRunning) {
+            clearInterval(swTimer);
+            swElapsed += Date.now() - swStart;
+            swRunning = false;
+            document.getElementById('swStart').textContent = '▶ Start';
+            document.getElementById('swStart').classList.remove('active');
+        } else {
+            swStart = Date.now();
+            swRunning = true;
+            document.getElementById('swStart').textContent = '⏸ Pause';
+            document.getElementById('swStart').classList.add('active');
+            swTimer = setInterval(updateStopwatch, 17);
+        }
+    }
+
+    function updateStopwatch() {
+        const total = swElapsed + (swRunning ? Date.now() - swStart : 0);
+        const mins = Math.floor(total / 60000);
+        const secs = Math.floor((total % 60000) / 1000);
+        const ms = total % 1000;
+        document.getElementById('stopwatchDisplay').textContent = 
+            String(mins).padStart(2,'0') + ':' + String(secs).padStart(2,'0') + '.' + String(ms).padStart(3,'0');
+    }
+
+    function lapStopwatch() {
+        if (!swRunning) return;
+        const total = swElapsed + Date.now() - swStart;
+        swLaps.push(total);
+        const lapList = document.getElementById('lapList');
+        const mins = Math.floor(total / 60000);
+        const secs = Math.floor((total % 60000) / 1000);
+        const ms = total % 1000;
+        lapList.innerHTML = swLaps.map((l, i) => {
+            const m2 = Math.floor(l / 60000), s2 = Math.floor((l % 60000) / 1000), ms2 = l % 1000;
+            return `Lap ${i+1}: ${String(m2).padStart(2,'0')}:${String(s2).padStart(2,'0')}.${String(ms2).padStart(3,'0')}`;
+        }).reverse().join('<br>');
+    }
+
+    function resetStopwatch() {
+        clearInterval(swTimer);
+        swRunning = false;
+        swElapsed = 0;
+        swLaps = [];
+        document.getElementById('stopwatchDisplay').textContent = '00:00.000';
+        document.getElementById('swStart').textContent = '▶ Start';
+        document.getElementById('swStart').classList.remove('active');
+        document.getElementById('lapList').innerHTML = '';
+    }
+
+    // ============================
+    // TIME FACTS
+    // ============================
+    const FACTS = [
+        { icon: '🌍', text: 'The <strong>Earth</strong> rotates at about <strong>1,670 km/h</strong> at the equator.' },
+        { icon: '⏰', text: 'A <strong>jiffy</strong> is an actual unit of time: <strong>1/100th of a second</strong>.' },
+        { icon: '🔬', text: 'The shortest measurable time is a <strong>zeptosecond</strong> — 10⁻²¹ seconds.' },
+        { icon: '🌌', text: 'The observable universe is <strong>13.8 billion years</strong> old.' },
+        { icon: '⚡', text: 'Light travels <strong>299,792 km</strong> every second.' },
+        { icon: '🦕', text: 'Dinosaurs roamed Earth for <strong>165 million years</strong>. Humans? About 300,000.' },
+        { icon: '🕰️', text: 'The most accurate clock in the world loses only <strong>1 second every 15 billion years</strong>.' },
+        { icon: '🌙', text: 'A day on <strong>Venus</strong> is longer than its year — <strong>243 Earth days</strong>.' },
+        { icon: '🧊', text: 'Time moves slightly <strong>faster</strong> at higher altitudes due to general relativity.' },
+        { icon: '🎵', text: 'The song "4\'33"</strong> by John Cage is <strong>4 minutes 33 seconds of silence</strong>.' },
+    ];
+
+    function showTimeFact() {
+        const fact = FACTS[Math.floor(Math.random() * FACTS.length)];
+        document.getElementById('timeFact').innerHTML = `<span class="fact-icon">${fact.icon}</span>${fact.text}`;
+    }
+
+    // ============================
+    // INIT
+    // ============================
+    renderClocks();
+    initAnalogClock();
+    renderCountdowns();
+    renderCapsules();
+    showTimeFact();
+
+    // Update loop
+    setInterval(() => {
+        updateClocks();
+        updateAnalogClock();
+        updateCountdowns();
+    }, 1000);
+    updateClocks();
+    updateAnalogClock();
+    updateCountdowns();
+
+    // Re-render capsules every 30s (for unlock checking)
+    setInterval(renderCapsules, 30000);
+
+    // Rotate facts every 30s
+    setInterval(showTimeFact, 30000);
+    </script>
+
+    <script src="/js/page-transitions.js?v=1"></script>
 </body>
 </html>
