@@ -498,6 +498,12 @@
                     <p>Classic paddle battle vs AI. Speed increases every point!</p>
                     <div class="play-tag">PLAY NOW</div>
                 </div>
+                <div class="game-card" onclick="startGame('typing')">
+                    <div class="game-card-icon">⌨️🔥</div>
+                    <h3>SPEED TYPER</h3>
+                    <p>Race against the clock! Type as fast and accurately as you can!</p>
+                    <div class="play-tag">PLAY NOW</div>
+                </div>
             </div>
         </div>
     </section>
@@ -724,6 +730,32 @@
         </div>
     </section>
 
+    <!-- SPEED TYPER GAME AREA -->
+    <section class="game-area" id="typingArea">
+        <div class="container">
+            <button class="game-back-btn" onclick="leaveGame('typing')"><i class="fas fa-arrow-left"></i> Back to Games</button>
+            <div class="section-header"><h2>⌨️ SPEED TYPER</h2></div>
+            <div class="game-status" id="typingStatus">Type the text below as fast as you can!</div>
+            <div style="text-align:center;margin-bottom:1rem;">
+                <div style="display:flex;gap:2rem;justify-content:center;font-family:'Press Start 2P',cursive;font-size:0.65rem;color:var(--arcade-green);margin-bottom:0.75rem;">
+                    <span>WPM: <span id="typingWPM">0</span></span>
+                    <span>ACC: <span id="typingAcc">100</span>%</span>
+                    <span>TIME: <span id="typingTime">30</span>s</span>
+                </div>
+                <div style="display:flex;gap:0.5rem;justify-content:center;margin-bottom:1rem;">
+                    <button class="arcade-btn secondary" onclick="setTypingDuration(15)">15s</button>
+                    <button class="arcade-btn secondary active" onclick="setTypingDuration(30)" id="dur30">30s</button>
+                    <button class="arcade-btn secondary" onclick="setTypingDuration(60)">60s</button>
+                </div>
+                <button class="arcade-btn" id="typingStartBtn" onclick="startTypingGame()"><i class="fas fa-play"></i> START</button>
+            </div>
+            <div id="typingTextDisplay" style="background:rgba(0,0,0,0.6);border:2px solid rgba(34,197,94,0.2);border-radius:12px;padding:1.5rem;margin:0 auto 1rem;max-width:700px;font-size:1.2rem;line-height:1.8;letter-spacing:0.5px;min-height:120px;font-family:'Courier New',monospace;position:relative;"></div>
+            <input type="text" id="typingInput" placeholder="Start typing here..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="width:100%;max-width:700px;display:block;margin:0 auto;background:rgba(0,0,0,0.5);border:2px solid rgba(34,197,94,0.3);color:var(--arcade-text);padding:0.8rem 1rem;border-radius:10px;font-size:1.1rem;font-family:'Courier New',monospace;outline:none;text-align:center;" disabled>
+            <div id="typingResult" style="display:none;text-align:center;margin-top:1.5rem;padding:1.5rem;background:rgba(34,197,94,0.05);border:1px solid rgba(34,197,94,0.15);border-radius:12px;max-width:500px;margin-left:auto;margin-right:auto;">
+            </div>
+        </div>
+    </section>
+
     <!-- LEADERBOARD PANEL -->
     <section class="games-section" id="leaderboardSection" style="background:var(--arcade-deep);border-top:1px solid rgba(34,197,94,0.1);">
         <div class="container">
@@ -740,6 +772,7 @@
                 <button class="arcade-btn secondary" onclick="showLeaderboard('wordScramble')">Word Scramble</button>
                 <button class="arcade-btn secondary" onclick="showLeaderboard('breakout')">Brick Breaker</button>
                 <button class="arcade-btn secondary" onclick="showLeaderboard('pong')">Pong</button>
+                <button class="arcade-btn secondary" onclick="showLeaderboard('typing')">Speed Typer</button>
             </div>
             <div id="leaderboardDisplay" style="max-width:600px;margin:0 auto;"></div>
         </div>
@@ -1724,6 +1757,7 @@
                             game === 'runner' ? '🏃 Distance Records' :
                             game === 'breakout' ? '🧱 Brick Breakers' :
                             game === 'pong' ? '🏓 Pong Champions' :
+                            game === 'typing' ? '⌨️ Speed Typers' :
                             '🔤 Word Wizards';
                 
                 let html = `<h3 style="font-family:'Press Start 2P',cursive;font-size:0.9rem;color:var(--arcade-green);text-align:center;margin-bottom:1.5rem;">${title}</h3>`;
@@ -2333,6 +2367,205 @@
             pongGame.init();
         }
         
+        // =====================================
+        // SPEED TYPER GAME
+        // =====================================
+        const TYPING_WORDS = [
+            'the', 'quick', 'brown', 'fox', 'jumps', 'over', 'lazy', 'dog', 'code', 'game',
+            'pixel', 'neon', 'arcade', 'score', 'level', 'power', 'speed', 'fast', 'type', 'race',
+            'cyber', 'quest', 'town', 'gold', 'star', 'fire', 'night', 'club', 'play', 'win',
+            'blue', 'teal', 'dark', 'deep', 'glow', 'wave', 'storm', 'rain', 'snow', 'moon',
+            'data', 'node', 'link', 'port', 'sync', 'grid', 'core', 'chip', 'byte', 'loop',
+            'hack', 'root', 'ping', 'bash', 'push', 'pull', 'fork', 'diff', 'merge', 'build',
+            'world', 'light', 'shadow', 'dream', 'spark', 'flash', 'drift', 'pulse', 'echo', 'void',
+            'agent', 'tower', 'vault', 'forge', 'blade', 'crown', 'shield', 'armor', 'realm', 'guild',
+            'ocean', 'river', 'stone', 'flame', 'frost', 'thunder', 'crystal', 'silver', 'golden', 'diamond',
+            'rocket', 'planet', 'orbit', 'comet', 'nebula', 'galaxy', 'quantum', 'photon', 'plasma', 'fusion'
+        ];
+
+        let typingState = {
+            active: false,
+            duration: 30,
+            startTime: 0,
+            timer: null,
+            words: [],
+            currentWordIdx: 0,
+            currentCharIdx: 0,
+            correct: 0,
+            incorrect: 0,
+            totalTyped: 0,
+            wordsCompleted: 0
+        };
+
+        function setTypingDuration(d) {
+            typingState.duration = d;
+            document.getElementById('typingTime').textContent = d;
+            document.querySelectorAll('#typingArea .arcade-btn.secondary').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function generateTypingText() {
+            const words = [];
+            for (let i = 0; i < 80; i++) {
+                words.push(TYPING_WORDS[Math.floor(Math.random() * TYPING_WORDS.length)]);
+            }
+            return words;
+        }
+
+        function renderTypingText() {
+            const display = document.getElementById('typingTextDisplay');
+            display.innerHTML = typingState.words.map((word, wi) => {
+                const chars = word.split('').map((ch, ci) => {
+                    let cls = '';
+                    if (wi < typingState.currentWordIdx) cls = 'tp-correct';
+                    else if (wi === typingState.currentWordIdx) {
+                        if (ci < typingState.currentCharIdx) {
+                            // Check if typed correctly
+                            const input = document.getElementById('typingInput').value;
+                            cls = (ci < input.length && input[ci] === ch) ? 'tp-correct' : 'tp-wrong';
+                        } else if (ci === typingState.currentCharIdx) {
+                            cls = 'tp-cursor';
+                        }
+                    }
+                    return `<span class="${cls}">${ch}</span>`;
+                }).join('');
+                const wordCls = wi === typingState.currentWordIdx ? 'tp-active-word' : '';
+                return `<span class="tp-word ${wordCls}">${chars}</span>`;
+            }).join(' ');
+        }
+
+        function startTypingGame() {
+            typingState.active = true;
+            typingState.words = generateTypingText();
+            typingState.currentWordIdx = 0;
+            typingState.currentCharIdx = 0;
+            typingState.correct = 0;
+            typingState.incorrect = 0;
+            typingState.totalTyped = 0;
+            typingState.wordsCompleted = 0;
+            typingState.startTime = Date.now();
+
+            document.getElementById('typingStartBtn').style.display = 'none';
+            document.getElementById('typingResult').style.display = 'none';
+            document.getElementById('typingInput').disabled = false;
+            document.getElementById('typingInput').value = '';
+            document.getElementById('typingInput').focus();
+            document.getElementById('typingStatus').textContent = 'GO! Type as fast as you can!';
+
+            renderTypingText();
+
+            typingState.timer = setInterval(() => {
+                const elapsed = (Date.now() - typingState.startTime) / 1000;
+                const remaining = Math.max(0, typingState.duration - elapsed);
+                document.getElementById('typingTime').textContent = Math.ceil(remaining);
+
+                // Update WPM live
+                const minutes = elapsed / 60;
+                const wpm = minutes > 0 ? Math.round(typingState.wordsCompleted / minutes) : 0;
+                document.getElementById('typingWPM').textContent = wpm;
+
+                const total = typingState.correct + typingState.incorrect;
+                const acc = total > 0 ? Math.round((typingState.correct / total) * 100) : 100;
+                document.getElementById('typingAcc').textContent = acc;
+
+                if (remaining <= 0) endTypingGame();
+            }, 100);
+        }
+
+        function endTypingGame() {
+            typingState.active = false;
+            clearInterval(typingState.timer);
+            document.getElementById('typingInput').disabled = true;
+
+            const minutes = typingState.duration / 60;
+            const wpm = Math.round(typingState.wordsCompleted / minutes);
+            const total = typingState.correct + typingState.incorrect;
+            const acc = total > 0 ? Math.round((typingState.correct / total) * 100) : 100;
+
+            document.getElementById('typingWPM').textContent = wpm;
+            document.getElementById('typingAcc').textContent = acc;
+            document.getElementById('typingTime').textContent = '0';
+            document.getElementById('typingStatus').textContent = '⏱️ Time\'s up!';
+
+            // Score = WPM * accuracy bonus
+            const score = Math.round(wpm * (acc / 100));
+
+            const resultEl = document.getElementById('typingResult');
+            resultEl.style.display = 'block';
+            resultEl.innerHTML = `
+                <div style="font-family:'Press Start 2P',cursive;font-size:1rem;color:var(--arcade-green);margin-bottom:1rem;">RESULTS</div>
+                <div style="display:flex;gap:2rem;justify-content:center;margin-bottom:1rem;flex-wrap:wrap;">
+                    <div><div style="font-size:2rem;font-weight:700;color:var(--arcade-cyan);">${wpm}</div><div style="font-size:0.7rem;color:var(--arcade-text-dim);">WPM</div></div>
+                    <div><div style="font-size:2rem;font-weight:700;color:${acc >= 95 ? 'var(--arcade-green)' : acc >= 80 ? 'var(--arcade-cyan)' : '#ef4444'};">${acc}%</div><div style="font-size:0.7rem;color:var(--arcade-text-dim);">ACCURACY</div></div>
+                    <div><div style="font-size:2rem;font-weight:700;color:var(--arcade-gold);">${score}</div><div style="font-size:0.7rem;color:var(--arcade-text-dim);">SCORE</div></div>
+                </div>
+                <div style="font-size:0.8rem;color:var(--arcade-text-dim);margin-bottom:1rem;">${typingState.wordsCompleted} words · ${typingState.correct} correct keys · ${typingState.incorrect} mistakes</div>
+                <div style="display:flex;gap:0.5rem;justify-content:center;">
+                    <button class="arcade-btn" onclick="startTypingGame()"><i class="fas fa-redo"></i> Play Again</button>
+                    <button class="arcade-btn secondary" onclick="submitTypingScore(${score})"><i class="fas fa-trophy"></i> Submit Score</button>
+                </div>
+            `;
+
+            document.getElementById('typingStartBtn').style.display = '';
+        }
+
+        async function submitTypingScore(score) {
+            const name = prompt('Enter your name for the leaderboard:');
+            if (!name?.trim()) return;
+            await submitScore('typing', name.trim(), score);
+            alert('Score submitted! 🏆');
+        }
+
+        // Input handler
+        document.getElementById('typingInput').addEventListener('input', function(e) {
+            if (!typingState.active) return;
+            const input = this.value;
+            const currentWord = typingState.words[typingState.currentWordIdx];
+
+            // Check for space (word completed)
+            if (input.endsWith(' ')) {
+                const typed = input.trim();
+                // Count correct/incorrect chars for this word
+                for (let i = 0; i < Math.max(typed.length, currentWord.length); i++) {
+                    typingState.totalTyped++;
+                    if (i < typed.length && i < currentWord.length && typed[i] === currentWord[i]) {
+                        typingState.correct++;
+                    } else {
+                        typingState.incorrect++;
+                    }
+                }
+                typingState.wordsCompleted++;
+                typingState.currentWordIdx++;
+                typingState.currentCharIdx = 0;
+                this.value = '';
+
+                if (typingState.currentWordIdx >= typingState.words.length) {
+                    endTypingGame();
+                    return;
+                }
+            } else {
+                typingState.currentCharIdx = input.length;
+            }
+
+            renderTypingText();
+        });
+
+        // Inject typing game styles
+        (function() {
+            const s = document.createElement('style');
+            s.textContent = `
+                .tp-word { display: inline; }
+                .tp-active-word { background: rgba(34,197,94,0.05); border-radius: 3px; padding: 2px 0; }
+                .tp-correct { color: #4ade80; }
+                .tp-wrong { color: #ef4444; background: rgba(239,68,68,0.15); border-radius: 2px; }
+                .tp-cursor { border-bottom: 2px solid var(--arcade-green); animation: tp-blink 0.8s infinite; }
+                @keyframes tp-blink { 0%,100% { border-color: var(--arcade-green); } 50% { border-color: transparent; } }
+                #typingTextDisplay { color: rgba(255,255,255,0.35); }
+                #typingInput:focus { border-color: var(--arcade-green); box-shadow: 0 0 15px rgba(34,197,94,0.15); }
+            `;
+            document.head.appendChild(s);
+        })();
+
         // Load overall leaderboard on page load
         setTimeout(() => showLeaderboard('overall'), 1000);
         
