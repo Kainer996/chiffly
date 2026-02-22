@@ -507,6 +507,14 @@ app.get('/api/user/:username', (req, res) => {
   res.json(stats);
 });
 
+// Achievements endpoint
+app.get('/api/achievements/:username', (req, res) => {
+  if (!userSystem.loaded) return res.status(503).json({ error: 'User system not ready' });
+  const data = userSystem.getAchievementProgress(req.params.username);
+  if (!data) return res.status(404).json({ error: 'User not found' });
+  res.json(data);
+});
+
 // Leaderboard endpoint
 app.get('/api/leaderboard', (req, res) => {
   if (!userSystem.loaded) {

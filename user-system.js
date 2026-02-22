@@ -19,14 +19,49 @@ const XP_REWARDS = {
 
 // Achievements
 const ACHIEVEMENTS = [
-  { id: 'first_steps', name: 'First Steps', desc: 'Join your first room', xpRequired: 10, icon: '👋' },
-  { id: 'chatterer', name: 'Chatterer', desc: 'Send 50 messages', xpRequired: 100, icon: '💬' },
-  { id: 'social_butterfly', name: 'Social Butterfly', desc: 'Visit 5 different venues', xpRequired: 200, icon: '🦋' },
-  { id: 'generous_tipper', name: 'Generous Tipper', desc: 'Send 10 tips', xpRequired: 300, icon: '💰' },
-  { id: 'streaming_star', name: 'Streaming Star', desc: 'Stream 5 sessions', xpRequired: 500, icon: '⭐' },
-  { id: 'arcade_master', name: 'Arcade Master', desc: 'Play 20 arcade games', xpRequired: 400, icon: '🎮' },
-  { id: 'town_veteran', name: 'Town Veteran', desc: 'Reach level 10', xpRequired: 1000, icon: '🏅' },
-  { id: 'legend', name: 'Chifftown Legend', desc: 'Reach level 25', xpRequired: 2500, icon: '👑' }
+  // --- Exploration ---
+  { id: 'first_steps', name: 'First Steps', desc: 'Join your first room', icon: '👋', category: 'exploration', tier: 'bronze',
+    check: (u) => u.stats.roomsJoined >= 1, progress: (u) => ({ current: u.stats.roomsJoined, target: 1 }), xpReward: 50, coinReward: 25 },
+  { id: 'social_butterfly', name: 'Social Butterfly', desc: 'Visit 5 different venues', icon: '🦋', category: 'exploration', tier: 'silver',
+    check: (u) => (u.stats.venuesVisited || []).length >= 5, progress: (u) => ({ current: (u.stats.venuesVisited || []).length, target: 5 }), xpReward: 200, coinReward: 100 },
+  { id: 'globetrotter', name: 'Globetrotter', desc: 'Visit all 9 venues', icon: '🌍', category: 'exploration', tier: 'gold',
+    check: (u) => (u.stats.venuesVisited || []).length >= 9, progress: (u) => ({ current: (u.stats.venuesVisited || []).length, target: 9 }), xpReward: 500, coinReward: 250 },
+  { id: 'room_regular', name: 'Room Regular', desc: 'Join 50 rooms', icon: '🚪', category: 'exploration', tier: 'silver',
+    check: (u) => u.stats.roomsJoined >= 50, progress: (u) => ({ current: u.stats.roomsJoined, target: 50 }), xpReward: 300, coinReward: 150 },
+
+  // --- Social ---
+  { id: 'chatterer', name: 'Chatterer', desc: 'Send 50 messages', icon: '💬', category: 'social', tier: 'bronze',
+    check: (u) => u.stats.messagesSent >= 50, progress: (u) => ({ current: u.stats.messagesSent, target: 50 }), xpReward: 100, coinReward: 50 },
+  { id: 'motormouth', name: 'Motormouth', desc: 'Send 500 messages', icon: '🗣️', category: 'social', tier: 'silver',
+    check: (u) => u.stats.messagesSent >= 500, progress: (u) => ({ current: u.stats.messagesSent, target: 500 }), xpReward: 400, coinReward: 200 },
+  { id: 'generous_tipper', name: 'Generous Tipper', desc: 'Send 10 tips', icon: '💰', category: 'social', tier: 'silver',
+    check: (u) => u.stats.tipsSent >= 10, progress: (u) => ({ current: u.stats.tipsSent, target: 10 }), xpReward: 300, coinReward: 150 },
+  { id: 'tip_magnet', name: 'Tip Magnet', desc: 'Receive 25 tips', icon: '🧲', category: 'social', tier: 'gold',
+    check: (u) => u.stats.tipsReceived >= 25, progress: (u) => ({ current: u.stats.tipsReceived, target: 25 }), xpReward: 500, coinReward: 250 },
+
+  // --- Streaming ---
+  { id: 'streaming_star', name: 'Streaming Star', desc: 'Stream 5 sessions', icon: '⭐', category: 'streaming', tier: 'silver',
+    check: (u) => u.stats.streamingSessions >= 5, progress: (u) => ({ current: u.stats.streamingSessions, target: 5 }), xpReward: 400, coinReward: 200 },
+  { id: 'broadcast_legend', name: 'Broadcast Legend', desc: 'Stream 25 sessions', icon: '📡', category: 'streaming', tier: 'gold',
+    check: (u) => u.stats.streamingSessions >= 25, progress: (u) => ({ current: u.stats.streamingSessions, target: 25 }), xpReward: 800, coinReward: 400 },
+
+  // --- Arcade ---
+  { id: 'arcade_rookie', name: 'Arcade Rookie', desc: 'Play 5 arcade games', icon: '🕹️', category: 'arcade', tier: 'bronze',
+    check: (u) => u.stats.gamesPlayed >= 5, progress: (u) => ({ current: u.stats.gamesPlayed, target: 5 }), xpReward: 100, coinReward: 50 },
+  { id: 'arcade_master', name: 'Arcade Master', desc: 'Play 50 arcade games', icon: '🎮', category: 'arcade', tier: 'silver',
+    check: (u) => u.stats.gamesPlayed >= 50, progress: (u) => ({ current: u.stats.gamesPlayed, target: 50 }), xpReward: 400, coinReward: 200 },
+  { id: 'arcade_legend', name: 'Arcade Legend', desc: 'Play 200 arcade games', icon: '🏆', category: 'arcade', tier: 'gold',
+    check: (u) => u.stats.gamesPlayed >= 200, progress: (u) => ({ current: u.stats.gamesPlayed, target: 200 }), xpReward: 1000, coinReward: 500 },
+
+  // --- Progression ---
+  { id: 'town_veteran', name: 'Town Veteran', desc: 'Reach level 10', icon: '🏅', category: 'progression', tier: 'silver',
+    check: (u, lvl) => lvl >= 10, progress: (u, lvl) => ({ current: lvl, target: 10 }), xpReward: 0, coinReward: 500 },
+  { id: 'legend', name: 'Chifftown Legend', desc: 'Reach level 25', icon: '👑', category: 'progression', tier: 'gold',
+    check: (u, lvl) => lvl >= 25, progress: (u, lvl) => ({ current: lvl, target: 25 }), xpReward: 0, coinReward: 1000 },
+  { id: 'coin_collector', name: 'Coin Collector', desc: 'Accumulate 1,000 coins', icon: '💎', category: 'progression', tier: 'silver',
+    check: (u) => (u.coins || 0) >= 1000, progress: (u) => ({ current: u.coins || 0, target: 1000 }), xpReward: 200, coinReward: 0 },
+  { id: 'millionaire', name: 'Millionaire', desc: 'Accumulate 10,000 coins', icon: '🤑', category: 'progression', tier: 'gold',
+    check: (u) => (u.coins || 0) >= 10000, progress: (u) => ({ current: u.coins || 0, target: 10000 }), xpReward: 500, coinReward: 0 },
 ];
 
 // Level calculation
@@ -221,10 +256,15 @@ class UserSystem {
     const user = this.users[username];
     let newAchievements = [];
 
+    const userLevel = calculateLevel(user.xp).level;
     ACHIEVEMENTS.forEach(achievement => {
-      if (!user.achievements.includes(achievement.id) && user.xp >= achievement.xpRequired) {
+      if (!user.achievements.includes(achievement.id) && achievement.check(user, userLevel)) {
         user.achievements.push(achievement.id);
         newAchievements.push(achievement);
+        
+        // Grant rewards
+        if (achievement.xpReward) user.xp += achievement.xpReward;
+        if (achievement.coinReward) user.coins = (user.coins || 0) + achievement.coinReward;
         
         // Add achievement item to inventory
         if (!user.inventory.includes(achievement.name)) {
@@ -281,6 +321,24 @@ class UserSystem {
       createdAt: user.createdAt,
       lastSeen: user.lastSeen
     };
+  }
+
+  getAchievementProgress(username) {
+    const user = this.users[username];
+    if (!user) return null;
+    const userLevel = calculateLevel(user.xp).level;
+    return ACHIEVEMENTS.map(a => {
+      const prog = a.progress(user, userLevel);
+      return {
+        id: a.id, name: a.name, desc: a.desc, icon: a.icon,
+        category: a.category, tier: a.tier,
+        xpReward: a.xpReward, coinReward: a.coinReward,
+        unlocked: user.achievements.includes(a.id),
+        current: Math.min(prog.current, prog.target),
+        target: prog.target,
+        percent: Math.min(100, Math.round((prog.current / prog.target) * 100))
+      };
+    });
   }
 
   getLeaderboard(limit = 10) {

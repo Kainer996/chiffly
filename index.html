@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="css/activity-feed.css?v=1">
     <link rel="stylesheet" href="css/profile-system.css?v=1">
     <link rel="stylesheet" href="css/shop-system.css?v=1">
+    <link rel="stylesheet" href="css/achievements.css?v=1">
 </head>
 <body>
     <!-- Ambient particles canvas -->
@@ -65,6 +66,10 @@
                         <a href="#" class="menu-item" onclick="if(window.ShopSystem)ShopSystem.openShop()">
                             <i class="fas fa-store"></i>
                             Marketplace
+                        </a>
+                        <a href="#" class="menu-item" onclick="if(window.AchievementsSystem)AchievementsSystem.open()">
+                            <i class="fas fa-trophy"></i>
+                            Trophy Case
                         </a>
                         <a href="#" class="menu-item">
                             <i class="fas fa-bell"></i>
@@ -1082,6 +1087,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeInviteM
 <script src="/js/shop-system.js?v=1"></script>
 <script src="/js/weather-events.js?v=1"></script>
 <script src="/js/building-preview.js?v=1"></script>
+<script src="/js/achievements.js?v=1"></script>
 <script src="/js/town-chat.js?v=1"></script>
 <script>
     // Town engine ready but disabled until we have proper isometric sprites
