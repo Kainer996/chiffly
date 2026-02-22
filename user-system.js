@@ -341,16 +341,31 @@ class UserSystem {
     });
   }
 
-  getLeaderboard(limit = 10) {
-    const sortedUsers = Object.values(this.users)
-      .sort((a, b) => b.xp - a.xp)
-      .slice(0, limit);
-
-    return sortedUsers.map(user => ({
+  getLeaderboard(limit = 10, category = 'xp') {
+    const users = Object.values(this.users);
+    let sorted;
+    switch (category) {
+      case 'coins':
+        sorted = users.sort((a, b) => (b.coins || 0) - (a.coins || 0)); break;
+      case 'achievements':
+        sorted = users.sort((a, b) => b.achievements.length - a.achievements.length); break;
+      case 'messages':
+        sorted = users.sort((a, b) => (b.stats.messagesSent || 0) - (a.stats.messagesSent || 0)); break;
+      case 'games':
+        sorted = users.sort((a, b) => (b.stats.gamesPlayed || 0) - (a.stats.gamesPlayed || 0)); break;
+      default:
+        sorted = users.sort((a, b) => b.xp - a.xp);
+    }
+    return sorted.slice(0, limit).map((user, i) => ({
+      rank: i + 1,
       username: user.username,
       xp: user.xp,
       level: calculateLevel(user.xp).level,
-      achievements: user.achievements.length
+      coins: user.coins || 0,
+      achievements: user.achievements.length,
+      messagesSent: user.stats.messagesSent || 0,
+      gamesPlayed: user.stats.gamesPlayed || 0,
+      roomsJoined: user.stats.roomsJoined || 0
     }));
   }
 

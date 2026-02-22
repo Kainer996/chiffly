@@ -436,6 +436,10 @@ app.get('/', (req, res) => {
 });
 
 // Serve the Questing IRL section
+app.get('/hall-of-fame', (req, res) => {
+  res.sendFile(path.join(__dirname, 'hall-of-fame.html'));
+});
+
 app.get('/questing', (req, res) => {
   res.sendFile(path.join(__dirname, 'questing.html'));
 });
@@ -522,7 +526,8 @@ app.get('/api/leaderboard', (req, res) => {
   }
   
   const limit = parseInt(req.query.limit) || 10;
-  const leaderboard = userSystem.getLeaderboard(limit);
+  const category = req.query.category || 'xp';
+  const leaderboard = userSystem.getLeaderboard(limit, category);
   res.json(leaderboard);
 });
 
