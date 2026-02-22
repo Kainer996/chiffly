@@ -518,26 +518,56 @@
             position: relative;
             overflow: hidden;
         }
-        
+
+        /* Equalizer visualizer */
+        .eq-visualizer {
+            display: flex; gap: 3px; align-items: flex-end;
+            height: 60px; width: 100%; justify-content: center;
+            margin-bottom: 1.5rem; opacity: 0.7;
+        }
+        .eq-bar {
+            width: 6px; border-radius: 3px;
+            background: linear-gradient(to top, var(--neon-cyan), var(--neon-blue));
+            animation: eqPulse var(--dur) ease-in-out infinite alternate;
+        }
+        @keyframes eqPulse { 0% { height: var(--min); } 100% { height: var(--max); } }
+
+        /* Floor tiles */
+        .floor-tiles {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            height: 80px; display: flex; gap: 4px; padding: 0 8px;
+            opacity: 0.3; pointer-events: none;
+        }
+        .floor-tile {
+            flex: 1; border-radius: 4px 4px 0 0;
+            animation: tileGlow var(--dur) ease-in-out infinite alternate;
+        }
+        @keyframes tileGlow {
+            0% { background: rgba(0,206,209,0.05); }
+            100% { background: rgba(0,206,209,var(--bright)); }
+        }
+
         .dancers-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
             gap: 1.5rem;
             width: 100%;
             margin-bottom: 2rem;
+            z-index: 1;
         }
-        
+
         .dancer {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 0.5rem;
-            animation: danceBounce 0.6s ease-in-out infinite alternate;
         }
-        
-        .dancer:nth-child(2n) {
-            animation-delay: -0.3s;
-        }
+        .dancer.move-bounce { animation: danceBounce 0.6s ease-in-out infinite alternate; }
+        .dancer.move-spin { animation: danceSpin 1.5s linear infinite; }
+        .dancer.move-wave { animation: danceWave 1s ease-in-out infinite; }
+        .dancer.move-shake { animation: danceShake 0.3s ease-in-out infinite; }
+        .dancer:nth-child(2n) { animation-delay: -0.3s; }
+        .dancer:nth-child(3n) { animation-delay: -0.15s; }
         
         .dancer-avatar {
             width: 60px;
@@ -556,14 +586,34 @@
             color: var(--club-text-dim);
             text-align: center;
         }
+
+        /* Dance move picker */
+        .dance-controls { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; margin-top: 0.5rem; z-index: 1; }
+        .move-btn {
+            padding: 0.4rem 0.8rem; border-radius: 8px;
+            border: 1px solid rgba(0,206,209,0.2); background: rgba(0,206,209,0.06);
+            color: var(--neon-cyan); cursor: pointer; font-size: 0.75rem; transition: all 0.2s;
+        }
+        .move-btn:hover { background: rgba(0,206,209,0.12); border-color: rgba(0,206,209,0.4); }
+        .move-btn.active { background: rgba(0,206,209,0.2); border-color: var(--neon-cyan); }
         
         @keyframes danceBounce {
-            0% {
-                transform: translateY(0) scale(1);
-            }
-            100% {
-                transform: translateY(-10px) scale(1.05);
-            }
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(-10px) scale(1.05); }
+        }
+        @keyframes danceSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes danceWave {
+            0%, 100% { transform: translateX(0) rotate(0deg); }
+            25% { transform: translateX(-8px) rotate(-5deg); }
+            75% { transform: translateX(8px) rotate(5deg); }
+        }
+        @keyframes danceShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
         }
         
         @media (max-width: 900px) {
@@ -775,12 +825,22 @@
                     </div>
                     
                     <div class="dance-area">
+                        <div class="eq-visualizer" id="eqVisualizer"></div>
                         <div id="dancersContainer" class="dancers-container">
                             <!-- Dancers will be added here dynamically -->
                         </div>
-                        <button onclick="joinDanceFloor()" class="club-btn secondary">
-                            <i class="fas fa-user-plus"></i> Join the Floor
-                        </button>
+                        <div style="display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:center; z-index:1;">
+                            <button onclick="joinDanceFloor()" class="club-btn secondary">
+                                <i class="fas fa-user-plus"></i> Join the Floor
+                            </button>
+                        </div>
+                        <div class="dance-controls" id="danceControls" style="display:none;">
+                            <button class="move-btn active" data-move="bounce" onclick="setDanceMove('bounce',this)">🕺 Bounce</button>
+                            <button class="move-btn" data-move="spin" onclick="setDanceMove('spin',this)">🌀 Spin</button>
+                            <button class="move-btn" data-move="wave" onclick="setDanceMove('wave',this)">🌊 Wave</button>
+                            <button class="move-btn" data-move="shake" onclick="setDanceMove('shake',this)">⚡ Shake</button>
+                        </div>
+                        <div class="floor-tiles" id="floorTiles"></div>
                     </div>
                 </div>
             </div>
@@ -990,6 +1050,52 @@
         }
         
         // Dance Floor functions
+        let currentMove = 'bounce';
+
+        // Build equalizer bars
+        (function buildEQ() {
+            const eq = document.getElementById('eqVisualizer');
+            if (!eq) return;
+            for (let i = 0; i < 32; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'eq-bar';
+                const min = 4 + Math.random() * 8;
+                const max = 20 + Math.random() * 40;
+                const dur = 0.3 + Math.random() * 0.5;
+                bar.style.setProperty('--min', min + 'px');
+                bar.style.setProperty('--max', max + 'px');
+                bar.style.setProperty('--dur', dur + 's');
+                bar.style.animationDelay = (Math.random() * -1) + 's';
+                eq.appendChild(bar);
+            }
+        })();
+
+        // Build floor tiles
+        (function buildTiles() {
+            const ft = document.getElementById('floorTiles');
+            if (!ft) return;
+            for (let i = 0; i < 12; i++) {
+                const tile = document.createElement('div');
+                tile.className = 'floor-tile';
+                const dur = 0.8 + Math.random() * 1.5;
+                const bright = 0.08 + Math.random() * 0.15;
+                tile.style.setProperty('--dur', dur + 's');
+                tile.style.setProperty('--bright', bright);
+                tile.style.animationDelay = (Math.random() * -2) + 's';
+                ft.appendChild(tile);
+            }
+        })();
+
+        function setDanceMove(move, btn) {
+            currentMove = move;
+            document.querySelectorAll('.move-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            // Update own dancer
+            const myDancer = dancers.find(d => d.username === currentUsername);
+            if (myDancer) { myDancer.move = move; updateDanceFloor(); }
+            if (socket) socket.emit('nightclub-dancer-move', { username: currentUsername, move });
+        }
+
         function joinDanceFloor() {
             if (dancers.find(d => d.username === currentUsername)) {
                 alert('You\'re already on the dance floor!');
@@ -998,11 +1104,13 @@
             
             const dancer = {
                 username: currentUsername,
-                emoji: ['💃', '🕺', '🎵', '🎶', '🔥', '⚡'][Math.floor(Math.random() * 6)]
+                emoji: ['💃', '🕺', '🎵', '🎶', '🔥', '⚡'][Math.floor(Math.random() * 6)],
+                move: currentMove
             };
             
             dancers.push(dancer);
             updateDanceFloor();
+            document.getElementById('danceControls').style.display = 'flex';
             
             // Broadcast join
             if (socket) {
@@ -1019,7 +1127,7 @@
             }
             
             container.innerHTML = dancers.map(dancer => `
-                <div class="dancer">
+                <div class="dancer move-${dancer.move || 'bounce'}">
                     <div class="dancer-avatar">${dancer.emoji}</div>
                     <div class="dancer-name">${escapeHtml(dancer.username)}</div>
                 </div>
