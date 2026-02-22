@@ -491,6 +491,61 @@
                 height: 250px;
             }
         }
+
+        /* Coin Flip */
+        .coinflip-game { text-align: center; }
+        .coinflip-coin {
+            width: 120px; height: 120px; margin: 1rem auto;
+            position: relative; perspective: 600px;
+        }
+        .coin-side {
+            position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3.5rem; border-radius: 50%;
+            background: radial-gradient(circle, #e8c84a 0%, #c9a84c 60%, #a08030 100%);
+            box-shadow: 0 4px 20px rgba(201,168,76,0.4);
+            backface-visibility: hidden;
+        }
+        .coin-tails { transform: rotateY(180deg); background: radial-gradient(circle, #5a9bae 0%, #2a7d8f 60%, #1a5d6f 100%); }
+        .coinflip-coin.flipping { animation: coinFlip 1s ease-in-out; }
+        .coinflip-coin.result-tails .coin-heads { transform: rotateY(180deg); }
+        .coinflip-coin.result-tails .coin-tails { transform: rotateY(0deg); }
+        @keyframes coinFlip {
+            0% { transform: rotateY(0); }
+            100% { transform: rotateY(1800deg); }
+        }
+        .coinflip-pick { display: flex; gap: 0.5rem; justify-content: center; margin: 1rem 0; }
+        .coinflip-choice {
+            padding: 0.6rem 1.2rem; border-radius: 10px;
+            border: 2px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05);
+            color: #e0e0e0; cursor: pointer; font-size: 0.95rem; transition: all 0.2s;
+        }
+        .coinflip-choice:hover { border-color: rgba(201,168,76,0.4); background: rgba(201,168,76,0.08); }
+        .coinflip-choice.active { border-color: #c9a84c; background: rgba(201,168,76,0.15); color: #c9a84c; }
+        .coinflip-controls { display: flex; flex-direction: column; gap: 0.8rem; align-items: center; }
+
+        /* Dice Roll */
+        .dice-game { text-align: center; }
+        .dice-display { display: flex; gap: 1.5rem; justify-content: center; margin: 1rem 0; }
+        .dice {
+            width: 80px; height: 80px; font-size: 3.5rem;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.3); border: 2px solid rgba(201,168,76,0.3);
+            border-radius: 16px; transition: transform 0.3s;
+        }
+        .dice.rolling { animation: diceShake 0.15s ease-in-out infinite; }
+        @keyframes diceShake {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(-15deg) scale(1.1); }
+            75% { transform: rotate(15deg) scale(1.1); }
+        }
+        .dice-bet-type { display: flex; gap: 0.5rem; justify-content: center; margin: 0.8rem 0; flex-wrap: wrap; }
+
+        @media (max-width: 768px) {
+            .coinflip-coin { width: 90px; height: 90px; }
+            .coin-side { font-size: 2.5rem; }
+            .dice { width: 60px; height: 60px; font-size: 2.5rem; }
+        }
     </style>
     <link rel="stylesheet" href="/css/quick-emotes.css?v=1">
     <link rel="stylesheet" href="/css/loading-screen.css?v=1">
@@ -593,6 +648,55 @@
                         <button class="bj-btn primary" id="rouletteSpin">Spin (10 🪙)</button>
                     </div>
                     <div id="rouletteResult"></div>
+                </div>
+            </div>
+
+            <!-- Coin Flip -->
+            <div class="game-card">
+                <h2 class="game-title">🪙 Coin Flip</h2>
+                <div class="coinflip-game">
+                    <div class="coinflip-coin" id="coinflipCoin">
+                        <div class="coin-side coin-heads">👑</div>
+                        <div class="coin-side coin-tails">🌙</div>
+                    </div>
+                    <div class="coinflip-pick">
+                        <button class="coinflip-choice active" data-pick="heads" id="pickHeads">👑 Heads</button>
+                        <button class="coinflip-choice" data-pick="tails" id="pickTails">🌙 Tails</button>
+                    </div>
+                    <div class="coinflip-controls">
+                        <div class="bet-selector">
+                            <button class="bet-btn active" data-bet="10">10 🪙</button>
+                            <button class="bet-btn" data-bet="25">25 🪙</button>
+                            <button class="bet-btn" data-bet="50">50 🪙</button>
+                        </div>
+                        <button class="spin-btn" id="coinflipBtn">FLIP!</button>
+                    </div>
+                    <div id="coinflipResult"></div>
+                </div>
+            </div>
+
+            <!-- Dice Roll -->
+            <div class="game-card">
+                <h2 class="game-title">🎲 Dice Roll</h2>
+                <div class="dice-game">
+                    <div class="dice-display">
+                        <div class="dice" id="dice1">⚀</div>
+                        <div class="dice" id="dice2">⚀</div>
+                    </div>
+                    <div class="dice-bet-type">
+                        <button class="coinflip-choice active" data-predict="over7" id="predOver">Over 7</button>
+                        <button class="coinflip-choice" data-predict="under7" id="predUnder">Under 7</button>
+                        <button class="coinflip-choice" data-predict="exact7" id="predExact">Exact 7 (4x)</button>
+                    </div>
+                    <div class="coinflip-controls">
+                        <div class="bet-selector">
+                            <button class="bet-btn active" data-bet="10">10 🪙</button>
+                            <button class="bet-btn" data-bet="25">25 🪙</button>
+                            <button class="bet-btn" data-bet="50">50 🪙</button>
+                        </div>
+                        <button class="spin-btn" id="diceRollBtn">ROLL!</button>
+                    </div>
+                    <div id="diceResult"></div>
                 </div>
             </div>
         </div>
@@ -1037,6 +1141,147 @@
                 updateStats();
                 document.getElementById('rouletteSpin').disabled = false;
             }, 3000);
+        });
+
+        // ==========================================
+        // COIN FLIP GAME
+        // ==========================================
+        let coinflipPick = 'heads';
+        let coinflipBet = 10;
+        const coinEl = document.getElementById('coinflipCoin');
+
+        document.querySelectorAll('.coinflip-game .coinflip-choice').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.coinflip-game .coinflip-choice').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                coinflipPick = btn.dataset.pick;
+            });
+        });
+
+        document.querySelectorAll('.coinflip-game .bet-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.coinflip-game .bet-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                coinflipBet = parseInt(btn.dataset.bet);
+            });
+        });
+
+        document.getElementById('coinflipBtn').addEventListener('click', () => {
+            if (coins < coinflipBet) {
+                document.getElementById('coinflipResult').textContent = '❌ Not enough coins!';
+                return;
+            }
+            const flipBtn = document.getElementById('coinflipBtn');
+            flipBtn.disabled = true;
+            coins -= coinflipBet;
+            updateCoins(coins);
+
+            coinEl.classList.remove('result-tails', 'flipping');
+            void coinEl.offsetWidth; // reflow
+            coinEl.classList.add('flipping');
+
+            const result = Math.random() < 0.5 ? 'heads' : 'tails';
+
+            setTimeout(() => {
+                coinEl.classList.remove('flipping');
+                if (result === 'tails') coinEl.classList.add('result-tails');
+                else coinEl.classList.remove('result-tails');
+
+                const won = result === coinflipPick;
+                const winnings = won ? coinflipBet * 2 : 0;
+                if (won) coins += winnings;
+                updateCoins(coins);
+
+                const resEl = document.getElementById('coinflipResult');
+                resEl.textContent = won
+                    ? `🎉 ${result.toUpperCase()}! You won ${winnings} coins!`
+                    : `💀 ${result.toUpperCase()}! You lost ${coinflipBet} coins.`;
+                resEl.style.color = won ? '#2ecc71' : '#e74c3c';
+
+                addHistory(won ? 'win' : 'lose', won ? winnings - coinflipBet : -coinflipBet);
+                socket.emit('casino-game-played', { game: 'coinflip', bet: coinflipBet, won, payout: winnings });
+                socket.emit('casino-update-coins', { coins });
+                updateStats();
+                flipBtn.disabled = false;
+            }, 1000);
+        });
+
+        // ==========================================
+        // DICE ROLL GAME
+        // ==========================================
+        const DICE_FACES = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+        let dicePrediction = 'over7';
+        let diceBet = 10;
+
+        document.querySelectorAll('.dice-bet-type .coinflip-choice').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.dice-bet-type .coinflip-choice').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                dicePrediction = btn.dataset.predict;
+            });
+        });
+
+        document.querySelectorAll('.dice-game .bet-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.dice-game .bet-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                diceBet = parseInt(btn.dataset.bet);
+            });
+        });
+
+        document.getElementById('diceRollBtn').addEventListener('click', () => {
+            if (coins < diceBet) {
+                document.getElementById('diceResult').textContent = '❌ Not enough coins!';
+                return;
+            }
+            const rollBtn = document.getElementById('diceRollBtn');
+            rollBtn.disabled = true;
+            coins -= diceBet;
+            updateCoins(coins);
+
+            const d1el = document.getElementById('dice1');
+            const d2el = document.getElementById('dice2');
+            d1el.classList.add('rolling');
+            d2el.classList.add('rolling');
+
+            // Animate random faces
+            const shakeInterval = setInterval(() => {
+                d1el.textContent = DICE_FACES[Math.floor(Math.random() * 6)];
+                d2el.textContent = DICE_FACES[Math.floor(Math.random() * 6)];
+            }, 80);
+
+            setTimeout(() => {
+                clearInterval(shakeInterval);
+                d1el.classList.remove('rolling');
+                d2el.classList.remove('rolling');
+
+                const v1 = Math.floor(Math.random() * 6) + 1;
+                const v2 = Math.floor(Math.random() * 6) + 1;
+                d1el.textContent = DICE_FACES[v1 - 1];
+                d2el.textContent = DICE_FACES[v2 - 1];
+
+                const total = v1 + v2;
+                let won = false;
+                let payout = 0;
+                if (dicePrediction === 'over7' && total > 7) { won = true; payout = diceBet * 2; }
+                else if (dicePrediction === 'under7' && total < 7) { won = true; payout = diceBet * 2; }
+                else if (dicePrediction === 'exact7' && total === 7) { won = true; payout = diceBet * 4; }
+
+                if (won) coins += payout;
+                updateCoins(coins);
+
+                const resEl = document.getElementById('diceResult');
+                resEl.textContent = won
+                    ? `🎉 Rolled ${total}! You won ${payout} coins!`
+                    : `💀 Rolled ${total}. You lost ${diceBet} coins.`;
+                resEl.style.color = won ? '#2ecc71' : '#e74c3c';
+
+                addHistory(won ? 'win' : 'lose', won ? payout - diceBet : -diceBet);
+                socket.emit('casino-game-played', { game: 'dice', bet: diceBet, won, payout });
+                socket.emit('casino-update-coins', { coins });
+                updateStats();
+                rollBtn.disabled = false;
+            }, 1200);
         });
 
         // Initialize
