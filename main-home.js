@@ -471,6 +471,8 @@ function initializeAuth() {
             `;
             signInBtn.classList.add('signed-in');
             if (userName) userName.textContent = username;
+            const notifBell = document.getElementById('notifBell');
+            if (notifBell) notifBell.style.display = '';
             
             const userStatus = document.querySelector('.user-status');
             if (userStatus) {
@@ -485,6 +487,8 @@ function initializeAuth() {
             `;
             signInBtn.classList.remove('signed-in');
             if (userMenu) userMenu.style.display = 'none';
+            const notifBellOut = document.getElementById('notifBell');
+            if (notifBellOut) notifBellOut.style.display = 'none';
         }
     }
     

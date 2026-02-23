@@ -7,21 +7,17 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="preload" href="/images/chifftown-map-wide.png" as="image">
-    <link rel="stylesheet" href="main-home-styles.css?v=26">
-    <link rel="stylesheet" href="css/town-buildings.css?v=1">
+    <link rel="stylesheet" href="main-home-styles.css?v=27">
     <link rel="stylesheet" href="css/town-animations.css?v=1">
-    <link rel="stylesheet" href="css/mobile-map.css?v=2">
-    <link rel="stylesheet" href="css/mobile-fullscreen.css?v=1">
+    <link rel="stylesheet" href="css/mobile-map.css?v=4">
     <link rel="stylesheet" href="css/weather-system.css?v=1">
-    <link rel="stylesheet" href="css/daily-challenges.css?v=1">
-    <link rel="stylesheet" href="css/generation-system.css?v=1">
-    <link rel="stylesheet" href="css/unlock-preview.css?v=1">
     <link rel="stylesheet" href="css/social-sidebar.css?v=1">
     <link rel="stylesheet" href="css/loading-screen.css?v=1">
     <link rel="stylesheet" href="css/activity-feed.css?v=1">
     <link rel="stylesheet" href="css/profile-system.css?v=1">
     <link rel="stylesheet" href="css/shop-system.css?v=1">
     <link rel="stylesheet" href="css/achievements.css?v=1">
+    <link rel="stylesheet" href="css/notification-center.css?v=1">
 </head>
 <body>
     <!-- Ambient particles canvas -->
@@ -42,6 +38,10 @@
                     <a href="newspaper.html" class="nav-link"><img src="/images/buildings/newspaper-icon.png?v=1770906861" alt="News" style="width: 20px; height: auto; vertical-align: middle; margin-right: 4px;"> News</a>
                     <a href="#about" class="nav-link">About</a>
                 </div>
+                <button class="notif-bell" id="notifBell" title="Notifications" style="display:none;">
+                    <i class="fas fa-bell"></i>
+                    <span class="notif-badge">0</span>
+                </button>
                 <div class="auth-section">
                     <button class="enter-btn" id="signInBtn">
                         <span class="enter-btn-glow"></span>
@@ -318,58 +318,7 @@
     <!-- Venues Section — Town Map -->
     <section id="venues" class="venues-section">
         <div class="container">
-            <div class="map-controls">
-                <button class="fullscreen-btn" onclick="toggleMapFullscreen()" title="Explore Chifftown">
-                    <i class="fas fa-expand"></i> Explore Full Screen
-                </button>
-            </div>
-            
             <div class="interactive-map-container" id="mapContainer">
-                <!-- Fullscreen HUD -->
-                <div class="fs-hud" id="fsHud">
-                    <div class="hud-left">
-                        <div class="hud-avatar" id="hudAvatar"><i class="fas fa-user"></i></div>
-                        <div class="hud-info">
-                            <div class="hud-username" id="hudUsername">Guest</div>
-                            <div class="hud-xp-bar">
-                                <div class="hud-xp-fill" id="hudXpFill" style="width: 35%"></div>
-                            </div>
-                            <div class="hud-xp-text"><span id="hudLevel">Lvl 1</span> · <span id="hudXp">350</span>/<span id="hudXpMax">1000</span> XP</div>
-                        </div>
-                    </div>
-                    <div class="hud-right">
-                        <div class="hud-currency clickable" onclick="if(window.ShopSystem)ShopSystem.openShop()" title="Open Marketplace">
-                            <span class="hud-coin">🪙</span>
-                            <span class="hud-coin-amount" id="hudCoins">250</span>
-                        </div>
-                        <div class="hud-currency hud-gems">
-                            <span class="hud-gem">💎</span>
-                            <span class="hud-gem-amount" id="hudGems">5</span>
-                        </div>
-                        <button class="fs-exit-btn" id="editModeBtn" onclick="toggleEdit()" title="Rearrange Town"><i class="fas fa-arrows-alt"></i></button>
-                        <button class="fs-exit-btn" onclick="toggleMapFullscreen()"><i class="fas fa-compress"></i></button>
-                    </div>
-                </div>
-                
-                <!-- Daily Challenges Widget -->
-                <div class="challenges-widget" id="challengesWidget">
-                    <div class="challenges-widget-header">
-                        <span class="challenges-widget-title">🎯 Daily Challenges</span>
-                        <a href="challenges.html" class="challenges-widget-link">View All</a>
-                    </div>
-                    <div id="challengesList" class="challenges-list">
-                        <!-- Challenges will be populated by JS -->
-                        <div class="challenge-mini-loading">
-                            <i class="fas fa-spinner fa-spin"></i> Loading challenges...
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="edit-toolbar" id="editToolbar">
-                    <span class="edit-label">✏️ Edit Mode</span>
-                    <button onclick="TownEngine.resetLayout()">Reset</button>
-                    <button class="save-btn" onclick="toggleEdit()">✓ Done</button>
-                </div>
                 <img src="/images/chifftown-map-wide.png" alt="Chifftown City Map" class="city-map-image">
                 <!-- Hotspot Overlays (until isometric sprites are ready) -->
                 <a href="/questing.html" class="map-hotspot adventure-hotspot" data-venue="Adventure Guild">
@@ -787,7 +736,7 @@
     <script src="main-home.js?v=12"></script>
     <script src="js/live-occupancy.js?v=1"></script>
     <script src="js/interactive-map.js?v=1"></script>
-    <script src="js/mobile-map.js?v=2"></script>
+    <script src="js/mobile-map.js?v=3"></script>
     <script>
     // === TOWN ALIVE ANIMATIONS ===
     (function() {
@@ -893,125 +842,7 @@
         setTimeout(spawnAircraft, 10000 + Math.random() * 10000);
     })();
     </script>
-<script>
-function toggleMapFullscreen() {
-    const container = document.getElementById('mapContainer');
-    const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement);
-    
-    if (isFullscreen) {
-        // Exit fullscreen
-        (document.exitFullscreen || document.webkitExitFullscreen).call(document);
-    } else {
-        // Enter real fullscreen
-        const requestFS = container.requestFullscreen || container.webkitRequestFullscreen;
-        if (requestFS) {
-            requestFS.call(container).then(() => {
-                container.classList.add('fullscreen-map');
-                // Try landscape on mobile
-                if (screen.orientation && screen.orientation.lock) {
-                    screen.orientation.lock('landscape').catch(() => {});
-                }
-            }).catch(() => {
-                // Fallback: CSS-only fullscreen for browsers that block the API
-                cssFullscreen(container, true);
-            });
-        } else {
-            // No Fullscreen API — CSS fallback
-            cssFullscreen(container, true);
-        }
-    }
-}
-
-function cssFullscreen(container, enter) {
-    if (enter) {
-        container.classList.add('fullscreen-map');
-        document.body.style.overflow = 'hidden';
-        const closeBtn = document.createElement('button');
-        closeBtn.id = 'fsCloseBtn';
-        closeBtn.className = 'fullscreen-close';
-        closeBtn.innerHTML = '<i class="fas fa-compress"></i> Exit';
-        closeBtn.onclick = toggleMapFullscreen;
-        closeBtn.style.display = 'block';
-        document.body.appendChild(closeBtn);
-    } else {
-        container.classList.remove('fullscreen-map');
-        document.body.style.overflow = '';
-        const closeBtn = document.getElementById('fsCloseBtn');
-        if (closeBtn) closeBtn.remove();
-    }
-}
-
-// Listen for fullscreen change to sync CSS class + cleanup
-document.addEventListener('fullscreenchange', onFSChange);
-document.addEventListener('webkitfullscreenchange', onFSChange);
-
-function onFSChange() {
-    const container = document.getElementById('mapContainer');
-    const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement);
-    if (isFullscreen) {
-        container.classList.add('fullscreen-map');
-        document.body.style.overflow = 'hidden';
-    } else {
-        container.classList.remove('fullscreen-map');
-        document.body.style.overflow = '';
-        if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
-        const closeBtn = document.getElementById('fsCloseBtn');
-        if (closeBtn) closeBtn.remove();
-    }
-}
-
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        const container = document.getElementById('mapContainer');
-        if (container.classList.contains('fullscreen-map') && !document.fullscreenElement) {
-            cssFullscreen(container, false);
-        }
-    }
-});
-
-// === HUD Data ===
-function updateHud() {
-    try {
-        const user = JSON.parse(localStorage.getItem('chifftown_user') || '{}');
-        const stats = JSON.parse(localStorage.getItem('chifftown_stats') || '{}');
-        
-        if (user.username || user.displayName) {
-            document.getElementById('hudUsername').textContent = user.displayName || user.username;
-        }
-        
-        const xp = stats.xp || 350;
-        const level = stats.level || Math.floor(xp / 1000) + 1;
-        const xpInLevel = xp % 1000;
-        const xpMax = 1000;
-        const coins = stats.coins || 250;
-        const gems = stats.gems || 5;
-        
-        document.getElementById('hudLevel').textContent = 'Lvl ' + level;
-        document.getElementById('hudXp').textContent = xpInLevel;
-        document.getElementById('hudXpMax').textContent = xpMax;
-        document.getElementById('hudXpFill').style.width = (xpInLevel / xpMax * 100) + '%';
-        document.getElementById('hudCoins').textContent = coins.toLocaleString();
-        document.getElementById('hudGems').textContent = gems;
-    } catch(e) {}
-}
-updateHud();
-
-// === EDIT MODE ===
-function toggleEdit() {
-    const isEdit = TownEngine.toggleEditMode();
-    const btn = document.getElementById('editModeBtn');
-    const toolbar = document.getElementById('editToolbar');
-    if (isEdit) {
-        btn.style.background = 'rgba(42, 157, 143, 0.4)';
-        btn.style.borderColor = 'rgba(42, 157, 143, 0.6)';
-        toolbar.classList.add('visible');
-    } else {
-        btn.style.background = '';
-        btn.style.borderColor = '';
-        toolbar.classList.remove('visible');
-    }
-}
-</script>
+<!-- Fullscreen, HUD, and Edit mode removed — map is now pure navigation -->
 <script>
 // === INVITE MODAL LOGIC ===
 function generateInviteCode() {
@@ -1077,12 +908,8 @@ function nativeShare() {
 
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeInviteModal(); });
 </script>
-<script src="/js/town-engine.js?v=1"></script>
 <script src="/js/weather-system.js?v=1"></script>
 <script src="/js/ambient-life.js?v=1"></script>
-<script src="/js/daily-challenges.js?v=1"></script>
-<script src="/js/generation-system.js?v=1"></script>
-<script src="/js/unlock-preview.js?v=1"></script>
 <script src="/js/social-system.js?v=1"></script>
 <script src="/js/loading-screen.js?v=1"></script>
 <script src="/js/page-transitions.js?v=1"></script>
@@ -1091,7 +918,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeInviteM
 <script src="/js/shop-system.js?v=1"></script>
 <script src="/js/weather-events.js?v=1"></script>
 <script src="/js/building-preview.js?v=1"></script>
-<script src="/js/town-npcs.js?v=1"></script>
+<script src="/js/town-npcs.js?v=2"></script>
 <script src="/js/town-atmosphere.js?v=1"></script>
 <script src="/js/achievements.js?v=1"></script>
 <script src="/js/town-chat.js?v=1"></script>
@@ -1099,10 +926,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeInviteM
 <script src="/js/pet-system.js?v=1"></script>
 <script src="/js/dm-system.js?v=1"></script>
 <script src="/js/seasonal-festival.js?v=1"></script>
-<script>
-    // Town engine ready but disabled until we have proper isometric sprites
-    // TownEngine.init('mapContainer');
-    // TODO: Generate isometric building sprites, then enable
-</script>
+<script src="/js/notification-center.js?v=1"></script>
+<!-- TownEngine removed — clean navigation map -->
 </body>
 </html>
