@@ -575,6 +575,25 @@ app.post('/api/coins/award', async (req, res) => {
   res.json({ success: true, newBalance: userSystem.getCoins(username) });
 });
 
+// Pet sync endpoint
+app.post('/api/pet/sync', (req, res) => {
+  const { username, pet } = req.body;
+  if (!username || !pet) return res.status(400).json({ error: 'Missing fields' });
+  if (!userSystem.loaded) return res.status(503).json({ error: 'System not ready' });
+  const user = userSystem.users[username];
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  user.pet = { type: pet.type, name: (pet.name || '').slice(0, 16), xp: pet.xp || 0, adoptedAt: pet.adoptedAt };
+  userSystem.saveUsers();
+  res.json({ success: true });
+});
+
+app.get('/api/pet/:username', (req, res) => {
+  if (!userSystem.loaded) return res.status(503).json({ error: 'System not ready' });
+  const user = userSystem.users[req.params.username];
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  res.json({ pet: user.pet || null });
+});
+
 // Fishing catch endpoint
 app.post('/api/fishing/catch', async (req, res) => {
   const { username, fishId, coins, xp } = req.body;

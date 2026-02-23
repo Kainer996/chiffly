@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Shelter — ChiffTown</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --shelter-dark: #060d1a;
+            --shelter-deep: #0a1628;
+            --shelter-teal: #14b8a6;
+            --shelter-gold: #f4c542;
+            --shelter-text: #e2e8f0;
+            --shelter-dim: rgba(226, 232, 240, 0.5);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--shelter-dark);
+            color: var(--shelter-text);
+            min-height: 100vh;
+        }
+
+        .nav-bar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            background: rgba(6, 13, 26, 0.92);
+            backdrop-filter: blur(12px);
+            padding: 0.6rem 1.5rem;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(20, 184, 166, 0.2);
+        }
+        .nav-bar a { color: var(--shelter-gold); text-decoration: none; font-weight: 600; }
+
+        .shelter-container {
+            max-width: 900px; margin: 0 auto; padding: 5rem 1.5rem 3rem;
+        }
+
+        .shelter-header {
+            text-align: center; margin-bottom: 2.5rem;
+        }
+        .shelter-header h1 {
+            font-size: 2.2rem; font-weight: 700;
+            background: linear-gradient(135deg, var(--shelter-teal), var(--shelter-gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        .shelter-header p { color: var(--shelter-dim); font-size: 0.95rem; }
+
+        .already-adopted {
+            text-align: center; padding: 3rem; 
+            background: rgba(20, 184, 166, 0.05);
+            border: 1px solid rgba(20, 184, 166, 0.15);
+            border-radius: 16px;
+        }
+        .already-adopted .pet-display { font-size: 4rem; margin-bottom: 0.5rem; }
+        .already-adopted h2 { color: var(--shelter-gold); margin-bottom: 0.3rem; }
+        .already-adopted p { color: var(--shelter-dim); }
+        .already-adopted .back-btn {
+            display: inline-block; margin-top: 1.2rem;
+            padding: 0.6rem 1.5rem; border-radius: 10px;
+            background: linear-gradient(135deg, var(--shelter-teal), #0d9488);
+            color: #fff; text-decoration: none; font-weight: 600;
+        }
+
+        .pets-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1.2rem;
+        }
+
+        .pet-card {
+            background: rgba(10, 22, 40, 0.6);
+            border: 1px solid rgba(20, 184, 166, 0.12);
+            border-radius: 16px; padding: 1.5rem; text-align: center;
+            cursor: pointer; transition: all 0.3s;
+            position: relative; overflow: hidden;
+        }
+        .pet-card:hover {
+            border-color: rgba(20, 184, 166, 0.4);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(20, 184, 166, 0.1);
+        }
+        .pet-card.selected {
+            border-color: var(--shelter-gold);
+            box-shadow: 0 0 20px rgba(244, 197, 66, 0.15);
+        }
+        .pet-card .emoji { font-size: 3rem; margin-bottom: 0.5rem; display: block; }
+        .pet-card .pet-type { font-weight: 600; font-size: 1rem; color: var(--shelter-text); }
+        .pet-card .pet-trait { font-size: 0.75rem; color: var(--shelter-dim); margin-top: 0.3rem; }
+
+        .adopt-section {
+            margin-top: 2rem; text-align: center;
+            opacity: 0; transform: translateY(10px);
+            transition: all 0.3s;
+        }
+        .adopt-section.visible { opacity: 1; transform: translateY(0); }
+
+        .name-input {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(20, 184, 166, 0.2);
+            border-radius: 12px; padding: 0.8rem 1.2rem;
+            color: var(--shelter-text); font-size: 1rem;
+            font-family: inherit; width: 280px; max-width: 90%;
+            text-align: center; margin-bottom: 1rem;
+        }
+        .name-input:focus { outline: none; border-color: var(--shelter-teal); }
+        .name-input::placeholder { color: var(--shelter-dim); }
+
+        .adopt-btn {
+            display: inline-block; padding: 0.8rem 2.5rem;
+            background: linear-gradient(135deg, var(--shelter-gold), #d4a017);
+            color: #0a1628; font-weight: 700; font-size: 1.05rem;
+            border: none; border-radius: 50px; cursor: pointer;
+            transition: all 0.3s; letter-spacing: 0.5px;
+        }
+        .adopt-btn:hover { transform: scale(1.05); box-shadow: 0 4px 20px rgba(244, 197, 66, 0.3); }
+
+        .success-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(6, 13, 26, 0.95); z-index: 200;
+            display: none; align-items: center; justify-content: center;
+            flex-direction: column; text-align: center;
+        }
+        .success-overlay.show { display: flex; animation: fadeIn 0.5s; }
+        .success-overlay .big-emoji { font-size: 5rem; margin-bottom: 1rem; animation: petBounce 1.5s ease-in-out infinite; }
+        .success-overlay h2 { font-size: 1.8rem; color: var(--shelter-gold); margin-bottom: 0.3rem; }
+        .success-overlay p { color: var(--shelter-dim); margin-bottom: 1.5rem; }
+        .success-overlay a {
+            padding: 0.7rem 2rem; border-radius: 10px;
+            background: linear-gradient(135deg, var(--shelter-teal), #0d9488);
+            color: #fff; text-decoration: none; font-weight: 600;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes petBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+
+        @media (max-width: 600px) {
+            .pets-grid { grid-template-columns: repeat(2, 1fr); gap: 0.8rem; }
+            .pet-card .emoji { font-size: 2.2rem; }
+            .shelter-header h1 { font-size: 1.6rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav-bar">
+        <a href="/main-home.html">← Back to Town</a>
+        <span style="color: var(--shelter-gold); font-weight: 600;">🐾 Pet Shelter</span>
+        <span></span>
+    </nav>
+
+    <div class="shelter-container">
+        <div class="shelter-header">
+            <h1>🐾 ChiffTown Pet Shelter</h1>
+            <p>Adopt a loyal companion to join you on your adventures!</p>
+        </div>
+
+        <div id="alreadyAdopted" class="already-adopted" style="display:none;">
+            <div class="pet-display" id="currentPetEmoji"></div>
+            <h2 id="currentPetName"></h2>
+            <p>Your companion is already with you! They're happily following you around ChiffTown.</p>
+            <a href="/main-home.html" class="back-btn">Return to Town</a>
+        </div>
+
+        <div id="adoptionArea">
+            <div class="pets-grid" id="petsGrid"></div>
+
+            <div class="adopt-section" id="adoptSection">
+                <p style="margin-bottom:0.8rem; color: var(--shelter-dim);">Name your new companion:</p>
+                <input type="text" class="name-input" id="petNameInput" placeholder="Enter a name..." maxlength="16"><br>
+                <button class="adopt-btn" id="adoptBtn" onclick="confirmAdopt()">🐾 Adopt!</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="success-overlay" id="successOverlay">
+        <div class="big-emoji" id="successEmoji"></div>
+        <h2 id="successTitle">Welcome home!</h2>
+        <p id="successMsg"></p>
+        <a href="/main-home.html">Take them to Town →</a>
+    </div>
+
+    <script src="/js/pet-system.js"></script>
+    <script>
+        const PETS = window.ChiffPet.PETS;
+        let selectedType = null;
+
+        // Check if already have a pet
+        const existing = window.ChiffPet.getPet();
+        if (existing) {
+            document.getElementById('adoptionArea').style.display = 'none';
+            const box = document.getElementById('alreadyAdopted');
+            box.style.display = 'block';
+            document.getElementById('currentPetEmoji').textContent = (PETS[existing.type] || PETS.cat).emoji;
+            document.getElementById('currentPetName').textContent = existing.name;
+        } else {
+            // Render pet cards
+            const grid = document.getElementById('petsGrid');
+            const traits = {
+                cat: 'Independent & mysterious', dog: 'Loyal & energetic',
+                fox: 'Clever & curious', owl: 'Wise & observant',
+                dragon: 'Fierce & protective', penguin: 'Chill & adorable',
+                bunny: 'Playful & gentle', wolf: 'Bold & majestic'
+            };
+            Object.entries(PETS).forEach(([type, info]) => {
+                const card = document.createElement('div');
+                card.className = 'pet-card';
+                card.innerHTML = `
+                    <span class="emoji">${info.emoji}</span>
+                    <div class="pet-type">${info.name}</div>
+                    <div class="pet-trait">${traits[type] || ''}</div>
+                `;
+                card.addEventListener('click', () => selectPet(type, card));
+                grid.appendChild(card);
+            });
+        }
+
+        function selectPet(type, card) {
+            selectedType = type;
+            document.querySelectorAll('.pet-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            const section = document.getElementById('adoptSection');
+            section.classList.add('visible');
+            document.getElementById('petNameInput').placeholder = `Name your ${PETS[type].name}...`;
+            document.getElementById('petNameInput').focus();
+        }
+
+        function confirmAdopt() {
+            if (!selectedType) return;
+            const name = document.getElementById('petNameInput').value.trim() || PETS[selectedType].name;
+            const success = window.ChiffPet.adopt(selectedType, name);
+            if (success) {
+                const overlay = document.getElementById('successOverlay');
+                document.getElementById('successEmoji').textContent = PETS[selectedType].emoji;
+                document.getElementById('successTitle').textContent = `${name} is yours!`;
+                document.getElementById('successMsg').textContent = `Your ${PETS[selectedType].name} companion will follow you everywhere in ChiffTown.`;
+                overlay.classList.add('show');
+            }
+        }
+
+        // Enter key to adopt
+        document.getElementById('petNameInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') confirmAdopt();
+        });
+    </script>
+</body>
+</html>
