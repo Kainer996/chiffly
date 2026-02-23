@@ -443,6 +443,9 @@
         // Award on server
         awardCatch(fish);
 
+        // Pet XP for fishing
+        if (window.ChiffPet) window.ChiffPet.addXP(Math.ceil(fish.xp / 5));
+
         // Reset after popup
         setTimeout(() => {
             document.getElementById('catchPopup').classList.remove('show');

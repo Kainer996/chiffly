@@ -616,10 +616,124 @@
             75% { transform: translateX(4px); }
         }
         
+        /* Crowd Reactions */
+        .crowd-reactions {
+            margin-top: 1rem; padding: 1rem;
+            background: rgba(0, 206, 209, 0.03);
+            border: 1px solid rgba(0, 206, 209, 0.1);
+            border-radius: 12px;
+        }
+        .reactions-title {
+            font-size: 0.8rem; font-weight: 600; color: var(--club-text-dim);
+            letter-spacing: 1.5px; margin-bottom: 0.6rem;
+            display: flex; align-items: center; gap: 0.4rem;
+        }
+        .reactions-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem;
+        }
+        .reaction-btn {
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(0, 206, 209, 0.12);
+            border-radius: 10px; padding: 0.6rem; font-size: 1.4rem;
+            cursor: pointer; transition: all 0.15s;
+        }
+        .reaction-btn:hover {
+            background: rgba(0, 206, 209, 0.12); transform: scale(1.1);
+            box-shadow: 0 0 12px rgba(0, 206, 209, 0.2);
+        }
+        .reaction-btn:active { transform: scale(0.95); }
+        .reactions-feed {
+            margin-top: 0.5rem; max-height: 60px; overflow: hidden;
+            font-size: 0.75rem; color: var(--club-text-dim);
+        }
+        .reaction-msg {
+            animation: reactionSlide 0.3s ease-out;
+            padding: 0.15rem 0;
+        }
+        @keyframes reactionSlide {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Floating crowd emoji */
+        .floating-reaction {
+            position: absolute; font-size: 2rem; z-index: 10;
+            animation: floatUp 1.5s ease-out forwards;
+            pointer-events: none;
+        }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-120px) scale(1.4); }
+        }
+
+        /* Laser Controls */
+        .laser-controls {
+            margin-top: 0.8rem; padding: 0.8rem 1rem;
+            background: rgba(59, 130, 246, 0.03);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            border-radius: 12px;
+        }
+        .laser-btns { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+        .laser-btn {
+            flex: 1; min-width: 60px; padding: 0.45rem 0.3rem;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(59, 130, 246, 0.15);
+            border-radius: 8px; color: var(--club-text-dim); font-size: 0.7rem;
+            cursor: pointer; transition: all 0.2s; font-weight: 500;
+        }
+        .laser-btn:hover, .laser-btn.active {
+            background: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.4);
+            color: var(--neon-ice); box-shadow: 0 0 10px rgba(59, 130, 246, 0.15);
+        }
+
+        /* Laser Overlay */
+        .laser-overlay {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none; z-index: 5; overflow: hidden;
+            border-radius: 16px;
+        }
+        .laser-beam {
+            position: absolute; top: 0; left: 50%;
+            width: 2px; height: 100%;
+            background: linear-gradient(180deg, rgba(0, 206, 209, 0.8), transparent 80%);
+            transform-origin: top center;
+            filter: blur(1px);
+        }
+        .laser-overlay.mode-sweep .laser-beam {
+            animation: laserSweep 2s ease-in-out infinite alternate;
+        }
+        .laser-overlay.mode-strobe {
+            animation: laserStrobe 0.15s steps(2) infinite;
+            background: rgba(0, 206, 209, 0.03);
+        }
+        .laser-overlay.mode-fan .laser-beam {
+            animation: laserFan 3s linear infinite;
+        }
+        @keyframes laserSweep {
+            0% { transform: rotate(-30deg); }
+            100% { transform: rotate(30deg); }
+        }
+        @keyframes laserStrobe {
+            0% { opacity: 0; } 50% { opacity: 1; }
+        }
+        @keyframes laserFan {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Rain mode: vertical falling lines */
+        .laser-rain-drop {
+            position: absolute; top: -20px; width: 1px;
+            background: linear-gradient(180deg, rgba(0, 206, 209, 0.6), transparent);
+            animation: laserDrop 1s linear infinite;
+        }
+        @keyframes laserDrop {
+            0% { transform: translateY(-20px); opacity: 1; }
+            100% { transform: translateY(420px); opacity: 0; }
+        }
+
         @media (max-width: 900px) {
             .dj-dance-container {
                 grid-template-columns: 1fr;
             }
+            .reactions-grid { grid-template-columns: repeat(4, 1fr); }
         }
         
         .stats-grid {
@@ -841,6 +955,37 @@
                             <button class="move-btn" data-move="shake" onclick="setDanceMove('shake',this)">⚡ Shake</button>
                         </div>
                         <div class="floor-tiles" id="floorTiles"></div>
+                        
+                        <!-- Laser beams overlay -->
+                        <div class="laser-overlay" id="laserOverlay"></div>
+                    </div>
+                    
+                    <!-- Crowd Reactions Panel -->
+                    <div class="crowd-reactions">
+                        <h4 class="reactions-title"><i class="fas fa-hand-sparkles"></i> CROWD REACTIONS</h4>
+                        <div class="reactions-grid">
+                            <button class="reaction-btn" onclick="crowdReact('🔥','FIRE!')">🔥</button>
+                            <button class="reaction-btn" onclick="crowdReact('🎉','PARTY!')">🎉</button>
+                            <button class="reaction-btn" onclick="crowdReact('💎','DIAMOND!')">💎</button>
+                            <button class="reaction-btn" onclick="crowdReact('⚡','ELECTRIC!')">⚡</button>
+                            <button class="reaction-btn" onclick="crowdReact('🌊','WAVE!')">🌊</button>
+                            <button class="reaction-btn" onclick="crowdReact('💀','DEAD!')">💀</button>
+                            <button class="reaction-btn" onclick="crowdReact('🚀','LIFTOFF!')">🚀</button>
+                            <button class="reaction-btn" onclick="crowdReact('👑','KING!')">👑</button>
+                        </div>
+                        <div class="reactions-feed" id="reactionsFeed"></div>
+                    </div>
+                    
+                    <!-- Laser Controls -->
+                    <div class="laser-controls">
+                        <h4 class="reactions-title"><i class="fas fa-bolt"></i> LASER SHOW</h4>
+                        <div class="laser-btns">
+                            <button class="laser-btn" data-mode="off" onclick="setLaser('off',this)">OFF</button>
+                            <button class="laser-btn" data-mode="sweep" onclick="setLaser('sweep',this)">🔵 Sweep</button>
+                            <button class="laser-btn" data-mode="strobe" onclick="setLaser('strobe',this)">⚡ Strobe</button>
+                            <button class="laser-btn" data-mode="rain" onclick="setLaser('rain',this)">🌧️ Rain</button>
+                            <button class="laser-btn" data-mode="fan" onclick="setLaser('fan',this)">🌀 Fan</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1197,6 +1342,124 @@
             document.getElementById('activeRooms').textContent = s.activeRooms || 0;
             document.getElementById('liveStreams').textContent = s.liveStreams || 0;
         }
+
+        // === CROWD REACTIONS ===
+        let reactionCooldown = false;
+        function crowdReact(emoji, label) {
+            if (reactionCooldown) return;
+            reactionCooldown = true;
+            setTimeout(() => reactionCooldown = false, 500);
+
+            // Float emoji up from dance floor
+            const area = document.querySelector('.dance-area');
+            if (area) {
+                for (let i = 0; i < 3; i++) {
+                    setTimeout(() => {
+                        const el = document.createElement('div');
+                        el.className = 'floating-reaction';
+                        el.textContent = emoji;
+                        el.style.left = (20 + Math.random() * 60) + '%';
+                        el.style.bottom = '10%';
+                        area.appendChild(el);
+                        setTimeout(() => el.remove(), 1500);
+                    }, i * 150);
+                }
+            }
+
+            // Add to feed
+            const feed = document.getElementById('reactionsFeed');
+            if (feed) {
+                const user = (() => { try { return JSON.parse(localStorage.getItem('chifftown_user') || '{}').username || 'Someone'; } catch(e) { return 'Someone'; } })();
+                const msg = document.createElement('div');
+                msg.className = 'reaction-msg';
+                msg.textContent = `${emoji} ${user}: ${label}`;
+                feed.prepend(msg);
+                while (feed.children.length > 5) feed.lastChild.remove();
+            }
+
+            // Broadcast via socket if available
+            if (socket && socket.connected) {
+                socket.emit('nightclub-reaction', { emoji, label });
+            }
+
+            // Pet XP for vibing
+            if (window.ChiffPet) window.ChiffPet.addXP(1);
+        }
+
+        // Listen for reactions from others
+        function setupReactionSocket() {
+            if (!socket) return;
+            socket.on('nightclub-reaction', (data) => {
+                const area = document.querySelector('.dance-area');
+                if (area) {
+                    const el = document.createElement('div');
+                    el.className = 'floating-reaction';
+                    el.textContent = data.emoji;
+                    el.style.left = (20 + Math.random() * 60) + '%';
+                    el.style.bottom = '10%';
+                    area.appendChild(el);
+                    setTimeout(() => el.remove(), 1500);
+                }
+            });
+        }
+
+        // === LASER SHOW ===
+        let currentLaserMode = 'off';
+        function setLaser(mode, btn) {
+            currentLaserMode = mode;
+            document.querySelectorAll('.laser-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+
+            const overlay = document.getElementById('laserOverlay');
+            if (!overlay) return;
+
+            // Clear previous
+            overlay.innerHTML = '';
+            overlay.className = 'laser-overlay';
+
+            if (mode === 'off') return;
+
+            if (mode === 'sweep') {
+                overlay.classList.add('mode-sweep');
+                for (let i = 0; i < 5; i++) {
+                    const beam = document.createElement('div');
+                    beam.className = 'laser-beam';
+                    beam.style.left = (20 + i * 15) + '%';
+                    beam.style.animationDelay = (i * 0.4) + 's';
+                    beam.style.opacity = 0.4 + Math.random() * 0.3;
+                    overlay.appendChild(beam);
+                }
+            } else if (mode === 'strobe') {
+                overlay.classList.add('mode-strobe');
+            } else if (mode === 'rain') {
+                for (let i = 0; i < 20; i++) {
+                    const drop = document.createElement('div');
+                    drop.className = 'laser-rain-drop';
+                    drop.style.left = Math.random() * 100 + '%';
+                    drop.style.height = (30 + Math.random() * 40) + 'px';
+                    drop.style.animationDelay = Math.random() * 1 + 's';
+                    drop.style.animationDuration = (0.6 + Math.random() * 0.8) + 's';
+                    overlay.appendChild(drop);
+                }
+            } else if (mode === 'fan') {
+                overlay.classList.add('mode-fan');
+                for (let i = 0; i < 8; i++) {
+                    const beam = document.createElement('div');
+                    beam.className = 'laser-beam';
+                    beam.style.left = '50%';
+                    beam.style.transform = `rotate(${i * 45}deg)`;
+                    beam.style.opacity = '0.3';
+                    overlay.appendChild(beam);
+                }
+            }
+        }
+
+        // Auto-setup laser reaction socket after init
+        const origInit = init;
+        init = function() {
+            origInit();
+            setTimeout(setupReactionSocket, 1000);
+        };
 
         document.addEventListener('DOMContentLoaded', init);
     </script>

@@ -1863,6 +1863,12 @@ io.on('connection', (socket) => {
     }
   });
 
+  // === NIGHTCLUB REACTIONS ===
+  socket.on('nightclub-reaction', (data) => {
+    if (!data || !data.emoji) return;
+    socket.broadcast.emit('nightclub-reaction', { emoji: data.emoji, label: data.label || '' });
+  });
+
   // === CASINO EVENTS ===
   socket.on('casino-game-played', async (data) => {
     const { username, game, bet, won, jackpot } = data;
