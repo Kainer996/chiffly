@@ -2,36 +2,848 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Starfire Observatory - ChiffTown</title>
-    <link rel="stylesheet" href="main-home-styles.css?v=26">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Starfire Observatory — ChiffTown</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --obs-void: #03060f;
+            --obs-deep: #060d1f;
+            --obs-navy: #0a1833;
+            --obs-teal: #0ea5e9;
+            --obs-gold: #f4c542;
+            --obs-silver: #94a3b8;
+            --obs-star: #e8eaff;
+            --obs-nebula: rgba(14, 165, 233, 0.06);
+            --obs-text: #cbd5e1;
+        }
         body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            color: #fff;
-            text-align: center;
+            font-family: 'Inter', sans-serif;
+            background: var(--obs-void);
+            color: var(--obs-text);
+            min-height: 100vh;
+            overflow: hidden;
+            cursor: crosshair;
         }
-        .container {
-            border: 2px solid #4fc3f7;
-            padding: 40px;
-            border-radius: 20px;
-            background: rgba(15, 23, 42, 0.9);
+
+        /* Nav */
+        .nav-bar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+            background: rgba(3, 6, 15, 0.85);
+            backdrop-filter: blur(16px);
+            padding: 0.6rem 1.5rem;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(14, 165, 233, 0.15);
         }
-        h1 {
-            font-size: 3rem;
-            color: #ffc107;
+        .nav-bar a { color: var(--obs-gold); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+        .nav-bar .title { font-size: 1.1rem; letter-spacing: 2px; text-transform: uppercase; }
+        .nav-bar .stats { display: flex; gap: 1.2rem; font-size: 0.8rem; color: var(--obs-silver); align-items: center; }
+        .nav-bar .stats span i { margin-right: 4px; }
+        .stat-gold { color: var(--obs-gold) !important; }
+        .stat-teal { color: var(--obs-teal) !important; }
+
+        /* Star Canvas */
+        #starfield {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 0;
         }
+
+        /* Telescope overlay */
+        .telescope-vignette {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 1; pointer-events: none;
+            background: radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.7) 60%, rgba(0,0,0,0.95) 80%);
+            opacity: 0; transition: opacity 0.8s ease;
+        }
+        .telescope-vignette.active { opacity: 1; }
+
+        /* HUD */
+        .hud {
+            position: fixed; z-index: 100; pointer-events: none;
+        }
+        .hud > * { pointer-events: auto; }
+
+        /* Constellation Tracker - bottom left */
+        .tracker {
+            position: fixed; bottom: 1.5rem; left: 1.5rem; z-index: 100;
+            background: rgba(6, 13, 31, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(14, 165, 233, 0.15);
+            border-radius: 16px;
+            padding: 1.2rem 1.4rem;
+            min-width: 240px;
+            max-height: 45vh;
+            overflow-y: auto;
+        }
+        .tracker h3 {
+            font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px;
+            color: var(--obs-teal); margin-bottom: 0.8rem;
+        }
+        .tracker-item {
+            display: flex; align-items: center; gap: 0.7rem;
+            padding: 0.45rem 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+            font-size: 0.82rem;
+        }
+        .tracker-item:last-child { border-bottom: none; }
+        .tracker-item .icon { font-size: 1.1rem; width: 24px; text-align: center; }
+        .tracker-item .name { flex: 1; }
+        .tracker-item .status { font-size: 0.7rem; padding: 2px 8px; border-radius: 8px; }
+        .tracker-item .status.found {
+            background: rgba(14, 165, 233, 0.15); color: var(--obs-teal);
+        }
+        .tracker-item .status.hidden {
+            background: rgba(255,255,255,0.05); color: var(--obs-silver);
+        }
+
+        /* Control panel - bottom right */
+        .controls {
+            position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 100;
+            display: flex; flex-direction: column; gap: 0.6rem; align-items: flex-end;
+        }
+        .ctrl-btn {
+            background: rgba(6, 13, 31, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(14, 165, 233, 0.15);
+            border-radius: 12px; padding: 0.7rem 1.2rem;
+            color: var(--obs-text); cursor: pointer;
+            font-family: 'Inter', sans-serif; font-size: 0.8rem;
+            transition: all 0.3s; display: flex; align-items: center; gap: 0.5rem;
+        }
+        .ctrl-btn:hover { border-color: var(--obs-teal); color: #fff; }
+        .ctrl-btn.active { border-color: var(--obs-gold); color: var(--obs-gold); }
+        .ctrl-btn i { font-size: 0.9rem; }
+
+        /* Star info tooltip */
+        .star-tooltip {
+            position: fixed; z-index: 150;
+            background: rgba(6, 13, 31, 0.92);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(14, 165, 233, 0.25);
+            border-radius: 12px; padding: 1rem 1.3rem;
+            pointer-events: none;
+            opacity: 0; transition: opacity 0.3s;
+            max-width: 250px;
+        }
+        .star-tooltip.visible { opacity: 1; }
+        .star-tooltip h4 { color: var(--obs-gold); font-size: 0.9rem; margin-bottom: 0.3rem; }
+        .star-tooltip p { font-size: 0.75rem; color: var(--obs-silver); line-height: 1.5; }
+
+        /* Discovery modal */
+        .discovery-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 300; display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.5s;
+        }
+        .discovery-overlay.active { opacity: 1; pointer-events: auto; }
+        .discovery-card {
+            background: linear-gradient(135deg, var(--obs-deep), var(--obs-navy));
+            border: 1px solid rgba(244, 197, 66, 0.3);
+            border-radius: 20px; padding: 2.5rem; text-align: center;
+            max-width: 380px; width: 90%;
+            transform: scale(0.8); transition: transform 0.5s;
+        }
+        .discovery-overlay.active .discovery-card { transform: scale(1); }
+        .discovery-card .big-icon { font-size: 4rem; margin-bottom: 1rem; }
+        .discovery-card h2 {
+            font-size: 1.5rem; font-weight: 800;
+            background: linear-gradient(135deg, #c9a84c, #f4c542);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        .discovery-card .subtitle { color: var(--obs-silver); font-size: 0.85rem; margin-bottom: 1.5rem; line-height: 1.6; }
+        .discovery-card .rewards { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 1.5rem; }
+        .discovery-card .reward {
+            background: rgba(255,255,255,0.05); border-radius: 12px; padding: 0.7rem 1.2rem;
+            font-size: 0.85rem; font-weight: 600;
+        }
+        .discovery-card .reward i { margin-right: 4px; }
+        .discovery-card button {
+            background: linear-gradient(135deg, #c9a84c, #f4c542);
+            border: none; border-radius: 12px; padding: 0.8rem 2rem;
+            color: #0a0f1e; font-weight: 700; font-size: 0.95rem; cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .discovery-card button:hover { transform: scale(1.05); }
+
+        /* Horoscope panel - top right */
+        .horoscope-panel {
+            position: fixed; top: 60px; right: 1.5rem; z-index: 100;
+            background: rgba(6, 13, 31, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(14, 165, 233, 0.15);
+            border-radius: 16px; padding: 1.2rem 1.4rem;
+            width: 280px;
+            transform: translateX(320px); transition: transform 0.4s ease;
+        }
+        .horoscope-panel.open { transform: translateX(0); }
+        .horoscope-panel h3 {
+            font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px;
+            color: var(--obs-gold); margin-bottom: 0.8rem;
+        }
+        .zodiac-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; margin-bottom: 1rem;
+        }
+        .zodiac-btn {
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px; padding: 0.5rem; text-align: center; cursor: pointer;
+            transition: all 0.2s; font-size: 1.2rem;
+        }
+        .zodiac-btn:hover { border-color: var(--obs-gold); background: rgba(244, 197, 66, 0.08); }
+        .zodiac-btn.selected { border-color: var(--obs-gold); background: rgba(244, 197, 66, 0.12); }
+        .zodiac-btn .label { font-size: 0.55rem; color: var(--obs-silver); display: block; margin-top: 2px; }
+        .horoscope-text {
+            font-size: 0.8rem; line-height: 1.7; color: var(--obs-text);
+            font-style: italic; min-height: 60px;
+        }
+        .horoscope-attr { font-size: 0.7rem; color: var(--obs-silver); margin-top: 0.6rem; text-align: right; }
+
+        /* Shooting star effect */
+        .shooting-star {
+            position: fixed; z-index: 2; pointer-events: none;
+            width: 100px; height: 1px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.8), transparent);
+            animation: shoot 1.2s linear forwards;
+        }
+        @keyframes shoot {
+            0% { opacity: 1; transform: translateX(0) translateY(0) rotate(-30deg); }
+            100% { opacity: 0; transform: translateX(400px) translateY(200px) rotate(-30deg); }
+        }
+
+        /* Notification toast */
+        .toast {
+            position: fixed; top: 70px; left: 50%; transform: translateX(-50%) translateY(-20px);
+            z-index: 250;
+            background: rgba(6, 13, 31, 0.92);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(14, 165, 233, 0.3);
+            border-radius: 12px; padding: 0.7rem 1.5rem;
+            font-size: 0.85rem; color: var(--obs-teal);
+            opacity: 0; transition: all 0.4s;
+            white-space: nowrap;
+        }
+        .toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* Mobile */
+        @media (max-width: 640px) {
+            .tracker { bottom: 0.8rem; left: 0.8rem; right: 0.8rem; min-width: auto; max-height: 35vh; }
+            .controls { bottom: 0.8rem; right: 0.8rem; }
+            .horoscope-panel { right: 0.5rem; width: calc(100vw - 1rem); }
+            .nav-bar { padding: 0.5rem 1rem; }
+            .nav-bar .title { font-size: 0.9rem; }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(14, 165, 233, 0.2); border-radius: 4px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🚀 Starfire Observatory</h1>
-        <p>This venue is under construction and will be available soon.</p>
-        <p>Unlocks at Level 20.</p>
-        <a href="/" style="color: #4fc3f7;">Return to ChiffTown</a>
+    <!-- Nav Bar -->
+    <div class="nav-bar">
+        <a href="/" class="title">🔭 Starfire Observatory</a>
+        <div class="stats">
+            <span class="stat-teal"><i class="fas fa-star"></i> <span id="found-count">0</span>/12</span>
+            <span class="stat-gold"><i class="fas fa-coins"></i> <span id="coin-display">0</span></span>
+        </div>
     </div>
+
+    <!-- Star Canvas -->
+    <canvas id="starfield"></canvas>
+
+    <!-- Telescope vignette -->
+    <div class="telescope-vignette" id="telescope-vignette"></div>
+
+    <!-- Star tooltip -->
+    <div class="star-tooltip" id="star-tooltip">
+        <h4 id="tooltip-name"></h4>
+        <p id="tooltip-desc"></p>
+    </div>
+
+    <!-- Constellation tracker -->
+    <div class="tracker" id="tracker">
+        <h3><i class="fas fa-map"></i> Star Chart</h3>
+        <div id="tracker-list"></div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <button class="ctrl-btn" id="btn-telescope" title="Toggle Telescope Mode">
+            <i class="fas fa-binoculars"></i> Telescope
+        </button>
+        <button class="ctrl-btn" id="btn-horoscope" title="Daily Horoscope">
+            <i class="fas fa-moon"></i> Horoscope
+        </button>
+        <button class="ctrl-btn" id="btn-timelapse" title="Time Lapse">
+            <i class="fas fa-clock"></i> Time Lapse
+        </button>
+    </div>
+
+    <!-- Horoscope Panel -->
+    <div class="horoscope-panel" id="horoscope-panel">
+        <h3><i class="fas fa-moon"></i> Daily Horoscope</h3>
+        <div class="zodiac-grid" id="zodiac-grid"></div>
+        <div class="horoscope-text" id="horoscope-text">Select your zodiac sign above...</div>
+        <div class="horoscope-attr" id="horoscope-attr"></div>
+    </div>
+
+    <!-- Discovery Modal -->
+    <div class="discovery-overlay" id="discovery-overlay">
+        <div class="discovery-card">
+            <div class="big-icon" id="discovery-icon">⭐</div>
+            <h2 id="discovery-title">Constellation Discovered!</h2>
+            <p class="subtitle" id="discovery-desc"></p>
+            <div class="rewards">
+                <div class="reward stat-gold"><i class="fas fa-coins"></i> <span id="discovery-coins">0</span></div>
+                <div class="reward stat-teal"><i class="fas fa-bolt"></i> <span id="discovery-xp">0</span> XP</div>
+            </div>
+            <button onclick="closeDiscovery()">Continue Stargazing</button>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Common systems -->
+    <script src="/js/dm-system.js"></script>
+    <script src="/js/pet-system.js"></script>
+
+    <script>
+    (function() {
+        'use strict';
+
+        // ─── CONSTELLATION DATA ───
+        const CONSTELLATIONS = [
+            { id: 'orion', name: 'Orion the Hunter', icon: '🏹', stars: 7, reward: { coins: 30, xp: 50 },
+              lore: 'The great hunter who stalks the winter sky. His belt of three stars guides travelers home.' },
+            { id: 'ursa_major', name: 'Ursa Major', icon: '🐻', stars: 7, reward: { coins: 30, xp: 50 },
+              lore: 'The Great Bear circles the pole star, never setting below the horizon.' },
+            { id: 'cassiopeia', name: 'Cassiopeia', icon: '👑', stars: 5, reward: { coins: 25, xp: 40 },
+              lore: 'The vain queen sits on her celestial throne, forever turning in the sky.' },
+            { id: 'lyra', name: 'Lyra', icon: '🎵', stars: 5, reward: { coins: 25, xp: 40 },
+              lore: 'The lyre of Orpheus, whose music could charm even the gods of the underworld.' },
+            { id: 'scorpius', name: 'Scorpius', icon: '🦂', stars: 6, reward: { coins: 28, xp: 45 },
+              lore: 'The scorpion that defeated Orion. They are placed on opposite sides of the sky.' },
+            { id: 'cygnus', name: 'Cygnus', icon: '🦢', stars: 5, reward: { coins: 25, xp: 40 },
+              lore: 'The swan flies along the Milky Way, its brightest star Deneb lighting the way.' },
+            { id: 'leo', name: 'Leo', icon: '🦁', stars: 6, reward: { coins: 28, xp: 45 },
+              lore: 'The Nemean Lion, whose golden fur was impervious to mortal weapons.' },
+            { id: 'draco', name: 'Draco', icon: '🐉', stars: 8, reward: { coins: 35, xp: 60 },
+              lore: 'The dragon Ladon, guardian of the golden apples in the garden of the Hesperides.' },
+            { id: 'aquila', name: 'Aquila', icon: '🦅', stars: 5, reward: { coins: 25, xp: 40 },
+              lore: 'The eagle of Zeus, who carried thunderbolts across the heavens.' },
+            { id: 'pegasus', name: 'Pegasus', icon: '🐎', stars: 4, reward: { coins: 22, xp: 35 },
+              lore: 'The winged horse born from the blood of Medusa, ridden by Bellerophon.' },
+            { id: 'phoenix', name: 'Phoenix', icon: '🔥', stars: 5, reward: { coins: 30, xp: 50 },
+              lore: 'The firebird that rises from its own ashes, a symbol of rebirth.' },
+            { id: 'serpens', name: 'Serpens Caput', icon: '🐍', stars: 5, reward: { coins: 25, xp: 40 },
+              lore: 'The serpent held by Ophiuchus, representing wisdom and healing.' },
+        ];
+
+        // ─── HOROSCOPE DATA ───
+        const ZODIAC = [
+            { sign: 'Aries', icon: '♈', dates: 'Mar 21–Apr 19' },
+            { sign: 'Taurus', icon: '♉', dates: 'Apr 20–May 20' },
+            { sign: 'Gemini', icon: '♊', dates: 'May 21–Jun 20' },
+            { sign: 'Cancer', icon: '♋', dates: 'Jun 21–Jul 22' },
+            { sign: 'Leo', icon: '♌', dates: 'Jul 23–Aug 22' },
+            { sign: 'Virgo', icon: '♍', dates: 'Aug 23–Sep 22' },
+            { sign: 'Libra', icon: '♎', dates: 'Sep 23–Oct 22' },
+            { sign: 'Scorpio', icon: '♏', dates: 'Oct 23–Nov 21' },
+            { sign: 'Sagittarius', icon: '♐', dates: 'Nov 22–Dec 21' },
+            { sign: 'Capricorn', icon: '♑', dates: 'Dec 22–Jan 19' },
+            { sign: 'Aquarius', icon: '♒', dates: 'Jan 20–Feb 18' },
+            { sign: 'Pisces', icon: '♓', dates: 'Feb 19–Mar 20' },
+        ];
+
+        const HOROSCOPE_PHRASES = [
+            "The stars align in your favor today. Trust your instincts and take that leap of faith.",
+            "A creative surge flows through you. Channel it into something meaningful before the moon wanes.",
+            "Someone from your past may resurface. Approach with curiosity, not caution.",
+            "Financial matters take a positive turn. The constellation of fortune shines on your investments.",
+            "Your social energy peaks tonight. Connect with kindred spirits in the tavern.",
+            "A mystery presents itself. Follow the trail of stardust — the answer lies in unexpected places.",
+            "Rest and reflection serve you well today. The brightest stars shine after the darkest nights.",
+            "Adventure calls from the east. Pack light and carry courage.",
+            "Your words carry extra weight today. Speak with intention and watch doors open.",
+            "A challenge transforms into an opportunity. The phoenix within you is ready to rise.",
+            "Patience reveals hidden treasures. What seems still on the surface stirs beneath.",
+            "The cosmos rewards bold moves. Step into the spotlight — you've earned it.",
+            "Harmony finds you through music and art. Let beauty guide your evening.",
+            "An unexpected message brings clarity. Keep your channels open.",
+            "The stars whisper of a journey. Whether physical or spiritual, embrace the unknown.",
+            "Your intuition is razor-sharp. Trust the quiet voice within over the noise around you.",
+        ];
+
+        // ─── STATE ───
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+        let W, H;
+        let stars = [];
+        let constellationStars = {}; // id -> [{x,y,selected}]
+        let discovered = JSON.parse(localStorage.getItem('ct_observatory_discovered') || '[]');
+        let selectedStars = []; // currently selected stars for active search
+        let activeConstellation = null;
+        let telescopeMode = false;
+        let timeLapse = false;
+        let timeLapseAngle = 0;
+        let mouseX = 0, mouseY = 0;
+        let frame = 0;
+
+        const username = localStorage.getItem('chifftown_username') || 'Stargazer';
+
+        // ─── CANVAS SETUP ───
+        function resize() {
+            W = canvas.width = window.innerWidth;
+            H = canvas.height = window.innerHeight;
+            generateStars();
+        }
+
+        function generateStars() {
+            stars = [];
+            const count = Math.floor((W * H) / 800);
+            for (let i = 0; i < count; i++) {
+                stars.push({
+                    x: Math.random() * W,
+                    y: Math.random() * H,
+                    r: Math.random() * 1.8 + 0.3,
+                    twinkleSpeed: Math.random() * 0.03 + 0.01,
+                    twinkleOffset: Math.random() * Math.PI * 2,
+                    brightness: Math.random() * 0.5 + 0.5,
+                    hue: Math.random() < 0.1 ? (Math.random() < 0.5 ? 30 : 200) : 0, // some gold/blue stars
+                });
+            }
+            generateConstellationStars();
+        }
+
+        function generateConstellationStars() {
+            constellationStars = {};
+            // Seed based on date so constellations stay consistent for the day
+            const daySeed = Math.floor(Date.now() / 86400000);
+            const rng = seedRandom(daySeed);
+
+            CONSTELLATIONS.forEach((c, ci) => {
+                const cx = (0.1 + (ci % 4) * 0.25 + rng() * 0.1) * W;
+                const cy = (0.15 + Math.floor(ci / 4) * 0.28 + rng() * 0.08) * H;
+                const cStars = [];
+                for (let s = 0; s < c.stars; s++) {
+                    const angle = (s / c.stars) * Math.PI * 2 + rng() * 0.8;
+                    const dist = 30 + rng() * 50;
+                    cStars.push({
+                        x: cx + Math.cos(angle) * dist,
+                        y: cy + Math.sin(angle) * dist,
+                        selected: false,
+                        r: 2.2 + rng() * 1.2,
+                    });
+                }
+                constellationStars[c.id] = cStars;
+            });
+        }
+
+        function seedRandom(seed) {
+            let s = seed;
+            return function() {
+                s = (s * 16807 + 0) % 2147483647;
+                return (s - 1) / 2147483646;
+            };
+        }
+
+        // ─── RENDERING ───
+        function draw() {
+            frame++;
+            ctx.fillStyle = 'rgba(3, 6, 15, 1)';
+            ctx.fillRect(0, 0, W, H);
+
+            // Nebula glow
+            drawNebula();
+
+            // Background stars
+            stars.forEach(s => {
+                const twinkle = Math.sin(frame * s.twinkleSpeed + s.twinkleOffset) * 0.3 + 0.7;
+                const alpha = s.brightness * twinkle;
+                if (s.hue) {
+                    ctx.fillStyle = `hsla(${s.hue}, 60%, 80%, ${alpha})`;
+                } else {
+                    ctx.fillStyle = `rgba(232, 234, 255, ${alpha})`;
+                }
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Constellation stars
+            CONSTELLATIONS.forEach(c => {
+                const cStars = constellationStars[c.id];
+                if (!cStars) return;
+                const isDiscovered = discovered.includes(c.id);
+
+                // Draw connection lines for discovered constellations
+                if (isDiscovered) {
+                    ctx.strokeStyle = 'rgba(14, 165, 233, 0.25)';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    cStars.forEach((s, i) => {
+                        if (i === 0) ctx.moveTo(s.x, s.y);
+                        else ctx.lineTo(s.x, s.y);
+                    });
+                    ctx.stroke();
+
+                    // Label
+                    const midX = cStars.reduce((a, s) => a + s.x, 0) / cStars.length;
+                    const midY = cStars.reduce((a, s) => a + s.y, 0) / cStars.length;
+                    ctx.font = '10px Inter';
+                    ctx.fillStyle = 'rgba(14, 165, 233, 0.5)';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(c.name, midX, midY - 15);
+                }
+
+                // Draw selected lines for active search
+                if (activeConstellation === c.id) {
+                    const sel = cStars.filter(s => s.selected);
+                    if (sel.length > 1) {
+                        ctx.strokeStyle = 'rgba(244, 197, 66, 0.4)';
+                        ctx.lineWidth = 1.5;
+                        ctx.setLineDash([4, 4]);
+                        ctx.beginPath();
+                        sel.forEach((s, i) => i === 0 ? ctx.moveTo(s.x, s.y) : ctx.lineTo(s.x, s.y));
+                        ctx.stroke();
+                        ctx.setLineDash([]);
+                    }
+                }
+
+                // Stars
+                cStars.forEach(s => {
+                    const twinkle = Math.sin(frame * 0.02 + s.x) * 0.2 + 0.8;
+                    const glow = s.selected ? 12 : (isDiscovered ? 8 : 4);
+                    const color = s.selected ? 'rgba(244, 197, 66,' : (isDiscovered ? 'rgba(14, 165, 233,' : 'rgba(232, 234, 255,');
+
+                    // Glow
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, s.r + glow, 0, Math.PI * 2);
+                    ctx.fillStyle = color + (0.1 * twinkle) + ')';
+                    ctx.fill();
+
+                    // Core
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+                    ctx.fillStyle = color + (twinkle) + ')';
+                    ctx.fill();
+                });
+            });
+
+            // Telescope crosshair
+            if (telescopeMode) {
+                ctx.strokeStyle = 'rgba(14, 165, 233, 0.2)';
+                ctx.lineWidth = 0.5;
+                ctx.beginPath();
+                ctx.moveTo(mouseX - 30, mouseY); ctx.lineTo(mouseX + 30, mouseY);
+                ctx.moveTo(mouseX, mouseY - 30); ctx.lineTo(mouseX, mouseY + 30);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(mouseX, mouseY, 20, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            // Time lapse rotation
+            if (timeLapse) {
+                timeLapseAngle += 0.002;
+                ctx.save();
+                ctx.translate(W / 2, H / 2);
+                ctx.rotate(timeLapseAngle);
+                ctx.translate(-W / 2, -H / 2);
+                ctx.restore();
+            }
+
+            requestAnimationFrame(draw);
+        }
+
+        function drawNebula() {
+            // Subtle nebula clouds
+            const grad1 = ctx.createRadialGradient(W * 0.3, H * 0.4, 0, W * 0.3, H * 0.4, W * 0.3);
+            grad1.addColorStop(0, 'rgba(14, 165, 233, 0.02)');
+            grad1.addColorStop(1, 'transparent');
+            ctx.fillStyle = grad1;
+            ctx.fillRect(0, 0, W, H);
+
+            const grad2 = ctx.createRadialGradient(W * 0.7, H * 0.6, 0, W * 0.7, H * 0.6, W * 0.25);
+            grad2.addColorStop(0, 'rgba(139, 92, 246, 0.015)');
+            grad2.addColorStop(1, 'transparent');
+            ctx.fillStyle = grad2;
+            ctx.fillRect(0, 0, W, H);
+
+            // Milky way band
+            ctx.save();
+            ctx.translate(W * 0.5, H * 0.5);
+            ctx.rotate(-0.4);
+            const grad3 = ctx.createLinearGradient(-W, -50, W, 50);
+            grad3.addColorStop(0, 'transparent');
+            grad3.addColorStop(0.3, 'rgba(200, 210, 255, 0.008)');
+            grad3.addColorStop(0.5, 'rgba(200, 210, 255, 0.015)');
+            grad3.addColorStop(0.7, 'rgba(200, 210, 255, 0.008)');
+            grad3.addColorStop(1, 'transparent');
+            ctx.fillStyle = grad3;
+            ctx.fillRect(-W, -100, W * 2, 200);
+            ctx.restore();
+        }
+
+        // ─── INTERACTION ───
+        canvas.addEventListener('click', (e) => {
+            const mx = e.clientX, my = e.clientY;
+
+            // Check constellation stars
+            for (const c of CONSTELLATIONS) {
+                if (discovered.includes(c.id)) continue;
+                const cStars = constellationStars[c.id];
+                if (!cStars) continue;
+
+                for (const s of cStars) {
+                    const dist = Math.hypot(mx - s.x, my - s.y);
+                    const hitRadius = telescopeMode ? 20 : 12;
+                    if (dist < hitRadius && !s.selected) {
+                        s.selected = true;
+                        activeConstellation = c.id;
+
+                        // Check if all stars selected
+                        if (cStars.every(st => st.selected)) {
+                            discoverConstellation(c);
+                        } else {
+                            showToast(`${c.icon} Star captured! (${cStars.filter(st => st.selected).length}/${c.stars})`);
+                        }
+                        return;
+                    }
+                }
+            }
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+
+            // Check star hover for tooltip
+            let found = false;
+            for (const c of CONSTELLATIONS) {
+                const cStars = constellationStars[c.id];
+                if (!cStars) continue;
+                for (const s of cStars) {
+                    const dist = Math.hypot(mouseX - s.x, mouseY - s.y);
+                    if (dist < 15) {
+                        showStarTooltip(mouseX, mouseY, c, discovered.includes(c.id));
+                        found = true;
+                        break;
+                    }
+                }
+                if (found) break;
+            }
+            if (!found) hideStarTooltip();
+        });
+
+        function showStarTooltip(x, y, constellation, isDiscovered) {
+            const tip = document.getElementById('star-tooltip');
+            const nameEl = document.getElementById('tooltip-name');
+            const descEl = document.getElementById('tooltip-desc');
+
+            nameEl.textContent = isDiscovered ? `${constellation.icon} ${constellation.name}` : '✨ Unknown Constellation';
+            descEl.textContent = isDiscovered ? constellation.lore : `Click all ${constellation.stars} stars to discover this constellation`;
+
+            tip.style.left = (x + 20) + 'px';
+            tip.style.top = (y - 10) + 'px';
+            tip.classList.add('visible');
+        }
+
+        function hideStarTooltip() {
+            document.getElementById('star-tooltip').classList.remove('visible');
+        }
+
+        // ─── DISCOVERY ───
+        function discoverConstellation(c) {
+            discovered.push(c.id);
+            localStorage.setItem('ct_observatory_discovered', JSON.stringify(discovered));
+
+            // Show discovery modal
+            document.getElementById('discovery-icon').textContent = c.icon;
+            document.getElementById('discovery-title').textContent = c.name + ' Discovered!';
+            document.getElementById('discovery-desc').textContent = c.lore;
+            document.getElementById('discovery-coins').textContent = c.reward.coins;
+            document.getElementById('discovery-xp').textContent = c.reward.xp;
+            document.getElementById('discovery-overlay').classList.add('active');
+
+            // Award rewards via API
+            awardRewards(c.reward.coins, c.reward.xp, c.name);
+
+            // Update tracker
+            renderTracker();
+            updateFoundCount();
+
+            // Spawn shooting stars celebration
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => spawnShootingStar(), i * 300);
+            }
+        }
+
+        window.closeDiscovery = function() {
+            document.getElementById('discovery-overlay').classList.remove('active');
+            activeConstellation = null;
+        };
+
+        async function awardRewards(coins, xp, name) {
+            try {
+                await fetch('/api/coins/award', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, amount: coins, reason: `Discovered ${name}` })
+                });
+            } catch(e) { console.log('Reward API error:', e); }
+
+            // XP via xp-engine if available
+            if (window.XPEngine) {
+                window.XPEngine.addXP(xp, 'constellation_discovery');
+            }
+        }
+
+        // ─── CONTROLS ───
+        document.getElementById('btn-telescope').addEventListener('click', () => {
+            telescopeMode = !telescopeMode;
+            document.getElementById('btn-telescope').classList.toggle('active', telescopeMode);
+            document.getElementById('telescope-vignette').classList.toggle('active', telescopeMode);
+            showToast(telescopeMode ? '🔭 Telescope mode ON — larger click radius' : '👁️ Normal view');
+        });
+
+        document.getElementById('btn-horoscope').addEventListener('click', () => {
+            document.getElementById('horoscope-panel').classList.toggle('open');
+        });
+
+        let timeLapseInterval;
+        document.getElementById('btn-timelapse').addEventListener('click', () => {
+            timeLapse = !timeLapse;
+            document.getElementById('btn-timelapse').classList.toggle('active', timeLapse);
+            if (timeLapse) {
+                showToast('⏩ Time lapse — watch the sky rotate');
+                // Slowly move all stars
+                timeLapseInterval = setInterval(() => {
+                    const cx = W / 2, cy = H / 2;
+                    stars.forEach(s => {
+                        const dx = s.x - cx, dy = s.y - cy;
+                        const angle = Math.atan2(dy, dx) + 0.001;
+                        const dist = Math.hypot(dx, dy);
+                        s.x = cx + Math.cos(angle) * dist;
+                        s.y = cy + Math.sin(angle) * dist;
+                    });
+                    Object.values(constellationStars).forEach(cStars => {
+                        cStars.forEach(s => {
+                            const dx = s.x - cx, dy = s.y - cy;
+                            const angle = Math.atan2(dy, dx) + 0.001;
+                            const dist = Math.hypot(dx, dy);
+                            s.x = cx + Math.cos(angle) * dist;
+                            s.y = cy + Math.sin(angle) * dist;
+                        });
+                    });
+                }, 16);
+            } else {
+                clearInterval(timeLapseInterval);
+                showToast('⏸️ Time lapse stopped');
+            }
+        });
+
+        // ─── HOROSCOPE ───
+        function initHoroscope() {
+            const grid = document.getElementById('zodiac-grid');
+            ZODIAC.forEach(z => {
+                const btn = document.createElement('div');
+                btn.className = 'zodiac-btn';
+                btn.innerHTML = `${z.icon}<span class="label">${z.sign}</span>`;
+                btn.onclick = () => selectZodiac(z, btn);
+                grid.appendChild(btn);
+            });
+        }
+
+        function selectZodiac(z, btn) {
+            document.querySelectorAll('.zodiac-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+
+            // Deterministic horoscope based on sign + date
+            const dayIndex = new Date().getDate();
+            const signIndex = ZODIAC.indexOf(z);
+            const phraseIndex = (dayIndex * 7 + signIndex * 3) % HOROSCOPE_PHRASES.length;
+
+            document.getElementById('horoscope-text').textContent = HOROSCOPE_PHRASES[phraseIndex];
+            document.getElementById('horoscope-attr').textContent = `${z.icon} ${z.sign} · ${z.dates}`;
+        }
+
+        // ─── TRACKER ───
+        function renderTracker() {
+            const list = document.getElementById('tracker-list');
+            list.innerHTML = '';
+            CONSTELLATIONS.forEach(c => {
+                const isFound = discovered.includes(c.id);
+                const item = document.createElement('div');
+                item.className = 'tracker-item';
+                item.innerHTML = `
+                    <span class="icon">${isFound ? c.icon : '❓'}</span>
+                    <span class="name">${isFound ? c.name : '???'}</span>
+                    <span class="status ${isFound ? 'found' : 'hidden'}">${isFound ? 'Found' : 'Hidden'}</span>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function updateFoundCount() {
+            document.getElementById('found-count').textContent = discovered.length;
+        }
+
+        // ─── SHOOTING STARS ───
+        function spawnShootingStar() {
+            const star = document.createElement('div');
+            star.className = 'shooting-star';
+            star.style.left = (Math.random() * W * 0.6) + 'px';
+            star.style.top = (Math.random() * H * 0.4) + 'px';
+            star.style.transform = `rotate(${-20 - Math.random() * 30}deg)`;
+            document.body.appendChild(star);
+            setTimeout(() => star.remove(), 1500);
+        }
+
+        // Random shooting stars
+        setInterval(() => {
+            if (Math.random() < 0.3) spawnShootingStar();
+        }, 4000);
+
+        // ─── TOAST ───
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('visible');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => toast.classList.remove('visible'), 2500);
+        }
+
+        // ─── COIN DISPLAY ───
+        async function loadCoins() {
+            try {
+                const res = await fetch(`/api/user/${username}`);
+                const data = await res.json();
+                if (data.coins !== undefined) {
+                    document.getElementById('coin-display').textContent = data.coins;
+                }
+            } catch(e) {}
+        }
+
+        // ─── INIT ───
+        window.addEventListener('resize', resize);
+        resize();
+        renderTracker();
+        updateFoundCount();
+        initHoroscope();
+        loadCoins();
+        draw();
+
+        // Welcome toast
+        setTimeout(() => showToast('🔭 Click glowing stars to discover constellations'), 1500);
+    })();
+    </script>
 </body>
 </html>
