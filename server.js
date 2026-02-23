@@ -1934,6 +1934,55 @@ io.on('connection', (socket) => {
   });
 
   // Town Chat (global map chat)
+  // === DIRECT MESSAGES ===
+  socket.on('dm-register', (data) => {
+    if (!data || !data.username) return;
+    // Store socket<->username mapping for DMs
+    socket.dmUsername = data.username.substring(0, 25);
+  });
+
+  socket.on('dm-send', (data) => {
+    if (!data || !data.to || !data.message || !socket.dmUsername) return;
+    const msg = {
+      from: socket.dmUsername,
+      to: data.to.substring(0, 25),
+      message: data.message.substring(0, 500),
+      timestamp: Date.now()
+    };
+    // Find recipient socket
+    let delivered = false;
+    for (const [id, s] of io.of('/').sockets) {
+      if (s.dmUsername === msg.to) {
+        s.emit('dm-receive', msg);
+        delivered = true;
+        break;
+      }
+    }
+    // Confirm to sender
+    socket.emit('dm-sent', { ...msg, delivered });
+  });
+
+  socket.on('dm-typing', (data) => {
+    if (!data || !data.to || !socket.dmUsername) return;
+    for (const [id, s] of io.of('/').sockets) {
+      if (s.dmUsername === data.to) {
+        s.emit('dm-typing', { from: socket.dmUsername });
+        break;
+      }
+    }
+  });
+
+  // Get online users for DM list
+  socket.on('dm-online', () => {
+    const online = [];
+    for (const [id, s] of io.of('/').sockets) {
+      if (s.dmUsername && s.dmUsername !== socket.dmUsername) {
+        online.push(s.dmUsername);
+      }
+    }
+    socket.emit('dm-online-list', [...new Set(online)]);
+  });
+
   socket.on('town-chat', (data) => {
     if (!data || !data.username || !data.message) return;
     const msg = {
