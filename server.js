@@ -575,6 +575,34 @@ app.post('/api/coins/award', async (req, res) => {
   res.json({ success: true, newBalance: userSystem.getCoins(username) });
 });
 
+// Lucky Wheel endpoints
+app.post('/api/wheel/spin', (req, res) => {
+  const { username, type } = req.body;
+  if (!username) return res.status(400).json({ error: 'Missing username' });
+  if (!userSystem.loaded) return res.status(503).json({ error: 'System not ready' });
+  const user = userSystem.users[username];
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  if (type === 'paid') {
+    const cost = 25;
+    if (userSystem.getCoins(username) < cost) return res.json({ error: 'Not enough coins!' });
+    userSystem.updateCoins(username, -cost);
+  }
+  res.json({ success: true, balance: userSystem.getCoins(username) });
+});
+
+app.post('/api/wheel/claim', async (req, res) => {
+  const { username, prizeType, amount } = req.body;
+  if (!username || !prizeType) return res.status(400).json({ error: 'Missing fields' });
+  if (!userSystem.loaded) return res.status(503).json({ error: 'System not ready' });
+  const user = userSystem.users[username];
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  const safeAmount = Math.min(Math.max(0, amount || 0), 500);
+  if (prizeType === 'coins') userSystem.updateCoins(username, safeAmount);
+  else if (prizeType === 'xp') await userSystem.addXP(username, safeAmount, 'Lucky Wheel prize', io);
+  logActivity('wheel_prize', { user: username, type: prizeType, amount: safeAmount });
+  res.json({ success: true });
+});
+
 // Pet sync endpoint
 app.post('/api/pet/sync', (req, res) => {
   const { username, pet } = req.body;
