@@ -575,6 +575,22 @@ app.post('/api/coins/award', async (req, res) => {
   res.json({ success: true, newBalance: userSystem.getCoins(username) });
 });
 
+// Fishing catch endpoint
+app.post('/api/fishing/catch', async (req, res) => {
+  const { username, fishId, coins, xp } = req.body;
+  if (!username || !fishId) return res.status(400).json({ error: 'Missing fields' });
+  if (!userSystem.loaded) return res.status(503).json({ error: 'System not ready' });
+  const user = userSystem.users[username];
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  // Cap rewards to prevent abuse
+  const safeCoins = Math.min(Math.max(0, coins || 0), 250);
+  const safeXP = Math.min(Math.max(0, xp || 0), 400);
+  userSystem.updateCoins(username, safeCoins);
+  if (safeXP > 0) await userSystem.addXP(username, safeXP, `Fishing: caught ${fishId}`, io);
+  logActivity('fishing_catch', { user: username, fish: fishId, coins: safeCoins, xp: safeXP });
+  res.json({ success: true, newBalance: userSystem.getCoins(username) });
+});
+
 app.post('/api/shop/buy', async (req, res) => {
   const { username, itemId } = req.body;
   

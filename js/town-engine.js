@@ -83,6 +83,15 @@ const TownEngine = (() => {
             unlocked: true,
             category: 'venue'
         },
+        'moonlit-pond': {
+            name: 'Moonlit Pond',
+            icon: '🎣',
+            image: '/images/venue-pond.svg',
+            width: 2, height: 2,
+            link: '/fishing.html',
+            unlocked: true,
+            category: 'venue'
+        },
         'apartment': {
             name: 'Your Apartment',
             icon: '🏠',
@@ -104,7 +113,8 @@ const TownEngine = (() => {
         { id: 'velvet-sky', gridX: 30, gridY: 14 },
         { id: 'adventure-guild', gridX: 32, gridY: 6 },
         { id: 'wellness-centre', gridX: 1, gridY: 12 },
-        { id: 'apartment', gridX: 34, gridY: 14 }
+        { id: 'apartment', gridX: 34, gridY: 14 },
+        { id: 'moonlit-pond', gridX: 24, gridY: 12 }
     ];
 
     // === STATE ===

@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moonlit Pond — ChiffTown</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --pond-dark: #060d1a;
+            --pond-deep: #0a1628;
+            --pond-water: #0c2d48;
+            --pond-teal: #14b8a6;
+            --pond-gold: #f4c542;
+            --pond-silver: #94a3b8;
+            --pond-text: #e2e8f0;
+            --pond-dim: rgba(226, 232, 240, 0.5);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--pond-dark);
+            color: var(--pond-text);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Nav */
+        .nav-bar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            background: rgba(6, 13, 26, 0.9);
+            backdrop-filter: blur(12px);
+            padding: 0.6rem 1.5rem;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(20, 184, 166, 0.2);
+        }
+        .nav-bar a { color: var(--pond-gold); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+        .nav-bar .title { font-size: 1.1rem; letter-spacing: 1px; }
+        .nav-bar .stats { display: flex; gap: 1.2rem; font-size: 0.85rem; color: var(--pond-silver); }
+        .nav-bar .stats span { display: flex; align-items: center; gap: 0.3rem; }
+
+        /* Pond Scene */
+        .pond-scene {
+            width: 100vw; height: 100vh;
+            position: relative;
+            background: linear-gradient(180deg, #071525 0%, #0a1628 30%, #0c2d48 70%, #145374 100%);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+
+        /* Stars */
+        .stars { position: absolute; top: 0; left: 0; right: 0; height: 40%; pointer-events: none; }
+        .star {
+            position: absolute; width: 2px; height: 2px;
+            background: #fff; border-radius: 50%;
+            animation: twinkle 3s infinite alternate;
+        }
+        @keyframes twinkle { 0% { opacity: 0.3; } 100% { opacity: 1; } }
+
+        /* Moon */
+        .moon {
+            position: absolute; top: 8%; right: 15%;
+            width: 60px; height: 60px; border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #ffeaa7, #f4c542);
+            box-shadow: 0 0 40px rgba(244, 197, 66, 0.4), 0 0 80px rgba(244, 197, 66, 0.15);
+        }
+
+        /* Water surface */
+        .water {
+            position: absolute; bottom: 0; left: 0; right: 0; height: 55%;
+            background: linear-gradient(180deg, rgba(12, 45, 72, 0.8) 0%, rgba(10, 22, 40, 0.95) 100%);
+            overflow: hidden;
+        }
+        .water::before {
+            content: ''; position: absolute; top: 0; left: -50%; right: -50%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.3), transparent);
+            animation: waterShimmer 4s ease-in-out infinite;
+        }
+        @keyframes waterShimmer {
+            0%, 100% { transform: translateX(-20%); opacity: 0.5; }
+            50% { transform: translateX(20%); opacity: 1; }
+        }
+
+        /* Ripples */
+        .ripple {
+            position: absolute; border-radius: 50%;
+            border: 1px solid rgba(20, 184, 166, 0.3);
+            animation: rippleExpand 2s ease-out forwards;
+            pointer-events: none;
+        }
+        @keyframes rippleExpand {
+            0% { width: 0; height: 0; opacity: 1; }
+            100% { width: 120px; height: 40px; opacity: 0; transform: translate(-50%, -50%); }
+        }
+
+        /* Fishing rod */
+        .rod-area {
+            position: absolute; bottom: 45%; left: 50%; transform: translateX(-50%);
+            width: 300px; height: 200px; z-index: 10;
+        }
+        .fishing-line {
+            position: absolute; top: 0; left: 50%;
+            width: 1px; height: 0;
+            background: linear-gradient(180deg, rgba(148, 163, 184, 0.6), rgba(20, 184, 166, 0.3));
+            transition: height 0.8s ease-out;
+            transform-origin: top;
+        }
+        .fishing-line.cast { height: 160px; }
+        .bobber {
+            position: absolute; bottom: -8px; left: -4px;
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #ef4444;
+            box-shadow: 0 0 6px rgba(239, 68, 68, 0.5);
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .fishing-line.cast .bobber { opacity: 1; animation: bobberFloat 2s ease-in-out infinite; }
+        .fishing-line.bite .bobber { animation: bobberBite 0.3s ease-in-out infinite; }
+        @keyframes bobberFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+        @keyframes bobberBite { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(8px); } }
+
+        /* Cast button */
+        .cast-btn {
+            position: absolute; bottom: 20%; left: 50%; transform: translateX(-50%);
+            z-index: 20;
+            background: linear-gradient(135deg, var(--pond-teal), #0d9488);
+            color: #fff; border: none; padding: 1rem 2.5rem;
+            border-radius: 50px; font-size: 1.1rem; font-weight: 600;
+            cursor: pointer; letter-spacing: 0.5px;
+            box-shadow: 0 4px 20px rgba(20, 184, 166, 0.3);
+            transition: all 0.3s;
+        }
+        .cast-btn:hover { transform: translateX(-50%) scale(1.05); box-shadow: 0 6px 30px rgba(20, 184, 166, 0.5); }
+        .cast-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: translateX(-50%); }
+
+        /* Catch popup */
+        .catch-popup {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+            z-index: 50;
+            background: rgba(10, 22, 40, 0.95);
+            border: 2px solid var(--pond-teal);
+            border-radius: 16px; padding: 2rem 3rem;
+            text-align: center; min-width: 280px;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .catch-popup.show { transform: translate(-50%, -50%) scale(1); }
+        .catch-popup .fish-emoji { font-size: 3.5rem; margin-bottom: 0.5rem; }
+        .catch-popup .fish-name { font-size: 1.3rem; font-weight: 700; color: var(--pond-gold); margin-bottom: 0.3rem; }
+        .catch-popup .fish-rarity { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 0.8rem; }
+        .catch-popup .fish-rewards { display: flex; gap: 1rem; justify-content: center; font-size: 0.9rem; color: var(--pond-teal); }
+        .rarity-common { color: #94a3b8; }
+        .rarity-uncommon { color: #22c55e; }
+        .rarity-rare { color: #3b82f6; }
+        .rarity-epic { color: #a855f7; }
+        .rarity-legendary { color: #f4c542; }
+
+        /* Inventory sidebar */
+        .inventory-panel {
+            position: fixed; right: 0; top: 50px; bottom: 0; width: 280px;
+            background: rgba(6, 13, 26, 0.95);
+            border-left: 1px solid rgba(20, 184, 166, 0.15);
+            padding: 1.2rem; overflow-y: auto;
+            transform: translateX(100%); transition: transform 0.3s;
+            z-index: 30;
+        }
+        .inventory-panel.open { transform: translateX(0); }
+        .inventory-panel h3 { font-size: 0.9rem; color: var(--pond-gold); margin-bottom: 0.8rem; letter-spacing: 1px; }
+        .catch-log { list-style: none; }
+        .catch-log li {
+            display: flex; align-items: center; gap: 0.6rem;
+            padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.85rem;
+        }
+        .catch-log .emoji { font-size: 1.3rem; }
+        .toggle-inv {
+            position: fixed; right: 1rem; top: 60px; z-index: 31;
+            background: rgba(10, 22, 40, 0.8); border: 1px solid rgba(20, 184, 166, 0.3);
+            color: var(--pond-teal); padding: 0.5rem 0.7rem; border-radius: 8px;
+            cursor: pointer; font-size: 1rem;
+        }
+
+        /* Ambient text */
+        .ambient-text {
+            position: absolute; bottom: 12%; left: 50%; transform: translateX(-50%);
+            font-size: 0.8rem; color: var(--pond-dim); font-style: italic;
+            text-align: center; pointer-events: none;
+        }
+
+        /* Lily pads */
+        .lily-pad {
+            position: absolute; font-size: 1.8rem; opacity: 0.4;
+            animation: lilyFloat 6s ease-in-out infinite;
+        }
+        @keyframes lilyFloat { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-5px) rotate(3deg); } }
+
+        /* Fish collection counter */
+        .collection-bar {
+            position: absolute; top: 60px; left: 1rem; z-index: 20;
+            background: rgba(10, 22, 40, 0.8); border: 1px solid rgba(20, 184, 166, 0.15);
+            border-radius: 10px; padding: 0.8rem 1rem; font-size: 0.8rem;
+        }
+        .collection-bar .label { color: var(--pond-dim); margin-bottom: 0.3rem; }
+        .collection-bar .progress-bar {
+            width: 160px; height: 6px; background: rgba(255,255,255,0.1);
+            border-radius: 3px; overflow: hidden; margin-top: 0.4rem;
+        }
+        .collection-bar .progress-fill {
+            height: 100%; background: linear-gradient(90deg, var(--pond-teal), var(--pond-gold));
+            border-radius: 3px; transition: width 0.5s;
+        }
+
+        @media (max-width: 768px) {
+            .inventory-panel { width: 100%; }
+            .collection-bar { display: none; }
+            .cast-btn { padding: 0.8rem 2rem; font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav-bar">
+        <a href="/main-home.html">← Back to Town</a>
+        <span class="title">🎣 Moonlit Pond</span>
+        <div class="stats">
+            <span>🪙 <span id="coinCount">0</span></span>
+            <span>⭐ <span id="xpCount">0</span> XP</span>
+        </div>
+    </nav>
+
+    <button class="toggle-inv" onclick="toggleInventory()">🐟 Catches</button>
+
+    <div class="collection-bar">
+        <div class="label">Fish Collection: <strong><span id="uniqueCount">0</span>/16</strong></div>
+        <div class="progress-bar"><div class="progress-fill" id="collectionFill" style="width:0%"></div></div>
+    </div>
+
+    <div class="pond-scene" id="pondScene">
+        <div class="stars" id="stars"></div>
+        <div class="moon"></div>
+
+        <div class="rod-area">
+            <div class="fishing-line" id="fishingLine">
+                <div class="bobber"></div>
+            </div>
+        </div>
+
+        <div class="water" id="water">
+            <span class="lily-pad" style="left:10%; top:15%;">🍃</span>
+            <span class="lily-pad" style="left:75%; top:25%; animation-delay:-2s;">🍃</span>
+            <span class="lily-pad" style="left:40%; top:60%; animation-delay:-4s;">🪷</span>
+            <span class="lily-pad" style="left:85%; top:50%; animation-delay:-1s;">🍃</span>
+        </div>
+
+        <button class="cast-btn" id="castBtn" onclick="castLine()">
+            <i class="fas fa-water"></i> Cast Line
+        </button>
+
+        <div class="ambient-text" id="ambientText">The water is calm tonight...</div>
+    </div>
+
+    <div class="catch-popup" id="catchPopup">
+        <div class="fish-emoji" id="catchEmoji"></div>
+        <div class="fish-name" id="catchName"></div>
+        <div class="fish-rarity" id="catchRarity"></div>
+        <div class="fish-rewards" id="catchRewards"></div>
+    </div>
+
+    <div class="inventory-panel" id="inventoryPanel">
+        <h3>🐟 TODAY'S CATCHES</h3>
+        <ul class="catch-log" id="catchLog"></ul>
+    </div>
+
+    <script>
+    // === FISH DATABASE ===
+    const FISH = [
+        // Common (60%)
+        { id: 'minnow', name: 'Silver Minnow', emoji: '🐟', rarity: 'common', coins: 2, xp: 5, weight: 15 },
+        { id: 'perch', name: 'Moonlit Perch', emoji: '🐟', rarity: 'common', coins: 3, xp: 8, weight: 12 },
+        { id: 'bass', name: 'Twilight Bass', emoji: '🐟', rarity: 'common', coins: 5, xp: 10, weight: 12 },
+        { id: 'carp', name: 'Bronze Carp', emoji: '🐟', rarity: 'common', coins: 4, xp: 8, weight: 10 },
+        { id: 'catfish', name: 'Whiskered Catfish', emoji: '🐡', rarity: 'common', coins: 5, xp: 12, weight: 8 },
+        // Uncommon (25%)
+        { id: 'trout', name: 'Starlight Trout', emoji: '🐠', rarity: 'uncommon', coins: 10, xp: 20, weight: 6 },
+        { id: 'pike', name: 'Shadow Pike', emoji: '🐠', rarity: 'uncommon', coins: 12, xp: 25, weight: 5 },
+        { id: 'salmon', name: 'Glacier Salmon', emoji: '🐠', rarity: 'uncommon', coins: 15, xp: 28, weight: 4 },
+        { id: 'eel', name: 'Electric Eel', emoji: '🐍', rarity: 'uncommon', coins: 18, xp: 30, weight: 3 },
+        // Rare (10%)
+        { id: 'koi', name: 'Golden Koi', emoji: '🎏', rarity: 'rare', coins: 30, xp: 50, weight: 2.5 },
+        { id: 'swordfish', name: 'Dusk Swordfish', emoji: '🗡️', rarity: 'rare', coins: 35, xp: 55, weight: 2 },
+        { id: 'octopus', name: 'Mystic Octopus', emoji: '🐙', rarity: 'rare', coins: 40, xp: 60, weight: 1.5 },
+        // Epic (4%)
+        { id: 'turtle', name: 'Ancient Turtle', emoji: '🐢', rarity: 'epic', coins: 75, xp: 100, weight: 0.8 },
+        { id: 'jellyfish', name: 'Neon Jellyfish', emoji: '🪼', rarity: 'epic', coins: 80, xp: 110, weight: 0.6 },
+        // Legendary (1%)
+        { id: 'whale', name: 'Moonwhale', emoji: '🐋', rarity: 'legendary', coins: 200, xp: 300, weight: 0.2 },
+        { id: 'dragon', name: 'Pond Dragon', emoji: '🐲', rarity: 'legendary', coins: 250, xp: 400, weight: 0.1 },
+    ];
+
+    const AMBIENT_MESSAGES = [
+        'The water is calm tonight...',
+        'Something glimmers beneath the surface...',
+        'Crickets chirp in the reeds...',
+        'The moon reflects off the still water...',
+        'A gentle breeze ripples the pond...',
+        'Fireflies dance along the shore...',
+        'You hear a distant splash...',
+        'The stars seem especially bright tonight...',
+    ];
+
+    const TOTAL_SPECIES = FISH.length;
+    let state = 'idle'; // idle, casting, waiting, bite, reeling
+    let catches = [];
+    let uniqueCaught = new Set();
+    let totalCoins = 0;
+    let totalXP = 0;
+    let biteTimeout = null;
+    let reelTimeout = null;
+
+    // Load user data
+    const user = JSON.parse(localStorage.getItem('chifftown_user') || '{}');
+    const username = user.username || user.displayName || 'Angler';
+
+    // Load fishing session from localStorage
+    function loadSession() {
+        try {
+            const saved = JSON.parse(localStorage.getItem('chifftown_fishing') || '{}');
+            if (saved.date === new Date().toDateString()) {
+                catches = saved.catches || [];
+                uniqueCaught = new Set(saved.unique || []);
+                totalCoins = saved.coins || 0;
+                totalXP = saved.xp || 0;
+                renderCatchLog();
+            }
+        } catch(e) {}
+        updateStats();
+    }
+
+    function saveSession() {
+        localStorage.setItem('chifftown_fishing', JSON.stringify({
+            date: new Date().toDateString(),
+            catches, unique: [...uniqueCaught],
+            coins: totalCoins, xp: totalXP
+        }));
+    }
+
+    // Generate stars
+    function generateStars() {
+        const container = document.getElementById('stars');
+        for (let i = 0; i < 80; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 3 + 's';
+            star.style.width = star.style.height = (Math.random() * 2 + 1) + 'px';
+            container.appendChild(star);
+        }
+    }
+
+    // Weighted random fish selection
+    function catchFish() {
+        const totalWeight = FISH.reduce((s, f) => s + f.weight, 0);
+        let r = Math.random() * totalWeight;
+        for (const fish of FISH) {
+            r -= fish.weight;
+            if (r <= 0) return fish;
+        }
+        return FISH[0];
+    }
+
+    // Create water ripple
+    function addRipple(x, y) {
+        const ripple = document.createElement('div');
+        ripple.className = 'ripple';
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        document.getElementById('water').appendChild(ripple);
+        setTimeout(() => ripple.remove(), 2000);
+    }
+
+    // Main cast flow
+    function castLine() {
+        if (state !== 'idle') return;
+        state = 'casting';
+        const btn = document.getElementById('castBtn');
+        const line = document.getElementById('fishingLine');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Waiting...';
+        line.classList.add('cast');
+
+        document.getElementById('ambientText').textContent = AMBIENT_MESSAGES[Math.floor(Math.random() * AMBIENT_MESSAGES.length)];
+
+        // Random wait for bite (2-8 seconds)
+        const waitTime = 2000 + Math.random() * 6000;
+        state = 'waiting';
+
+        biteTimeout = setTimeout(() => {
+            // Fish bites!
+            state = 'bite';
+            line.classList.add('bite');
+            btn.innerHTML = '<i class="fas fa-hand-pointer"></i> REEL IN!';
+            btn.disabled = false;
+            btn.onclick = reelIn;
+            document.getElementById('ambientText').textContent = '🐟 Something\'s biting! Reel it in!';
+
+            // Add urgency ripples
+            const water = document.getElementById('water');
+            const cx = water.offsetWidth / 2;
+            addRipple(cx - 20, 80);
+            addRipple(cx + 10, 90);
+
+            // Auto-fail if too slow (4 seconds)
+            reelTimeout = setTimeout(() => {
+                if (state === 'bite') {
+                    missedFish();
+                }
+            }, 4000);
+        }, waitTime);
+    }
+
+    function reelIn() {
+        if (state !== 'bite') return;
+        clearTimeout(reelTimeout);
+        state = 'reeling';
+
+        const fish = catchFish();
+        const line = document.getElementById('fishingLine');
+        const btn = document.getElementById('castBtn');
+
+        line.classList.remove('cast', 'bite');
+
+        // Record catch
+        catches.push({ ...fish, time: Date.now() });
+        uniqueCaught.add(fish.id);
+        totalCoins += fish.coins;
+        totalXP += fish.xp;
+
+        // Show popup
+        showCatchPopup(fish);
+        renderCatchLog();
+        updateStats();
+        saveSession();
+
+        // Award on server
+        awardCatch(fish);
+
+        // Reset after popup
+        setTimeout(() => {
+            document.getElementById('catchPopup').classList.remove('show');
+            state = 'idle';
+            btn.innerHTML = '<i class="fas fa-water"></i> Cast Line';
+            btn.disabled = false;
+            btn.onclick = castLine;
+            document.getElementById('ambientText').textContent = AMBIENT_MESSAGES[Math.floor(Math.random() * AMBIENT_MESSAGES.length)];
+        }, 2500);
+    }
+
+    function missedFish() {
+        state = 'idle';
+        const line = document.getElementById('fishingLine');
+        const btn = document.getElementById('castBtn');
+        line.classList.remove('cast', 'bite');
+        btn.innerHTML = '<i class="fas fa-water"></i> Cast Line';
+        btn.disabled = false;
+        btn.onclick = castLine;
+        document.getElementById('ambientText').textContent = 'The fish got away! Try again...';
+    }
+
+    function showCatchPopup(fish) {
+        const popup = document.getElementById('catchPopup');
+        document.getElementById('catchEmoji').textContent = fish.emoji;
+        document.getElementById('catchName').textContent = fish.name;
+        const rarityEl = document.getElementById('catchRarity');
+        rarityEl.textContent = fish.rarity;
+        rarityEl.className = 'fish-rarity rarity-' + fish.rarity;
+        document.getElementById('catchRewards').innerHTML = `
+            <span>🪙 +${fish.coins}</span>
+            <span>⭐ +${fish.xp} XP</span>
+        `;
+        popup.classList.add('show');
+    }
+
+    function renderCatchLog() {
+        const log = document.getElementById('catchLog');
+        log.innerHTML = catches.slice().reverse().slice(0, 30).map(c => `
+            <li>
+                <span class="emoji">${c.emoji}</span>
+                <span>
+                    <strong class="rarity-${c.rarity}">${c.name}</strong><br>
+                    <small>🪙 ${c.coins} · ⭐ ${c.xp} XP</small>
+                </span>
+            </li>
+        `).join('');
+    }
+
+    function updateStats() {
+        document.getElementById('coinCount').textContent = totalCoins;
+        document.getElementById('xpCount').textContent = totalXP;
+        document.getElementById('uniqueCount').textContent = uniqueCaught.size;
+        document.getElementById('collectionFill').style.width = (uniqueCaught.size / TOTAL_SPECIES * 100) + '%';
+    }
+
+    async function awardCatch(fish) {
+        if (!username || username === 'Angler') return;
+        try {
+            await fetch('/api/fishing/catch', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, fishId: fish.id, coins: fish.coins, xp: fish.xp })
+            });
+        } catch(e) { console.log('Could not sync catch to server'); }
+    }
+
+    function toggleInventory() {
+        document.getElementById('inventoryPanel').classList.toggle('open');
+    }
+
+    // Init
+    generateStars();
+    loadSession();
+
+    // Ambient ripples
+    setInterval(() => {
+        if (state === 'idle' || state === 'waiting') {
+            const water = document.getElementById('water');
+            addRipple(Math.random() * water.offsetWidth, Math.random() * water.offsetHeight * 0.6 + 20);
+        }
+    }, 3000);
+    </script>
+</body>
+</html>
