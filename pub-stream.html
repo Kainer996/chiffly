@@ -954,7 +954,6 @@
                 font-size: 1.1em !important;
             }
         }
-    </style>
 
         /* === VENUE-THEMED BACKGROUNDS === */
         
@@ -1142,8 +1141,9 @@
             background: rgba(59, 130, 246, 0.08);
             border-color: rgba(59, 130, 246, 0.2);
         }
+    </style>
 </head>
-
+<body>
     <script>
         // Apply venue theme based on URL parameter
         (function() {
@@ -1153,7 +1153,6 @@
             console.log('🎨 Venue theme applied:', venueType);
         })();
     </script>
-<body>
     <div id="debug-log-container" style="position: fixed; top: 0; left: 0; right: 0; background: rgba(0,0,0,0.8); color: #fff; padding: 5px; font-size: 10px; z-index: 99999; max-height: 30vh; overflow-y: scroll; font-family: monospace; display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 5px; border-bottom: 1px solid #555;">
             <h4 style="margin: 0; padding: 0;">Live Diagnostics</h4>
