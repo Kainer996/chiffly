@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://chifftown.com/</loc>
+    <image:image>
+      <image:loc>https://chifftown.com/images/og-image.jpg</image:loc>
+      <image:title>ChiffTown — Interactive Virtual Town Map</image:title>
+      <image:caption>An interactive virtual town map with themed video chat venues</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://chifftown.com/images/chifftown-map-wide.webp</image:loc>
+      <image:title>ChiffTown Town Map — Full View</image:title>
+      <image:caption>Full town map of ChiffTown showing all clickable venue buildings</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://chifftown.com/pub.html</loc>
+    <image:image>
+      <image:loc>https://chifftown.com/images/og-pub.jpg</image:loc>
+      <image:title>The Chiff Inn — ChiffTown Virtual Pub</image:title>
+      <image:caption>The Chiff Inn — a cosy virtual pub with live video chat</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://chifftown.com/nightclub.html</loc>
+    <image:image>
+      <image:loc>https://chifftown.com/images/og-nightclub.jpg</image:loc>
+      <image:title>Neon Pulse Nightclub — ChiffTown</image:title>
+      <image:caption>Neon Pulse — electric virtual nightclub with live video chat</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://chifftown.com/cinema.html</loc>
+    <image:image>
+      <image:loc>https://chifftown.com/images/og-cinema.jpg</image:loc>
+      <image:title>Starlight Cinema — ChiffTown</image:title>
+      <image:caption>Starlight Cinema — watch films together with live video chat</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://chifftown.com/lounge.html</loc>
+    <image:image>
+      <image:loc>https://chifftown.com/images/og-lounge.jpg</image:loc>
+      <image:title>Velvet Sky Lounge — ChiffTown</image:title>
+      <image:caption>The Velvet Sky Lounge — chill virtual lounge with live video chat</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://chifftown.com/games.html</loc>
+    <image:image>
+      <image:loc>https://chifftown.com/images/og-arcade.jpg</image:loc>
+      <image:title>Pixel Palace Arcade — ChiffTown</image:title>
+      <image:caption>Pixel Palace Arcade — retro games with friends</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://chifftown.com/casino.html</loc>
+    <image:image>
+      <image:loc>https://chifftown.com/images/og-casino.jpg</image:loc>
+      <image:title>The Golden Dice Casino — ChiffTown</image:title>
+      <image:caption>The Golden Dice Casino — try your luck in ChiffTown</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://chifftown.com/wellness.html</loc>
+    <image:image>
+      <image:loc>https://chifftown.com/images/og-wellness.jpg</image:loc>
+      <image:title>The Wellness Centre — ChiffTown</image:title>
+      <image:caption>The Wellness Centre — relax in ChiffTown's virtual spa</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://chifftown.com/fishing.html</loc>
+    <image:image>
+      <image:loc>https://chifftown.com/images/og-fishing.jpg</image:loc>
+      <image:title>Moonlit Pond — Fishing in ChiffTown</image:title>
+      <image:caption>Moonlit Pond — go fishing and relax</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://chifftown.com/achievements.html</loc>
+    <image:image>
+      <image:loc>https://chifftown.com/images/og-achievements.jpg</image:loc>
+      <image:title>Achievements — ChiffTown Progression System</image:title>
+      <image:caption>Achievements board — track your ChiffTown milestones</image:caption>
+    </image:image>
+  </url>
+</urlset>

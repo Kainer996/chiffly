@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <title>Hall of Fame — ChiffTown | Top Players & Legends</title>
+    <link rel="alternate" hreflang="en" href="https://chifftown.com/hall-of-fame.html">
+    <link rel="alternate" hreflang="x-default" href="https://chifftown.com/hall-of-fame.html">
+    <link rel="canonical" href="https://chifftown.com/hall-of-fame.html">
+    <meta name="description" content="See the top players, biggest achievements, and legendary moments in ChiffTown. Who has the highest XP, most rooms joined, and rarest achievements?">
+    <meta name="keywords" content="ChiffTown hall of fame, top players, leaderboard, virtual town legends, XP rankings, social game leaderboard">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://chifftown.com/hall-of-fame.html">
+    <meta property="og:title" content="Hall of Fame — ChiffTown">
+    <meta property="og:description" content="See the top players, biggest achievements, and legendary moments in ChiffTown. Who has the highest XP and rarest achievements?">
+    <meta property="og:image" content="https://chifftown.com/images/og-hall-of-fame.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:secure_url" content="https://chifftown.com/images/og-hall-of-fame.jpg">
+    <meta property="og:image:alt" content="ChiffTown Hall of Fame — top players and legendary achievements">
+    <meta property="og:site_name" content="ChiffTown">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@chifftown">
+    <meta name="twitter:title" content="Hall of Fame — ChiffTown">
+    <meta name="twitter:description" content="See the top players, biggest achievements, and legendary moments in ChiffTown.">
+    <meta name="twitter:image" content="https://chifftown.com/images/og-hall-of-fame.jpg">
+    <meta name="twitter:image:alt" content="ChiffTown Hall of Fame — top players and legendary achievements">
+    <meta name="twitter:creator" content="@chifftown">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"></noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(170deg, #0a0f1e 0%, #0f1a2e 50%, #0a0f1e 100%);
+            color: #e0e0f0; min-height: 100vh;
+        }
+
+        /* Nav */
+        .top-nav {
+            background: rgba(10,15,30,0.95); backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(201,168,76,0.15);
+            padding: 0.8rem 2rem; display: flex; align-items: center; gap: 1rem;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .top-nav a { color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem; transition: color 0.2s; }
+        .top-nav a:hover { color: #c9a84c; }
+        .top-nav .nav-title { color: #c9a84c; font-weight: 800; font-size: 1.1rem; margin-right: auto; }
+
+        /* Header */
+        .hof-header {
+            text-align: center; padding: 3rem 1rem 2rem;
+            background: radial-gradient(ellipse at center top, rgba(201,168,76,0.08) 0%, transparent 60%);
+        }
+        .hof-header h1 {
+            font-size: 2.5rem; font-weight: 800;
+            background: linear-gradient(135deg, #c9a84c, #e8d88a, #c9a84c);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .hof-header p { color: rgba(255,255,255,0.5); margin-top: 0.5rem; }
+
+        /* Tabs */
+        .tabs {
+            display: flex; justify-content: center; gap: 0.5rem; padding: 0 1rem;
+            flex-wrap: wrap; margin-bottom: 2rem;
+        }
+        .tab {
+            padding: 0.6rem 1.4rem; border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03);
+            color: rgba(255,255,255,0.6); cursor: pointer; font-size: 0.85rem;
+            transition: all 0.2s; font-weight: 500;
+        }
+        .tab:hover { background: rgba(255,255,255,0.06); color: #fff; }
+        .tab.active { background: rgba(201,168,76,0.12); border-color: rgba(201,168,76,0.4); color: #c9a84c; }
+
+        /* Board */
+        .board { max-width: 800px; margin: 0 auto; padding: 0 1rem 3rem; }
+
+        /* Podium */
+        .podium { display: flex; justify-content: center; align-items: flex-end; gap: 1rem; margin-bottom: 2rem; min-height: 200px; }
+        .podium-spot {
+            display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+            padding: 1.2rem; border-radius: 16px; transition: all 0.3s;
+        }
+        .podium-spot.gold {
+            background: linear-gradient(170deg, rgba(201,168,76,0.15) 0%, rgba(201,168,76,0.05) 100%);
+            border: 1px solid rgba(201,168,76,0.3); order: 2; min-height: 180px;
+        }
+        .podium-spot.silver {
+            background: linear-gradient(170deg, rgba(192,192,192,0.1) 0%, rgba(192,192,192,0.03) 100%);
+            border: 1px solid rgba(192,192,192,0.2); order: 1; min-height: 150px;
+        }
+        .podium-spot.bronze {
+            background: linear-gradient(170deg, rgba(205,127,50,0.1) 0%, rgba(205,127,50,0.03) 100%);
+            border: 1px solid rgba(205,127,50,0.2); order: 3; min-height: 130px;
+        }
+        .podium-medal { font-size: 2.2rem; }
+        .podium-name { font-weight: 700; font-size: 1rem; }
+        .podium-stat { color: rgba(255,255,255,0.5); font-size: 0.8rem; }
+        .podium-value { font-size: 1.5rem; font-weight: 800; color: #c9a84c; }
+
+        /* Table rows */
+        .rank-row {
+            display: flex; align-items: center; gap: 1rem;
+            padding: 0.9rem 1.2rem; border-radius: 12px;
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04);
+            margin-bottom: 0.5rem; transition: all 0.2s;
+        }
+        .rank-row:hover { background: rgba(255,255,255,0.05); border-color: rgba(201,168,76,0.15); }
+        .rank-num { font-weight: 700; color: rgba(255,255,255,0.3); width: 30px; text-align: center; font-size: 0.9rem; }
+        .rank-name { flex: 1; font-weight: 600; font-size: 0.95rem; }
+        .rank-stat { display: flex; flex-direction: column; align-items: flex-end; }
+        .rank-value { font-weight: 700; color: #c9a84c; font-size: 1rem; }
+        .rank-label { font-size: 0.7rem; color: rgba(255,255,255,0.35); }
+
+        .rank-row.self { background: rgba(42,157,143,0.08); border-color: rgba(42,157,143,0.25); }
+        .rank-row.self .rank-name { color: #2a9d8f; }
+
+        .loading { text-align: center; padding: 3rem; color: rgba(255,255,255,0.4); }
+
+        @media (max-width: 600px) {
+            .hof-header h1 { font-size: 1.8rem; }
+            .podium { gap: 0.5rem; }
+            .podium-spot { padding: 0.8rem; min-width: 90px; }
+            .podium-value { font-size: 1.1rem; }
+        }
+    </style>
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon-180x180.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0a0a1a">
+    <style>
+      @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+      :focus-visible { outline: 2px solid #c9a84c; outline-offset: 2px; }
+      :focus:not(:focus-visible) { outline: none; }
+    </style>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Hall of Fame — ChiffTown",
+      "url": "https://chifftown.com/hall-of-fame.html",
+      "description": "See the top players, biggest achievements, and legendary moments in ChiffTown.",
+      "isPartOf": {
+        "@type": "WebApplication",
+        "name": "ChiffTown",
+        "url": "https://chifftown.com",
+        "applicationCategory": "SocialNetworkingApplication"
+      },
+      "breadcrumb": {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "ChiffTown", "item": "https://chifftown.com/" },
+          { "@type": "ListItem", "position": 2, "name": "Hall of Fame", "item": "https://chifftown.com/hall-of-fame.html" }
+        ]
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the ChiffTown Hall of Fame?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Hall of Fame is ChiffTown's leaderboard — a showcase of the town's top players ranked by XP, achievements, and contributions to the community. The best of the best end up here."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I get on the Hall of Fame?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Earn XP by visiting venues, chatting, playing games, completing quests, and maintaining daily streaks. The more active you are in the town, the higher your ranking."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What are the rankings based on?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Hall of Fame rankings are based on total XP earned, achievements unlocked, and overall community engagement. Consistency and exploration are the fastest paths to the top."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How often is the Hall of Fame updated?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Rankings update dynamically as players earn XP and unlock achievements — so the leaderboard reflects real-time activity in the town."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is ChiffTown free to play?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, completely free. Everyone gets the same shot at the Hall of Fame — no pay-to-win, no premium boosts. Just good old exploration and dedication."
+        }
+      }
+      ]
+    }
+    </script>
+</head>
+<body>
+    <a href="#main-content" class="skip-link" style="position:absolute;top:-40px;left:0;background:#c9a84c;color:#0a0a1a;padding:8px 16px;z-index:100000;font-weight:600;transition:top 0.3s;" onfocus="this.style.top='0'" onblur="this.style.top='-40px'">Skip to content</a>
+    <nav class="top-nav">
+        <span class="nav-title">🏆 Hall of Fame</span>
+        <a href="/"><i class="fas fa-map"></i> Town Map</a>
+        <a href="/games"><i class="fas fa-gamepad"></i> Arcade</a>
+        <a href="/casino.html"><i class="fas fa-dice"></i> Casino</a>
+    </nav>
+
+<main id="main-content">
+    <div class="hof-header">
+        <h1>🏆 Hall of Fame</h1>
+        <p>The legends of ChiffTown — who will claim the top spot?</p>
+    </div>
+
+    <div class="tabs" id="tabs">
+        <button class="tab active" data-cat="xp">⭐ XP</button>
+        <button class="tab" data-cat="coins">🪙 Coins</button>
+        <button class="tab" data-cat="messages">💬 Messages</button>
+        <button class="tab" data-cat="games">🎮 Games</button>
+        <button class="tab" data-cat="achievements">🏅 Achievements</button>
+    </div>
+
+    <div class="board" id="board">
+        <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading rankings...</div>
+    </div>
+
+    <script>
+        const CATEGORY_META = {
+            xp: { label: 'XP', field: 'xp', icon: '⭐', format: v => v.toLocaleString() + ' XP' },
+            coins: { label: 'Coins', field: 'coins', icon: '🪙', format: v => v.toLocaleString() + ' coins' },
+            messages: { label: 'Messages', field: 'messagesSent', icon: '💬', format: v => v.toLocaleString() + ' sent' },
+            games: { label: 'Games', field: 'gamesPlayed', icon: '🎮', format: v => v.toLocaleString() + ' played' },
+            achievements: { label: 'Achievements', field: 'achievements', icon: '🏅', format: v => v + ' unlocked' }
+        };
+
+        let currentCat = 'xp';
+        const currentUser = localStorage.getItem('chifftown_username') || '';
+
+        // Tab clicks
+        document.getElementById('tabs').addEventListener('click', (e) => {
+            const tab = e.target.closest('.tab');
+            if (!tab) return;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            currentCat = tab.dataset.cat;
+            loadBoard();
+        });
+
+        async function loadBoard() {
+            const board = document.getElementById('board');
+            board.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+            try {
+                const res = await fetch(`/api/leaderboard?limit=20&category=${currentCat}`);
+                const data = await res.json();
+                renderBoard(data);
+            } catch(e) {
+                board.innerHTML = '<div class="loading">Failed to load leaderboard.</div>';
+            }
+        }
+
+        function renderBoard(data) {
+            const board = document.getElementById('board');
+            const meta = CATEGORY_META[currentCat];
+            if (!data.length) {
+                board.innerHTML = '<div class="loading">No players yet — be the first!</div>';
+                return;
+            }
+
+            const medals = ['🥇', '🥈', '🥉'];
+            const classes = ['gold', 'silver', 'bronze'];
+            const top3 = data.slice(0, 3);
+            const rest = data.slice(3);
+
+            let html = '<div class="podium">';
+            // Show in order: silver(1), gold(0), bronze(2)
+            [1, 0, 2].forEach(idx => {
+                const p = top3[idx];
+                if (!p) return;
+                html += `
+                    <div class="podium-spot ${classes[idx]}">
+                        <div class="podium-medal">${medals[idx]}</div>
+                        <div class="podium-name">${esc(p.username)}</div>
+                        <div class="podium-value">${meta.format(p[meta.field])}</div>
+                        <div class="podium-stat">Level ${p.level}</div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+
+            rest.forEach(p => {
+                const isSelf = p.username.toLowerCase() === currentUser.toLowerCase();
+                html += `
+                    <div class="rank-row ${isSelf ? 'self' : ''}">
+                        <div class="rank-num">#${p.rank}</div>
+                        <div class="rank-name">${esc(p.username)}</div>
+                        <div class="rank-stat">
+                            <span class="rank-value">${meta.format(p[meta.field])}</span>
+                            <span class="rank-label">Level ${p.level}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            board.innerHTML = html;
+        }
+
+        function esc(s) {
+            const d = document.createElement('div');
+            d.textContent = s;
+            return d.innerHTML;
+        }
+
+        // Initial load
+        loadBoard();
+    </script>
+    <script src="/js/loading-screen.js?v=1"></script>
+    <script src="/js/page-transitions.js?v=1"></script>
+</main>
+
+    <script src="/js/share-button.js" data-share-message="Check out the ChiffTown Hall of Fame! 🌟"></script>
+</body>
+</html>

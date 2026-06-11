@@ -1,0 +1,444 @@
+/**
+ * ============================================
+ * CHIFFTOWN LOADING SCREEN STYLES
+ * ============================================
+ * Beautiful animated transitions between rooms
+ * Deep blues, teal, gold - no pink/purple
+ * Crisp & cool design language
+ * ============================================
+ */
+
+/* ==========================================
+   LOADING SCREEN CONTAINER
+   ========================================== */
+
+.loading-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: linear-gradient(
+        135deg,
+        rgba(10, 15, 30, 0.98) 0%,
+        rgba(15, 25, 45, 0.98) 50%,
+        rgba(10, 20, 35, 0.98) 100%
+    );
+    backdrop-filter: blur(20px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+    
+    /* Accent color (set dynamically) */
+    --loading-accent: #4fc3f7;
+}
+
+.loading-screen.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.loading-screen.hiding {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* Background gradient animation */
+.loading-screen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        ellipse 80% 50% at 50% 50%,
+        rgba(79, 195, 247, 0.08) 0%,
+        transparent 60%
+    );
+    animation: pulseGlow 3s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.1); }
+}
+
+/* Grid pattern overlay */
+.loading-screen::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+        linear-gradient(rgba(79, 195, 247, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(79, 195, 247, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    opacity: 0.5;
+}
+
+/* ==========================================
+   LOADING CONTENT
+   ========================================== */
+
+.loading-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    padding: 2rem;
+    max-width: 400px;
+    width: 90%;
+}
+
+/* ==========================================
+   ANIMATED LOGO
+   ========================================== */
+
+.loading-logo {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid transparent;
+}
+
+.logo-ring.outer {
+    width: 100%;
+    height: 100%;
+    border-color: rgba(79, 195, 247, 0.3);
+    border-top-color: var(--loading-accent);
+    animation: spinRing 2s linear infinite;
+}
+
+.logo-ring.middle {
+    width: 80%;
+    height: 80%;
+    border-color: rgba(79, 195, 247, 0.2);
+    border-right-color: var(--loading-accent);
+    animation: spinRing 1.5s linear infinite reverse;
+}
+
+.logo-ring.inner {
+    width: 60%;
+    height: 60%;
+    border-color: rgba(79, 195, 247, 0.15);
+    border-bottom-color: var(--loading-accent);
+    animation: spinRing 1s linear infinite;
+}
+
+@keyframes spinRing {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.logo-icon {
+    position: relative;
+    z-index: 3;
+    font-size: 2.5rem;
+    animation: bounceIcon 1.5s ease-in-out infinite;
+    filter: drop-shadow(0 0 10px var(--loading-accent));
+}
+
+@keyframes bounceIcon {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-8px) scale(1.1); }
+}
+
+/* ==========================================
+   ROOM INFO
+   ========================================== */
+
+.loading-info {
+    text-align: center;
+}
+
+.loading-room-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 30px var(--loading-accent);
+    animation: fadeSlideUp 0.6s ease-out forwards;
+    animation-delay: 0.2s;
+    opacity: 0;
+}
+
+.loading-tagline {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-style: italic;
+    animation: fadeSlideUp 0.6s ease-out forwards;
+    animation-delay: 0.4s;
+    opacity: 0;
+}
+
+@keyframes fadeSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==========================================
+   PROGRESS BAR
+   ========================================== */
+
+.loading-progress-container {
+    width: 100%;
+    max-width: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    animation: fadeSlideUp 0.6s ease-out forwards;
+    animation-delay: 0.5s;
+    opacity: 0;
+}
+
+.loading-progress-track {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid rgba(79, 195, 247, 0.2);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.loading-progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(
+        90deg,
+        var(--loading-accent) 0%,
+        #29b6f6 50%,
+        var(--loading-accent) 100%
+    );
+    background-size: 200% 100%;
+    border-radius: 10px;
+    transition: width 0.1s ease-out;
+    animation: shimmerProgress 2s linear infinite;
+    box-shadow: 0 0 10px var(--loading-accent);
+}
+
+@keyframes shimmerProgress {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+}
+
+.loading-percentage {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--loading-accent);
+    text-shadow: 0 0 10px var(--loading-accent);
+}
+
+/* ==========================================
+   LOADING TIP
+   ========================================== */
+
+.loading-tip {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    background: rgba(255, 193, 7, 0.1);
+    border: 1px solid rgba(255, 193, 7, 0.25);
+    border-radius: 12px;
+    animation: fadeSlideUp 0.6s ease-out forwards;
+    animation-delay: 0.7s;
+    opacity: 0;
+}
+
+.loading-tip i {
+    font-size: 1.25rem;
+    color: #ffc107;
+    animation: pulseTip 2s ease-in-out infinite;
+}
+
+@keyframes pulseTip {
+    0%, 100% { opacity: 0.7; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.1); }
+}
+
+.loading-tip span {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.85);
+    font-style: italic;
+}
+
+/* ==========================================
+   PARTICLE EFFECTS
+   ========================================== */
+
+.loading-particles {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.loading-particles .particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: var(--loading-accent);
+    border-radius: 50%;
+    opacity: 0;
+    animation: floatParticle 4s ease-in-out infinite;
+}
+
+.loading-particles .particle:nth-child(1) { left: 10%; animation-delay: 0s; }
+.loading-particles .particle:nth-child(2) { left: 20%; animation-delay: 0.5s; }
+.loading-particles .particle:nth-child(3) { left: 35%; animation-delay: 1s; }
+.loading-particles .particle:nth-child(4) { left: 50%; animation-delay: 1.5s; }
+.loading-particles .particle:nth-child(5) { left: 65%; animation-delay: 2s; }
+.loading-particles .particle:nth-child(6) { left: 75%; animation-delay: 2.5s; }
+.loading-particles .particle:nth-child(7) { left: 85%; animation-delay: 3s; }
+.loading-particles .particle:nth-child(8) { left: 95%; animation-delay: 3.5s; }
+
+@keyframes floatParticle {
+    0% {
+        bottom: -10%;
+        opacity: 0;
+        transform: translateX(0) scale(0.5);
+    }
+    10% {
+        opacity: 0.8;
+    }
+    90% {
+        opacity: 0.8;
+    }
+    100% {
+        bottom: 110%;
+        opacity: 0;
+        transform: translateX(50px) scale(1.5);
+    }
+}
+
+/* Alternate particle sizes and colors */
+.loading-particles .particle:nth-child(2n) {
+    width: 6px;
+    height: 6px;
+    background: rgba(255, 193, 7, 0.8);
+}
+
+.loading-particles .particle:nth-child(3n) {
+    width: 3px;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.6);
+}
+
+/* ==========================================
+   RESPONSIVE DESIGN
+   ========================================== */
+
+@media (max-width: 768px) {
+    .loading-content {
+        gap: 1.5rem;
+        padding: 1.5rem;
+    }
+    
+    .loading-logo {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .logo-icon {
+        font-size: 2rem;
+    }
+    
+    .loading-room-name {
+        font-size: 1.5rem;
+    }
+    
+    .loading-tagline {
+        font-size: 0.875rem;
+    }
+    
+    .loading-progress-container {
+        max-width: 250px;
+    }
+    
+    .loading-tip {
+        padding: 0.875rem 1.25rem;
+    }
+    
+    .loading-tip span {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .loading-content {
+        gap: 1.25rem;
+        padding: 1rem;
+    }
+    
+    .loading-logo {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .logo-icon {
+        font-size: 1.75rem;
+    }
+    
+    .loading-room-name {
+        font-size: 1.25rem;
+    }
+    
+    .loading-tagline {
+        font-size: 0.8rem;
+    }
+    
+    .loading-tip {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
+    }
+}
+
+/* ==========================================
+   PREFERS REDUCED MOTION
+   ========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .logo-ring,
+    .logo-icon,
+    .loading-room-name,
+    .loading-tagline,
+    .loading-progress-container,
+    .loading-tip,
+    .loading-progress-bar,
+    .loading-tip i,
+    .loading-particles .particle {
+        animation: none;
+    }
+    
+    .loading-room-name,
+    .loading-tagline,
+    .loading-progress-container,
+    .loading-tip {
+        opacity: 1;
+    }
+    
+    .loading-progress-bar {
+        background: var(--loading-accent);
+    }
+}

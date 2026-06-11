@@ -1,0 +1,514 @@
+{
+  "jaha": {
+    "username": "jaha",
+    "xp": 30,
+    "level": 1,
+    "createdAt": 1770887792892,
+    "lastSeen": 1770887792894,
+    "stats": {
+      "roomsJoined": 1,
+      "messagesSent": 0,
+      "tipsSent": 0,
+      "tipsReceived": 0,
+      "streamingSessions": 1,
+      "gamesPlayed": 0,
+      "venuesVisited": [
+        "nightclub"
+      ]
+    },
+    "achievements": [
+      "first_steps"
+    ],
+    "inventory": [
+      "First Steps"
+    ],
+    "socketId": "0KchQZ-uWS09dClEAAAV"
+  },
+  "jaba": {
+    "username": "jaba",
+    "xp": 30,
+    "level": 1,
+    "coins": 100,
+    "stardust": 0,
+    "createdAt": 1770892773813,
+    "lastSeen": 1770892773816,
+    "stats": {
+      "roomsJoined": 1,
+      "messagesSent": 0,
+      "tipsSent": 0,
+      "tipsReceived": 0,
+      "streamingSessions": 1,
+      "gamesPlayed": 0,
+      "venuesVisited": [
+        "pub"
+      ]
+    },
+    "achievements": [
+      "first_steps"
+    ],
+    "inventory": [
+      "First Steps"
+    ],
+    "socketId": "PUu8-fSQR21YmRx1AAAB"
+  },
+  "baha": {
+    "username": "baha",
+    "xp": 62,
+    "level": 1,
+    "coins": 100,
+    "stardust": 0,
+    "createdAt": 1770920368230,
+    "lastSeen": 1775165563871,
+    "stats": {
+      "roomsJoined": 2,
+      "messagesSent": 1,
+      "tipsSent": 0,
+      "tipsReceived": 0,
+      "streamingSessions": 2,
+      "gamesPlayed": 0,
+      "venuesVisited": [
+        "pub"
+      ]
+    },
+    "achievements": [
+      "first_steps"
+    ],
+    "inventory": [
+      "First Steps"
+    ],
+    "socketId": "Th4gS0VIkF6WwNZhAAAu"
+  },
+  "hahaha": {
+    "username": "hahaha",
+    "xp": 60,
+    "level": 1,
+    "coins": 100,
+    "stardust": 0,
+    "createdAt": 1771102150993,
+    "lastSeen": 1771102153394,
+    "stats": {
+      "roomsJoined": 2,
+      "messagesSent": 0,
+      "tipsSent": 0,
+      "tipsReceived": 0,
+      "streamingSessions": 2,
+      "gamesPlayed": 0,
+      "venuesVisited": [
+        "pub"
+      ]
+    },
+    "achievements": [
+      "first_steps"
+    ],
+    "inventory": [
+      "First Steps"
+    ],
+    "socketId": "rszjgnBdvJIYJl0kAAAW"
+  },
+  "yaan": {
+    "username": "yaan",
+    "xp": 38,
+    "level": 1,
+    "coins": 100,
+    "stardust": 0,
+    "createdAt": 1771102431786,
+    "lastSeen": 1771102431787,
+    "stats": {
+      "roomsJoined": 1,
+      "messagesSent": 4,
+      "tipsSent": 0,
+      "tipsReceived": 0,
+      "streamingSessions": 1,
+      "gamesPlayed": 0,
+      "venuesVisited": [
+        "pub"
+      ]
+    },
+    "achievements": [
+      "first_steps"
+    ],
+    "inventory": [
+      "First Steps"
+    ],
+    "socketId": "EdoXYMJvQ5p-sxEzAAA3"
+  },
+  "Faith": {
+    "username": "Faith",
+    "xp": 30,
+    "level": 1,
+    "coins": 100,
+    "stardust": 0,
+    "createdAt": 1771102452750,
+    "lastSeen": 1771102452750,
+    "stats": {
+      "roomsJoined": 1,
+      "messagesSent": 0,
+      "tipsSent": 0,
+      "tipsReceived": 0,
+      "streamingSessions": 1,
+      "gamesPlayed": 0,
+      "venuesVisited": [
+        "pub"
+      ]
+    },
+    "achievements": [
+      "first_steps"
+    ],
+    "inventory": [
+      "First Steps"
+    ],
+    "socketId": "A2Mvd_wPkAhk-o1UAAA9"
+  },
+  "crunch": {
+    "username": "crunch",
+    "xp": 24,
+    "level": 1,
+    "coins": 100,
+    "stardust": 0,
+    "createdAt": 1771102458485,
+    "lastSeen": 1771102458485,
+    "stats": {
+      "roomsJoined": 1,
+      "messagesSent": 6,
+      "tipsSent": 0,
+      "tipsReceived": 0,
+      "streamingSessions": 0,
+      "gamesPlayed": 0,
+      "venuesVisited": [
+        "pub"
+      ]
+    },
+    "achievements": [
+      "first_steps"
+    ],
+    "inventory": [
+      "First Steps"
+    ],
+    "socketId": "biou56u3_iYYPiSSAAA_"
+  },
+  "Buns": {
+    "username": "Buns",
+    "xp": 35,
+    "level": 1,
+    "coins": 100,
+    "stardust": 0,
+    "createdAt": 1771102464731,
+    "lastSeen": 1771102514908,
+    "stats": {
+      "roomsJoined": 2,
+      "messagesSent": 7,
+      "tipsSent": 0,
+      "tipsReceived": 0,
+      "streamingSessions": 0,
+      "gamesPlayed": 0,
+      "venuesVisited": [
+        "pub"
+      ]
+    },
+    "achievements": [
+      "first_steps"
+    ],
+    "inventory": [
+      "First Steps"
+    ],
+    "socketId": "LjoEU9jK7bhfUvqTAABR"
+  },
+  "kikuh": {
+    "username": "kikuh",
+    "xp": 12,
+    "level": 1,
+    "coins": 100,
+    "stardust": 0,
+    "createdAt": 1771102561392,
+    "lastSeen": 1771102561392,
+    "stats": {
+      "roomsJoined": 1,
+      "messagesSent": 1,
+      "tipsSent": 0,
+      "tipsReceived": 0,
+      "streamingSessions": 0,
+      "gamesPlayed": 0,
+      "venuesVisited": [
+        "pub"
+      ]
+    },
+    "achievements": [
+      "first_steps"
+    ],
+    "inventory": [
+      "First Steps"
+    ],
+    "socketId": "TdivINOsFO7UAXetAABV"
+  },
+  "hcc": {
+    "username": "hcc",
+    "xp": 30,
+    "level": 1,
+    "coins": 100,
+    "stardust": 0,
+    "createdAt": 1771524080743,
+    "lastSeen": 1771524080745,
+    "stats": {
+      "roomsJoined": 1,
+      "messagesSent": 0,
+      "tipsSent": 0,
+      "tipsReceived": 0,
+      "streamingSessions": 1,
+      "gamesPlayed": 0,
+      "venuesVisited": [
+        "pub"
+      ]
+    },
+    "achievements": [
+      "first_steps"
+    ],
+    "inventory": [
+      "First Steps"
+    ],
+    "socketId": "69K6LVFnzJlVoHQwAAAX"
+  },
+  "hvc": {
+    "username": "hvc",
+    "xp": 30,
+    "level": 1,
+    "coins": 100,
+    "stardust": 0,
+    "createdAt": 1771524121229,
+    "lastSeen": 1771524121230,
+    "stats": {
+      "roomsJoined": 1,
+      "messagesSent": 0,
+      "tipsSent": 0,
+      "tipsReceived": 0,
+      "streamingSessions": 1,
+      "gamesPlayed": 0,
+      "venuesVisited": [
+        "nightclub"
+      ]
+    },
+    "achievements": [
+      "first_steps"
+    ],
+    "inventory": [
+      "First Steps"
+    ],
+    "socketId": "9LV43ySnu0i7FPm8AAAx"
+  },
+  "as": {
+    "username": "as",
+    "xp": 0,
+    "level": 1,
+    "coins": 100,
+    "stardust": 0,
+    "createdAt": 1771868442917,
+    "lastSeen": 1772960281991,
+    "stats": {
+      "roomsJoined": 0,
+      "messagesSent": 0,
+      "tipsSent": 0,
+      "tipsReceived": 0,
+      "streamingSessions": 0,
+      "gamesPlayed": 0,
+      "venuesVisited": []
+    },
+    "achievements": [],
+    "inventory": [],
+    "socketId": "Dt7I1EVd8rVTLlIJAAAD",
+    "apartmentData": {
+      "furniture": {
+        "sofa": {
+          "x": 100,
+          "y": 300,
+          "rotation": 0
+        },
+        "bed": {
+          "x": 300,
+          "y": 300,
+          "rotation": 0
+        },
+        "plant": {
+          "x": 600,
+          "y": 350,
+          "rotation": 0
+        }
+      },
+      "wallDecor": [],
+      "theme": "cabin",
+      "roomName": "",
+      "roomDesc": "",
+      "roomAccess": "public",
+      "guestbook": []
+    }
+  },
+  "bc": {
+    "username": "bc",
+    "xp": 30,
+    "level": 1,
+    "coins": 100,
+    "stardust": 0,
+    "createdAt": 1772705316081,
+    "lastSeen": 1772705316082,
+    "stats": {
+      "roomsJoined": 1,
+      "messagesSent": 0,
+      "tipsSent": 0,
+      "tipsReceived": 0,
+      "streamingSessions": 1,
+      "gamesPlayed": 0,
+      "venuesVisited": [
+        "pub"
+      ]
+    },
+    "achievements": [],
+    "inventory": [],
+    "socketId": "0PheIIr9gQOhnoOyAAAD"
+  },
+  "Jaha": {
+    "username": "Jaha",
+    "xp": 84,
+    "level": 1,
+    "coins": 125,
+    "stardust": 0,
+    "createdAt": 1772748165425,
+    "lastSeen": 1772748165426,
+    "stats": {
+      "roomsJoined": 1,
+      "messagesSent": 2,
+      "tipsSent": 0,
+      "tipsReceived": 0,
+      "streamingSessions": 1,
+      "gamesPlayed": 0,
+      "venuesVisited": [
+        "pub"
+      ]
+    },
+    "achievements": [
+      "first_steps"
+    ],
+    "inventory": [
+      "First Steps"
+    ],
+    "socketId": "UNMi-AnZTW4suIXtAAAZ"
+  },
+  "Yaan": {
+    "username": "Yaan",
+    "xp": 0,
+    "level": 1,
+    "coins": 100,
+    "stardust": 0,
+    "createdAt": 1772920479459,
+    "lastSeen": 1772920479459,
+    "stats": {
+      "roomsJoined": 0,
+      "messagesSent": 0,
+      "tipsSent": 0,
+      "tipsReceived": 0,
+      "streamingSessions": 0,
+      "gamesPlayed": 0,
+      "venuesVisited": []
+    },
+    "achievements": [],
+    "inventory": [],
+    "socketId": "exLVsmTYG5dTjlZjAAAP"
+  },
+  "asdfghjk": {
+    "username": "asdfghjk",
+    "xp": 84,
+    "level": 1,
+    "coins": 125,
+    "stardust": 0,
+    "createdAt": 1772923550186,
+    "lastSeen": 1772923550188,
+    "stats": {
+      "roomsJoined": 1,
+      "messagesSent": 2,
+      "tipsSent": 0,
+      "tipsReceived": 0,
+      "streamingSessions": 1,
+      "gamesPlayed": 0,
+      "venuesVisited": [
+        "pub"
+      ]
+    },
+    "achievements": [
+      "first_steps"
+    ],
+    "inventory": [
+      "First Steps"
+    ],
+    "socketId": "Cy05OxmfAL3BcL43AAAt"
+  },
+  "Gh": {
+    "username": "Gh",
+    "xp": 82,
+    "level": 1,
+    "coins": 125,
+    "stardust": 0,
+    "createdAt": 1773521947321,
+    "lastSeen": 1773521947324,
+    "stats": {
+      "roomsJoined": 1,
+      "messagesSent": 1,
+      "tipsSent": 0,
+      "tipsReceived": 0,
+      "streamingSessions": 1,
+      "gamesPlayed": 0,
+      "venuesVisited": [
+        "pub"
+      ]
+    },
+    "achievements": [
+      "first_steps"
+    ],
+    "inventory": [
+      "First Steps"
+    ],
+    "socketId": "katZ361oT3mS7weKAAAm"
+  },
+  "Hello!": {
+    "username": "Hello!",
+    "xp": 30,
+    "level": 1,
+    "coins": 100,
+    "stardust": 0,
+    "createdAt": 1773950993887,
+    "lastSeen": 1773950993889,
+    "stats": {
+      "roomsJoined": 1,
+      "messagesSent": 0,
+      "tipsSent": 0,
+      "tipsReceived": 0,
+      "streamingSessions": 1,
+      "gamesPlayed": 0,
+      "venuesVisited": [
+        "pub"
+      ]
+    },
+    "achievements": [],
+    "inventory": [],
+    "socketId": "OsRLnTxnlx5Rt8E1AACJ"
+  },
+  "vb": {
+    "username": "vb",
+    "xp": 30,
+    "level": 1,
+    "coins": 100,
+    "stardust": 0,
+    "createdAt": 1776353763537,
+    "lastSeen": 1776353763539,
+    "stats": {
+      "roomsJoined": 1,
+      "messagesSent": 0,
+      "tipsSent": 0,
+      "tipsReceived": 0,
+      "streamingSessions": 1,
+      "gamesPlayed": 0,
+      "venuesVisited": [
+        "pub"
+      ]
+    },
+    "achievements": [],
+    "inventory": [],
+    "socketId": "SjHBAItBDkcLhSPjAABh"
+  }
+}

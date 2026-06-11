@@ -1,0 +1,12 @@
+[
+  {
+    "id": "2f1e3781-7768-422a-bbe0-ecb1ad81724b",
+    "name": "Happy Hour at the Tavern",
+    "description": "Join us for double XP!",
+    "venue": "The Tavern",
+    "startTime": "2026-02-12T09:00:00Z",
+    "endTime": "2026-02-12T23:00:00Z",
+    "xpMultiplier": 2,
+    "createdAt": "2026-02-12T09:26:01.013Z"
+  }
+]

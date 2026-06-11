@@ -1,0 +1,24 @@
+
+
+# Ava server snapshot safety exclusions
+.env
+.env.*
+node_modules/
+.next/
+venv/
+.venv/
+__pycache__/
+.cache/
+dist/
+build/
+coverage/
+*.log
+*.bak
+*.backup
+*.old
+*.pem
+*.key
+*.p12
+*.pfx
+*.sqlite
+*.db

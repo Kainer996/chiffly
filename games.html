@@ -1,0 +1,2974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <title>The Arcade — ChiffTown</title>
+    <link rel="alternate" hreflang="en" href="https://chifftown.com/games.html">
+    <link rel="alternate" hreflang="x-default" href="https://chifftown.com/games.html">
+    <link rel="canonical" href="https://chifftown.com/games.html">
+    <!-- Open Graph -->
+    <meta name="keywords" content="virtual arcade, online games, pixel palace arcade, multiplayer mini-games, video chat games, ChiffTown">
+    <meta name="description" content="Play retro arcade games with friends at The Arcade in ChiffTown. Tic-tac-toe, trivia, Rock Paper Scissors — earn coins and XP while chatting over video.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://chifftown.com/games.html">
+    <meta property="og:title" content="Pixel Palace Arcade — ChiffTown">
+    <meta property="og:description" content="Play retro arcade games with friends at The Arcade in ChiffTown. Tic-tac-toe, trivia, Rock Paper Scissors — earn coins and XP while chatting over video.">
+    <meta property="og:image" content="https://chifftown.com/images/og-arcade.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:secure_url" content="https://chifftown.com/images/og-arcade.jpg">
+    <meta property="og:image:alt" content="Pixel Palace Arcade — retro games with video chat in ChiffTown">
+    <meta name="twitter:image:alt" content="Pixel Palace Arcade — retro games with video chat in ChiffTown">
+    <meta name="twitter:creator" content="@chifftown">
+    <meta property="og:site_name" content="ChiffTown">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@chifftown">
+    <meta name="twitter:title" content="Pixel Palace Arcade — ChiffTown">
+    <meta name="twitter:description" content="Play retro arcade games with friends at The Arcade in ChiffTown. Tic-tac-toe, trivia, Rock Paper Scissors — earn coins and XP while chatting over video.">
+    <meta name="twitter:image" content="https://chifftown.com/images/og-arcade.jpg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon-180x180.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0a0a1a">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.socket.io">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"></noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --arcade-dark: #021a0a;
+            --arcade-deep: #052e16;
+            --arcade-green: #22c55e;
+            --arcade-lime: #84cc16;
+            --arcade-cyan: #22d3ee;
+            --arcade-text: #ecfdf5;
+            --arcade-text-dim: rgba(236, 253, 245, 0.55);
+        }
+        html { scroll-behavior: smooth; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--arcade-dark); 
+            color: var(--arcade-text); 
+            overflow-x: hidden; 
+            min-height: 100vh;
+            position: relative;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+        
+        /* Arcade background image */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: image-set(url('/images/venue-arcade.webp') type('image/webp'), url('/images/venue-arcade.png') type('image/png')) center/cover no-repeat fixed;
+            opacity: 0.25;
+            z-index: -2;
+            image-rendering: pixelated;
+            filter: contrast(1.2) saturate(1.3);
+        }
+        
+        /* Dark overlay with retro grid */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: 
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.05) 2px, rgba(0,0,0,0.05) 4px),
+                repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(34,197,94,0.02) 2px, rgba(34,197,94,0.02) 4px),
+                linear-gradient(180deg, rgba(2,26,10,0.85) 0%, rgba(5,46,22,0.8) 30%, rgba(6,78,59,0.75) 55%, rgba(5,46,22,0.8) 80%, rgba(2,26,10,0.9) 100%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        /* Pixel particles animation */
+        @keyframes pixelFloat {
+            0% { transform: translateY(100vh) scale(1); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 0.5; }
+            100% { transform: translateY(-10vh) scale(0.5); opacity: 0; }
+        }
+        
+        .pixel-particles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        .pixel-particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: var(--arcade-green);
+            animation: pixelFloat 8s linear infinite;
+            opacity: 0.6;
+            image-rendering: pixelated;
+            box-shadow: 0 0 4px currentColor;
+        }
+        
+        .pixel-particle:nth-child(1) { left: 10%; animation-delay: 0s; background: var(--arcade-green); }
+        .pixel-particle:nth-child(2) { left: 25%; animation-delay: -2s; background: var(--arcade-lime); animation-duration: 10s; }
+        .pixel-particle:nth-child(3) { left: 40%; animation-delay: -4s; background: var(--arcade-cyan); }
+        .pixel-particle:nth-child(4) { left: 55%; animation-delay: -1s; background: var(--arcade-green); animation-duration: 9s; }
+        .pixel-particle:nth-child(5) { left: 70%; animation-delay: -3s; background: var(--arcade-lime); }
+        .pixel-particle:nth-child(6) { left: 85%; animation-delay: -5s; background: var(--arcade-cyan); animation-duration: 11s; }
+        .pixel-particle:nth-child(7) { left: 15%; animation-delay: -6s; background: var(--arcade-green); }
+        .pixel-particle:nth-child(8) { left: 60%; animation-delay: -2.5s; background: var(--arcade-lime); animation-duration: 8.5s; }
+        
+        /* CRT Scanline effect */
+        .crt-scanlines {
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15) 0px,
+                transparent 1px,
+                transparent 2px,
+                rgba(0, 0, 0, 0.15) 3px
+            );
+            pointer-events: none;
+            z-index: 10;
+            animation: scanlineMove 8s linear infinite;
+        }
+        
+        @keyframes scanlineMove {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(4px); }
+        }
+        
+        /* CRT Screen curve and glow */
+        .crt-overlay {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at center, transparent 50%, rgba(2,26,10,0.3) 100%);
+            pointer-events: none;
+            z-index: 9;
+        }
+        
+        /* Glitch effect for headers */
+        .arcade-title {
+            animation: glitchTitle 8s ease-in-out infinite;
+        }
+        
+        @keyframes glitchTitle {
+            0%, 90%, 100% { 
+                text-shadow: 0 0 10px rgba(34,197,94,0.4), 0 0 20px rgba(34,197,94,0.2);
+            }
+            91% {
+                text-shadow: -2px 0 0 #0ea5e9, 2px 0 0 #00ffff;
+                transform: skew(-0.5deg);
+            }
+            92% {
+                text-shadow: 2px 0 0 #0ea5e9, -2px 0 0 #00ffff;
+                transform: skew(0.5deg);
+            }
+            93% {
+                text-shadow: 0 0 10px rgba(34,197,94,0.4), 0 0 20px rgba(34,197,94,0.2);
+                transform: skew(0deg);
+            }
+        }
+        
+        /* Retro game sprites floating */
+        .retro-sprites {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            font-size: 32px;
+            opacity: 0.15;
+            z-index: 2;
+        }
+        
+        .sprite {
+            position: absolute;
+            animation: spriteFloat 20s linear infinite;
+        }
+        
+        .sprite:nth-child(1) { left: 5%; top: 10%; animation-delay: 0s; }
+        .sprite:nth-child(2) { left: 85%; top: 25%; animation-delay: -5s; animation-duration: 25s; }
+        .sprite:nth-child(3) { left: 30%; top: 60%; animation-delay: -10s; animation-duration: 22s; }
+        .sprite:nth-child(4) { left: 70%; top: 75%; animation-delay: -15s; animation-duration: 24s; }
+        
+        @keyframes spriteFloat {
+            0% { transform: translateY(0) translateX(0); }
+            25% { transform: translateY(-20px) translateX(10px); }
+            50% { transform: translateY(-10px) translateX(-15px); }
+            75% { transform: translateY(-25px) translateX(5px); }
+            100% { transform: translateY(0) translateX(0); }
+        }
+        
+        .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 0.75rem 0; background: rgba(2,26,10,0.9); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(34,197,94,0.15); }
+        .nav-container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .nav-logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: var(--arcade-text); }
+        .nav-logo img { height: 32px; width: auto; image-rendering: pixelated; }
+        .nav-logo span { font-family: 'Press Start 2P', cursive; font-size: 0.85rem; }
+        .nav-links { display: flex; gap: 0.5rem; }
+        .nav-links a { color: var(--arcade-text-dim); text-decoration: none; font-size: 0.88rem; font-weight: 500; padding: 0.4rem 0.8rem; border-radius: 8px; transition: all 0.2s ease; }
+        .nav-links a:hover { color: var(--arcade-text); background: rgba(34,197,94,0.1); }
+        
+        .back-btn { position: fixed; top: 80px; left: 1.5rem; background: rgba(2,26,10,0.9); backdrop-filter: blur(10px); border: 1px solid rgba(34,197,94,0.2); color: var(--arcade-green); padding: 0.6rem 1rem; border-radius: 50px; cursor: pointer; z-index: 999; transition: all 0.3s ease; font-size: 0.85rem; display: flex; align-items: center; gap: 0.4rem; text-decoration: none; }
+        .back-btn:hover { background: rgba(34,197,94,0.1); transform: translateX(-3px); }
+        
+        .arcade-hero {
+            min-height: 50vh; display: flex; align-items: center; justify-content: center; text-align: center;
+            position: relative; overflow: hidden;
+            background: linear-gradient(180deg, #021a0a 0%, #052e16 30%, #064e3b 55%, #052e16 80%, #021a0a 100%);
+        }
+        
+        .pixel-grid {
+            position: absolute; inset: 0;
+            background-image: radial-gradient(circle, rgba(34,197,94,0.08) 1px, transparent 1px);
+            background-size: 20px 20px; opacity: 0.5;
+        }
+        
+        .game-elements { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+        .game-el { position: absolute; font-size: 1.5rem; opacity: 0.1; animation: floatGame 10s ease-in-out infinite; }
+        .game-el:nth-child(1) { left: 10%; top: 20%; animation-delay: 0s; }
+        .game-el:nth-child(2) { left: 80%; top: 30%; animation-delay: -2s; }
+        .game-el:nth-child(3) { left: 25%; top: 70%; animation-delay: -4s; }
+        .game-el:nth-child(4) { left: 70%; top: 60%; animation-delay: -6s; }
+        .game-el:nth-child(5) { left: 45%; top: 15%; animation-delay: -8s; }
+        @keyframes floatGame { 0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.08; } 50% { transform: translateY(-20px) rotate(10deg); opacity: 0.15; } }
+        
+        .arcade-content { position: relative; z-index: 5; max-width: 650px; padding: 0 2rem; }
+        .arcade-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2); padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.65rem; font-weight: 600; color: var(--arcade-green); margin-bottom: 1.25rem; font-family: 'Press Start 2P', cursive; }
+        .arcade-title { font-family: 'Press Start 2P', cursive; font-size: clamp(1.5rem, 4vw, 2.5rem); margin-bottom: 1rem; line-height: 1.4; color: var(--arcade-green); text-shadow: 0 0 20px rgba(34,197,94,0.4), 0 0 40px rgba(34,197,94,0.2); }
+        .arcade-subtitle { font-size: 1.1rem; color: var(--arcade-text-dim); margin-bottom: 2rem; line-height: 1.6; }
+        
+        /* Game Selection Cards */
+        .games-section { padding: 3rem 0; background: var(--arcade-dark); }
+        .section-header { margin-bottom: 2rem; text-align: center; }
+        .section-header h2 { font-family: 'Press Start 2P', cursive; font-size: 1rem; margin-bottom: 0.75rem; color: var(--arcade-green); text-shadow: 0 0 10px rgba(34,197,94,0.3); }
+        .section-header p { color: var(--arcade-text-dim); font-size: 0.95rem; }
+        
+        .games-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 3rem; }
+        .game-card {
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(34,197,94,0.12); border-radius: 16px;
+            padding: 2rem; cursor: pointer; transition: all 0.3s ease; text-align: center; position: relative; overflow: hidden;
+        }
+        .game-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--arcade-green), var(--arcade-cyan)); opacity: 0; transition: opacity 0.3s; }
+        .game-card:hover { background: rgba(34,197,94,0.05); border-color: rgba(34,197,94,0.25); transform: translateY(-4px); }
+        .game-card:hover::before { opacity: 1; }
+        .game-card-icon { font-size: 3rem; margin-bottom: 1rem; }
+        .game-card h3 { font-family: 'Press Start 2P', cursive; font-size: 0.8rem; color: var(--arcade-green); margin-bottom: 0.75rem; }
+        .game-card p { color: var(--arcade-text-dim); font-size: 0.85rem; line-height: 1.5; }
+        .game-card .play-tag { display: inline-block; margin-top: 1rem; background: linear-gradient(135deg, var(--arcade-green), #16a34a); color: #021a0a; font-weight: 700; font-size: 0.75rem; padding: 0.5rem 1.2rem; border-radius: 50px; font-family: 'Press Start 2P', cursive; }
+        
+        /* Game Area */
+        .game-area { display: none; padding: 2rem 0; min-height: 60vh; }
+        .game-area.active { display: block; }
+        .game-back-btn { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2); color: var(--arcade-green); padding: 0.5rem 1rem; border-radius: 50px; cursor: pointer; font-size: 0.8rem; margin-bottom: 1.5rem; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.2s; }
+        .game-back-btn:hover { background: rgba(34,197,94,0.2); }
+        .game-status { font-family: 'Press Start 2P', cursive; font-size: 0.7rem; color: var(--arcade-green); text-align: center; margin-bottom: 1.5rem; padding: 0.75rem; background: rgba(34,197,94,0.05); border: 1px solid rgba(34,197,94,0.1); border-radius: 12px; }
+        
+        /* TTT Board */
+        .ttt-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; max-width: 300px; margin: 0 auto 1.5rem; }
+        .ttt-cell {
+            aspect-ratio: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(34,197,94,0.15);
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            font-family: 'Press Start 2P', cursive; font-size: 2rem; color: var(--arcade-green);
+            cursor: pointer; transition: all 0.2s;
+        }
+        .ttt-cell:hover { background: rgba(34,197,94,0.08); }
+        .ttt-cell.x { color: #22d3ee; }
+        .ttt-cell.o { color: #ec4899; }
+        .ttt-cell.disabled { pointer-events: none; }
+        
+        /* RPS */
+        .rps-choices { display: flex; gap: 1rem; justify-content: center; margin: 1.5rem 0; flex-wrap: wrap; }
+        .rps-choice {
+            width: 100px; height: 100px; border-radius: 16px; border: 2px solid rgba(34,197,94,0.2);
+            background: rgba(255,255,255,0.02); display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 0.5rem; cursor: pointer; transition: all 0.3s; font-size: 2.5rem;
+        }
+        .rps-choice:hover { border-color: var(--arcade-green); background: rgba(34,197,94,0.08); transform: scale(1.05); }
+        .rps-choice.selected { border-color: var(--arcade-green); background: rgba(34,197,94,0.15); box-shadow: 0 0 20px rgba(34,197,94,0.3); }
+        .rps-choice span { font-size: 0.6rem; font-family: 'Press Start 2P', cursive; color: var(--arcade-text-dim); }
+        .rps-vs { display: flex; align-items: center; justify-content: center; gap: 2rem; margin: 1.5rem 0; }
+        .rps-player { text-align: center; }
+        .rps-player .emoji { font-size: 3rem; }
+        .rps-player .name { font-family: 'Press Start 2P', cursive; font-size: 0.6rem; color: var(--arcade-text-dim); margin-top: 0.5rem; }
+        .rps-score { font-family: 'Press Start 2P', cursive; font-size: 1.5rem; color: var(--arcade-green); }
+        
+        /* Trivia */
+        .trivia-question-box {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(34,197,94,0.15); border-radius: 16px;
+            padding: 2rem; margin-bottom: 1.5rem; text-align: center;
+        }
+        .trivia-category { font-size: 0.7rem; color: var(--arcade-cyan); font-family: 'Press Start 2P', cursive; margin-bottom: 0.5rem; }
+        .trivia-q-text { font-size: 1.1rem; line-height: 1.6; margin-bottom: 1.5rem; }
+        .trivia-timer { font-family: 'Press Start 2P', cursive; font-size: 1.5rem; color: var(--arcade-green); margin-bottom: 1rem; }
+        .trivia-timer.urgent { color: #ef4444; animation: pulse 0.5s ease infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .trivia-options { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; max-width: 600px; margin: 0 auto; }
+        .trivia-option {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(34,197,94,0.15); border-radius: 12px;
+            padding: 1rem; cursor: pointer; transition: all 0.2s; text-align: center; font-size: 0.9rem;
+        }
+        .trivia-option:hover { border-color: var(--arcade-green); background: rgba(34,197,94,0.08); }
+        .trivia-option.correct { border-color: #22c55e; background: rgba(34,197,94,0.2); color: #22c55e; }
+        .trivia-option.wrong { border-color: #ef4444; background: rgba(239,68,68,0.1); color: #ef4444; }
+        .trivia-option.disabled { pointer-events: none; opacity: 0.6; }
+        .trivia-scoreboard { margin-top: 1.5rem; }
+        .trivia-score-row { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: rgba(255,255,255,0.02); border-radius: 8px; margin-bottom: 0.5rem; }
+        .trivia-score-row .rank { font-family: 'Press Start 2P', cursive; font-size: 0.7rem; color: var(--arcade-green); }
+        .trivia-score-row .name { font-size: 0.9rem; }
+        .trivia-score-row .score { font-family: 'Press Start 2P', cursive; font-size: 0.7rem; color: var(--arcade-cyan); }
+        .trivia-players { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; margin: 1rem 0; }
+        .trivia-player-tag { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2); padding: 0.3rem 0.8rem; border-radius: 50px; font-size: 0.75rem; }
+        
+        /* Single Player Games */
+        .snake-cell { aspect-ratio: 1; background: rgba(255,255,255,0.02); border-radius: 2px; }
+        .snake-cell.snake { background: var(--arcade-green); box-shadow: 0 0 5px var(--arcade-green); }
+        .snake-cell.food { background: #ef4444; box-shadow: 0 0 5px #ef4444; animation: pulse 0.5s ease infinite; }
+        
+        .memory-card {
+            aspect-ratio: 1; background: rgba(255,255,255,0.03); border: 2px solid rgba(34,197,94,0.15);
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; cursor: pointer; transition: all 0.3s; position: relative;
+        }
+        .memory-card::before {
+            content: '?'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+            background: rgba(34,197,94,0.1); border-radius: 10px; font-family: 'Press Start 2P', cursive;
+            font-size: 2rem; color: var(--arcade-green); transition: opacity 0.3s;
+        }
+        .memory-card.flipped::before { opacity: 0; pointer-events: none; }
+        .memory-card.matched { border-color: var(--arcade-lime); background: rgba(132,204,22,0.1); }
+        .memory-card:not(.flipped):not(.matched):hover { transform: scale(1.05); border-color: var(--arcade-green); }
+        
+        .leaderboard-entry {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.75rem 1rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(34,197,94,0.08);
+            border-radius: 12px; margin-bottom: 0.5rem; transition: all 0.2s;
+        }
+        .leaderboard-entry:hover { background: rgba(34,197,94,0.04); border-color: rgba(34,197,94,0.15); }
+        .leaderboard-entry .rank { font-family: 'Press Start 2P', cursive; font-size: 0.75rem; color: var(--arcade-green); min-width: 50px; }
+        .leaderboard-entry .rank.gold { color: #fbbf24; }
+        .leaderboard-entry .rank.silver { color: #94a3b8; }
+        .leaderboard-entry .rank.bronze { color: #f97316; }
+        .leaderboard-entry .name { flex: 1; font-size: 0.95rem; }
+        .leaderboard-entry .score { font-family: 'Press Start 2P', cursive; font-size: 0.7rem; color: var(--arcade-cyan); }
+        
+        /* Rooms section */
+        .rooms-section { padding: 3rem 0; border-top: 1px solid rgba(34,197,94,0.08); }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-bottom: 3rem; }
+        .stat-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(34,197,94,0.1); padding: 1.5rem; border-radius: 16px; text-align: center; transition: all 0.3s ease; }
+        .stat-card:hover { background: rgba(34,197,94,0.04); transform: translateY(-3px); }
+        .stat-card i { font-size: 1.8rem; color: var(--arcade-green); margin-bottom: 0.75rem; }
+        .stat-number { font-size: 1.5rem; font-weight: 700; font-family: 'Press Start 2P', cursive; margin-bottom: 0.25rem; color: var(--arcade-green); }
+        .stat-label { color: var(--arcade-text-dim); font-size: 0.85rem; }
+        .rooms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.25rem; }
+        .room-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(34,197,94,0.1); border-radius: 16px; padding: 1.5rem; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden; }
+        .room-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--arcade-green), var(--arcade-cyan)); opacity: 0; transition: opacity 0.3s; }
+        .room-card:hover { background: rgba(34,197,94,0.04); border-color: rgba(34,197,94,0.2); transform: translateY(-4px); }
+        .room-card:hover::before { opacity: 1; }
+        .room-card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
+        .room-card-icon { width: 44px; height: 44px; background: linear-gradient(135deg, var(--arcade-green), #16a34a); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #021a0a; font-size: 1.2rem; }
+        .room-card-title { font-size: 1.1rem; font-weight: 600; }
+        .room-card-description { color: var(--arcade-text-dim); font-size: 0.88rem; margin-bottom: 1rem; line-height: 1.5; }
+        .room-card-stats { display: flex; justify-content: space-between; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.04); }
+        .room-card-stat { display: flex; align-items: center; gap: 0.4rem; color: var(--arcade-text-dim); font-size: 0.82rem; }
+        .room-card-stat .fa-circle.live { color: #4ade80; }
+        .empty-state { text-align: center; padding: 3rem 2rem; }
+        .empty-state i { font-size: 2.5rem; color: var(--arcade-green); margin-bottom: 1rem; opacity: 0.6; }
+        .empty-state h3 { font-family: 'Press Start 2P', cursive; font-size: 0.8rem; margin-bottom: 0.75rem; color: var(--arcade-green); }
+        .empty-state p { color: var(--arcade-text-dim); margin-bottom: 1rem; }
+        
+        .arcade-btn { background: linear-gradient(135deg, var(--arcade-green), #16a34a); color: #021a0a; border: none; padding: 0.75rem 1.5rem; border-radius: 50px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem; font-family: inherit; box-shadow: 0 4px 15px rgba(34,197,94,0.3); }
+        .arcade-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(34,197,94,0.4); }
+        .arcade-btn.secondary { background: rgba(255,255,255,0.05); border: 1px solid rgba(34,197,94,0.2); box-shadow: none; color: var(--arcade-text); }
+        .arcade-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        
+        .footer { background: rgba(1,10,4,0.95); border-top: 1px solid rgba(34,197,94,0.08); padding: 3rem 0 1.25rem; }
+        .footer-content { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-bottom: 2rem; }
+        .footer-section h3 { font-family: 'Press Start 2P', cursive; font-size: 0.7rem; color: var(--arcade-green); margin-bottom: 0.75rem; }
+        .footer-section p, .footer-section a { color: var(--arcade-text-dim); font-size: 0.88rem; text-decoration: none; }
+        .footer-section ul { list-style: none; }
+        .footer-section li { margin-bottom: 0.4rem; }
+        .footer-section a:hover { color: var(--arcade-green); }
+        .social-links { display: flex; gap: 0.5rem; }
+        .social-links a { width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; color: var(--arcade-text-dim); transition: all 0.3s; }
+        .social-links a:hover { background: rgba(34,197,94,0.1); color: var(--arcade-green); }
+        .footer-bottom { text-align: center; padding-top: 1.25rem; border-top: 1px solid rgba(255,255,255,0.04); }
+        .footer-bottom p { color: rgba(236,253,245,0.3); font-size: 0.8rem; }
+        
+        @media (max-width: 768px) {
+            .arcade-title { font-size: 1.5rem; }
+            .games-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .rooms-grid { grid-template-columns: 1fr; }
+            .trivia-options { grid-template-columns: 1fr; }
+            .rps-choices { gap: 0.5rem; }
+            .rps-choice { width: 80px; height: 80px; }
+        }
+    </style>
+    <link rel="stylesheet" href="/css/quick-emotes.css?v=1">
+    <link rel="stylesheet" href="/css/loading-screen.css?v=1">
+    <link rel="stylesheet" href="/css/activity-feed.css?v=1">
+    <style>
+      @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+      :focus-visible { outline: 2px solid #c9a84c; outline-offset: 2px; }
+      :focus:not(:focus-visible) { outline: none; }
+    </style>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "AmusementPark",
+      "name": "Pixel Palace Arcade",
+      "url": "https://chifftown.com/games.html",
+      "description": "A retro arcade inside ChiffTown with multiplayer mini-games and live video chat. Earn XP and compete with friends. No downloads needed.",
+      "isPartOf": {
+        "@type": "WebApplication",
+        "name": "ChiffTown",
+        "url": "https://chifftown.com"
+      },
+      "image": "https://chifftown.com/images/og-arcade.jpg",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://chifftown.com/"},{"@type":"ListItem","position":2,"name":"Venues","item":"https://chifftown.com/#venues"},{"@type":"ListItem","position":3,"name":"The Arcade","item":"https://chifftown.com/games.html"}]}
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the Pixel Palace Arcade in ChiffTown?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Pixel Palace is ChiffTown's retro arcade — a venue packed with browser-based mini-games you can play solo or with friends while on video chat. Classic arcade vibes with a social twist."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What games can I play in ChiffTown's arcade?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Pixel Palace features a variety of arcade-style mini-games including classic retro games. Play, earn XP, and compete with friends on the leaderboard — all from your browser."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I play arcade games with friends on video chat?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! Start a room in Pixel Palace and share the link. You and friends can play games and video chat simultaneously — no downloads, just open and play."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do I earn XP in the ChiffTown arcade?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Playing games in Pixel Palace earns you XP that counts toward your ChiffTown level. The more you play, the faster you level up and unlock new venues."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is ChiffTown's arcade free to play?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, completely free. Pixel Palace is open to all ChiffTown visitors. No tokens, no pay-to-play. Just show up and game."
+          }
+        }
+      ]
+    }
+    </script>
+</head>
+<body>
+    <a href="#main-content" class="skip-link" style="position:absolute;top:-40px;left:0;background:#c9a84c;color:#0a0a1a;padding:8px 16px;z-index:100000;font-weight:600;transition:top 0.3s;" onfocus="this.style.top='0'" onblur="this.style.top='-40px'">Skip to content</a>
+    <!-- CRT Effects -->
+    <div class="crt-overlay"></div>
+    <div class="crt-scanlines"></div>
+    
+    <!-- Pixel Particles -->
+    <div class="pixel-particles">
+        <div class="pixel-particle"></div>
+        <div class="pixel-particle"></div>
+        <div class="pixel-particle"></div>
+        <div class="pixel-particle"></div>
+        <div class="pixel-particle"></div>
+        <div class="pixel-particle"></div>
+        <div class="pixel-particle"></div>
+        <div class="pixel-particle"></div>
+    </div>
+    
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo"><img src="/images/chifftown-logo.png" alt="CHIFFTOWN"></a>
+            <div class="nav-links"><a href="index.html">Home</a></div>
+        </div>
+    </nav>
+    <main>
+    <!-- Breadcrumb navigation -->
+    <nav aria-label="Breadcrumb" style="position:absolute;top:2rem;left:1.5rem;font-size:0.75rem;z-index:50;opacity:0.65;pointer-events:auto;">
+        <ol style="list-style:none;padding:0;margin:0;display:flex;align-items:center;gap:0.3rem;" itemscope itemtype="https://schema.org/BreadcrumbList">
+            <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+                <a href="/" itemprop="item" style="color:rgba(240,234,255,0.7);text-decoration:none;"><span itemprop="name">ChiffTown</span></a>
+                <meta itemprop="position" content="1">
+            </li>
+            <li style="color:rgba(240,234,255,0.7);opacity:0.6;" aria-hidden="true">›</li>
+            <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+                <span itemprop="name" aria-current="page" style="color:rgba(240,234,255,0.7);">Pixel Palace</span>
+                <meta itemprop="position" content="2">
+            </li>
+        </ol>
+    </nav>
+    <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Town Centre</a>
+
+    <section id="main-content" class="arcade-hero">
+        <div class="pixel-grid"></div>
+        <div class="retro-sprites">
+            <div class="sprite">👾</div>
+            <div class="sprite">🕹️</div>
+            <div class="sprite">🎮</div>
+            <div class="sprite">⭐</div>
+        </div>
+        <div class="game-elements">
+            <div class="game-el">🎮</div><div class="game-el">🕹️</div><div class="game-el">👾</div>
+            <div class="game-el">🏆</div><div class="game-el">⭐</div>
+        </div>
+        <div class="arcade-content">
+            <div class="arcade-badge"><i class="fas fa-gamepad"></i> PLAYER 1 READY</div>
+            <h1 class="arcade-title">THE ARCADE</h1>
+            <p class="arcade-subtitle">Challenge friends, compete online, and game on. Pick a game below!</p>
+        </div>
+    </section>
+
+    <!-- Game Selection -->
+    <section class="games-section" id="gameSelect">
+        <div class="container">
+            <div class="section-header">
+                <h2>MULTIPLAYER GAMES</h2>
+                <p>Challenge other players online</p>
+            </div>
+            <div class="games-grid">
+                <div class="game-card" onclick="startGame('ttt')">
+                    <div class="game-card-icon">❌⭕</div>
+                    <h3>TIC TAC TOE</h3>
+                    <p>Classic 2-player strategy. Get three in a row to win!</p>
+                    <div class="play-tag">PLAY NOW</div>
+                </div>
+                <div class="game-card" onclick="startGame('rps')">
+                    <div class="game-card-icon">✊✋✌️</div>
+                    <h3>ROCK PAPER SCISSORS</h3>
+                    <p>Best of 5 rounds. Quick reflexes win the day!</p>
+                    <div class="play-tag">PLAY NOW</div>
+                </div>
+                <div class="game-card" onclick="startGame('trivia')">
+                    <div class="game-card-icon">🧠💡</div>
+                    <h3>TRIVIA QUIZ</h3>
+                    <p>10 questions from around the world. Test your knowledge!</p>
+                    <div class="play-tag">PLAY NOW</div>
+                </div>
+            </div>
+            
+            <div class="section-header" style="margin-top:3rem;">
+                <h2>SINGLE PLAYER GAMES</h2>
+                <p>Compete for the high score - climb the global leaderboard!</p>
+            </div>
+            <div class="games-grid">
+                <div class="game-card" onclick="startGame('snake')">
+                    <div class="game-card-icon">🐍🍎</div>
+                    <h3>SNAKE</h3>
+                    <p>Classic snake game. Eat food, grow long, don't crash!</p>
+                    <div class="play-tag">PLAY NOW</div>
+                </div>
+                <div class="game-card" onclick="startGame('memory')">
+                    <div class="game-card-icon">🃏💭</div>
+                    <h3>MEMORY MATCH</h3>
+                    <p>Match emoji pairs. Fewest moves + time bonus = high score!</p>
+                    <div class="play-tag">PLAY NOW</div>
+                </div>
+                <div class="game-card" onclick="startGame('reaction')">
+                    <div class="game-card-icon">⚡🎯</div>
+                    <h3>REACTION TEST</h3>
+                    <p>Click when the screen changes. Best of 5 rounds!</p>
+                    <div class="play-tag">PLAY NOW</div>
+                </div>
+                <div class="game-card" onclick="startGame('runner')">
+                    <div class="game-card-icon">🏃💨</div>
+                    <h3>ENDLESS RUNNER</h3>
+                    <p>Jump over obstacles. How far can you run?</p>
+                    <div class="play-tag">PLAY NOW</div>
+                </div>
+                <div class="game-card" onclick="startGame('wordScramble')">
+                    <div class="game-card-icon">🔤📝</div>
+                    <h3>WORD SCRAMBLE</h3>
+                    <p>Unscramble words against the clock. 30 seconds each!</p>
+                    <div class="play-tag">PLAY NOW</div>
+                </div>
+                <div class="game-card" onclick="startGame('breakout')">
+                    <div class="game-card-icon">🧱💥</div>
+                    <h3>BRICK BREAKER</h3>
+                    <p>Bounce the ball and smash all the bricks! Classic arcade fun!</p>
+                    <div class="play-tag">PLAY NOW</div>
+                </div>
+                <div class="game-card" onclick="startGame('pong')">
+                    <div class="game-card-icon">🏓⚡</div>
+                    <h3>NEON PONG</h3>
+                    <p>Classic paddle battle vs AI. Speed increases every point!</p>
+                    <div class="play-tag">PLAY NOW</div>
+                </div>
+                <div class="game-card" onclick="startGame('typing')">
+                    <div class="game-card-icon">⌨️🔥</div>
+                    <h3>SPEED TYPER</h3>
+                    <p>Race against the clock! Type as fast and accurately as you can!</p>
+                    <div class="play-tag">PLAY NOW</div>
+                </div>
+                <div class="game-card" onclick="startGame('mines')">
+                    <div class="game-card-icon">💣🚩</div>
+                    <h3>MINESWEEPER</h3>
+                    <p>Clear the grid without hitting a mine. Flag suspects, reveal the rest!</p>
+                    <div class="play-tag">PLAY NOW</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TIC TAC TOE GAME AREA -->
+    <section class="game-area" id="tttArea">
+        <div class="container">
+            <button class="game-back-btn" onclick="leaveGame('ttt')"><i class="fas fa-arrow-left"></i> Back to Games</button>
+            <div class="section-header"><h2>TIC TAC TOE</h2></div>
+            <div class="game-status" id="tttStatus">Enter your name to find an opponent...</div>
+            <div id="tttNameInput" style="text-align:center;margin-bottom:1.5rem;">
+                <input type="text" id="tttName" placeholder="Your name" style="background:rgba(255,255,255,0.05);border:1px solid rgba(34,197,94,0.2);color:var(--arcade-text);padding:0.6rem 1rem;border-radius:8px;font-size:0.9rem;margin-right:0.5rem;">
+                <button class="arcade-btn" onclick="findTTTGame()"><i class="fas fa-search"></i> Find Game</button>
+            </div>
+            <div class="ttt-board" id="tttBoard" style="display:none;">
+                <div class="ttt-cell" onclick="tttMove(0)"></div>
+                <div class="ttt-cell" onclick="tttMove(1)"></div>
+                <div class="ttt-cell" onclick="tttMove(2)"></div>
+                <div class="ttt-cell" onclick="tttMove(3)"></div>
+                <div class="ttt-cell" onclick="tttMove(4)"></div>
+                <div class="ttt-cell" onclick="tttMove(5)"></div>
+                <div class="ttt-cell" onclick="tttMove(6)"></div>
+                <div class="ttt-cell" onclick="tttMove(7)"></div>
+                <div class="ttt-cell" onclick="tttMove(8)"></div>
+            </div>
+            <div style="text-align:center;margin-top:1rem;">
+                <button class="arcade-btn secondary" id="tttPlayAgain" onclick="findTTTGame()" style="display:none;"><i class="fas fa-redo"></i> Play Again</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- RPS GAME AREA -->
+    <section class="game-area" id="rpsArea">
+        <div class="container">
+            <button class="game-back-btn" onclick="leaveGame('rps')"><i class="fas fa-arrow-left"></i> Back to Games</button>
+            <div class="section-header"><h2>ROCK PAPER SCISSORS</h2></div>
+            <div class="game-status" id="rpsStatus">Enter your name to find an opponent...</div>
+            <div id="rpsNameInput" style="text-align:center;margin-bottom:1.5rem;">
+                <input type="text" id="rpsName" placeholder="Your name" style="background:rgba(255,255,255,0.05);border:1px solid rgba(34,197,94,0.2);color:var(--arcade-text);padding:0.6rem 1rem;border-radius:8px;font-size:0.9rem;margin-right:0.5rem;">
+                <button class="arcade-btn" onclick="findRPSGame()"><i class="fas fa-search"></i> Find Game</button>
+            </div>
+            <div id="rpsGame" style="display:none;">
+                <div class="rps-vs">
+                    <div class="rps-player"><div class="emoji" id="rpsP1Emoji">❓</div><div class="name" id="rpsP1Name">Player 1</div></div>
+                    <div class="rps-score" id="rpsScoreDisplay">0 - 0</div>
+                    <div class="rps-player"><div class="emoji" id="rpsP2Emoji">❓</div><div class="name" id="rpsP2Name">Player 2</div></div>
+                </div>
+                <div id="rpsRound" style="text-align:center;font-family:'Press Start 2P',cursive;font-size:0.7rem;color:var(--arcade-text-dim);margin-bottom:1rem;">ROUND 1/5</div>
+                <div class="rps-choices" id="rpsChoices">
+                    <div class="rps-choice" onclick="rpsChoose('rock')">🪨<span>ROCK</span></div>
+                    <div class="rps-choice" onclick="rpsChoose('paper')">📄<span>PAPER</span></div>
+                    <div class="rps-choice" onclick="rpsChoose('scissors')">✂️<span>SCISSORS</span></div>
+                </div>
+                <div id="rpsResult" style="text-align:center;margin-top:1rem;font-family:'Press Start 2P',cursive;font-size:0.8rem;color:var(--arcade-green);"></div>
+            </div>
+            <div style="text-align:center;margin-top:1rem;">
+                <button class="arcade-btn secondary" id="rpsPlayAgain" onclick="findRPSGame()" style="display:none;"><i class="fas fa-redo"></i> Play Again</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- TRIVIA GAME AREA -->
+    <section class="game-area" id="triviaArea">
+        <div class="container">
+            <button class="game-back-btn" onclick="leaveGame('trivia')"><i class="fas fa-arrow-left"></i> Back to Games</button>
+            <div class="section-header"><h2>TRIVIA QUIZ</h2></div>
+            <div class="game-status" id="triviaStatus">Enter your name to join a trivia session...</div>
+            <div id="triviaNameInput" style="text-align:center;margin-bottom:1.5rem;">
+                <input type="text" id="triviaName" placeholder="Your name" style="background:rgba(255,255,255,0.05);border:1px solid rgba(34,197,94,0.2);color:var(--arcade-text);padding:0.6rem 1rem;border-radius:8px;font-size:0.9rem;margin-right:0.5rem;">
+                <button class="arcade-btn" onclick="findTriviaGame()"><i class="fas fa-search"></i> Join Quiz</button>
+            </div>
+            <div id="triviaLobby" style="display:none;text-align:center;">
+                <p style="color:var(--arcade-text-dim);margin-bottom:1rem;">Players in lobby:</p>
+                <div class="trivia-players" id="triviaPlayerList"></div>
+                <button class="arcade-btn" id="triviaStartBtn" onclick="startTrivia()" style="display:none;margin-top:1rem;"><i class="fas fa-play"></i> Start Quiz</button>
+            </div>
+            <div id="triviaGame" style="display:none;">
+                <div class="trivia-question-box">
+                    <div class="trivia-category" id="triviaCategory">Category</div>
+                    <div class="trivia-timer" id="triviaTimer">15</div>
+                    <div class="trivia-q-text" id="triviaQuestion">Question?</div>
+                </div>
+                <div class="trivia-options" id="triviaOptions"></div>
+            </div>
+            <div class="trivia-scoreboard" id="triviaScoreboard" style="display:none;">
+                <div class="section-header"><h2 style="font-size:0.8rem;">SCOREBOARD</h2></div>
+                <div id="triviaScores"></div>
+            </div>
+            <div style="text-align:center;margin-top:1rem;">
+                <button class="arcade-btn secondary" id="triviaPlayAgain" onclick="findTriviaGame()" style="display:none;"><i class="fas fa-redo"></i> Play Again</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- SNAKE GAME AREA -->
+    <section class="game-area" id="snakeArea">
+        <div class="container">
+            <button class="game-back-btn" onclick="leaveGame('snake')"><i class="fas fa-arrow-left"></i> Back to Games</button>
+            <div class="section-header"><h2>SNAKE</h2></div>
+            <div class="game-status" id="snakeStatus">Press START to begin!</div>
+            <div style="text-align:center;margin-bottom:1rem;">
+                <div style="font-family:'Press Start 2P',cursive;font-size:0.7rem;color:var(--arcade-green);margin-bottom:0.5rem;">SCORE: <span id="snakeScore">0</span></div>
+                <button class="arcade-btn" id="snakeStartBtn" onclick="startSnake()"><i class="fas fa-play"></i> START</button>
+            </div>
+            <div id="snakeBoard" style="display:grid;grid-template-columns:repeat(20,1fr);gap:1px;max-width:500px;margin:0 auto;background:#000;border:2px solid var(--arcade-green);aspect-ratio:1;"></div>
+            <div style="text-align:center;margin-top:1rem;"><p style="color:var(--arcade-text-dim);font-size:0.85rem;">Use ARROW KEYS to move</p></div>
+        </div>
+    </section>
+
+    <!-- MEMORY MATCH GAME AREA -->
+    <section class="game-area" id="memoryArea">
+        <div class="container">
+            <button class="game-back-btn" onclick="leaveGame('memory')"><i class="fas fa-arrow-left"></i> Back to Games</button>
+            <div class="section-header"><h2>MEMORY MATCH</h2></div>
+            <div class="game-status" id="memoryStatus">Match all pairs!</div>
+            <div style="text-align:center;margin-bottom:1rem;">
+                <div style="display:flex;gap:2rem;justify-content:center;font-family:'Press Start 2P',cursive;font-size:0.65rem;color:var(--arcade-green);margin-bottom:0.75rem;">
+                    <span>MOVES: <span id="memoryMoves">0</span></span>
+                    <span>TIME: <span id="memoryTime">0</span>s</span>
+                </div>
+                <button class="arcade-btn" id="memoryStartBtn" onclick="startMemory()"><i class="fas fa-play"></i> NEW GAME</button>
+            </div>
+            <div id="memoryBoard" style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;max-width:400px;margin:0 auto;"></div>
+        </div>
+    </section>
+
+    <!-- REACTION TEST GAME AREA -->
+    <section class="game-area" id="reactionArea">
+        <div class="container">
+            <button class="game-back-btn" onclick="leaveGame('reaction')"><i class="fas fa-arrow-left"></i> Back to Games</button>
+            <div class="section-header"><h2>REACTION SPEED TEST</h2></div>
+            <div class="game-status" id="reactionStatus">Click START when ready!</div>
+            <div style="text-align:center;margin-bottom:1rem;">
+                <div style="font-family:'Press Start 2P',cursive;font-size:0.65rem;color:var(--arcade-green);margin-bottom:0.75rem;">ROUND: <span id="reactionRound">0</span>/5 | AVG: <span id="reactionAvg">0</span>ms</div>
+                <button class="arcade-btn" id="reactionStartBtn" onclick="startReaction()"><i class="fas fa-play"></i> START TEST</button>
+            </div>
+            <div id="reactionBox" style="width:100%;max-width:600px;height:300px;margin:0 auto;background:rgba(255,255,255,0.03);border:2px solid rgba(34,197,94,0.2);border-radius:16px;display:flex;align-items:center;justify-content:center;font-family:'Press Start 2P',cursive;font-size:1rem;color:var(--arcade-text);cursor:pointer;transition:background 0.3s;"></div>
+        </div>
+    </section>
+
+    <!-- ENDLESS RUNNER GAME AREA -->
+    <section class="game-area" id="runnerArea">
+        <div class="container">
+            <button class="game-back-btn" onclick="leaveGame('runner')"><i class="fas fa-arrow-left"></i> Back to Games</button>
+            <div class="section-header"><h2>ENDLESS RUNNER</h2></div>
+            <div class="game-status" id="runnerStatus">Press SPACE or TAP to jump!</div>
+            <div style="text-align:center;margin-bottom:1rem;">
+                <div style="font-family:'Press Start 2P',cursive;font-size:0.7rem;color:var(--arcade-green);margin-bottom:0.75rem;">DISTANCE: <span id="runnerScore">0</span>m</div>
+                <button class="arcade-btn" id="runnerStartBtn" onclick="startRunner()"><i class="fas fa-play"></i> START RUN</button>
+            </div>
+            <div id="runnerGame" style="position:relative;width:100%;max-width:700px;height:200px;margin:0 auto;background:rgba(255,255,255,0.03);border:2px solid rgba(34,197,94,0.2);border-radius:16px;overflow:hidden;">
+                <div id="runnerPlayer" style="position:absolute;left:50px;bottom:20px;width:30px;height:30px;background:var(--arcade-green);border-radius:4px;"></div>
+                <div id="runnerGround" style="position:absolute;bottom:0;left:0;right:0;height:20px;background:rgba(34,197,94,0.1);"></div>
+            </div>
+            <div style="text-align:center;margin-top:1rem;"><p style="color:var(--arcade-text-dim);font-size:0.85rem;">Press SPACE or click to jump</p></div>
+        </div>
+    </section>
+
+    <!-- WORD SCRAMBLE GAME AREA -->
+    <section class="game-area" id="wordScrambleArea">
+        <div class="container">
+            <button class="game-back-btn" onclick="leaveGame('wordScramble')"><i class="fas fa-arrow-left"></i> Back to Games</button>
+            <div class="section-header"><h2>WORD SCRAMBLE</h2></div>
+            <div class="game-status" id="wordStatus">Unscramble the word!</div>
+            <div style="text-align:center;margin-bottom:1rem;">
+                <div style="display:flex;gap:2rem;justify-content:center;font-family:'Press Start 2P',cursive;font-size:0.65rem;color:var(--arcade-green);margin-bottom:0.75rem;">
+                    <span>SCORE: <span id="wordScore">0</span></span>
+                    <span>TIME: <span id="wordTimer">30</span>s</span>
+                </div>
+                <button class="arcade-btn" id="wordStartBtn" onclick="startWordScramble()"><i class="fas fa-play"></i> START</button>
+            </div>
+            <div id="wordGameArea" style="display:none;">
+                <div style="text-align:center;margin-bottom:1.5rem;">
+                    <div style="font-family:'Press Start 2P',cursive;font-size:1.5rem;color:var(--arcade-green);letter-spacing:0.3rem;margin-bottom:1rem;" id="scrambledWord"></div>
+                </div>
+                <div style="text-align:center;">
+                    <input type="text" id="wordInput" placeholder="Type your answer..." style="background:rgba(255,255,255,0.05);border:1px solid rgba(34,197,94,0.2);color:var(--arcade-text);padding:0.75rem 1.5rem;border-radius:12px;font-size:1rem;width:100%;max-width:400px;text-align:center;margin-bottom:0.75rem;">
+                    <br>
+                    <button class="arcade-btn" onclick="submitWord()"><i class="fas fa-check"></i> SUBMIT</button>
+                    <button class="arcade-btn secondary" onclick="skipWord()" style="margin-left:0.5rem;"><i class="fas fa-forward"></i> SKIP</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BRICK BREAKER GAME AREA -->
+    <section class="game-area" id="breakoutArea">
+        <div class="container">
+            <button class="game-back-btn" onclick="leaveGame('breakout')"><i class="fas fa-arrow-left"></i> Back to Games</button>
+            <div class="section-header"><h2>BRICK BREAKER</h2></div>
+            <div class="game-status" id="breakoutStatus">Click or tap to launch the ball!</div>
+            <div style="text-align:center;margin-bottom:1rem;">
+                <div style="display:flex;gap:2rem;justify-content:center;font-family:'Press Start 2P',cursive;font-size:0.65rem;color:var(--arcade-green);margin-bottom:0.75rem;">
+                    <span>SCORE: <span id="breakoutScore">0</span></span>
+                    <span>LIVES: <span id="breakoutLives">3</span></span>
+                    <span>LEVEL: <span id="breakoutLevel">1</span></span>
+                </div>
+                <button class="arcade-btn" id="breakoutStartBtn" onclick="startBreakout()"><i class="fas fa-play"></i> START</button>
+            </div>
+            <canvas id="breakoutCanvas" width="600" height="450" style="display:block;margin:0 auto;background:rgba(0,0,0,0.8);border:2px solid var(--arcade-green);border-radius:8px;max-width:100%;touch-action:none;"></canvas>
+            <div style="text-align:center;margin-top:1rem;color:var(--arcade-text-dim);font-size:0.8rem;">
+                <p>🖱️ Move mouse/finger to control paddle • 🚀 Click/tap to launch</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- PONG GAME AREA -->
+    <section class="game-area" id="pongArea">
+        <div class="container">
+            <button class="game-back-btn" onclick="leaveGame('pong')"><i class="fas fa-arrow-left"></i> Back to Games</button>
+            <div class="section-header"><h2>NEON PONG</h2></div>
+            <div class="game-status" id="pongStatus">Defeat the AI to earn points!</div>
+            <div style="text-align:center;margin-bottom:1rem;">
+                <div style="display:flex;gap:2rem;justify-content:center;font-family:'Press Start 2P',cursive;font-size:0.65rem;color:var(--arcade-green);margin-bottom:0.75rem;">
+                    <span>YOU: <span id="pongPlayerScore">0</span></span>
+                    <span>AI: <span id="pongAIScore">0</span></span>
+                </div>
+                <button class="arcade-btn" id="pongStartBtn" onclick="startPong()"><i class="fas fa-play"></i> START</button>
+            </div>
+            <canvas id="pongCanvas" width="600" height="400" style="display:block;margin:0 auto;background:rgba(0,0,0,0.8);border:2px solid var(--arcade-green);border-radius:8px;max-width:100%;touch-action:none;"></canvas>
+            <div style="text-align:center;margin-top:1rem;color:var(--arcade-text-dim);font-size:0.8rem;">
+                <p>🖱️ Move mouse/finger to control left paddle</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SPEED TYPER GAME AREA -->
+    <section class="game-area" id="typingArea">
+        <div class="container">
+            <button class="game-back-btn" onclick="leaveGame('typing')"><i class="fas fa-arrow-left"></i> Back to Games</button>
+            <div class="section-header"><h2>⌨️ SPEED TYPER</h2></div>
+            <div class="game-status" id="typingStatus">Type the text below as fast as you can!</div>
+            <div style="text-align:center;margin-bottom:1rem;">
+                <div style="display:flex;gap:2rem;justify-content:center;font-family:'Press Start 2P',cursive;font-size:0.65rem;color:var(--arcade-green);margin-bottom:0.75rem;">
+                    <span>WPM: <span id="typingWPM">0</span></span>
+                    <span>ACC: <span id="typingAcc">100</span>%</span>
+                    <span>TIME: <span id="typingTime">30</span>s</span>
+                </div>
+                <div style="display:flex;gap:0.5rem;justify-content:center;margin-bottom:1rem;">
+                    <button class="arcade-btn secondary" onclick="setTypingDuration(15)">15s</button>
+                    <button class="arcade-btn secondary active" onclick="setTypingDuration(30)" id="dur30">30s</button>
+                    <button class="arcade-btn secondary" onclick="setTypingDuration(60)">60s</button>
+                </div>
+                <button class="arcade-btn" id="typingStartBtn" onclick="startTypingGame()"><i class="fas fa-play"></i> START</button>
+            </div>
+            <div id="typingTextDisplay" style="background:rgba(0,0,0,0.6);border:2px solid rgba(34,197,94,0.2);border-radius:12px;padding:1.5rem;margin:0 auto 1rem;max-width:700px;font-size:1.2rem;line-height:1.8;letter-spacing:0.5px;min-height:120px;font-family:'Courier New',monospace;position:relative;"></div>
+            <input type="text" id="typingInput" placeholder="Start typing here..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="width:100%;max-width:700px;display:block;margin:0 auto;background:rgba(0,0,0,0.5);border:2px solid rgba(34,197,94,0.3);color:var(--arcade-text);padding:0.8rem 1rem;border-radius:10px;font-size:1.1rem;font-family:'Courier New',monospace;outline:none;text-align:center;" disabled>
+            <div id="typingResult" style="display:none;text-align:center;margin-top:1.5rem;padding:1.5rem;background:rgba(34,197,94,0.05);border:1px solid rgba(34,197,94,0.15);border-radius:12px;max-width:500px;margin-left:auto;margin-right:auto;">
+            </div>
+        </div>
+    </section>
+
+    <!-- LEADERBOARD PANEL -->
+    <section class="games-section" id="leaderboardSection" style="background:var(--arcade-deep);border-top:1px solid rgba(34,197,94,0.1);">
+        <div class="container">
+            <div class="section-header">
+                <h2>🏆 GLOBAL LEADERBOARD</h2>
+                <p>Top players across all single-player games</p>
+            </div>
+            <div style="display:flex;gap:0.5rem;justify-content:center;margin-bottom:2rem;flex-wrap:wrap;">
+                <button class="arcade-btn secondary" onclick="showLeaderboard('overall')">Overall Champions</button>
+                <button class="arcade-btn secondary" onclick="showLeaderboard('snake')">Snake</button>
+                <button class="arcade-btn secondary" onclick="showLeaderboard('memory')">Memory</button>
+                <button class="arcade-btn secondary" onclick="showLeaderboard('reaction')">Reaction</button>
+                <button class="arcade-btn secondary" onclick="showLeaderboard('runner')">Runner</button>
+                <button class="arcade-btn secondary" onclick="showLeaderboard('wordScramble')">Word Scramble</button>
+                <button class="arcade-btn secondary" onclick="showLeaderboard('breakout')">Brick Breaker</button>
+                <button class="arcade-btn secondary" onclick="showLeaderboard('pong')">Pong</button>
+                <button class="arcade-btn secondary" onclick="showLeaderboard('typing')">Speed Typer</button>
+            </div>
+            <div id="leaderboardDisplay" style="max-width:600px;margin:0 auto;"></div>
+        </div>
+    </section>
+
+    <!-- Video Chat Rooms Section -->
+    <section class="rooms-section" id="roomsSection">
+        <div class="container">
+            <div class="section-header">
+                <h2>ARCADE ROOMS</h2>
+                <p>Video chat while gaming — start or join a room</p>
+            </div>
+            <div style="display:flex;gap:0.75rem;justify-content:center;margin-bottom:2rem;">
+                <button class="arcade-btn" onclick="createRoom()"><i class="fas fa-plus"></i> Start Room</button>
+                <button class="arcade-btn secondary" onclick="refreshRooms()"><i class="fas fa-sync-alt"></i> Refresh</button>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card"><i class="fas fa-users"></i><div class="stat-number" id="totalUsers">0</div><div class="stat-label">Players</div></div>
+                <div class="stat-card"><i class="fas fa-gamepad"></i><div class="stat-number" id="activeRooms">0</div><div class="stat-label">Active</div></div>
+                <div class="stat-card"><i class="fas fa-trophy"></i><div class="stat-number" id="liveStreams">0</div><div class="stat-label">Live</div></div>
+            </div>
+            <div id="roomsList" class="rooms-grid"></div>
+            <div id="noRooms" class="empty-state">
+                <i class="fas fa-gamepad"></i>
+                <h3>NO ACTIVE ROOMS</h3>
+                <p>Start a video room to game with friends!</p>
+                <button class="arcade-btn" onclick="createRoom()"><i class="fas fa-plus"></i> Start Room</button>
+            </div>
+        </div>
+    </section>
+
+    </main>
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section"><h3>THE ARCADE</h3><p>ChiffTown's gaming den.</p></div>
+                <div class="footer-section"><h3>GAMES</h3><ul><li><a href="#" onclick="startGame('ttt')">Tic Tac Toe</a></li><li><a href="#" onclick="startGame('rps')">Rock Paper Scissors</a></li><li><a href="#" onclick="startGame('trivia')">Trivia Quiz</a></li></ul></div>
+                <div class="footer-section"><h3>CONNECT</h3><div class="social-links"><a href="#"><i class="fab fa-twitter"></i></a><a href="#"><i class="fab fa-discord"></i></a></div></div>
+            </div>
+            <div class="footer-bottom"><p>&copy; 2026 ChiffTown — The Arcade</p></div>
+        </div>
+    
+    <!-- Related Venues — also in ChiffTown -->
+    <section aria-labelledby="related-venues-heading" style="padding:3rem 0;background:rgba(255,255,255,0.02);border-top:1px solid rgba(255,255,255,0.06);">
+        <div style="max-width:900px;margin:0 auto;padding:0 1.5rem;">
+            <h2 id="related-venues-heading" style="font-family:'Playfair Display',serif;font-size:1.4rem;margin-bottom:1.5rem;color:rgba(255,255,255,0.9);">Also in ChiffTown</h2>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem;" role="list">
+                <a href="/pub.html" style="display:flex;gap:1rem;align-items:center;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:1rem 1.25rem;text-decoration:none;color:rgba(255,255,255,0.85);transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(201,168,76,0.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'" role="listitem">
+                    <i class="fas fa-beer-mug-empty" style="color:#c9a84c;font-size:1.25rem;flex-shrink:0;" aria-hidden="true"></i>
+                    <div>
+                        <div style="font-weight:600;font-size:0.95rem;">The Chiff Inn</div>
+                        <div style="font-size:0.8rem;color:rgba(255,255,255,0.5);margin-top:0.2rem;">Wind down after gaming</div>
+                    </div>
+                </a>
+                <a href="/nightclub.html" style="display:flex;gap:1rem;align-items:center;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:1rem 1.25rem;text-decoration:none;color:rgba(255,255,255,0.85);transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(201,168,76,0.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'" role="listitem">
+                    <i class="fas fa-music" style="color:#c9a84c;font-size:1.25rem;flex-shrink:0;" aria-hidden="true"></i>
+                    <div>
+                        <div style="font-weight:600;font-size:0.95rem;">Neon Pulse</div>
+                        <div style="font-size:0.8rem;color:rgba(255,255,255,0.5);margin-top:0.2rem;">Keep the energy up</div>
+                    </div>
+                </a>
+                <a href="/questing.html" style="display:flex;gap:1rem;align-items:center;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:1rem 1.25rem;text-decoration:none;color:rgba(255,255,255,0.85);transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(201,168,76,0.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'" role="listitem">
+                    <i class="fas fa-scroll" style="color:#c9a84c;font-size:1.25rem;flex-shrink:0;" aria-hidden="true"></i>
+                    <div>
+                        <div style="font-weight:600;font-size:0.95rem;">Adventure Guild</div>
+                        <div style="font-size:0.8rem;color:rgba(255,255,255,0.5);margin-top:0.2rem;">More adventures await</div>
+                    </div>
+                </a>
+            </div>
+            <div style="text-align:center;margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;">
+                <a href="/" style="display:inline-flex;align-items:center;gap:0.5rem;color:rgba(201,168,76,0.8);text-decoration:none;font-size:0.9rem;border:1px solid rgba(201,168,76,0.3);padding:0.5rem 1.25rem;border-radius:50px;" aria-label="View the full ChiffTown map and all venues">
+                    <i class="fas fa-map" aria-hidden="true"></i> See the full town map
+                </a>
+                <a href="/blog/virtual-game-night-ideas.html" style="display:inline-flex;align-items:center;gap:0.5rem;color:rgba(201,168,76,0.8);text-decoration:none;font-size:0.9rem;border:1px solid rgba(201,168,76,0.3);padding:0.5rem 1.25rem;border-radius:50px;" aria-label="Read our virtual game night ideas blog post">
+                    <i class="fas fa-lightbulb" aria-hidden="true"></i> Game night ideas
+                </a>
+            </div>
+        </div>
+    </section>
+</footer>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="/js/xp-client.js?v=1"></script>
+    <script>
+        let socket = null, pendingHost = null;
+        let currentGameId = null, currentGameType = null;
+        let myTTTSymbol = null;
+        let triviaTimerInterval = null;
+        
+        // === SOCKET INIT ===
+        function initSocket() {
+            const url = ['localhost','127.0.0.1'].includes(location.hostname) ? 'http://localhost:3000' : location.origin;
+            socket = io(url, { transports: ['websocket','polling'], timeout: 5000, forceNew: true });
+            
+            socket.on('connect', () => {
+                console.log('✅ Arcade connected');
+                socket.emit('get-room-list');
+                // Initialize XP System with this socket
+                if (window.XPSystem) window.XPSystem.init(socket);
+            });
+            
+            // Room events
+            socket.on('room-list', d => {
+                const filtered = d.rooms.filter(r => r.type === 'arcade');
+                updateRoomList(filtered);
+                updateStats(d.stats);
+            });
+            socket.on('room-created', r => {
+                const u = pendingHost || 'Host';
+                pendingHost = null;
+                setTimeout(() => window.location.href = `pub-stream.html?v=${Date.now()}&room=${r.id}&username=${encodeURIComponent(u)}&host=1&type=arcade`, 400);
+            });
+            socket.on('room-updated', () => socket.emit('get-room-list'));
+            
+            // === TTT Events ===
+            socket.on('ttt-waiting', d => {
+                currentGameId = d.gameId;
+                document.getElementById('tttStatus').textContent = '⏳ Waiting for opponent...';
+            });
+            socket.on('ttt-start', d => {
+                currentGameId = d.gameId;
+                myTTTSymbol = d.player1.username === document.getElementById('tttName').value ? 'X' : 'O';
+                document.getElementById('tttNameInput').style.display = 'none';
+                document.getElementById('tttBoard').style.display = 'grid';
+                document.getElementById('tttPlayAgain').style.display = 'none';
+                updateTTTBoard(d.board, d.turn);
+                document.getElementById('tttStatus').textContent = `You are ${myTTTSymbol} — ${d.turn === myTTTSymbol ? 'YOUR TURN!' : 'Opponent\'s turn...'}`;
+            });
+            socket.on('ttt-update', d => {
+                updateTTTBoard(d.board, d.turn);
+                if (d.winner) {
+                    const won = d.winner === myTTTSymbol;
+                    document.getElementById('tttStatus').textContent = won ? '🏆 YOU WIN!' : '😢 YOU LOSE!';
+                    document.getElementById('tttPlayAgain').style.display = 'inline-flex';
+                    disableTTTBoard();
+                } else if (d.draw) {
+                    document.getElementById('tttStatus').textContent = "🤝 IT'S A DRAW!";
+                    document.getElementById('tttPlayAgain').style.display = 'inline-flex';
+                    disableTTTBoard();
+                } else {
+                    document.getElementById('tttStatus').textContent = d.turn === myTTTSymbol ? '🎯 YOUR TURN!' : "⏳ Opponent's turn...";
+                }
+            });
+            socket.on('ttt-opponent-left', () => {
+                document.getElementById('tttStatus').textContent = '🚪 Opponent left! You win by default.';
+                document.getElementById('tttPlayAgain').style.display = 'inline-flex';
+                disableTTTBoard();
+            });
+            
+            // === RPS Events ===
+            socket.on('rps-waiting', d => {
+                currentGameId = d.gameId;
+                document.getElementById('rpsStatus').textContent = '⏳ Waiting for opponent...';
+            });
+            socket.on('rps-start', d => {
+                currentGameId = d.gameId;
+                document.getElementById('rpsNameInput').style.display = 'none';
+                document.getElementById('rpsGame').style.display = 'block';
+                document.getElementById('rpsPlayAgain').style.display = 'none';
+                document.getElementById('rpsP1Name').textContent = d.player1;
+                document.getElementById('rpsP2Name').textContent = d.player2;
+                document.getElementById('rpsScoreDisplay').textContent = '0 - 0';
+                document.getElementById('rpsRound').textContent = 'ROUND 1/5';
+                document.getElementById('rpsResult').textContent = '';
+                document.getElementById('rpsP1Emoji').textContent = '❓';
+                document.getElementById('rpsP2Emoji').textContent = '❓';
+                enableRPSChoices();
+                document.getElementById('rpsStatus').textContent = '✊ Make your choice!';
+            });
+            socket.on('rps-opponent-chose', () => {
+                document.getElementById('rpsStatus').textContent = '⏳ Opponent has chosen! Your turn...';
+            });
+            socket.on('rps-result', d => {
+                const emojiMap = { rock: '🪨', paper: '📄', scissors: '✂️' };
+                document.getElementById('rpsP1Emoji').textContent = emojiMap[d.p1Choice];
+                document.getElementById('rpsP2Emoji').textContent = emojiMap[d.p2Choice];
+                document.getElementById('rpsScoreDisplay').textContent = `${d.scores[0]} - ${d.scores[1]}`;
+                document.getElementById('rpsRound').textContent = `ROUND ${d.round}/5`;
+                document.getElementById('rpsResult').textContent = d.winner === 'draw' ? '🤝 DRAW!' : `🏆 ${d.winner} wins!`;
+                document.getElementById('rpsStatus').textContent = d.winner === 'draw' ? '🤝 Draw this round!' : `${d.winner} wins this round!`;
+                // Re-enable choices after 2 seconds for next round
+                setTimeout(() => {
+                    document.getElementById('rpsP1Emoji').textContent = '❓';
+                    document.getElementById('rpsP2Emoji').textContent = '❓';
+                    document.getElementById('rpsResult').textContent = '';
+                    enableRPSChoices();
+                    document.getElementById('rpsStatus').textContent = '✊ Make your choice!';
+                }, 2000);
+            });
+            socket.on('rps-game-over', d => {
+                document.getElementById('rpsStatus').textContent = `🏆 GAME OVER! ${d.winner === 'Draw' ? "It's a draw!" : d.winner + ' wins!'}`;
+                document.getElementById('rpsScoreDisplay').textContent = `${d.scores[0]} - ${d.scores[1]}`;
+                document.getElementById('rpsPlayAgain').style.display = 'inline-flex';
+                disableRPSChoices();
+            });
+            socket.on('rps-opponent-left', () => {
+                document.getElementById('rpsStatus').textContent = '🚪 Opponent left!';
+                document.getElementById('rpsPlayAgain').style.display = 'inline-flex';
+                disableRPSChoices();
+            });
+            
+            // === Trivia Events ===
+            socket.on('trivia-waiting', d => {
+                currentGameId = d.gameId;
+                document.getElementById('triviaNameInput').style.display = 'none';
+                document.getElementById('triviaLobby').style.display = 'block';
+                document.getElementById('triviaStartBtn').style.display = 'inline-flex';
+                document.getElementById('triviaStatus').textContent = '⏳ Waiting for more players...';
+                updateTriviaPlayers([{ username: document.getElementById('triviaName').value, score: 0 }]);
+            });
+            socket.on('trivia-player-joined', d => {
+                currentGameId = d.gameId;
+                document.getElementById('triviaNameInput').style.display = 'none';
+                document.getElementById('triviaLobby').style.display = 'block';
+                updateTriviaPlayers(d.players);
+                if (d.hostCanStart) {
+                    document.getElementById('triviaStatus').textContent = '✅ Ready to start!';
+                }
+            });
+            socket.on('trivia-game-started', d => {
+                document.getElementById('triviaLobby').style.display = 'none';
+                document.getElementById('triviaGame').style.display = 'block';
+                document.getElementById('triviaScoreboard').style.display = 'block';
+                document.getElementById('triviaPlayAgain').style.display = 'none';
+                document.getElementById('triviaStatus').textContent = `🧠 ${d.totalQuestions} questions — let's go!`;
+                updateTriviaScoreboard(d.players);
+            });
+            socket.on('trivia-question', d => {
+                document.getElementById('triviaCategory').textContent = `${d.category} (${d.difficulty})`;
+                document.getElementById('triviaQuestion').textContent = d.question;
+                document.getElementById('triviaStatus').textContent = `Question ${d.index + 1}/${d.total}`;
+                const opts = document.getElementById('triviaOptions');
+                opts.innerHTML = d.options.map((o, i) => `<div class="trivia-option" onclick="triviaAnswer('${escapeAttr(o)}')">${o}</div>`).join('');
+                startTriviaTimer(d.timeLimit);
+            });
+            socket.on('trivia-answer-result', d => {
+                // Highlight correct/wrong after answering
+                const opts = document.querySelectorAll('.trivia-option');
+                opts.forEach(o => {
+                    o.classList.add('disabled');
+                    if (o.textContent === d.correctAnswer) o.classList.add('correct');
+                });
+            });
+            socket.on('trivia-scores', d => {
+                stopTriviaTimer();
+                // Highlight correct answer for everyone
+                const opts = document.querySelectorAll('.trivia-option');
+                opts.forEach(o => {
+                    o.classList.add('disabled');
+                    if (o.textContent === d.correctAnswer) o.classList.add('correct');
+                });
+                updateTriviaScoreboard(d.scores);
+            });
+            socket.on('trivia-game-over', d => {
+                stopTriviaTimer();
+                document.getElementById('triviaGame').style.display = 'none';
+                document.getElementById('triviaStatus').textContent = `🏆 GAME OVER! ${d.winner} wins!`;
+                updateTriviaScoreboard(d.scores);
+                document.getElementById('triviaPlayAgain').style.display = 'inline-flex';
+            });
+            socket.on('trivia-player-left', d => {
+                updateTriviaPlayers(d.players);
+                updateTriviaScoreboard(d.players);
+            });
+        }
+        
+        // === GAME NAVIGATION ===
+        function startGame(type) {
+            document.getElementById('gameSelect').style.display = 'none';
+            document.getElementById('roomsSection').style.display = 'none';
+            document.getElementById(type + 'Area').classList.add('active');
+            currentGameType = type;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        function leaveGame(type) {
+            if (currentGameId && socket) {
+                socket.emit(type + '-leave', { gameId: currentGameId });
+            }
+            currentGameId = null;
+            currentGameType = null;
+            myTTTSymbol = null;
+            stopTriviaTimer();
+            
+            // Reset all game areas
+            document.querySelectorAll('.game-area').forEach(a => a.classList.remove('active'));
+            document.getElementById('gameSelect').style.display = '';
+            document.getElementById('roomsSection').style.display = '';
+            
+            // Reset game UIs
+            resetTTT(); resetRPS(); resetTrivia();
+        }
+        
+        // === TTT Functions ===
+        function findTTTGame() {
+            const name = document.getElementById('tttName').value.trim();
+            if (!name) { alert('Enter your name!'); return; }
+            document.getElementById('tttPlayAgain').style.display = 'none';
+            resetTTTBoard();
+            socket.emit('ttt-find-game', { username: name });
+            document.getElementById('tttStatus').textContent = '🔍 Finding opponent...';
+        }
+        
+        function tttMove(cell) {
+            if (!currentGameId) return;
+            socket.emit('ttt-move', { gameId: currentGameId, cell });
+        }
+        
+        function updateTTTBoard(board, turn) {
+            const cells = document.querySelectorAll('.ttt-cell');
+            board.forEach((val, i) => {
+                cells[i].textContent = val === 'X' ? '✕' : val === 'O' ? '○' : '';
+                cells[i].className = 'ttt-cell' + (val === 'X' ? ' x' : val === 'O' ? ' o' : '');
+                if (val || turn !== myTTTSymbol) cells[i].classList.add('disabled');
+            });
+        }
+        
+        function disableTTTBoard() {
+            document.querySelectorAll('.ttt-cell').forEach(c => c.classList.add('disabled'));
+        }
+        
+        function resetTTTBoard() {
+            document.querySelectorAll('.ttt-cell').forEach(c => { c.textContent = ''; c.className = 'ttt-cell'; });
+        }
+        
+        function resetTTT() {
+            document.getElementById('tttNameInput').style.display = '';
+            document.getElementById('tttBoard').style.display = 'none';
+            document.getElementById('tttPlayAgain').style.display = 'none';
+            document.getElementById('tttStatus').textContent = 'Enter your name to find an opponent...';
+            resetTTTBoard();
+        }
+        
+        // === RPS Functions ===
+        function findRPSGame() {
+            const name = document.getElementById('rpsName').value.trim();
+            if (!name) { alert('Enter your name!'); return; }
+            document.getElementById('rpsPlayAgain').style.display = 'none';
+            document.getElementById('rpsGame').style.display = 'none';
+            document.getElementById('rpsNameInput').style.display = '';
+            socket.emit('rps-find-game', { username: name });
+            document.getElementById('rpsStatus').textContent = '🔍 Finding opponent...';
+            document.getElementById('rpsNameInput').style.display = 'none';
+        }
+        
+        function rpsChoose(choice) {
+            if (!currentGameId) return;
+            socket.emit('rps-choose', { gameId: currentGameId, choice });
+            document.querySelectorAll('.rps-choice').forEach(c => {
+                c.classList.remove('selected');
+                if (c.querySelector('span').textContent === choice.toUpperCase()) c.classList.add('selected');
+            });
+            disableRPSChoices();
+            document.getElementById('rpsStatus').textContent = '⏳ Waiting for opponent...';
+        }
+        
+        function enableRPSChoices() {
+            document.querySelectorAll('.rps-choice').forEach(c => { c.style.pointerEvents = 'auto'; c.classList.remove('selected'); });
+        }
+        function disableRPSChoices() {
+            document.querySelectorAll('.rps-choice').forEach(c => c.style.pointerEvents = 'none');
+        }
+        
+        function resetRPS() {
+            document.getElementById('rpsNameInput').style.display = '';
+            document.getElementById('rpsGame').style.display = 'none';
+            document.getElementById('rpsPlayAgain').style.display = 'none';
+            document.getElementById('rpsStatus').textContent = 'Enter your name to find an opponent...';
+        }
+        
+        // === Trivia Functions ===
+        function findTriviaGame() {
+            const name = document.getElementById('triviaName').value.trim();
+            if (!name) { alert('Enter your name!'); return; }
+            document.getElementById('triviaPlayAgain').style.display = 'none';
+            document.getElementById('triviaGame').style.display = 'none';
+            document.getElementById('triviaScoreboard').style.display = 'none';
+            document.getElementById('triviaLobby').style.display = 'none';
+            socket.emit('trivia-find-game', { username: name });
+            document.getElementById('triviaStatus').textContent = '🔍 Finding quiz session...';
+            document.getElementById('triviaNameInput').style.display = 'none';
+        }
+        
+        function startTrivia() {
+            if (!currentGameId) return;
+            socket.emit('trivia-start', { gameId: currentGameId });
+            document.getElementById('triviaStatus').textContent = '🚀 Starting quiz...';
+        }
+        
+        function triviaAnswer(answer) {
+            if (!currentGameId) return;
+            const timeLeft = parseInt(document.getElementById('triviaTimer').textContent) || 0;
+            socket.emit('trivia-answer', { gameId: currentGameId, answer, timeLeft });
+            // Highlight selected
+            document.querySelectorAll('.trivia-option').forEach(o => {
+                if (o.textContent === answer) o.style.borderColor = 'var(--arcade-cyan)';
+                o.classList.add('disabled');
+            });
+        }
+        
+        function startTriviaTimer(seconds) {
+            stopTriviaTimer();
+            const el = document.getElementById('triviaTimer');
+            let time = seconds;
+            el.textContent = time;
+            el.classList.remove('urgent');
+            triviaTimerInterval = setInterval(() => {
+                time--;
+                el.textContent = time;
+                if (time <= 5) el.classList.add('urgent');
+                if (time <= 0) { stopTriviaTimer(); }
+            }, 1000);
+        }
+        
+        function stopTriviaTimer() {
+            if (triviaTimerInterval) { clearInterval(triviaTimerInterval); triviaTimerInterval = null; }
+        }
+        
+        function updateTriviaPlayers(players) {
+            document.getElementById('triviaPlayerList').innerHTML = players.map(p => 
+                `<span class="trivia-player-tag">👤 ${escapeHtml(p.username)}</span>`
+            ).join('');
+        }
+        
+        function updateTriviaScoreboard(scores) {
+            document.getElementById('triviaScoreboard').style.display = 'block';
+            document.getElementById('triviaScores').innerHTML = scores.map((s, i) => `
+                <div class="trivia-score-row">
+                    <span class="rank">#${i + 1}</span>
+                    <span class="name">${escapeHtml(s.username)}</span>
+                    <span class="score">${s.score}</span>
+                </div>
+            `).join('');
+        }
+        
+        function resetTrivia() {
+            document.getElementById('triviaNameInput').style.display = '';
+            document.getElementById('triviaLobby').style.display = 'none';
+            document.getElementById('triviaGame').style.display = 'none';
+            document.getElementById('triviaScoreboard').style.display = 'none';
+            document.getElementById('triviaPlayAgain').style.display = 'none';
+            document.getElementById('triviaStatus').textContent = 'Enter your name to join a trivia session...';
+            stopTriviaTimer();
+        }
+        
+        // === Room Functions ===
+        function createRoom() {
+            const u = prompt('Player name?');
+            if (!u?.trim()) return;
+            pendingHost = u.trim();
+            if (socket) socket.emit('create-room', { name: `${u}'s Game`, description: 'Ready Player One. Join the fun!', maxParticipants: 10, isPrivate: false, type: 'arcade' });
+            else window.location.href = `pub-stream.html?v=${Date.now()}&room=${Math.random().toString(36).substring(2,8).toUpperCase()}&username=${encodeURIComponent(u.trim())}&host=1&type=arcade`;
+        }
+        function refreshRooms() { if (socket) socket.emit('get-room-list'); }
+        function joinRoom(id) {
+            const u = prompt('Player name?');
+            if (!u?.trim()) return;
+            window.location.href = `pub-stream.html?v=${Date.now()}&room=${id}&username=${encodeURIComponent(u.trim())}&host=0&type=arcade`;
+        }
+        
+        function updateRoomList(rooms) {
+            const l = document.getElementById('roomsList'), e = document.getElementById('noRooms');
+            if (!rooms.length) { l.style.display = 'none'; e.style.display = 'block'; return; }
+            l.style.display = 'grid'; e.style.display = 'none';
+            l.innerHTML = rooms.map(r => `
+                <div class="room-card" onclick="joinRoom('${r.id}')">
+                    <div class="room-card-header">
+                        <div class="room-card-icon"><i class="fas fa-gamepad"></i></div>
+                        <h3 class="room-card-title">${escapeHtml(r.name)}</h3>
+                    </div>
+                    <p class="room-card-description">${escapeHtml(r.description)}</p>
+                    <div class="room-card-stats">
+                        <div class="room-card-stat"><i class="fas fa-users"></i> ${r.participantCount}/${r.maxParticipants}</div>
+                        <div class="room-card-stat"><i class="fas fa-circle ${r.hasStreamer ? 'live' : 'offline'}"></i> ${r.hasStreamer ? 'Live' : 'Waiting'}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        function updateStats(s) {
+            document.getElementById('totalUsers').textContent = s.totalUsers || 0;
+            document.getElementById('activeRooms').textContent = s.activeRooms || 0;
+            document.getElementById('liveStreams').textContent = s.liveStreams || 0;
+        }
+        
+        function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+        function escapeAttr(t) { return t.replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
+        
+        // === SINGLE PLAYER GAMES ===
+        
+        // Snake Game
+        let snakeGame = null;
+        function startSnake() {
+            if (snakeGame) snakeGame.stop();
+            document.getElementById('snakeStartBtn').style.display = 'none';
+            
+            const board = document.getElementById('snakeBoard');
+            board.innerHTML = '';
+            for (let i = 0; i < 400; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'snake-cell';
+                cell.dataset.index = i;
+                board.appendChild(cell);
+            }
+            
+            snakeGame = {
+                snake: [210, 211, 212],
+                direction: 'right',
+                food: null,
+                score: 0,
+                speed: 150,
+                interval: null,
+                stopped: false,
+                
+                spawnFood() {
+                    const empty = [];
+                    for (let i = 0; i < 400; i++) {
+                        if (!this.snake.includes(i)) empty.push(i);
+                    }
+                    this.food = empty[Math.floor(Math.random() * empty.length)];
+                    document.querySelector(`[data-index="${this.food}"]`).classList.add('food');
+                },
+                
+                move() {
+                    if (this.stopped) return;
+                    const head = this.snake[this.snake.length - 1];
+                    let newHead = head;
+                    
+                    if (this.direction === 'up') newHead = head - 20;
+                    if (this.direction === 'down') newHead = head + 20;
+                    if (this.direction === 'left') newHead = head - 1;
+                    if (this.direction === 'right') newHead = head + 1;
+                    
+                    // Check wall collision
+                    if (newHead < 0 || newHead >= 400 || 
+                        (this.direction === 'left' && head % 20 === 0) ||
+                        (this.direction === 'right' && head % 20 === 19)) {
+                        this.gameOver();
+                        return;
+                    }
+                    
+                    // Check self collision
+                    if (this.snake.includes(newHead)) {
+                        this.gameOver();
+                        return;
+                    }
+                    
+                    this.snake.push(newHead);
+                    
+                    // Check food
+                    if (newHead === this.food) {
+                        this.score++;
+                        document.getElementById('snakeScore').textContent = this.score;
+                        this.speed = Math.max(50, this.speed - 2);
+                        clearInterval(this.interval);
+                        this.interval = setInterval(() => this.move(), this.speed);
+                        this.spawnFood();
+                    } else {
+                        const tail = this.snake.shift();
+                        document.querySelector(`[data-index="${tail}"]`).classList.remove('snake');
+                    }
+                    
+                    document.querySelector(`[data-index="${newHead}"]`).classList.add('snake');
+                },
+                
+                async gameOver() {
+                    this.stopped = true;
+                    clearInterval(this.interval);
+                    document.getElementById('snakeStatus').textContent = `🎮 GAME OVER! Score: ${this.score}`;
+                    document.getElementById('snakeStartBtn').style.display = 'inline-flex';
+                    
+                    // Submit score
+                    const username = prompt('Enter your name for the leaderboard:');
+                    if (username && username.trim()) {
+                        await submitScore('snake', username.trim(), this.score);
+                    }
+                },
+                
+                stop() {
+                    this.stopped = true;
+                    if (this.interval) clearInterval(this.interval);
+                }
+            };
+            
+            snakeGame.spawnFood();
+            snakeGame.interval = setInterval(() => snakeGame.move(), snakeGame.speed);
+            document.getElementById('snakeStatus').textContent = '🐍 Use arrow keys to move!';
+            
+            // Arrow key controls
+            document.onkeydown = (e) => {
+                if (!snakeGame || snakeGame.stopped) return;
+                if (e.key === 'ArrowUp' && snakeGame.direction !== 'down') snakeGame.direction = 'up';
+                if (e.key === 'ArrowDown' && snakeGame.direction !== 'up') snakeGame.direction = 'down';
+                if (e.key === 'ArrowLeft' && snakeGame.direction !== 'right') snakeGame.direction = 'left';
+                if (e.key === 'ArrowRight' && snakeGame.direction !== 'left') snakeGame.direction = 'right';
+            };
+        }
+        
+        // Memory Match Game
+        let memoryGame = null;
+        const EMOJIS = ['🍎','🍊','🍋','🍌','🍉','🍇','🍓','🫐','🍒','🥝','🍑','🥭','🍍','🥥','🥑','🍆'];
+        
+        function startMemory() {
+            if (memoryGame) memoryGame.stop();
+            document.getElementById('memoryStartBtn').style.display = 'none';
+            
+            const pairs = EMOJIS.slice(0, 8).flatMap(e => [e, e]);
+            const shuffled = pairs.sort(() => Math.random() - 0.5);
+            
+            const board = document.getElementById('memoryBoard');
+            board.innerHTML = '';
+            shuffled.forEach((emoji, i) => {
+                const card = document.createElement('div');
+                card.className = 'memory-card';
+                card.innerHTML = `<span>${emoji}</span>`;
+                card.dataset.emoji = emoji;
+                card.dataset.index = i;
+                card.onclick = () => memoryGame && memoryGame.flip(i);
+                board.appendChild(card);
+            });
+            
+            memoryGame = {
+                flipped: [],
+                matched: [],
+                moves: 0,
+                startTime: Date.now(),
+                timer: null,
+                stopped: false,
+                
+                flip(index) {
+                    if (this.stopped || this.flipped.length >= 2 || this.flipped.includes(index) || this.matched.includes(index)) return;
+                    
+                    const card = document.querySelector(`.memory-card[data-index="${index}"]`);
+                    card.classList.add('flipped');
+                    this.flipped.push(index);
+                    
+                    if (this.flipped.length === 2) {
+                        this.moves++;
+                        document.getElementById('memoryMoves').textContent = this.moves;
+                        
+                        const [i1, i2] = this.flipped;
+                        const c1 = document.querySelector(`.memory-card[data-index="${i1}"]`);
+                        const c2 = document.querySelector(`.memory-card[data-index="${i2}"]`);
+                        
+                        if (c1.dataset.emoji === c2.dataset.emoji) {
+                            this.matched.push(i1, i2);
+                            c1.classList.add('matched');
+                            c2.classList.add('matched');
+                            this.flipped = [];
+                            
+                            if (this.matched.length === 16) {
+                                this.gameOver();
+                            }
+                        } else {
+                            setTimeout(() => {
+                                c1.classList.remove('flipped');
+                                c2.classList.remove('flipped');
+                                this.flipped = [];
+                            }, 800);
+                        }
+                    }
+                },
+                
+                async gameOver() {
+                    this.stopped = true;
+                    clearInterval(this.timer);
+                    const time = Math.floor((Date.now() - this.startTime) / 1000);
+                    const score = Math.max(0, 10000 - (this.moves * 50) - (time * 10));
+                    
+                    document.getElementById('memoryStatus').textContent = `🎉 Complete! Moves: ${this.moves} | Time: ${time}s`;
+                    document.getElementById('memoryStartBtn').style.display = 'inline-flex';
+                    
+                    const username = prompt(`Your score: ${score}\nEnter name for leaderboard:`);
+                    if (username && username.trim()) {
+                        await submitScore('memory', username.trim(), score);
+                    }
+                },
+                
+                stop() {
+                    this.stopped = true;
+                    if (this.timer) clearInterval(this.timer);
+                }
+            };
+            
+            // Start timer
+            memoryGame.timer = setInterval(() => {
+                if (memoryGame && !memoryGame.stopped) {
+                    const elapsed = Math.floor((Date.now() - memoryGame.startTime) / 1000);
+                    document.getElementById('memoryTime').textContent = elapsed;
+                }
+            }, 1000);
+            
+            document.getElementById('memoryStatus').textContent = '🃏 Find all matching pairs!';
+            document.getElementById('memoryMoves').textContent = '0';
+            document.getElementById('memoryTime').textContent = '0';
+        }
+        
+        // Reaction Speed Test
+        let reactionGame = null;
+        function startReaction() {
+            if (reactionGame) return;
+            document.getElementById('reactionStartBtn').style.display = 'none';
+            
+            reactionGame = {
+                round: 0,
+                times: [],
+                waitTime: null,
+                startTime: null,
+                box: document.getElementById('reactionBox'),
+                
+                nextRound() {
+                    this.round++;
+                    document.getElementById('reactionRound').textContent = this.round;
+                    document.getElementById('reactionStatus').textContent = '⏳ Wait for it...';
+                    this.box.style.background = 'rgba(255,255,255,0.03)';
+                    this.box.textContent = 'Wait...';
+                    this.box.onclick = () => this.tooEarly();
+                    
+                    this.waitTime = setTimeout(() => {
+                        this.box.style.background = 'var(--arcade-green)';
+                        this.box.textContent = 'CLICK NOW!';
+                        this.startTime = Date.now();
+                        this.box.onclick = () => this.click();
+                    }, 2000 + Math.random() * 3000);
+                },
+                
+                tooEarly() {
+                    clearTimeout(this.waitTime);
+                    this.box.style.background = 'rgba(239,68,68,0.2)';
+                    this.box.textContent = 'Too early!';
+                    this.box.onclick = null;
+                    setTimeout(() => this.nextRound(), 1500);
+                },
+                
+                click() {
+                    const time = Date.now() - this.startTime;
+                    this.times.push(time);
+                    this.box.style.background = 'rgba(34,197,94,0.2)';
+                    this.box.textContent = `${time}ms`;
+                    this.box.onclick = null;
+                    
+                    const avg = Math.round(this.times.reduce((a, b) => a + b, 0) / this.times.length);
+                    document.getElementById('reactionAvg').textContent = avg;
+                    
+                    if (this.round < 5) {
+                        setTimeout(() => this.nextRound(), 1500);
+                    } else {
+                        this.gameOver(avg);
+                    }
+                },
+                
+                async gameOver(avg) {
+                    document.getElementById('reactionStatus').textContent = `✅ Complete! Average: ${avg}ms`;
+                    document.getElementById('reactionStartBtn').style.display = 'inline-flex';
+                    this.box.onclick = null;
+                    
+                    const username = prompt(`Your average: ${avg}ms\nEnter name for leaderboard:`);
+                    if (username && username.trim()) {
+                        await submitScore('reaction', username.trim(), avg);
+                    }
+                    reactionGame = null;
+                }
+            };
+            
+            reactionGame.nextRound();
+        }
+        
+        // Endless Runner Game
+        let runnerGame = null;
+        function startRunner() {
+            if (runnerGame) runnerGame.stop();
+            document.getElementById('runnerStartBtn').style.display = 'none';
+            
+            const game = document.getElementById('runnerGame');
+            const player = document.getElementById('runnerPlayer');
+            game.innerHTML = '<div id="runnerPlayer" style="position:absolute;left:50px;bottom:20px;width:30px;height:30px;background:var(--arcade-green);border-radius:4px;"></div><div id="runnerGround" style="position:absolute;bottom:0;left:0;right:0;height:20px;background:rgba(34,197,94,0.1);"></div>';
+            
+            runnerGame = {
+                distance: 0,
+                jumping: false,
+                gravity: 0,
+                obstacles: [],
+                speed: 5,
+                interval: null,
+                spawnTimer: null,
+                stopped: false,
+                
+                jump() {
+                    if (this.jumping || this.stopped) return;
+                    this.jumping = true;
+                    this.gravity = -15;
+                },
+                
+                update() {
+                    if (this.stopped) return;
+                    
+                    // Update player
+                    const player = document.getElementById('runnerPlayer');
+                    if (!player) return;
+                    
+                    if (this.jumping) {
+                        let bottom = parseInt(player.style.bottom);
+                        bottom += this.gravity;
+                        this.gravity += 1;
+                        
+                        if (bottom <= 20) {
+                            bottom = 20;
+                            this.jumping = false;
+                            this.gravity = 0;
+                        }
+                        player.style.bottom = bottom + 'px';
+                    }
+                    
+                    // Update obstacles
+                    this.obstacles.forEach((obs, i) => {
+                        obs.x -= this.speed;
+                        obs.el.style.left = obs.x + 'px';
+                        
+                        // Check collision
+                        const playerBottom = parseInt(player.style.bottom);
+                        const playerLeft = 50;
+                        if (obs.x < playerLeft + 30 && obs.x + 20 > playerLeft && playerBottom < 40) {
+                            this.gameOver();
+                        }
+                        
+                        if (obs.x < -20) {
+                            obs.el.remove();
+                            this.obstacles.splice(i, 1);
+                            this.distance += 10;
+                            document.getElementById('runnerScore').textContent = this.distance;
+                        }
+                    });
+                    
+                    this.speed += 0.001;
+                },
+                
+                spawnObstacle() {
+                    if (this.stopped) return;
+                    const obs = document.createElement('div');
+                    obs.style.cssText = 'position:absolute;left:700px;bottom:20px;width:20px;height:20px;background:#ef4444;border-radius:4px;';
+                    document.getElementById('runnerGame').appendChild(obs);
+                    this.obstacles.push({ x: 700, el: obs });
+                },
+                
+                async gameOver() {
+                    this.stopped = true;
+                    clearInterval(this.interval);
+                    clearInterval(this.spawnTimer);
+                    document.getElementById('runnerStatus').textContent = `💥 Crashed! Distance: ${this.distance}m`;
+                    document.getElementById('runnerStartBtn').style.display = 'inline-flex';
+                    
+                    const username = prompt(`You ran ${this.distance}m!\nEnter name for leaderboard:`);
+                    if (username && username.trim()) {
+                        await submitScore('runner', username.trim(), this.distance);
+                    }
+                },
+                
+                stop() {
+                    this.stopped = true;
+                    if (this.interval) clearInterval(this.interval);
+                    if (this.spawnTimer) clearInterval(this.spawnTimer);
+                }
+            };
+            
+            runnerGame.interval = setInterval(() => runnerGame.update(), 30);
+            runnerGame.spawnTimer = setInterval(() => runnerGame.spawnObstacle(), 2000);
+            
+            document.getElementById('runnerStatus').textContent = '🏃 Running! Jump to avoid obstacles!';
+            document.getElementById('runnerScore').textContent = '0';
+            
+            document.onkeydown = (e) => {
+                if (e.code === 'Space' && runnerGame) {
+                    e.preventDefault();
+                    runnerGame.jump();
+                }
+            };
+            
+            document.getElementById('runnerGame').onclick = () => runnerGame && runnerGame.jump();
+        }
+        
+        // Word Scramble Game
+        let wordGame = null;
+        const WORDS = [
+            'PYTHON','JAVASCRIPT','DATABASE','FUNCTION','VARIABLE','ALGORITHM','DEVELOPER',
+            'COMPUTER','KEYBOARD','MONITOR','NETWORK','INTERNET','SOFTWARE','HARDWARE',
+            'BROWSER','WEBSITE','SECURITY','PASSWORD','FIREWALL','ENCRYPT','DOWNLOAD',
+            'UPLOAD','STREAMING','GAMING','VIRTUAL','DIGITAL','CODING','PROGRAMMING',
+            'INTERFACE','APPLICATION','MOBILE','TABLET','CLOUD','SERVER','CLIENT',
+            'DEBUGGING','TESTING','VERSION','PACKAGE','MODULE','LIBRARY','FRAMEWORK',
+            'SYNTAX','COMPILER','RUNTIME','MEMORY','STORAGE','PROCESSOR','GRAPHICS',
+            'ARTIFICIAL','MACHINE','LEARNING','NEURAL','QUANTUM','BLOCKCHAIN'
+        ];
+        
+        function startWordScramble() {
+            if (wordGame) wordGame.stop();
+            document.getElementById('wordStartBtn').style.display = 'none';
+            document.getElementById('wordGameArea').style.display = 'block';
+            
+            wordGame = {
+                score: 0,
+                currentWord: '',
+                scrambled: '',
+                timeLeft: 30,
+                timer: null,
+                stopped: false,
+                
+                newWord() {
+                    this.currentWord = WORDS[Math.floor(Math.random() * WORDS.length)];
+                    this.scrambled = this.currentWord.split('').sort(() => Math.random() - 0.5).join('');
+                    document.getElementById('scrambledWord').textContent = this.scrambled;
+                    document.getElementById('wordInput').value = '';
+                    document.getElementById('wordInput').focus();
+                    this.timeLeft = 30;
+                    document.getElementById('wordTimer').textContent = this.timeLeft;
+                },
+                
+                checkAnswer() {
+                    const answer = document.getElementById('wordInput').value.toUpperCase().trim();
+                    if (answer === this.currentWord) {
+                        this.score++;
+                        document.getElementById('wordScore').textContent = this.score;
+                        document.getElementById('wordStatus').textContent = '✅ Correct!';
+                        setTimeout(() => {
+                            document.getElementById('wordStatus').textContent = 'Unscramble the word!';
+                            this.newWord();
+                        }, 500);
+                    } else {
+                        document.getElementById('wordStatus').textContent = '❌ Wrong! Try again';
+                        setTimeout(() => {
+                            document.getElementById('wordStatus').textContent = 'Unscramble the word!';
+                        }, 1000);
+                    }
+                },
+                
+                skip() {
+                    this.newWord();
+                },
+                
+                tick() {
+                    this.timeLeft--;
+                    document.getElementById('wordTimer').textContent = this.timeLeft;
+                    if (this.timeLeft <= 0) {
+                        this.gameOver();
+                    }
+                },
+                
+                async gameOver() {
+                    this.stopped = true;
+                    clearInterval(this.timer);
+                    document.getElementById('wordGameArea').style.display = 'none';
+                    document.getElementById('wordStatus').textContent = `⏰ Time's up! Score: ${this.score}`;
+                    document.getElementById('wordStartBtn').style.display = 'inline-flex';
+                    
+                    const username = prompt(`You solved ${this.score} words!\nEnter name for leaderboard:`);
+                    if (username && username.trim()) {
+                        await submitScore('wordScramble', username.trim(), this.score);
+                    }
+                },
+                
+                stop() {
+                    this.stopped = true;
+                    if (this.timer) clearInterval(this.timer);
+                }
+            };
+            
+            wordGame.newWord();
+            wordGame.timer = setInterval(() => wordGame.tick(), 1000);
+            document.getElementById('wordStatus').textContent = 'Unscramble the word!';
+            document.getElementById('wordScore').textContent = '0';
+            
+            // Enter key to submit
+            document.getElementById('wordInput').onkeypress = (e) => {
+                if (e.key === 'Enter' && wordGame) wordGame.checkAnswer();
+            };
+        }
+        
+        function submitWord() {
+            if (wordGame) wordGame.checkAnswer();
+        }
+        
+        function skipWord() {
+            if (wordGame) wordGame.skip();
+        }
+        
+        // Submit score to leaderboard
+        async function submitScore(game, username, score) {
+            try {
+                const res = await fetch(`/api/leaderboard/${game}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, score })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(`🎉 Score submitted! Your rank: #${data.rank}${data.isTopTen ? ' (TOP 10!)' : ''}`);
+                    showLeaderboard(game);
+                }
+            } catch (err) {
+                console.error('Error submitting score:', err);
+            }
+        }
+        
+        // Show leaderboard
+        async function showLeaderboard(game) {
+            const display = document.getElementById('leaderboardDisplay');
+            display.innerHTML = '<div style="text-align:center;padding:2rem;"><i class="fas fa-spinner fa-spin" style="font-size:2rem;color:var(--arcade-green);"></i></div>';
+            
+            try {
+                const url = game === 'overall' ? '/api/leaderboard' : `/api/leaderboard/${game}`;
+                const res = await fetch(url);
+                const data = await res.json();
+                
+                if (!data.length) {
+                    display.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--arcade-text-dim);">No scores yet. Be the first!</div>';
+                    return;
+                }
+                
+                let title = game === 'overall' ? '👑 Overall Champions' : 
+                            game === 'snake' ? '🐍 Snake Masters' :
+                            game === 'memory' ? '🃏 Memory Champions' :
+                            game === 'reaction' ? '⚡ Lightning Reflexes' :
+                            game === 'runner' ? '🏃 Distance Records' :
+                            game === 'breakout' ? '🧱 Brick Breakers' :
+                            game === 'pong' ? '🏓 Pong Champions' :
+                            game === 'typing' ? '⌨️ Speed Typers' :
+                            '🔤 Word Wizards';
+                
+                let html = `<h3 style="font-family:'Press Start 2P',cursive;font-size:0.9rem;color:var(--arcade-green);text-align:center;margin-bottom:1.5rem;">${title}</h3>`;
+                
+                data.forEach((entry, i) => {
+                    const rankClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+                    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
+                    
+                    if (game === 'overall') {
+                        html += `<div class="leaderboard-entry">
+                            <span class="rank ${rankClass}">${medal} #${i + 1}</span>
+                            <span class="name">${escapeHtml(entry.username)}</span>
+                            <span class="score">${entry.topPositions} 🏆 | ${entry.gamesPlayed} games</span>
+                        </div>`;
+                    } else {
+                        const scoreText = game === 'reaction' ? `${entry.score}ms` : `${entry.score}`;
+                        html += `<div class="leaderboard-entry">
+                            <span class="rank ${rankClass}">${medal} #${i + 1}</span>
+                            <span class="name">${escapeHtml(entry.username)}</span>
+                            <span class="score">${scoreText}</span>
+                        </div>`;
+                    }
+                });
+                
+                display.innerHTML = html;
+            } catch (err) {
+                console.error('Error loading leaderboard:', err);
+                display.innerHTML = '<div style="text-align:center;padding:2rem;color:#ef4444;">Error loading leaderboard</div>';
+            }
+        }
+        
+        // =====================================
+        // BRICK BREAKER GAME
+        // =====================================
+        let breakoutGame = null;
+        
+        function startBreakout() {
+            if (breakoutGame) breakoutGame.stop();
+            document.getElementById('breakoutStartBtn').style.display = 'none';
+            document.getElementById('breakoutStatus').textContent = 'Click or tap to launch the ball!';
+            
+            const canvas = document.getElementById('breakoutCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Responsive canvas sizing
+            const maxWidth = Math.min(600, window.innerWidth - 40);
+            const ratio = 600 / 450;
+            canvas.width = maxWidth;
+            canvas.height = maxWidth / ratio;
+            
+            const scale = canvas.width / 600;
+            
+            breakoutGame = {
+                canvas,
+                ctx,
+                scale,
+                score: 0,
+                lives: 3,
+                level: 1,
+                ballLaunched: false,
+                gameOver: false,
+                
+                // Paddle
+                paddle: {
+                    width: 90 * scale,
+                    height: 12 * scale,
+                    x: (canvas.width - 90 * scale) / 2,
+                    y: canvas.height - 30 * scale,
+                    speed: 8 * scale
+                },
+                
+                // Ball
+                ball: {
+                    radius: 8 * scale,
+                    x: canvas.width / 2,
+                    y: canvas.height - 45 * scale,
+                    dx: 4 * scale,
+                    dy: -4 * scale,
+                    speed: 4 * scale
+                },
+                
+                // Bricks
+                bricks: [],
+                brickRows: 5,
+                brickCols: 8,
+                brickWidth: 0,
+                brickHeight: 20 * scale,
+                brickPadding: 4 * scale,
+                brickTop: 50 * scale,
+                brickColors: ['#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4'],
+                
+                init() {
+                    this.brickWidth = (canvas.width - this.brickPadding * (this.brickCols + 1)) / this.brickCols;
+                    this.createBricks();
+                    this.bindEvents();
+                    this.loop();
+                },
+                
+                createBricks() {
+                    this.bricks = [];
+                    for (let r = 0; r < this.brickRows; r++) {
+                        for (let c = 0; c < this.brickCols; c++) {
+                            this.bricks.push({
+                                x: this.brickPadding + c * (this.brickWidth + this.brickPadding),
+                                y: this.brickTop + r * (this.brickHeight + this.brickPadding),
+                                width: this.brickWidth,
+                                height: this.brickHeight,
+                                color: this.brickColors[r % this.brickColors.length],
+                                alive: true,
+                                points: (this.brickRows - r) * 10
+                            });
+                        }
+                    }
+                },
+                
+                bindEvents() {
+                    // Mouse move
+                    this.mouseMoveHandler = (e) => {
+                        const rect = canvas.getBoundingClientRect();
+                        const mouseX = e.clientX - rect.left;
+                        this.paddle.x = Math.max(0, Math.min(canvas.width - this.paddle.width, mouseX - this.paddle.width / 2));
+                        if (!this.ballLaunched) {
+                            this.ball.x = this.paddle.x + this.paddle.width / 2;
+                        }
+                    };
+                    
+                    // Touch move
+                    this.touchMoveHandler = (e) => {
+                        e.preventDefault();
+                        const rect = canvas.getBoundingClientRect();
+                        const touchX = e.touches[0].clientX - rect.left;
+                        this.paddle.x = Math.max(0, Math.min(canvas.width - this.paddle.width, touchX - this.paddle.width / 2));
+                        if (!this.ballLaunched) {
+                            this.ball.x = this.paddle.x + this.paddle.width / 2;
+                        }
+                    };
+                    
+                    // Click/tap to launch
+                    this.launchHandler = () => {
+                        if (!this.ballLaunched && !this.gameOver) {
+                            this.ballLaunched = true;
+                            // Random angle
+                            const angle = (Math.random() * 60 - 30) * Math.PI / 180;
+                            this.ball.dx = Math.sin(angle) * this.ball.speed;
+                            this.ball.dy = -Math.cos(angle) * this.ball.speed;
+                            document.getElementById('breakoutStatus').textContent = 'Go! Break all the bricks!';
+                        }
+                    };
+                    
+                    canvas.addEventListener('mousemove', this.mouseMoveHandler);
+                    canvas.addEventListener('touchmove', this.touchMoveHandler, { passive: false });
+                    canvas.addEventListener('click', this.launchHandler);
+                    canvas.addEventListener('touchstart', this.launchHandler);
+                },
+                
+                update() {
+                    if (this.gameOver || !this.ballLaunched) return;
+                    
+                    // Move ball
+                    this.ball.x += this.ball.dx;
+                    this.ball.y += this.ball.dy;
+                    
+                    // Wall collision
+                    if (this.ball.x - this.ball.radius < 0 || this.ball.x + this.ball.radius > canvas.width) {
+                        this.ball.dx = -this.ball.dx;
+                    }
+                    if (this.ball.y - this.ball.radius < 0) {
+                        this.ball.dy = -this.ball.dy;
+                    }
+                    
+                    // Bottom - lose life
+                    if (this.ball.y + this.ball.radius > canvas.height) {
+                        this.lives--;
+                        document.getElementById('breakoutLives').textContent = this.lives;
+                        
+                        if (this.lives <= 0) {
+                            this.endGame();
+                            return;
+                        }
+                        
+                        // Reset ball
+                        this.ballLaunched = false;
+                        this.ball.x = this.paddle.x + this.paddle.width / 2;
+                        this.ball.y = canvas.height - 45 * this.scale;
+                        document.getElementById('breakoutStatus').textContent = `💔 Lost a life! ${this.lives} left. Click to launch.`;
+                    }
+                    
+                    // Paddle collision
+                    if (this.ball.y + this.ball.radius > this.paddle.y &&
+                        this.ball.y - this.ball.radius < this.paddle.y + this.paddle.height &&
+                        this.ball.x > this.paddle.x &&
+                        this.ball.x < this.paddle.x + this.paddle.width) {
+                        
+                        // Calculate hit position (-1 to 1)
+                        const hitPos = (this.ball.x - (this.paddle.x + this.paddle.width / 2)) / (this.paddle.width / 2);
+                        const angle = hitPos * 60 * Math.PI / 180;
+                        const speed = Math.sqrt(this.ball.dx * this.ball.dx + this.ball.dy * this.ball.dy);
+                        
+                        this.ball.dx = Math.sin(angle) * speed;
+                        this.ball.dy = -Math.abs(Math.cos(angle) * speed);
+                        this.ball.y = this.paddle.y - this.ball.radius;
+                    }
+                    
+                    // Brick collision
+                    for (const brick of this.bricks) {
+                        if (!brick.alive) continue;
+                        
+                        if (this.ball.x + this.ball.radius > brick.x &&
+                            this.ball.x - this.ball.radius < brick.x + brick.width &&
+                            this.ball.y + this.ball.radius > brick.y &&
+                            this.ball.y - this.ball.radius < brick.y + brick.height) {
+                            
+                            brick.alive = false;
+                            this.ball.dy = -this.ball.dy;
+                            this.score += brick.points;
+                            document.getElementById('breakoutScore').textContent = this.score;
+                            
+                            // Check win
+                            if (this.bricks.every(b => !b.alive)) {
+                                this.nextLevel();
+                            }
+                            break;
+                        }
+                    }
+                },
+                
+                nextLevel() {
+                    this.level++;
+                    document.getElementById('breakoutLevel').textContent = this.level;
+                    
+                    // Speed up ball
+                    this.ball.speed *= 1.1;
+                    
+                    // Reset ball position
+                    this.ballLaunched = false;
+                    this.ball.x = this.paddle.x + this.paddle.width / 2;
+                    this.ball.y = canvas.height - 45 * this.scale;
+                    
+                    // Add more rows
+                    this.brickRows = Math.min(7, 5 + Math.floor(this.level / 2));
+                    this.createBricks();
+                    
+                    document.getElementById('breakoutStatus').textContent = `🎉 Level ${this.level}! Click to continue.`;
+                },
+                
+                draw() {
+                    const ctx = this.ctx;
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Draw bricks
+                    for (const brick of this.bricks) {
+                        if (!brick.alive) continue;
+                        ctx.fillStyle = brick.color;
+                        ctx.shadowColor = brick.color;
+                        ctx.shadowBlur = 8;
+                        ctx.fillRect(brick.x, brick.y, brick.width, brick.height);
+                        ctx.shadowBlur = 0;
+                    }
+                    
+                    // Draw paddle
+                    ctx.fillStyle = '#22c55e';
+                    ctx.shadowColor = '#22c55e';
+                    ctx.shadowBlur = 15;
+                    ctx.fillRect(this.paddle.x, this.paddle.y, this.paddle.width, this.paddle.height);
+                    ctx.shadowBlur = 0;
+                    
+                    // Draw ball
+                    ctx.beginPath();
+                    ctx.arc(this.ball.x, this.ball.y, this.ball.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.shadowColor = '#ffffff';
+                    ctx.shadowBlur = 15;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    ctx.closePath();
+                },
+                
+                loop() {
+                    if (this.stopped) return;
+                    this.update();
+                    this.draw();
+                    this.animFrame = requestAnimationFrame(() => this.loop());
+                },
+                
+                async endGame() {
+                    this.gameOver = true;
+                    this.stopped = true;
+                    cancelAnimationFrame(this.animFrame);
+                    
+                    document.getElementById('breakoutStatus').textContent = `🎮 Game Over! Final Score: ${this.score}`;
+                    document.getElementById('breakoutStartBtn').style.display = 'inline-flex';
+                    document.getElementById('breakoutStartBtn').innerHTML = '<i class="fas fa-redo"></i> PLAY AGAIN';
+                    
+                    // Submit score
+                    const username = prompt('🏆 New high score! Enter your name:');
+                    if (username && username.trim()) {
+                        await submitScore('breakout', username.trim(), this.score);
+                        showLeaderboard('breakout');
+                    }
+                },
+                
+                stop() {
+                    this.stopped = true;
+                    cancelAnimationFrame(this.animFrame);
+                    canvas.removeEventListener('mousemove', this.mouseMoveHandler);
+                    canvas.removeEventListener('touchmove', this.touchMoveHandler);
+                    canvas.removeEventListener('click', this.launchHandler);
+                    canvas.removeEventListener('touchstart', this.launchHandler);
+                    
+                    // Reset UI
+                    document.getElementById('breakoutScore').textContent = '0';
+                    document.getElementById('breakoutLives').textContent = '3';
+                    document.getElementById('breakoutLevel').textContent = '1';
+                }
+            };
+            
+            breakoutGame.init();
+        }
+        
+        // =====================================
+        // NEON PONG GAME
+        // =====================================
+        let pongGame = null;
+        
+        function startPong() {
+            if (pongGame) pongGame.stop();
+            document.getElementById('pongStartBtn').style.display = 'none';
+            document.getElementById('pongStatus').textContent = 'First to 5 wins!';
+            document.getElementById('pongPlayerScore').textContent = '0';
+            document.getElementById('pongAIScore').textContent = '0';
+            
+            const canvas = document.getElementById('pongCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Responsive canvas
+            const maxWidth = Math.min(600, window.innerWidth - 40);
+            const ratio = 600 / 400;
+            canvas.width = maxWidth;
+            canvas.height = maxWidth / ratio;
+            
+            const scale = canvas.width / 600;
+            
+            pongGame = {
+                canvas,
+                ctx,
+                scale,
+                playerScore: 0,
+                aiScore: 0,
+                maxScore: 5,
+                stopped: false,
+                paused: false,
+                
+                // Paddles
+                paddleWidth: 12 * scale,
+                paddleHeight: 80 * scale,
+                paddleSpeed: 6 * scale,
+                
+                player: {
+                    x: 20 * scale,
+                    y: 0,
+                    targetY: 0
+                },
+                
+                ai: {
+                    x: 0,
+                    y: 0,
+                    speed: 3.5 * scale,
+                    reactionDelay: 0.15
+                },
+                
+                // Ball
+                ball: {
+                    x: 0,
+                    y: 0,
+                    radius: 10 * scale,
+                    dx: 5 * scale,
+                    dy: 3 * scale,
+                    baseSpeed: 5 * scale,
+                    maxSpeed: 12 * scale
+                },
+                
+                // Particles for trail effect
+                particles: [],
+                
+                init() {
+                    this.player.y = (canvas.height - this.paddleHeight) / 2;
+                    this.player.targetY = this.player.y;
+                    this.ai.x = canvas.width - 20 * scale - this.paddleWidth;
+                    this.ai.y = (canvas.height - this.paddleHeight) / 2;
+                    this.resetBall();
+                    this.bindEvents();
+                    this.loop();
+                },
+                
+                resetBall(towardsPlayer = Math.random() > 0.5) {
+                    this.ball.x = canvas.width / 2;
+                    this.ball.y = canvas.height / 2;
+                    
+                    const angle = (Math.random() * 60 - 30) * Math.PI / 180;
+                    const direction = towardsPlayer ? -1 : 1;
+                    this.ball.dx = Math.cos(angle) * this.ball.baseSpeed * direction;
+                    this.ball.dy = Math.sin(angle) * this.ball.baseSpeed;
+                    
+                    this.paused = true;
+                    setTimeout(() => { this.paused = false; }, 1000);
+                },
+                
+                bindEvents() {
+                    this.mouseMoveHandler = (e) => {
+                        const rect = canvas.getBoundingClientRect();
+                        const mouseY = e.clientY - rect.top;
+                        this.player.targetY = Math.max(0, Math.min(canvas.height - this.paddleHeight, mouseY - this.paddleHeight / 2));
+                    };
+                    
+                    this.touchMoveHandler = (e) => {
+                        e.preventDefault();
+                        const rect = canvas.getBoundingClientRect();
+                        const touchY = e.touches[0].clientY - rect.top;
+                        this.player.targetY = Math.max(0, Math.min(canvas.height - this.paddleHeight, touchY - this.paddleHeight / 2));
+                    };
+                    
+                    canvas.addEventListener('mousemove', this.mouseMoveHandler);
+                    canvas.addEventListener('touchmove', this.touchMoveHandler, { passive: false });
+                },
+                
+                update() {
+                    if (this.stopped || this.paused) return;
+                    
+                    // Smooth player paddle movement
+                    const diff = this.player.targetY - this.player.y;
+                    this.player.y += diff * 0.2;
+                    
+                    // AI paddle movement
+                    const aiTarget = this.ball.y - this.paddleHeight / 2;
+                    const aiDiff = aiTarget - this.ai.y;
+                    // Add some reaction delay / imperfection
+                    if (Math.abs(aiDiff) > 10 * this.scale) {
+                        this.ai.y += Math.sign(aiDiff) * Math.min(this.ai.speed, Math.abs(aiDiff));
+                    }
+                    this.ai.y = Math.max(0, Math.min(canvas.height - this.paddleHeight, this.ai.y));
+                    
+                    // Move ball
+                    this.ball.x += this.ball.dx;
+                    this.ball.y += this.ball.dy;
+                    
+                    // Add particle trail
+                    if (Math.random() > 0.5) {
+                        this.particles.push({
+                            x: this.ball.x,
+                            y: this.ball.y,
+                            alpha: 1,
+                            radius: this.ball.radius * 0.8
+                        });
+                    }
+                    
+                    // Update particles
+                    this.particles = this.particles.filter(p => {
+                        p.alpha -= 0.05;
+                        p.radius *= 0.95;
+                        return p.alpha > 0;
+                    });
+                    
+                    // Top/bottom wall collision
+                    if (this.ball.y - this.ball.radius < 0 || this.ball.y + this.ball.radius > canvas.height) {
+                        this.ball.dy = -this.ball.dy;
+                        this.ball.y = this.ball.y < canvas.height / 2 ? this.ball.radius : canvas.height - this.ball.radius;
+                    }
+                    
+                    // Player paddle collision
+                    if (this.ball.x - this.ball.radius < this.player.x + this.paddleWidth &&
+                        this.ball.x + this.ball.radius > this.player.x &&
+                        this.ball.y > this.player.y &&
+                        this.ball.y < this.player.y + this.paddleHeight) {
+                        
+                        const hitPos = (this.ball.y - (this.player.y + this.paddleHeight / 2)) / (this.paddleHeight / 2);
+                        const angle = hitPos * 60 * Math.PI / 180;
+                        const speed = Math.min(this.ball.maxSpeed, Math.sqrt(this.ball.dx * this.ball.dx + this.ball.dy * this.ball.dy) * 1.05);
+                        
+                        this.ball.dx = Math.abs(Math.cos(angle) * speed);
+                        this.ball.dy = Math.sin(angle) * speed;
+                        this.ball.x = this.player.x + this.paddleWidth + this.ball.radius;
+                    }
+                    
+                    // AI paddle collision
+                    if (this.ball.x + this.ball.radius > this.ai.x &&
+                        this.ball.x - this.ball.radius < this.ai.x + this.paddleWidth &&
+                        this.ball.y > this.ai.y &&
+                        this.ball.y < this.ai.y + this.paddleHeight) {
+                        
+                        const hitPos = (this.ball.y - (this.ai.y + this.paddleHeight / 2)) / (this.paddleHeight / 2);
+                        const angle = hitPos * 60 * Math.PI / 180;
+                        const speed = Math.min(this.ball.maxSpeed, Math.sqrt(this.ball.dx * this.ball.dx + this.ball.dy * this.ball.dy) * 1.05);
+                        
+                        this.ball.dx = -Math.abs(Math.cos(angle) * speed);
+                        this.ball.dy = Math.sin(angle) * speed;
+                        this.ball.x = this.ai.x - this.ball.radius;
+                    }
+                    
+                    // Scoring
+                    if (this.ball.x < 0) {
+                        this.aiScore++;
+                        document.getElementById('pongAIScore').textContent = this.aiScore;
+                        this.checkWin() || this.resetBall(true);
+                    } else if (this.ball.x > canvas.width) {
+                        this.playerScore++;
+                        document.getElementById('pongPlayerScore').textContent = this.playerScore;
+                        this.checkWin() || this.resetBall(false);
+                    }
+                },
+                
+                checkWin() {
+                    if (this.playerScore >= this.maxScore) {
+                        this.endGame(true);
+                        return true;
+                    } else if (this.aiScore >= this.maxScore) {
+                        this.endGame(false);
+                        return true;
+                    }
+                    return false;
+                },
+                
+                draw() {
+                    const ctx = this.ctx;
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Draw center line
+                    ctx.setLineDash([10, 10]);
+                    ctx.strokeStyle = 'rgba(34, 197, 94, 0.3)';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(canvas.width / 2, 0);
+                    ctx.lineTo(canvas.width / 2, canvas.height);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    
+                    // Draw particle trail
+                    this.particles.forEach(p => {
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                        ctx.fillStyle = `rgba(34, 197, 94, ${p.alpha * 0.5})`;
+                        ctx.fill();
+                    });
+                    
+                    // Draw paddles with glow
+                    ctx.shadowColor = '#22c55e';
+                    ctx.shadowBlur = 20;
+                    ctx.fillStyle = '#22c55e';
+                    ctx.fillRect(this.player.x, this.player.y, this.paddleWidth, this.paddleHeight);
+                    
+                    ctx.shadowColor = '#22d3ee';
+                    ctx.fillStyle = '#22d3ee';
+                    ctx.fillRect(this.ai.x, this.ai.y, this.paddleWidth, this.paddleHeight);
+                    ctx.shadowBlur = 0;
+                    
+                    // Draw ball with glow
+                    ctx.beginPath();
+                    ctx.arc(this.ball.x, this.ball.y, this.ball.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.shadowColor = '#ffffff';
+                    ctx.shadowBlur = 25;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    
+                    // Draw scores on canvas
+                    ctx.font = `bold ${32 * this.scale}px 'Press Start 2P', monospace`;
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(this.playerScore, canvas.width / 4, 60 * this.scale);
+                    ctx.fillText(this.aiScore, canvas.width * 3 / 4, 60 * this.scale);
+                },
+                
+                loop() {
+                    if (this.stopped) return;
+                    this.update();
+                    this.draw();
+                    this.animFrame = requestAnimationFrame(() => this.loop());
+                },
+                
+                async endGame(playerWon) {
+                    this.stopped = true;
+                    cancelAnimationFrame(this.animFrame);
+                    
+                    const status = playerWon ? '🏆 YOU WIN!' : '😢 AI WINS!';
+                    document.getElementById('pongStatus').textContent = status;
+                    document.getElementById('pongStartBtn').style.display = 'inline-flex';
+                    document.getElementById('pongStartBtn').innerHTML = '<i class="fas fa-redo"></i> PLAY AGAIN';
+                    
+                    if (playerWon) {
+                        // Calculate score based on AI score (fewer AI points = better)
+                        const score = (this.maxScore - this.aiScore) * 100 + Math.floor(Math.random() * 50);
+                        const username = prompt(`🏆 Victory! Score: ${score}\nEnter name for leaderboard:`);
+                        if (username && username.trim()) {
+                            await submitScore('pong', username.trim(), score);
+                            showLeaderboard('pong');
+                        }
+                    }
+                },
+                
+                stop() {
+                    this.stopped = true;
+                    cancelAnimationFrame(this.animFrame);
+                    canvas.removeEventListener('mousemove', this.mouseMoveHandler);
+                    canvas.removeEventListener('touchmove', this.touchMoveHandler);
+                }
+            };
+            
+            pongGame.init();
+        }
+        
+        // =====================================
+        // SPEED TYPER GAME
+        // =====================================
+        const TYPING_WORDS = [
+            'the', 'quick', 'brown', 'fox', 'jumps', 'over', 'lazy', 'dog', 'code', 'game',
+            'pixel', 'neon', 'arcade', 'score', 'level', 'power', 'speed', 'fast', 'type', 'race',
+            'cyber', 'quest', 'town', 'gold', 'star', 'fire', 'night', 'club', 'play', 'win',
+            'blue', 'teal', 'dark', 'deep', 'glow', 'wave', 'storm', 'rain', 'snow', 'moon',
+            'data', 'node', 'link', 'port', 'sync', 'grid', 'core', 'chip', 'byte', 'loop',
+            'hack', 'root', 'ping', 'bash', 'push', 'pull', 'fork', 'diff', 'merge', 'build',
+            'world', 'light', 'shadow', 'dream', 'spark', 'flash', 'drift', 'pulse', 'echo', 'void',
+            'agent', 'tower', 'vault', 'forge', 'blade', 'crown', 'shield', 'armor', 'realm', 'guild',
+            'ocean', 'river', 'stone', 'flame', 'frost', 'thunder', 'crystal', 'silver', 'golden', 'diamond',
+            'rocket', 'planet', 'orbit', 'comet', 'nebula', 'galaxy', 'quantum', 'photon', 'plasma', 'fusion'
+        ];
+
+        let typingState = {
+            active: false,
+            duration: 30,
+            startTime: 0,
+            timer: null,
+            words: [],
+            currentWordIdx: 0,
+            currentCharIdx: 0,
+            correct: 0,
+            incorrect: 0,
+            totalTyped: 0,
+            wordsCompleted: 0
+        };
+
+        function setTypingDuration(d) {
+            typingState.duration = d;
+            document.getElementById('typingTime').textContent = d;
+            document.querySelectorAll('#typingArea .arcade-btn.secondary').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function generateTypingText() {
+            const words = [];
+            for (let i = 0; i < 80; i++) {
+                words.push(TYPING_WORDS[Math.floor(Math.random() * TYPING_WORDS.length)]);
+            }
+            return words;
+        }
+
+        function renderTypingText() {
+            const display = document.getElementById('typingTextDisplay');
+            display.innerHTML = typingState.words.map((word, wi) => {
+                const chars = word.split('').map((ch, ci) => {
+                    let cls = '';
+                    if (wi < typingState.currentWordIdx) cls = 'tp-correct';
+                    else if (wi === typingState.currentWordIdx) {
+                        if (ci < typingState.currentCharIdx) {
+                            // Check if typed correctly
+                            const input = document.getElementById('typingInput').value;
+                            cls = (ci < input.length && input[ci] === ch) ? 'tp-correct' : 'tp-wrong';
+                        } else if (ci === typingState.currentCharIdx) {
+                            cls = 'tp-cursor';
+                        }
+                    }
+                    return `<span class="${cls}">${ch}</span>`;
+                }).join('');
+                const wordCls = wi === typingState.currentWordIdx ? 'tp-active-word' : '';
+                return `<span class="tp-word ${wordCls}">${chars}</span>`;
+            }).join(' ');
+        }
+
+        function startTypingGame() {
+            typingState.active = true;
+            typingState.words = generateTypingText();
+            typingState.currentWordIdx = 0;
+            typingState.currentCharIdx = 0;
+            typingState.correct = 0;
+            typingState.incorrect = 0;
+            typingState.totalTyped = 0;
+            typingState.wordsCompleted = 0;
+            typingState.startTime = Date.now();
+
+            document.getElementById('typingStartBtn').style.display = 'none';
+            document.getElementById('typingResult').style.display = 'none';
+            document.getElementById('typingInput').disabled = false;
+            document.getElementById('typingInput').value = '';
+            document.getElementById('typingInput').focus();
+            document.getElementById('typingStatus').textContent = 'GO! Type as fast as you can!';
+
+            renderTypingText();
+
+            typingState.timer = setInterval(() => {
+                const elapsed = (Date.now() - typingState.startTime) / 1000;
+                const remaining = Math.max(0, typingState.duration - elapsed);
+                document.getElementById('typingTime').textContent = Math.ceil(remaining);
+
+                // Update WPM live
+                const minutes = elapsed / 60;
+                const wpm = minutes > 0 ? Math.round(typingState.wordsCompleted / minutes) : 0;
+                document.getElementById('typingWPM').textContent = wpm;
+
+                const total = typingState.correct + typingState.incorrect;
+                const acc = total > 0 ? Math.round((typingState.correct / total) * 100) : 100;
+                document.getElementById('typingAcc').textContent = acc;
+
+                if (remaining <= 0) endTypingGame();
+            }, 100);
+        }
+
+        function endTypingGame() {
+            typingState.active = false;
+            clearInterval(typingState.timer);
+            document.getElementById('typingInput').disabled = true;
+
+            const minutes = typingState.duration / 60;
+            const wpm = Math.round(typingState.wordsCompleted / minutes);
+            const total = typingState.correct + typingState.incorrect;
+            const acc = total > 0 ? Math.round((typingState.correct / total) * 100) : 100;
+
+            document.getElementById('typingWPM').textContent = wpm;
+            document.getElementById('typingAcc').textContent = acc;
+            document.getElementById('typingTime').textContent = '0';
+            document.getElementById('typingStatus').textContent = '⏱️ Time\'s up!';
+
+            // Score = WPM * accuracy bonus
+            const score = Math.round(wpm * (acc / 100));
+
+            const resultEl = document.getElementById('typingResult');
+            resultEl.style.display = 'block';
+            resultEl.innerHTML = `
+                <div style="font-family:'Press Start 2P',cursive;font-size:1rem;color:var(--arcade-green);margin-bottom:1rem;">RESULTS</div>
+                <div style="display:flex;gap:2rem;justify-content:center;margin-bottom:1rem;flex-wrap:wrap;">
+                    <div><div style="font-size:2rem;font-weight:700;color:var(--arcade-cyan);">${wpm}</div><div style="font-size:0.7rem;color:var(--arcade-text-dim);">WPM</div></div>
+                    <div><div style="font-size:2rem;font-weight:700;color:${acc >= 95 ? 'var(--arcade-green)' : acc >= 80 ? 'var(--arcade-cyan)' : '#ef4444'};">${acc}%</div><div style="font-size:0.7rem;color:var(--arcade-text-dim);">ACCURACY</div></div>
+                    <div><div style="font-size:2rem;font-weight:700;color:var(--arcade-gold);">${score}</div><div style="font-size:0.7rem;color:var(--arcade-text-dim);">SCORE</div></div>
+                </div>
+                <div style="font-size:0.8rem;color:var(--arcade-text-dim);margin-bottom:1rem;">${typingState.wordsCompleted} words · ${typingState.correct} correct keys · ${typingState.incorrect} mistakes</div>
+                <div style="display:flex;gap:0.5rem;justify-content:center;">
+                    <button class="arcade-btn" onclick="startTypingGame()"><i class="fas fa-redo"></i> Play Again</button>
+                    <button class="arcade-btn secondary" onclick="submitTypingScore(${score})"><i class="fas fa-trophy"></i> Submit Score</button>
+                </div>
+            `;
+
+            document.getElementById('typingStartBtn').style.display = '';
+        }
+
+        async function submitTypingScore(score) {
+            const name = prompt('Enter your name for the leaderboard:');
+            if (!name?.trim()) return;
+            await submitScore('typing', name.trim(), score);
+            alert('Score submitted! 🏆');
+        }
+
+        // Input handler
+        document.getElementById('typingInput').addEventListener('input', function(e) {
+            if (!typingState.active) return;
+            const input = this.value;
+            const currentWord = typingState.words[typingState.currentWordIdx];
+
+            // Check for space (word completed)
+            if (input.endsWith(' ')) {
+                const typed = input.trim();
+                // Count correct/incorrect chars for this word
+                for (let i = 0; i < Math.max(typed.length, currentWord.length); i++) {
+                    typingState.totalTyped++;
+                    if (i < typed.length && i < currentWord.length && typed[i] === currentWord[i]) {
+                        typingState.correct++;
+                    } else {
+                        typingState.incorrect++;
+                    }
+                }
+                typingState.wordsCompleted++;
+                typingState.currentWordIdx++;
+                typingState.currentCharIdx = 0;
+                this.value = '';
+
+                if (typingState.currentWordIdx >= typingState.words.length) {
+                    endTypingGame();
+                    return;
+                }
+            } else {
+                typingState.currentCharIdx = input.length;
+            }
+
+            renderTypingText();
+        });
+
+        // Inject typing game styles
+        (function() {
+            const s = document.createElement('style');
+            s.textContent = `
+                .tp-word { display: inline; }
+                .tp-active-word { background: rgba(34,197,94,0.05); border-radius: 3px; padding: 2px 0; }
+                .tp-correct { color: #4ade80; }
+                .tp-wrong { color: #ef4444; background: rgba(239,68,68,0.15); border-radius: 2px; }
+                .tp-cursor { border-bottom: 2px solid var(--arcade-green); animation: tp-blink 0.8s infinite; }
+                @keyframes tp-blink { 0%,100% { border-color: var(--arcade-green); } 50% { border-color: transparent; } }
+                #typingTextDisplay { color: rgba(255,255,255,0.35); }
+                #typingInput:focus { border-color: var(--arcade-green); box-shadow: 0 0 15px rgba(34,197,94,0.15); }
+            `;
+            document.head.appendChild(s);
+        })();
+
+        // Load overall leaderboard on page load
+        setTimeout(() => showLeaderboard('overall'), 1000);
+        
+        document.addEventListener('DOMContentLoaded', initSocket);
+
+        // =============================================
+        // MINESWEEPER GAME
+        // =============================================
+        const MINES_CONFIGS = {
+            easy:   { rows: 9,  cols: 9,  mines: 10 },
+            medium: { rows: 12, cols: 12, mines: 25 },
+            hard:   { rows: 16, cols: 16, mines: 50 },
+        };
+        let minesBoard = [];
+        let minesRevealed = [];
+        let minesFlagged = [];
+        let minesRows = 9, minesCols = 9, minesCount = 10;
+        let minesGameOver = false;
+        let minesFirstClick = true;
+        let minesTimerInterval = null;
+        let minesTime = 0;
+        let minesFlagTotal = 0;
+        let minesCellsRevealed = 0;
+
+        function minesInit(difficulty = 'easy') {
+            const cfg = MINES_CONFIGS[difficulty] || MINES_CONFIGS.easy;
+            minesRows = cfg.rows;
+            minesCols = cfg.cols;
+            minesCount = cfg.mines;
+            minesGameOver = false;
+            minesFirstClick = true;
+            minesTime = 0;
+            minesFlagTotal = 0;
+            minesCellsRevealed = 0;
+            clearInterval(minesTimerInterval);
+
+            // Init empty board
+            minesBoard = Array.from({ length: minesRows }, () => Array(minesCols).fill(0));
+            minesRevealed = Array.from({ length: minesRows }, () => Array(minesCols).fill(false));
+            minesFlagged = Array.from({ length: minesRows }, () => Array(minesCols).fill(false));
+
+            document.getElementById('minesMineCount').textContent = minesCount;
+            document.getElementById('minesFlagCount').textContent = 0;
+            document.getElementById('minesTimer').textContent = 0;
+            document.getElementById('minesStatus').textContent = 'Click any cell to begin. Right-click to flag.';
+            minesRender();
+        }
+
+        function minesPlaceMines(safeR, safeC) {
+            let placed = 0;
+            while (placed < minesCount) {
+                const r = Math.floor(Math.random() * minesRows);
+                const c = Math.floor(Math.random() * minesCols);
+                if (minesBoard[r][c] === -1) continue;
+                if (Math.abs(r - safeR) <= 1 && Math.abs(c - safeC) <= 1) continue;
+                minesBoard[r][c] = -1;
+                placed++;
+            }
+            // Calculate numbers
+            for (let r = 0; r < minesRows; r++) {
+                for (let c = 0; c < minesCols; c++) {
+                    if (minesBoard[r][c] === -1) continue;
+                    let count = 0;
+                    for (let dr = -1; dr <= 1; dr++) {
+                        for (let dc = -1; dc <= 1; dc++) {
+                            const nr = r + dr, nc = c + dc;
+                            if (nr >= 0 && nr < minesRows && nc >= 0 && nc < minesCols && minesBoard[nr][nc] === -1) count++;
+                        }
+                    }
+                    minesBoard[r][c] = count;
+                }
+            }
+        }
+
+        function minesRender() {
+            const grid = document.getElementById('minesGrid');
+            const cellSize = minesCols > 12 ? 28 : 34;
+            grid.style.gridTemplateColumns = `repeat(${minesCols}, ${cellSize}px)`;
+            grid.innerHTML = '';
+
+            const numColors = ['', '#3b82f6', '#22c55e', '#ef4444', '#8b5cf6', '#f59e0b', '#06b6d4', '#e2e8f0', '#94a3b8'];
+
+            for (let r = 0; r < minesRows; r++) {
+                for (let c = 0; c < minesCols; c++) {
+                    const cell = document.createElement('div');
+                    cell.style.cssText = `width:${cellSize}px;height:${cellSize}px;display:flex;align-items:center;justify-content:center;font-size:${cellSize > 30 ? '0.85' : '0.7'}rem;font-weight:700;border-radius:3px;cursor:pointer;transition:background 0.1s;`;
+
+                    if (minesRevealed[r][c]) {
+                        cell.style.background = 'rgba(10,22,40,0.8)';
+                        cell.style.cursor = 'default';
+                        const val = minesBoard[r][c];
+                        if (val === -1) {
+                            cell.textContent = '💣';
+                            cell.style.background = 'rgba(239,68,68,0.2)';
+                        } else if (val > 0) {
+                            cell.textContent = val;
+                            cell.style.color = numColors[val] || '#e2e8f0';
+                        }
+                    } else if (minesFlagged[r][c]) {
+                        cell.style.background = 'rgba(34,197,94,0.08)';
+                        cell.textContent = '🚩';
+                    } else {
+                        cell.style.background = 'rgba(34,197,94,0.04)';
+                        cell.onmouseenter = () => { if (!minesGameOver) cell.style.background = 'rgba(34,197,94,0.12)'; };
+                        cell.onmouseleave = () => { if (!minesGameOver) cell.style.background = 'rgba(34,197,94,0.04)'; };
+                    }
+
+                    cell.addEventListener('click', () => minesReveal(r, c));
+                    cell.addEventListener('contextmenu', (e) => { e.preventDefault(); minesFlag(r, c); });
+                    // Mobile long-press for flag
+                    let pressTimer;
+                    cell.addEventListener('touchstart', (e) => {
+                        pressTimer = setTimeout(() => { e.preventDefault(); minesFlag(r, c); }, 400);
+                    });
+                    cell.addEventListener('touchend', () => clearTimeout(pressTimer));
+                    cell.addEventListener('touchmove', () => clearTimeout(pressTimer));
+
+                    grid.appendChild(cell);
+                }
+            }
+        }
+
+        function minesReveal(r, c) {
+            if (minesGameOver || minesRevealed[r][c] || minesFlagged[r][c]) return;
+
+            if (minesFirstClick) {
+                minesFirstClick = false;
+                minesPlaceMines(r, c);
+                minesTimerInterval = setInterval(() => {
+                    minesTime++;
+                    document.getElementById('minesTimer').textContent = minesTime;
+                }, 1000);
+            }
+
+            minesRevealed[r][c] = true;
+            minesCellsRevealed++;
+
+            if (minesBoard[r][c] === -1) {
+                // Game over - reveal all mines
+                minesGameOver = true;
+                clearInterval(minesTimerInterval);
+                for (let i = 0; i < minesRows; i++)
+                    for (let j = 0; j < minesCols; j++)
+                        if (minesBoard[i][j] === -1) minesRevealed[i][j] = true;
+                document.getElementById('minesStatus').textContent = '💥 BOOM! Game Over!';
+                minesRender();
+                return;
+            }
+
+            // Flood fill for empty cells
+            if (minesBoard[r][c] === 0) {
+                for (let dr = -1; dr <= 1; dr++) {
+                    for (let dc = -1; dc <= 1; dc++) {
+                        const nr = r + dr, nc = c + dc;
+                        if (nr >= 0 && nr < minesRows && nc >= 0 && nc < minesCols) {
+                            minesReveal(nr, nc);
+                        }
+                    }
+                }
+            }
+
+            // Check win
+            const totalSafe = minesRows * minesCols - minesCount;
+            if (minesCellsRevealed >= totalSafe) {
+                minesGameOver = true;
+                clearInterval(minesTimerInterval);
+                document.getElementById('minesStatus').textContent = `🎉 YOU WIN! Cleared in ${minesTime}s!`;
+                // Award XP + coins
+                const xp = minesCount * 2;
+                const coins = Math.floor(minesCount * 1.5);
+                awardArcadeScore('Minesweeper', minesTime, xp, coins);
+                if (window.ChiffPet) window.ChiffPet.addXP(Math.ceil(xp / 5));
+            }
+
+            minesRender();
+        }
+
+        function minesFlag(r, c) {
+            if (minesGameOver || minesRevealed[r][c]) return;
+            minesFlagged[r][c] = !minesFlagged[r][c];
+            minesFlagTotal += minesFlagged[r][c] ? 1 : -1;
+            document.getElementById('minesFlagCount').textContent = minesFlagTotal;
+            minesRender();
+        }
+
+        function awardArcadeScore(game, score, xp, coins) {
+            const user = JSON.parse(localStorage.getItem('chifftown_user') || '{}');
+            const uname = user.username || user.displayName;
+            if (!uname) return;
+            fetch('/api/coins/award', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: uname, amount: coins, reason: `${game} win` })
+            }).catch(() => {});
+            if (window.XPEngine) window.XPEngine.awardXP(xp, `${game} completed`);
+        }
+
+        // Init minesweeper on first open
+        minesInit('easy');
+    </script>
+    
+    <!-- MINESWEEPER GAME AREA -->
+    <section class="game-area" id="minesArea">
+        <div class="container">
+            <button class="game-back-btn" onclick="leaveGame('mines')"><i class="fas fa-arrow-left"></i> Back to Games</button>
+            <div class="section-header"><h2>MINESWEEPER</h2></div>
+            <div class="game-status" id="minesStatus">Click any cell to begin. Right-click to flag.</div>
+            <div style="display:flex; gap:1rem; justify-content:center; margin-bottom:1rem; flex-wrap:wrap;">
+                <button class="game-back-btn" onclick="minesInit('easy')" style="margin:0;">Easy (9×9)</button>
+                <button class="game-back-btn" onclick="minesInit('medium')" style="margin:0;">Medium (12×12)</button>
+                <button class="game-back-btn" onclick="minesInit('hard')" style="margin:0;">Hard (16×16)</button>
+            </div>
+            <div style="display:flex; justify-content:center; gap:2rem; margin-bottom:1rem; font-family:'Press Start 2P',cursive; font-size:0.7rem; color:var(--arcade-green);">
+                <span>💣 Mines: <span id="minesMineCount">10</span></span>
+                <span>🚩 Flags: <span id="minesFlagCount">0</span></span>
+                <span>⏱️ <span id="minesTimer">0</span>s</span>
+            </div>
+            <div id="minesGrid" style="display:inline-grid; gap:1px; background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.15); border-radius:8px; padding:4px; margin:0 auto; user-select:none;"></div>
+        </div>
+    </section>
+
+    <!-- ChiffTown Share Button -->
+    <script src="/js/share-button.js" data-share-message="Challenge me at the Pixel Palace arcade! 🎮"></script>
+    
+    <!-- Quick Emotes & Loading Screen & Activity Feed -->
+    <script src="/js/quick-emotes.js?v=1"></script>
+    <script src="/js/loading-screen.js?v=1"></script>
+    <script src="/js/activity-feed.js?v=1"></script>
+<script src="/js/page-transitions.js?v=1"></script>
+<script src="/js/pet-system.js?v=1"></script>
+<script src="/js/dm-system.js?v=1"></script>
+</body>
+</html>

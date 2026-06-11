@@ -1,0 +1,72 @@
+{
+  "Buns|Faith": {
+    "users": [
+      "Buns",
+      "Faith"
+    ],
+    "points": 1,
+    "level": "Stranger",
+    "interactions": 1,
+    "lastInteraction": 1771102484252
+  },
+  "Buns|crunch": {
+    "users": [
+      "Buns",
+      "crunch"
+    ],
+    "points": 12,
+    "level": "Acquaintance",
+    "interactions": 12,
+    "lastInteraction": 1771102783030
+  },
+  "Buns|yaan": {
+    "users": [
+      "Buns",
+      "yaan"
+    ],
+    "points": 9,
+    "level": "Stranger",
+    "interactions": 9,
+    "lastInteraction": 1771102894939
+  },
+  "crunch|yaan": {
+    "users": [
+      "yaan",
+      "crunch"
+    ],
+    "points": 9,
+    "level": "Stranger",
+    "interactions": 9,
+    "lastInteraction": 1771102894938
+  },
+  "kikuh|yaan": {
+    "users": [
+      "yaan",
+      "kikuh"
+    ],
+    "points": 3,
+    "level": "Stranger",
+    "interactions": 3,
+    "lastInteraction": 1771102707220
+  },
+  "Buns|kikuh": {
+    "users": [
+      "Buns",
+      "kikuh"
+    ],
+    "points": 6,
+    "level": "Stranger",
+    "interactions": 6,
+    "lastInteraction": 1771102783030
+  },
+  "crunch|kikuh": {
+    "users": [
+      "crunch",
+      "kikuh"
+    ],
+    "points": 7,
+    "level": "Stranger",
+    "interactions": 7,
+    "lastInteraction": 1771102739734
+  }
+}

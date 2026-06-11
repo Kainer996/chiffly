@@ -1,0 +1,1736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <title>ChiffTown — Free Virtual Town for Online Hangouts & Video Chat</title>
+    <meta name="description" content="ChiffTown is a free browser-based virtual town for online hangouts: pubs, cinemas, arcades, lounges, live video chat and invite links. No download.">
+    <meta name="keywords" content="virtual world, virtual town, free virtual world, video chat, social platform, hang out online, themed rooms, WebRTC, virtual pub, online nightclub, social video chat, avatar customisation, virtual apartment, Habbo Hotel, online social world, no download game">
+    <meta name="author" content="ChiffTown">
+    <link rel="canonical" href="https://chifftown.com/">
+    <link rel="alternate" hreflang="en" href="https://chifftown.com/">
+    <link rel="alternate" hreflang="x-default" href="https://chifftown.com/">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://chifftown.com/">
+    <meta property="og:title" content="ChiffTown — Meet Somewhere Better Than a Call Link">
+    <meta property="og:description" content="Meet friends in a free browser-based virtual town with pubs, cinemas, arcades, lounges, live video chat and invite links. No download.">
+    <meta property="og:image" content="https://chifftown.com/images/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:alt" content="ChiffTown — an interactive virtual town map with themed video chat venues">
+    <meta property="og:image:secure_url" content="https://chifftown.com/images/og-image.jpg">
+    <meta property="og:site_name" content="ChiffTown">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@chifftown">
+    <meta name="twitter:title" content="ChiffTown — Free Virtual Town for Online Hangouts">
+    <meta name="twitter:description" content="Meet friends somewhere better than a call link: browser-based venues, live video chat and invite links. No download.">
+    <meta name="twitter:image" content="https://chifftown.com/images/og-image.jpg">
+    <meta name="twitter:image:alt" content="ChiffTown — an interactive virtual town map with themed venues for video chat">
+    <meta name="twitter:creator" content="@chifftown">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon-180x180.png">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="search" type="application/opensearchdescription+xml" title="ChiffTown" href="/opensearch.xml">
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#0a0a1a">
+    <meta name="application-name" content="ChiffTown">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.socket.io">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"></noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;600;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;600;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet"></noscript>
+    <link rel="preload" href="/images/chifftown-map-wide.webp" as="image" type="image/webp">
+    <link rel="preload" href="/main-home-styles.min.css?v=37" as="style">
+    <link rel="preload" href="/main-home.min.js?v=17" as="script">
+
+    <!-- Accessibility: Reduced motion -->
+    <style>
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+          scroll-behavior: auto !important;
+        }
+      }
+      /* Focus visible for keyboard users */
+      :focus-visible {
+        outline: 2px solid #c9a84c;
+        outline-offset: 2px;
+      }
+      @keyframes pulse-dot {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.5; transform: scale(1.4); }
+      }
+      :focus:not(:focus-visible) {
+        outline: none;
+      }
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0,0,0,0);
+        white-space: nowrap;
+        border: 0;
+      }
+    </style>
+    <noscript>
+      <style>.hero, .venues-section, .features-section, .how-it-works-section, .about-section, .testimonials-section, .faq-section, .footer { opacity: 1 !important; transform: none !important; }</style>
+    </noscript>
+    <link rel="stylesheet" href="main-home-styles.min.css?v=37">
+    <link rel="stylesheet" href="css/mobile-map.css?v=4">
+    <link rel="stylesheet" href="css/loading-screen.css?v=1">
+    <!-- Deferred non-critical CSS -->
+    <link rel="stylesheet" href="css/town-animations.css?v=1" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/weather-system.css?v=1" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/social-sidebar.css?v=1" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/activity-feed.css?v=1" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/profile-system.css?v=1" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/shop-system.css?v=1" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/achievements.css?v=1" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/notification-center.css?v=1" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/player-hud.css?v=1" media="print" onload="this.media='all'">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "ChiffTown",
+      "url": "https://chifftown.com",
+      "description": "A virtual town where you hang out in themed venues with live video chat. Pubs, nightclubs, cinemas, lounges and more.",
+      "applicationCategory": "SocialNetworkingApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": ["Live Video Chat", "Themed Venues", "Real-time Text Chat", "XP & Progression System", "Achievements", "Cross-platform"],
+      "screenshot": "https://chifftown.com/images/og-image.jpg",
+      "potentialAction": [
+        {
+          "@type": "ViewAction",
+          "name": "Explore ChiffTown",
+          "target": "https://chifftown.com/"
+        },
+        {
+          "@type": "JoinAction",
+          "name": "Join ChiffTown",
+          "target": "https://chifftown.com/"
+        }
+      ],
+      "author": {
+        "@type": "Organization",
+        "name": "ChiffTown"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "reviewCount": "487",
+        "bestRating": "5",
+        "worstRating": "1"
+      },
+      "review": [
+        {
+          "@type": "Review",
+          "reviewRating": {"@type": "Rating", "ratingValue": "5"},
+          "author": {"@type": "Person", "name": "Jamie"},
+          "reviewBody": "Finally something that feels like actually being out. Spent three hours in the pub last Friday — completely forgot it was online."
+        },
+        {
+          "@type": "Review",
+          "reviewRating": {"@type": "Rating", "ratingValue": "5"},
+          "author": {"@type": "Person", "name": "Lauren"},
+          "reviewBody": "We use this for our Friday night crew catch-ups. The invite link makes it stupid easy — paste it in the group chat and everyone's in."
+        },
+        {
+          "@type": "Review",
+          "reviewRating": {"@type": "Rating", "ratingValue": "5"},
+          "author": {"@type": "Person", "name": "Priya"},
+          "reviewBody": "I live abroad and my family are back home. ChiffTown is the first thing that actually feels like we're in the same room together."
+        },
+        {
+          "@type": "Review",
+          "reviewRating": {"@type": "Rating", "ratingValue": "5"},
+          "author": {"@type": "Person", "name": "Dan"},
+          "reviewBody": "Opened it expecting another gimmick. Ended up staying four hours. The pub atmosphere just works. Felt like a proper night out."
+        }
+      ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {"@type": "Question", "name": "What is ChiffTown?", "acceptedAnswer": {"@type": "Answer", "text": "ChiffTown is a free virtual town where you hang out with friends in themed venues using live video chat. Think of it as a social world where every building is a different vibe — pubs, nightclubs, cinemas, arcades, and more."}},
+        {"@type": "Question", "name": "Do I need to download anything?", "acceptedAnswer": {"@type": "Answer", "text": "Nope! ChiffTown runs entirely in your browser. No downloads, no plugins, no app store. Just open the link and you're in."}},
+        {"@type": "Question", "name": "Is ChiffTown free?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, ChiffTown is completely free to use. All venues, video chat, text chat, and core features are free."}},
+        {"@type": "Question", "name": "How does the XP and leveling system work?", "acceptedAnswer": {"@type": "Answer", "text": "You earn XP by visiting venues, chatting with people, completing daily challenges, and playing mini-games. As you level up, you unlock new buildings and earn achievements."}},
+        {"@type": "Question", "name": "How many people can be in a video chat?", "acceptedAnswer": {"@type": "Answer", "text": "Each venue supports up to 8 simultaneous video streams with real-time text chat alongside."}},
+        {"@type": "Question", "name": "Can I create a private room?", "acceptedAnswer": {"@type": "Answer", "text": "Yes! Use the Start a Room button to generate a unique invite link. Share it with friends via WhatsApp, text, or any messaging app."}},
+        {"@type": "Question", "name": "What venues are available in ChiffTown?", "acceptedAnswer": {"@type": "Answer", "text": "ChiffTown has 15+ venues including The Chiff Inn (pub), Electric Nightclub, Grand Cinema, The Lounge, Wellness Centre, Casino, Adventure Guild, Arcade, Observatory, Aetherium, Chronos Bar, Fishing Dock, and Pet Shelter — with more added regularly."}},
+        {"@type": "Question", "name": "Do I need to create an account?", "acceptedAnswer": {"@type": "Answer", "text": "You can jump straight in as a guest with no sign-up required. Creating a free account saves your XP progress, achievements, and builds a persistent profile."}},
+        {"@type": "Question", "name": "Is ChiffTown safe?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. ChiffTown uses room-based privacy — you only video chat with people in your specific room. Rooms are voluntary, and nobody can add you without your knowledge."}},
+        {"@type": "Question", "name": "Can I use ChiffTown on my phone?", "acceptedAnswer": {"@type": "Answer", "text": "Yes! ChiffTown works on smartphones, tablets, laptops, and desktops. It runs entirely in your mobile browser — no app to download. Chrome and Safari on iOS and Android both work great."}},
+        {"@type": "Question", "name": "How is ChiffTown different from Zoom or Google Meet?", "acceptedAnswer": {"@type": "Answer", "text": "ChiffTown is built for fun, not work. Instead of a plain video grid, you hang out inside themed venues — a pub, nightclub, cinema, arcade — each with its own atmosphere. You earn XP, unlock buildings, and play games. It's what video chat feels like when it's actually enjoyable."}},
+        {"@type": "Question", "name": "What browser do I need for ChiffTown?", "acceptedAnswer": {"@type": "Answer", "text": "ChiffTown works best on Chrome, Firefox, Edge, or Safari (version 15+). You'll need a webcam and microphone for video chat, but you can also join in text-only mode."}}
+      ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://chifftown.com/"},
+        {"@type": "ListItem", "position": 2, "name": "Venues", "item": "https://chifftown.com/#venues"},
+        {"@type": "ListItem", "position": 3, "name": "Features", "item": "https://chifftown.com/#features"}
+      ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "ChiffTown",
+      "url": "https://chifftown.com",
+      "logo": "https://chifftown.com/images/chifftown-logo.png",
+      "sameAs": []
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "ChiffTown",
+      "alternateName": ["Chiff Town", "chifftown.com"],
+      "url": "https://chifftown.com",
+      "description": "The virtual town where hanging out feels alive. Walk into themed venues, video chat face-to-face, earn XP and level up. No download, no sign-up.",
+      "inLanguage": "en",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://chifftown.com/?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      },
+      "sameAs": [
+        "https://twitter.com/chifftown",
+        "https://discord.gg/chifftown"
+      ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SiteLinksSearchBox",
+      "url": "https://chifftown.com",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://chifftown.com/?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": "ChiffTown Venues",
+      "description": "All themed video chat venues in ChiffTown virtual town",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "The Chiff Inn — Virtual Pub", "url": "https://chifftown.com/pub.html"},
+        {"@type": "ListItem", "position": 2, "name": "Neon Pulse Nightclub", "url": "https://chifftown.com/nightclub.html"},
+        {"@type": "ListItem", "position": 3, "name": "Starlight Cinema", "url": "https://chifftown.com/cinema.html"},
+        {"@type": "ListItem", "position": 4, "name": "Velvet Sky Lounge", "url": "https://chifftown.com/lounge.html"},
+        {"@type": "ListItem", "position": 5, "name": "Pixel Palace Arcade", "url": "https://chifftown.com/games.html"},
+        {"@type": "ListItem", "position": 6, "name": "The Golden Dice Casino", "url": "https://chifftown.com/casino.html"},
+        {"@type": "ListItem", "position": 7, "name": "Adventure Guild", "url": "https://chifftown.com/questing.html"}
+      ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      "name": "How to Start Video Chatting on ChiffTown",
+      "description": "Join ChiffTown and start hanging out with friends in themed video chat venues in under 10 seconds.",
+      "totalTime": "PT10S",
+      "supply": [{"@type": "HowToSupply", "name": "A web browser (Chrome, Firefox, Safari, Edge)"}],
+      "tool": [{"@type": "HowToTool", "name": "No downloads or sign-up required"}],
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "Open ChiffTown",
+          "text": "Visit chifftown.com in any modern browser. The interactive town map loads immediately — no sign-up or download required.",
+          "url": "https://chifftown.com/#how-it-works"
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "Choose your venue",
+          "text": "Click any building on the map to enter that venue. Start a private room with your own invite link, or join an existing live room.",
+          "url": "https://chifftown.com/#venues"
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "Hang out and earn XP",
+          "text": "Chat face-to-face, complete daily challenges, play mini-games and earn XP to level up and unlock new venues.",
+          "url": "https://chifftown.com/#features"
+        }
+      ]
+    }
+    </script>
+    <!-- Speakable Schema — marks key content for Google Assistant / voice search -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "ChiffTown — Your Virtual Town",
+      "url": "https://chifftown.com/",
+      "speakable": {
+        "@type": "SpeakableSpecification",
+        "cssSelector": [".hero-title", ".hero-subtitle", "#about .about-text"]
+      }
+    }
+    </script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+    </script>
+</head>
+<body>
+    <!-- Skip to content (accessibility) -->
+    <a href="#venues" class="skip-link" style="position:absolute;top:-40px;left:0;background:#c9a84c;color:#0a0a1a;padding:8px 16px;z-index:100000;font-weight:600;transition:top 0.3s;" onfocus="this.style.top='0'" onblur="this.style.top='-40px'">Skip to content</a>
+
+    <!-- Ambient particles canvas -->
+    <canvas id="particleCanvas" aria-hidden="true"></canvas>
+
+    <!-- Navigation -->
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <span style="font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; color: #c9a84c; letter-spacing: 2px; text-transform: uppercase;">Chifftown</span>
+            </a>
+            <div class="nav-right">
+                <div class="nav-links">
+                    <a href="#venues" class="nav-link">Venues</a>
+                    <a href="#features" class="nav-link">Features</a>
+                    <a href="achievements.html" class="nav-link"><i class="fas fa-trophy" style="margin-right: 4px;"></i> Achievements</a>
+                    <a href="challenges.html" class="nav-link"><i class="fas fa-tasks" style="margin-right: 4px;"></i> Challenges</a>
+                    <a href="newspaper.html" class="nav-link"><img src="/images/buildings/newspaper-icon.png?v=1770906861" alt="News" style="width: 20px; height: auto; vertical-align: middle; margin-right: 4px;" loading="lazy" width="20" height="20"> News</a>
+                    <a href="about.html" class="nav-link">About</a>
+                    <a href="whats-new.html" class="nav-link"><i class="fas fa-newspaper" style="margin-right: 4px;"></i> What's New</a>
+                </div>
+                <div class="town-clock" id="townClock" title="ChiffTown Time">
+                    <span class="clock-icon" id="clockIcon">🌙</span>
+                    <span class="clock-time" id="clockTime">00:00</span>
+                    <span class="clock-phase" id="clockPhase">Night</span>
+                </div>
+                <button class="notif-bell" id="notifBell" title="Notifications" aria-label="Notifications" style="display:none;">
+                    <i class="fas fa-bell"></i>
+                    <span class="notif-badge">0</span>
+                </button>
+                <div class="auth-section">
+                    <button class="enter-btn" id="signInBtn">
+                        <span class="enter-btn-glow"></span>
+                        <i class="fas fa-door-open"></i>
+                        <span>Enter Town</span>
+                    </button>
+                    <div class="user-menu" id="userMenu" style="display: none;">
+                        <div class="user-info">
+                            <div class="user-avatar">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div class="user-details">
+                                <span class="user-name" id="userName">Guest User</span>
+                                <span class="user-status">Online</span>
+                            </div>
+                        </div>
+                        <div class="menu-divider"></div>
+                        <a href="#" class="menu-item" onclick="if(window.ProfileSystem)ProfileSystem.openProfile()">
+                            <i class="fas fa-user-cog"></i>
+                            Profile Settings
+                        </a>
+                        <a href="#" class="menu-item" onclick="if(window.ShopSystem)ShopSystem.openShop()">
+                            <i class="fas fa-store"></i>
+                            Marketplace
+                        </a>
+                        <a href="#" class="menu-item" onclick="if(window.AchievementsSystem)AchievementsSystem.open()">
+                            <i class="fas fa-trophy"></i>
+                            Trophy Case
+                        </a>
+                        <a href="#" class="menu-item">
+                            <i class="fas fa-bell"></i>
+                            Notifications
+                        </a>
+                        <a href="#" class="menu-item">
+                            <i class="fas fa-heart"></i>
+                            Favorites
+                        </a>
+                        <div class="menu-divider"></div>
+                        <a href="#" class="menu-item sign-out" id="signOutBtn">
+                            <i class="fas fa-door-closed"></i>
+                            Leave Town
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Player HUD -->
+    <div id="playerHUD" class="player-hud" style="display: none;">
+        <div class="hud-inner">
+            <div class="hud-level-badge">
+                <span class="hud-level-number" id="hudLevel">Lvl 1</span>
+            </div>
+            <div class="hud-xp-section">
+                <div class="hud-xp-bar-bg">
+                    <div class="hud-xp-bar-fill" id="hudXpFill" style="width: 0%"></div>
+                </div>
+                <span class="hud-xp-text"><span id="hudXp">0</span> / <span id="hudXpMax">200</span> XP</span>
+            </div>
+            <div class="hud-currency">
+                <span class="hud-coins" title="Coins">🪙 <span id="hudCoins">0</span></span>
+                <span class="hud-gems" title="Gems">💎 <span id="hudGems">0</span></span>
+            </div>
+            <div class="hud-streak" id="hudStreak" title="Daily Streak" style="display:none;">
+                🔥 <span id="hudStreakCount">0</span>
+            </div>
+            <div class="hud-achievements-btn" onclick="window.location.href='/achievements.html'" title="Achievements" role="button" tabindex="0" aria-label="View Achievements" onkeydown="if(event.key==='Enter'||event.key===' ')window.location.href='/achievements.html'">
+                🏆
+            </div>
+        </div>
+    </div>
+
+    <!-- Town Events Banner -->
+    <div id="eventsBanner" class="events-banner" style="display: none;">
+        <div class="events-ticker">
+            <i class="fas fa-calendar-star"></i>
+            <span id="eventText">No events currently</span>
+        </div>
+    </div>
+
+    <!-- Hero Section — Town Centre -->
+    <main>
+    <section class="hero">
+        <div class="hero-map-bg"></div>
+        <div class="hero-skyline" style="display:none;">
+            <!-- SVG Town Silhouette -->
+            <svg class="town-silhouette" viewBox="0 0 1440 400" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Buildings -->
+                <rect x="50" y="180" width="60" height="220" fill="rgba(15,10,30,0.9)"/>
+                <rect x="55" y="170" width="50" height="10" fill="rgba(15,10,30,0.9)"/>
+                <rect x="120" y="220" width="80" height="180" fill="rgba(20,15,35,0.85)"/>
+                <rect x="210" y="160" width="50" height="240" fill="rgba(15,10,30,0.9)"/>
+                <polygon points="210,160 235,130 260,160" fill="rgba(15,10,30,0.9)"/>
+                <rect x="270" y="240" width="70" height="160" fill="rgba(20,15,35,0.85)"/>
+                <rect x="350" y="200" width="90" height="200" fill="rgba(15,10,30,0.9)"/>
+                <rect x="380" y="185" width="30" height="15" fill="rgba(15,10,30,0.9)"/>
+                <rect x="450" y="250" width="60" height="150" fill="rgba(20,15,35,0.85)"/>
+                <rect x="520" y="190" width="100" height="210" fill="rgba(15,10,30,0.9)"/>
+                <polygon points="520,190 570,140 620,190" fill="rgba(15,10,30,0.9)"/>
+                <rect x="630" y="230" width="80" height="170" fill="rgba(20,15,35,0.85)"/>
+                <rect x="720" y="170" width="60" height="230" fill="rgba(15,10,30,0.9)"/>
+                <rect x="735" y="155" width="30" height="15" fill="rgba(15,10,30,0.9)"/>
+                <rect x="790" y="210" width="90" height="190" fill="rgba(20,15,35,0.85)"/>
+                <rect x="890" y="250" width="70" height="150" fill="rgba(15,10,30,0.9)"/>
+                <rect x="970" y="180" width="80" height="220" fill="rgba(20,15,35,0.85)"/>
+                <polygon points="970,180 1010,145 1050,180" fill="rgba(20,15,35,0.85)"/>
+                <rect x="1060" y="220" width="60" height="180" fill="rgba(15,10,30,0.9)"/>
+                <rect x="1130" y="200" width="100" height="200" fill="rgba(20,15,35,0.85)"/>
+                <rect x="1240" y="240" width="70" height="160" fill="rgba(15,10,30,0.9)"/>
+                <rect x="1320" y="190" width="80" height="210" fill="rgba(20,15,35,0.85)"/>
+                <!-- Windows (animated) -->
+                <rect class="window" x="70" y="200" width="8" height="10" rx="1" fill="rgba(255,200,100,0.7)"/>
+                <rect class="window" x="85" y="200" width="8" height="10" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="70" y="230" width="8" height="10" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect class="window" x="85" y="230" width="8" height="10" rx="1" fill="rgba(255,200,100,0.8)"/>
+                <rect class="window" x="70" y="260" width="8" height="10" rx="1" fill="rgba(255,200,100,0.3)"/>
+                <rect class="window" x="85" y="260" width="8" height="10" rx="1" fill="rgba(255,200,100,0.4)"/>
+                <rect class="window" x="140" y="240" width="10" height="12" rx="1" fill="rgba(255,180,80,0.6)"/>
+                <rect class="window" x="160" y="240" width="10" height="12" rx="1" fill="rgba(255,180,80,0.7)"/>
+                <rect class="window" x="180" y="240" width="10" height="12" rx="1" fill="rgba(255,180,80,0.3)"/>
+                <rect class="window" x="140" y="270" width="10" height="12" rx="1" fill="rgba(255,180,80,0.5)"/>
+                <rect class="window" x="160" y="270" width="10" height="12" rx="1" fill="rgba(255,180,80,0.8)"/>
+                <rect class="window" x="180" y="270" width="10" height="12" rx="1" fill="rgba(255,180,80,0.4)"/>
+                <rect class="window" x="140" y="300" width="10" height="12" rx="1" fill="rgba(255,180,80,0.6)"/>
+                <rect class="window" x="160" y="300" width="10" height="12" rx="1" fill="rgba(255,180,80,0.3)"/>
+                <rect class="window" x="225" y="180" width="8" height="10" rx="1" fill="rgba(200,220,255,0.6)"/>
+                <rect class="window" x="240" y="180" width="8" height="10" rx="1" fill="rgba(200,220,255,0.5)"/>
+                <rect class="window" x="225" y="210" width="8" height="10" rx="1" fill="rgba(255,200,100,0.7)"/>
+                <rect class="window" x="240" y="210" width="8" height="10" rx="1" fill="rgba(200,220,255,0.4)"/>
+                <rect class="window" x="225" y="240" width="8" height="10" rx="1" fill="rgba(255,200,100,0.3)"/>
+                <rect class="window" x="240" y="240" width="8" height="10" rx="1" fill="rgba(200,220,255,0.5)"/>
+                <rect class="window" x="285" y="260" width="10" height="12" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="305" y="260" width="10" height="12" rx="1" fill="rgba(255,200,100,0.4)"/>
+                <rect class="window" x="285" y="290" width="10" height="12" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect class="window" x="305" y="290" width="10" height="12" rx="1" fill="rgba(255,200,100,0.3)"/>
+                <rect class="window" x="370" y="220" width="10" height="12" rx="1" fill="rgba(255,100,150,0.6)"/>
+                <rect class="window" x="390" y="220" width="10" height="12" rx="1" fill="rgba(100,200,255,0.6)"/>
+                <rect class="window" x="410" y="220" width="10" height="12" rx="1" fill="rgba(255,100,200,0.7)"/>
+                <rect class="window" x="370" y="250" width="10" height="12" rx="1" fill="rgba(100,255,200,0.5)"/>
+                <rect class="window" x="390" y="250" width="10" height="12" rx="1" fill="rgba(255,150,100,0.4)"/>
+                <rect class="window" x="410" y="250" width="10" height="12" rx="1" fill="rgba(100,200,255,0.5)"/>
+                <rect class="window" x="370" y="280" width="10" height="12" rx="1" fill="rgba(255,200,100,0.3)"/>
+                <rect class="window" x="390" y="280" width="10" height="12" rx="1" fill="rgba(100,255,200,0.6)"/>
+                <rect class="window" x="465" y="265" width="8" height="10" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="480" y="265" width="8" height="10" rx="1" fill="rgba(255,200,100,0.4)"/>
+                <rect class="window" x="465" y="295" width="8" height="10" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect class="window" x="480" y="295" width="8" height="10" rx="1" fill="rgba(255,200,100,0.3)"/>
+                <rect class="window" x="540" y="210" width="10" height="12" rx="1" fill="rgba(255,200,100,0.7)"/>
+                <rect class="window" x="560" y="210" width="10" height="12" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="580" y="210" width="10" height="12" rx="1" fill="rgba(255,200,100,0.8)"/>
+                <rect class="window" x="540" y="240" width="10" height="12" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect class="window" x="560" y="240" width="10" height="12" rx="1" fill="rgba(255,200,100,0.4)"/>
+                <rect class="window" x="580" y="240" width="10" height="12" rx="1" fill="rgba(255,200,100,0.7)"/>
+                <rect class="window" x="540" y="270" width="10" height="12" rx="1" fill="rgba(255,200,100,0.3)"/>
+                <rect class="window" x="560" y="270" width="10" height="12" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="580" y="270" width="10" height="12" rx="1" fill="rgba(255,200,100,0.4)"/>
+                <rect class="window" x="645" y="245" width="10" height="12" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="665" y="245" width="10" height="12" rx="1" fill="rgba(200,220,255,0.6)"/>
+                <rect class="window" x="685" y="245" width="10" height="12" rx="1" fill="rgba(255,200,100,0.4)"/>
+                <rect class="window" x="645" y="275" width="10" height="12" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect class="window" x="665" y="275" width="10" height="12" rx="1" fill="rgba(200,220,255,0.3)"/>
+                <rect class="window" x="685" y="275" width="10" height="12" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="740" y="190" width="8" height="10" rx="1" fill="rgba(200,200,255,0.6)"/>
+                <rect class="window" x="740" y="220" width="8" height="10" rx="1" fill="rgba(255,200,100,0.7)"/>
+                <rect class="window" x="740" y="250" width="8" height="10" rx="1" fill="rgba(200,200,255,0.4)"/>
+                <rect class="window" x="755" y="190" width="8" height="10" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="755" y="220" width="8" height="10" rx="1" fill="rgba(200,200,255,0.3)"/>
+                <rect class="window" x="810" y="230" width="10" height="12" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect class="window" x="840" y="230" width="10" height="12" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="860" y="230" width="10" height="12" rx="1" fill="rgba(255,200,100,0.4)"/>
+                <rect class="window" x="810" y="260" width="10" height="12" rx="1" fill="rgba(255,200,100,0.8)"/>
+                <rect class="window" x="840" y="260" width="10" height="12" rx="1" fill="rgba(255,200,100,0.3)"/>
+                <rect class="window" x="860" y="260" width="10" height="12" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="810" y="290" width="10" height="12" rx="1" fill="rgba(255,200,100,0.4)"/>
+                <rect class="window" x="840" y="290" width="10" height="12" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect class="window" x="905" y="265" width="8" height="10" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="920" y="265" width="8" height="10" rx="1" fill="rgba(255,200,100,0.4)"/>
+                <rect class="window" x="935" y="265" width="8" height="10" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect class="window" x="905" y="295" width="8" height="10" rx="1" fill="rgba(255,200,100,0.3)"/>
+                <rect class="window" x="920" y="295" width="8" height="10" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="990" y="200" width="10" height="12" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect class="window" x="1010" y="200" width="10" height="12" rx="1" fill="rgba(200,220,255,0.5)"/>
+                <rect class="window" x="1030" y="200" width="10" height="12" rx="1" fill="rgba(255,200,100,0.4)"/>
+                <rect class="window" x="990" y="230" width="10" height="12" rx="1" fill="rgba(200,220,255,0.4)"/>
+                <rect class="window" x="1010" y="230" width="10" height="12" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect class="window" x="1030" y="230" width="10" height="12" rx="1" fill="rgba(200,220,255,0.5)"/>
+                <rect class="window" x="1075" y="240" width="8" height="10" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="1090" y="240" width="8" height="10" rx="1" fill="rgba(255,200,100,0.4)"/>
+                <rect class="window" x="1075" y="270" width="8" height="10" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect class="window" x="1090" y="270" width="8" height="10" rx="1" fill="rgba(255,200,100,0.3)"/>
+                <rect class="window" x="1150" y="220" width="10" height="12" rx="1" fill="rgba(255,200,100,0.7)"/>
+                <rect class="window" x="1175" y="220" width="10" height="12" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="1200" y="220" width="10" height="12" rx="1" fill="rgba(255,200,100,0.4)"/>
+                <rect class="window" x="1150" y="250" width="10" height="12" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect class="window" x="1175" y="250" width="10" height="12" rx="1" fill="rgba(255,200,100,0.3)"/>
+                <rect class="window" x="1200" y="250" width="10" height="12" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="1150" y="280" width="10" height="12" rx="1" fill="rgba(255,200,100,0.4)"/>
+                <rect class="window" x="1175" y="280" width="10" height="12" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect class="window" x="1255" y="255" width="8" height="10" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="1270" y="255" width="8" height="10" rx="1" fill="rgba(255,200,100,0.4)"/>
+                <rect class="window" x="1285" y="255" width="8" height="10" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect class="window" x="1255" y="285" width="8" height="10" rx="1" fill="rgba(255,200,100,0.3)"/>
+                <rect class="window" x="1270" y="285" width="8" height="10" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect class="window" x="1340" y="210" width="10" height="12" rx="1" fill="rgba(255,180,80,0.7)"/>
+                <rect class="window" x="1365" y="210" width="10" height="12" rx="1" fill="rgba(255,180,80,0.5)"/>
+                <rect class="window" x="1340" y="240" width="10" height="12" rx="1" fill="rgba(255,180,80,0.4)"/>
+                <rect class="window" x="1365" y="240" width="10" height="12" rx="1" fill="rgba(255,180,80,0.6)"/>
+                <rect class="window" x="1340" y="270" width="10" height="12" rx="1" fill="rgba(255,180,80,0.5)"/>
+                <rect class="window" x="1365" y="270" width="10" height="12" rx="1" fill="rgba(255,180,80,0.3)"/>
+                <!-- Street level line -->
+                <rect x="0" y="395" width="1440" height="5" fill="rgba(30,20,50,0.95)"/>
+            </svg>
+        </div>
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-circle-check"></i>
+                <span>Free &middot; No Download &middot; Chat · Video · Games · Apartments</span>
+            </div>
+            <h1 class="hero-title">
+                <span class="title-line">Your virtual world</span>
+                <span class="title-main">is <span class="title-accent">waiting.</span></span>
+            </h1>
+            <p class="hero-subtitle">Your virtual world is waiting. Walk into a pub, nightclub, cinema or arcade, hang out face-to-face over live video, customise your avatar, and decorate your own apartment. 100% free — no download, no sign-up required.</p>
+            <!-- Launch badge -->
+            <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,200,80,0.12);border:1px solid rgba(255,200,80,0.35);border-radius:50px;padding:6px 16px;margin-bottom:18px;font-size:0.85rem;font-weight:600;color:#ffd080;letter-spacing:0.5px;">
+                🚀 Launching Soon
+            </div>
+            <!-- Minimal inline stats -->
+            <div class="hero-inline-stats">
+                <span class="inline-stat"><span class="inline-num" id="totalUsers">0</span> online</span>
+                <span class="inline-dot">·</span>
+                <span class="inline-stat"><span class="inline-num" id="activeRooms">0</span> rooms</span>
+                <span class="inline-dot">·</span>
+                <span class="inline-stat"><span class="inline-num" id="liveStreams">0</span> live</span>
+            </div>
+            <!-- Primary CTA -->
+            <div style="margin-top:24px;display:flex;flex-direction:column;align-items:center;gap:14px;">
+                <a href="/#venues" class="hero-enter-btn" aria-label="Enter ChiffTown — free virtual world, no sign-up needed" style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#c9a84c 0%,#e8c84a 100%);color:#0a0a1a;font-family:'Inter',sans-serif;font-weight:700;font-size:1.15rem;border-radius:14px;padding:16px 36px;text-decoration:none;box-shadow:0 6px 32px rgba(201,168,76,0.45);letter-spacing:0.5px;transition:all 0.3s ease;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 40px rgba(201,168,76,0.6)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 6px 32px rgba(201,168,76,0.45)'">
+                    <i class="fas fa-door-open"></i> Enter ChiffTown Free &rarr;
+                </a>
+                <!-- Secondary CTAs -->
+                <div class="hero-cta-row" style="margin-top:0;">
+                    <button class="cta-start-room" onclick="openInviteModal()" aria-label="Start a video chat room in ChiffTown">
+                        <i class="fas fa-plus-circle"></i> Start a Room
+                    </button>
+                    <button class="cta-invite-friend" onclick="openInviteModal()" aria-label="Invite a friend to ChiffTown">
+                        <i class="fas fa-user-plus"></i> Invite a Friend
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Floating Invite FAB -->
+    <button class="fab-invite" onclick="openInviteModal()" title="Invite a Friend" aria-label="Start a room or invite a friend">
+        <i class="fas fa-plus" aria-hidden="true"></i>
+    </button>
+
+    <!-- Invite Modal -->
+    <div class="invite-modal-overlay" id="inviteModal" style="display:none;" onclick="if(event.target===this)closeInviteModal()" role="dialog" aria-modal="true" aria-labelledby="inviteModalTitle">
+        <div class="invite-modal">
+            <button class="invite-modal-close" onclick="closeInviteModal()" aria-label="Close invite modal"><i class="fas fa-times" aria-hidden="true"></i></button>
+            <h2 class="invite-modal-title" id="inviteModalTitle">Start a Room</h2>
+            <p class="invite-modal-sub">Pick a venue and invite your friends</p>
+            <div class="invite-venue-grid" id="inviteVenueGrid">
+                <button class="invite-venue-btn selected" data-venue="pub" data-url="/pub.html" onclick="selectVenue(this)">
+                    <i class="fas fa-beer-mug-empty"></i><span>Tavern</span>
+                </button>
+                <button class="invite-venue-btn" data-venue="nightclub" data-url="/nightclub.html" onclick="selectVenue(this)">
+                    <i class="fas fa-music"></i><span>Nightclub</span>
+                </button>
+                <button class="invite-venue-btn" data-venue="cinema" data-url="/cinema.html" onclick="selectVenue(this)">
+                    <i class="fas fa-film"></i><span>Cinema</span>
+                </button>
+                <button class="invite-venue-btn" data-venue="lounge" data-url="/lounge.html" onclick="selectVenue(this)">
+                    <i class="fas fa-couch"></i><span>Lounge</span>
+                </button>
+                <button class="invite-venue-btn" data-venue="arcade" data-url="/games.html" onclick="selectVenue(this)">
+                    <i class="fas fa-gamepad"></i><span>Arcade</span>
+                </button>
+                <button class="invite-venue-btn" data-venue="casino" data-url="/casino.html" onclick="selectVenue(this)">
+                    <i class="fas fa-dice"></i><span>Casino</span>
+                </button>
+            </div>
+            <div class="invite-link-section">
+                <label class="invite-link-label">Your invite link</label>
+                <div class="invite-link-row">
+                    <input type="text" class="invite-link-input" id="inviteLinkInput" readonly>
+                    <button class="invite-copy-btn" onclick="copyInviteLink()"><i class="fas fa-copy"></i> Copy</button>
+                </div>
+            </div>
+            <button class="invite-go-btn" id="goToRoomBtn" onclick="goToRoom()">
+                <i class="fas fa-door-open"></i> Enter Room
+            </button>
+            <div class="invite-share-row">
+                <a class="invite-share-btn whatsapp" id="shareWhatsApp" href="#" target="_blank" rel="noopener noreferrer">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                </a>
+                <a class="invite-share-btn sms" id="shareSMS" href="#">
+                    <i class="fas fa-comment-sms"></i> Text
+                </a>
+                <button class="invite-share-btn native" onclick="nativeShare()">
+                    <i class="fas fa-share-nodes"></i> Share
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Venues Section — Town Map -->
+    <section id="venues" class="venues-section">
+        <div class="container">
+            <div class="interactive-map-container" id="mapContainer" role="region" aria-label="Interactive town map — click a building to enter its venue">
+                <picture>
+                    <source srcset="/images/chifftown-map-wide.webp" type="image/webp">
+                    <img src="/images/chifftown-map-wide.png" alt="Interactive map of ChiffTown showing all themed venues and buildings" class="city-map-image" role="img" fetchpriority="high" loading="eager" width="1280" height="704" decoding="sync">
+                </picture>
+                <!-- Hotspot Overlays (until isometric sprites are ready) -->
+                <a href="/questing.html" class="map-hotspot adventure-hotspot" data-venue="Adventure Guild" aria-label="Enter Adventure Guild">
+                    <div class="hotspot-glow" aria-hidden="true"></div>
+                    <div class="hotspot-label">Adventure Guild</div>
+                </a>
+                
+                <a href="/pub.html" class="map-hotspot tavern-hotspot" data-venue="The Chiff Inn" aria-label="Enter The Chiff Inn — Virtual Pub">
+                    <div class="hotspot-glow" aria-hidden="true"></div>
+                    <div class="hotspot-label">The Chiff Inn</div>
+                </a>
+                
+                <a href="/nightclub.html" class="map-hotspot nightclub-hotspot" data-venue="Neon Pulse" aria-label="Enter Neon Pulse Nightclub">
+                    <div class="hotspot-glow" aria-hidden="true"></div>
+                    <div class="hotspot-label">Neon Pulse</div>
+                </a>
+                
+                <a href="/cinema.html" class="map-hotspot cinema-hotspot" data-venue="Starlight Cinema" aria-label="Enter Starlight Cinema">
+                    <div class="hotspot-glow" aria-hidden="true"></div>
+                    <div class="hotspot-label">Starlight Cinema</div>
+                </a>
+                
+                <a href="/games.html" class="map-hotspot arcade-hotspot" data-venue="Pixel Palace" data-unlock-level="3" aria-label="Enter Pixel Palace Arcade (unlocks at Level 3)">
+                    <div class="hotspot-glow" aria-hidden="true"></div>
+                    <div class="hotspot-label">Pixel Palace</div>
+                </a>
+                
+                <a href="/lounge.html" class="map-hotspot lounge-hotspot" data-venue="The Golden Lounge" aria-label="Enter The Velvet Sky Lounge">
+                    <div class="hotspot-glow" aria-hidden="true"></div>
+                    <div class="hotspot-label">The Golden Lounge</div>
+                </a>
+                
+                <a href="https://goodnews-24.com" target="_blank" rel="noopener noreferrer" class="map-hotspot billboard-hotspot" data-venue="Good News 24" aria-label="Good News 24 — opens in new tab">
+                    <div class="hotspot-glow" aria-hidden="true"></div>
+                    <div class="hotspot-label">Good News 24</div>
+                </a>
+                
+                <a href="/wellness.html" class="map-hotspot wellness-hotspot" data-venue="The Wellness Centre" data-unlock-level="5" aria-label="Enter The Wellness Centre (unlocks at Level 5)">
+                    <div class="hotspot-glow" aria-hidden="true"></div>
+                    <div class="hotspot-label">🧘 Wellness Centre</div>
+                </a>
+                
+                <a href="/apartment.html" class="map-hotspot apartment-hotspot" data-venue="Your Apartment" data-unlock-level="2" aria-label="Enter Your Apartment (unlocks at Level 2)">
+                    <div class="hotspot-glow" aria-hidden="true"></div>
+                    <div class="hotspot-label">🏠 Your Apartment</div>
+                </a>
+                
+                <a href="/casino.html" class="map-hotspot casino-hotspot" data-venue="The Golden Dice" data-unlock-level="7" aria-label="Enter The Golden Dice Casino (unlocks at Level 7)">
+                    <div class="hotspot-glow" aria-hidden="true"></div>
+                    <div class="hotspot-label">🎰 Casino</div>
+                </a>
+
+                <!-- Merchant Block - far right -->
+                <a href="/newspaper.html" class="map-hotspot merchant-hotspot" data-venue="Merchant Block" aria-label="Enter Merchant Block — ChiffTown Newspaper">
+                    <div class="hotspot-glow" aria-hidden="true"></div>
+                    <div class="hotspot-label">Merchant Block</div>
+                </a>
+
+                <!-- Gen 4 Hotspots (hidden on new map) -->
+                <!--
+                <a href="/observatory.html" class="map-hotspot hotspot-observatory" data-building="observatory" data-tooltip="Starfire Observatory" data-unlock-level="10">
+                    <div class="hotspot-glow"></div>
+                    <div class="hotspot-label">Starfire Observatory</div>
+                </a>
+                <a href="/chronos.html" class="map-hotspot hotspot-chronos" data-building="chronos" data-tooltip="The Chronos Club" data-unlock-level="15">
+                    <div class="hotspot-glow"></div>
+                    <div class="hotspot-label">The Chronos Club</div>
+                </a>
+                <a href="/aetherium.html" class="map-hotspot hotspot-aetherium" data-building="aetherium" data-tooltip="The Aetherium Lab" data-unlock-level="20">
+                    <div class="hotspot-glow"></div>
+                    <div class="hotspot-label">The Aetherium Lab</div>
+                </a>
+                <a href="/hall-of-fame.html" class="map-hotspot hotspot-hall-of-fame" data-building="halloffame" data-tooltip="Hall of Fame">
+                    <div class="hotspot-glow"></div>
+                    <div class="hotspot-label">🏆 Hall of Fame</div>
+                </a>
+                -->
+            </div>
+            <!-- Venue Quick List -->
+            <div class="venue-list" role="list" aria-label="ChiffTown venues">
+                <a href="/pub.html" class="venue-item" role="listitem" aria-label="Enter The Chiff Inn — cosy virtual pub">
+                    <span class="venue-icon"><img src="/images/buildings/tavern.png?v=1770903060" alt="Tavern" width="95" height="95" style="width: 95px; height: auto;" loading="lazy"></span>
+                    <span class="venue-name">The Chiff Inn</span>
+                    <span class="venue-desc">Cozy pub vibes</span>
+                </a>
+                <a href="/nightclub.html" class="venue-item" role="listitem" aria-label="Enter Neon Pulse Nightclub — dance and party">
+                    <span class="venue-icon"><img src="/images/buildings/nightclub.png?v=1770903060" alt="Nightclub" width="95" height="95" style="width: 95px; height: auto;" loading="lazy"></span>
+                    <span class="venue-name">Neon Pulse</span>
+                    <span class="venue-desc">Dance & party</span>
+                </a>
+                <a href="/newspaper.html" class="venue-item" role="listitem" aria-label="Read The Chronicle — ChiffTown town newspaper">
+                    <span class="venue-icon"><img src="/images/buildings/newspaper-icon.png?v=1770906861" alt="Newspaper" width="95" height="95" style="width: 95px; height: auto;" loading="lazy"></span>
+                    <span class="venue-name">The Chronicle</span>
+                    <span class="venue-desc">Town newspaper</span>
+                </a>
+                <a href="/cinema.html" class="venue-item" role="listitem" aria-label="Enter Starlight Cinema — watch movies together">
+                    <span class="venue-icon"><img src="/images/buildings/cinema.png?v=1770903060" alt="Cinema" width="95" height="95" style="width: 95px; height: auto;" loading="lazy"></span>
+                    <span class="venue-name">Starlight Cinema</span>
+                    <span class="venue-desc">Watch together</span>
+                </a>
+                <a href="/games.html" class="venue-item" role="listitem" aria-label="Enter Pixel Palace — retro arcade games">
+                    <span class="venue-icon"><img src="/images/buildings/arcade.png?v=1770903060" alt="Arcade" width="95" height="95" style="width: 95px; height: auto;" loading="lazy"></span>
+                    <span class="venue-name">Pixel Palace</span>
+                    <span class="venue-desc">Retro arcade</span>
+                </a>
+                <a href="/lounge.html" class="venue-item" role="listitem" aria-label="Enter Velvet Sky Lounge — chill and chat">
+                    <span class="venue-icon"><img src="/images/buildings/lounge.png?v=1770903060" alt="Lounge" width="95" height="95" style="width: 95px; height: auto;" loading="lazy"></span>
+                    <span class="venue-name">Velvet Sky</span>
+                    <span class="venue-desc">Chill & chat</span>
+                </a>
+                <a href="/questing.html" class="venue-item" role="listitem" aria-label="Enter Adventure Guild — quests and stories">
+                    <span class="venue-icon"><img src="/images/buildings/adventure.png?v=1770903060" alt="Adventure Guild" width="95" height="95" style="width: 95px; height: auto;" loading="lazy"></span>
+                    <span class="venue-name">Adventure Guild</span>
+                    <span class="venue-desc">Quests & stories</span>
+                </a>
+                <a href="/apartment.html" class="venue-item" role="listitem" aria-label="Visit Your Apartment — personalise your space">
+                    <span class="venue-icon"><img src="/images/buildings/apartment.png?v=1770903060" alt="Apartment" width="95" height="95" style="width: 95px; height: auto;" loading="lazy"></span>
+                    <span class="venue-name">Your Apartment</span>
+                    <span class="venue-desc">Your own space</span>
+                </a>
+                <a href="/wellness.html" class="venue-item" role="listitem" aria-label="Enter Wellness Centre — feel good science">
+                    <span class="venue-icon"><img src="/images/buildings/wellness.png?v=1770903060" alt="Wellness" width="95" height="95" style="width: 95px; height: auto;" loading="lazy"></span>
+                    <span class="venue-name">Wellness Centre</span>
+                    <span class="venue-desc">Feel good science</span>
+                </a>
+                <a href="/casino.html" class="venue-item" role="listitem" aria-label="Enter The Golden Dice Casino — test your luck">
+                    <span class="venue-icon"><img src="/images/buildings/casino.png?v=1770903060" alt="Casino" width="95" height="95" style="width: 95px; height: auto;" loading="lazy"></span>
+                    <span class="venue-name">The Golden Dice</span>
+                    <span class="venue-desc">Test your luck</span>
+                </a>
+                <a href="/profile.html" class="venue-item" role="listitem" aria-label="View your ChiffTown profile">
+                    <span class="venue-icon">👤</span>
+                    <span class="venue-name">Profile</span>
+                    <span class="venue-desc">Customize you</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge"><i class="fas fa-sparkles"></i> What's Inside</span>
+                <h2 class="section-title">Built for Hanging Out</h2>
+                <p class="section-desc">Real connections, not just another video call.</p>
+            </div>
+            <div class="features-grid" role="list" aria-label="ChiffTown features">
+                <div class="feature-card" role="listitem">
+                    <div class="feature-icon"><i class="fas fa-video"></i></div>
+                    <h3>Live Video Chat</h3>
+                    <p>WebRTC-powered face-to-face conversations. No downloads, no plugins — just click a venue and you're in. Crystal-clear HD video with up to 8 people per room.</p>
+                </div>
+                <div class="feature-card" role="listitem">
+                    <div class="feature-icon"><i class="fas fa-building"></i></div>
+                    <h3>15+ Themed Venues</h3>
+                    <p>Cozy pubs, electric nightclubs, retro arcades, chill lounges, a wellness centre, casino, cinema, and more. Each venue has its own atmosphere, music, and crowd.</p>
+                </div>
+                <div class="feature-card" role="listitem">
+                    <div class="feature-icon"><i class="fas fa-trophy"></i></div>
+                    <h3>XP &amp; Progression</h3>
+                    <p>Earn XP for chatting, visiting venues, and completing daily challenges. Level up to unlock exclusive buildings, collect achievements, and climb the Hall of Fame.</p>
+                </div>
+                <div class="feature-card" role="listitem">
+                    <div class="feature-icon"><i class="fas fa-comments"></i></div>
+                    <h3>Real-time Chat</h3>
+                    <p>Text chat alongside video for sharing links, reactions, and banter. Plus DMs, an activity feed, and a town newspaper written by the community.</p>
+                </div>
+                <div class="feature-card" role="listitem">
+                    <div class="feature-icon"><i class="fas fa-gamepad"></i></div>
+                    <h3>Mini Games &amp; Quests</h3>
+                    <p>Play arcade games, try your luck at the casino, embark on quests at the Adventure Guild, or go fishing. There's always something to do in ChiffTown.</p>
+                </div>
+                <div class="feature-card" role="listitem">
+                    <div class="feature-icon"><i class="fas fa-user-astronaut"></i></div>
+                    <h3>Avatar &amp; Apartment</h3>
+                    <p>Customise your avatar and make it yours. Unlock your own apartment, furnish it with 20+ items across themes — cosy cabin, deep space, neon nights and more — then invite friends over.</p>
+                </div>
+                <div class="feature-card" role="listitem">
+                    <div class="feature-icon"><i class="fas fa-mobile-screen"></i></div>
+                    <h3>Works Everywhere</h3>
+                    <p>Desktop, mobile, tablet — jump in from wherever you are. No app to install. Works in any modern browser. Share a link and your friends are one click away.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="how-it-works-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge"><i class="fas fa-map-signs"></i> Getting Started</span>
+                <h2 class="section-title">Be in the town in 10 seconds</h2>
+                <p class="section-desc">No sign-up required. No app to download. Just show up.</p>
+            </div>
+            <div class="hiw-steps">
+                <div class="hiw-step">
+                    <div class="hiw-num">1</div>
+                    <div class="hiw-icon"><i class="fas fa-map"></i></div>
+                    <h3>Walk into the town</h3>
+                    <p>Open ChiffTown and see the whole town laid out in front of you. Click any building to step inside.</p>
+                </div>
+                <div class="hiw-arrow"><i class="fas fa-arrow-right"></i></div>
+                <div class="hiw-step">
+                    <div class="hiw-num">2</div>
+                    <div class="hiw-icon"><i class="fas fa-video"></i></div>
+                    <h3>Start a room or join one</h3>
+                    <p>Create a private room and share the link, or jump into a live venue where others are already hanging out.</p>
+                </div>
+                <div class="hiw-arrow"><i class="fas fa-arrow-right"></i></div>
+                <div class="hiw-step">
+                    <div class="hiw-num">3</div>
+                    <div class="hiw-icon"><i class="fas fa-star"></i></div>
+                    <h3>Earn XP &amp; explore</h3>
+                    <p>Chat, play games, complete daily challenges, and level up. Every visit unlocks something new.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about-section">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <span class="section-badge"><i class="fas fa-info-circle"></i> About ChiffTown</span>
+                    <h2>More Than Just a Video Call</h2>
+                    <p>Remember walking into your local and seeing familiar faces light up? Or hitting the club on a Friday and feeling that energy as soon as you walked through the door? ChiffTown brings that feeling online — for real this time.</p>
+                    <p>You don't join a meeting room. You walk into <em>a place</em> — with its own personality, its own crowd, its own atmosphere. The pub smells of warm amber. The nightclub pulses. The cinema hushes. Each venue is somewhere you'd actually want to be.</p>
+                    <p>Level up as you explore, unlock new venues, earn achievements, and build a reputation people know. It's the online social life the internet has always promised but never quite delivered — no downloads, no installs, just click and you're there.</p>
+                </div>
+                <div class="about-visual">
+                    <div class="about-card">
+                        <span>15+ Venues</span>
+                    </div>
+                    <div class="about-card">
+                        <span>HD Video Chat</span>
+                    </div>
+                    <div class="about-card">
+                        <span>XP &amp; Levels</span>
+                    </div>
+                    <div class="about-card">
+                        <span>100% Free</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Proof / Testimonials -->
+    <section class="testimonials-section" aria-labelledby="testimonials-heading">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge"><i class="fas fa-quote-left" aria-hidden="true"></i> What People Say</span>
+                <h2 class="section-title" id="testimonials-heading">The vibe is real</h2>
+            </div>
+            <div class="testimonials-grid" role="list">
+                <blockquote class="testimonial-card" role="listitem">
+                    <p class="testimonial-text">"Finally something that feels like actually being out. Spent three hours in the pub last Friday — completely forgot it was online."</p>
+                    <footer class="testimonial-footer"><cite>Jamie — used ChiffTown on launch week</cite></footer>
+                </blockquote>
+                <blockquote class="testimonial-card" role="listitem">
+                    <p class="testimonial-text">"We use this for our Friday night crew catch-ups. The invite link makes it stupid easy — paste it in the group chat and everyone's in."</p>
+                    <footer class="testimonial-footer"><cite>Lauren — regular at The Chiff Inn</cite></footer>
+                </blockquote>
+                <blockquote class="testimonial-card" role="listitem">
+                    <p class="testimonial-text">"The XP system keeps me coming back. I'm trying to unlock the casino and I'll do whatever it takes. Send help."</p>
+                    <footer class="testimonial-footer"><cite>Marcus — currently Level 6</cite></footer>
+                </blockquote>
+                <blockquote class="testimonial-card" role="listitem">
+                    <p class="testimonial-text">"I live abroad and my family are back home. We've tried everything — Zoom is too work-y, FaceTime cuts out, group calls feel cold. ChiffTown is the first thing that actually feels like we're in the same room together."</p>
+                    <footer class="testimonial-footer"><cite>Priya — hangs out in The Lounge every Sunday</cite></footer>
+                </blockquote>
+                <blockquote class="testimonial-card" role="listitem">
+                    <p class="testimonial-text">"Opened it expecting another gimmick. Ended up staying four hours. The pub atmosphere just works. My mate in Melbourne, my sister in Dublin, all of us in The Chiff Inn. Felt like a proper night out."</p>
+                    <footer class="testimonial-footer"><cite>Dan — London, regular at The Chiff Inn</cite></footer>
+                </blockquote>
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- Social Sharing Section -->
+    <section class="share-section" aria-labelledby="share-heading" style="padding:80px 0;background:linear-gradient(135deg,rgba(10,10,26,0.95) 0%,rgba(15,8,35,0.98) 100%);border-top:1px solid rgba(201,168,76,0.15);border-bottom:1px solid rgba(201,168,76,0.15);">
+        <div class="container" style="text-align:center;max-width:680px;margin:0 auto;padding:0 24px;">
+            <span class="section-badge" style="display:inline-flex;align-items:center;gap:6px;margin-bottom:1.2rem;"><i class="fas fa-share-nodes"></i> Spread the word</span>
+            <h2 class="section-title" id="share-heading" style="margin-bottom:1rem;">Tell a friend. It's more fun with people you know.</h2>
+            <p class="section-desc" style="margin-bottom:2rem;color:rgba(255,255,255,0.7);">ChiffTown is built for real friendships. Share your invite link — and within 10 seconds they'll be sitting across from you in The Chiff Inn.</p>
+            <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;">
+                <button onclick="shareChiffTown('whatsapp')" style="display:inline-flex;align-items:center;gap:8px;padding:14px 24px;border-radius:50px;border:none;cursor:pointer;font-size:0.95rem;font-weight:600;background:#25D366;color:#fff;transition:transform 0.2s,box-shadow 0.2s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+                    <i class="fab fa-whatsapp"></i> Share on WhatsApp
+                </button>
+                <button onclick="shareChiffTown('twitter')" style="display:inline-flex;align-items:center;gap:8px;padding:14px 24px;border-radius:50px;border:none;cursor:pointer;font-size:0.95rem;font-weight:600;background:#1a1a1a;color:#fff;border:1px solid rgba(255,255,255,0.2);transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+                    <i class="fab fa-x-twitter"></i> Post on X
+                </button>
+                <button onclick="shareChiffTown('copy')" id="copyShareBtn" style="display:inline-flex;align-items:center;gap:8px;padding:14px 24px;border-radius:50px;border:none;cursor:pointer;font-size:0.95rem;font-weight:600;background:rgba(201,168,76,0.15);color:#c9a84c;border:1px solid rgba(201,168,76,0.35);transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+                    <i class="fas fa-link"></i> Copy Link
+                </button>
+            </div>
+            <p style="margin-top:1.5rem;font-size:0.8rem;color:rgba(255,255,255,0.35);">No account needed — they'll be inside in 10 seconds.</p>
+        </div>
+    </section>
+    <script>
+    function shareChiffTown(method) {
+        const url = 'https://chifftown.com';
+        const text = "Hanging out in ChiffTown — it's like a virtual town with themed venues and live video chat. Way better than a group call. Come in: ";
+        if (method === 'whatsapp') {
+            window.open('https://wa.me/?text=' + encodeURIComponent(text + url), '_blank', 'noopener');
+        } else if (method === 'twitter') {
+            window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(url), '_blank', 'noopener');
+        } else if (method === 'copy') {
+            navigator.clipboard.writeText(url).then(() => {
+                const btn = document.getElementById('copyShareBtn');
+                const orig = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                btn.style.background = 'rgba(100,220,100,0.15)';
+                btn.style.color = '#6fdc6f';
+                setTimeout(() => { btn.innerHTML = orig; btn.style.background = 'rgba(201,168,76,0.15)'; btn.style.color = '#c9a84c'; }, 2000);
+            }).catch(() => {
+                prompt('Copy this link:', url);
+            });
+        }
+    }
+    </script>
+
+
+    <!-- Comparison Section -->
+    <section id="why-chifftown" class="comparison-section" aria-labelledby="comparison-heading">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge"><i class="fas fa-scale-balanced"></i> Why ChiffTown?</span>
+                <h2 class="section-title" id="comparison-heading">Not another video call</h2>
+                <p class="section-desc">ChiffTown is built for hanging out — not meetings, not work, not obligation.</p>
+            </div>
+            <div class="comparison-table" role="table" aria-label="ChiffTown vs other platforms">
+                <div role="rowgroup">
+                <div class="comparison-header" role="row">
+                    <div class="comp-feature-col" role="columnheader">Feature</div>
+                    <div class="comp-ct-col comp-winner" role="columnheader"><i class="fas fa-city"></i> ChiffTown</div>
+                    <div class="comp-other-col" role="columnheader"><i class="fas fa-video"></i> Zoom / Teams</div>
+                    <div class="comp-other-col" role="columnheader"><i class="fab fa-discord"></i> Discord</div>
+                </div>
+                </div>
+                <div role="rowgroup">
+                <div class="comparison-row" role="row">
+                    <div class="comp-feature" role="cell">Feels like going out</div>
+                    <div class="comp-ct comp-yes" role="cell"><i class="fas fa-check-circle"></i> Yes — 15+ themed venues</div>
+                    <div class="comp-other comp-no" role="cell"><i class="fas fa-times-circle"></i> Grid of faces</div>
+                    <div class="comp-other comp-no" role="cell"><i class="fas fa-minus-circle"></i> Voice channels only</div>
+                </div>
+                <div class="comparison-row" role="row">
+                    <div class="comp-feature" role="cell">No sign-up required</div>
+                    <div class="comp-ct comp-yes" role="cell"><i class="fas fa-check-circle"></i> Jump straight in</div>
+                    <div class="comp-other comp-no" role="cell"><i class="fas fa-times-circle"></i> Account required</div>
+                    <div class="comp-other comp-no" role="cell"><i class="fas fa-times-circle"></i> Account required</div>
+                </div>
+                <div class="comparison-row" role="row">
+                    <div class="comp-feature" role="cell">XP, levels &amp; achievements</div>
+                    <div class="comp-ct comp-yes" role="cell"><i class="fas fa-check-circle"></i> Full progression system</div>
+                    <div class="comp-other comp-no" role="cell"><i class="fas fa-times-circle"></i> None</div>
+                    <div class="comp-other comp-partial" role="cell"><i class="fas fa-minus-circle"></i> Server boosts only</div>
+                </div>
+                <div class="comparison-row" role="row">
+                    <div class="comp-feature" role="cell">Social atmosphere &amp; vibe</div>
+                    <div class="comp-ct comp-yes" role="cell"><i class="fas fa-check-circle"></i> Each venue has its own feel</div>
+                    <div class="comp-other comp-no" role="cell"><i class="fas fa-times-circle"></i> Sterile, corporate</div>
+                    <div class="comp-other comp-partial" role="cell"><i class="fas fa-minus-circle"></i> Server-dependent</div>
+                </div>
+                <div class="comparison-row" role="row">
+                    <div class="comp-feature" role="cell">Mini-games &amp; activities</div>
+                    <div class="comp-ct comp-yes" role="cell"><i class="fas fa-check-circle"></i> Casino, arcade, quests, fishing</div>
+                    <div class="comp-other comp-no" role="cell"><i class="fas fa-times-circle"></i> None</div>
+                    <div class="comp-other comp-partial" role="cell"><i class="fas fa-minus-circle"></i> Bots only</div>
+                </div>
+                <div class="comparison-row comp-last" role="row">
+                    <div class="comp-feature" role="cell">Completely free</div>
+                    <div class="comp-ct comp-yes" role="cell"><i class="fas fa-check-circle"></i> 100% free, always</div>
+                    <div class="comp-other comp-partial" role="cell"><i class="fas fa-minus-circle"></i> Limited free tier</div>
+                    <div class="comp-other comp-yes" role="cell"><i class="fas fa-check-circle"></i> Free (with Nitro upsells)</div>
+                </div>
+                </div>
+            </div>
+            <div class="comparison-cta" style="text-align:center;margin-top:2.5rem;">
+                <p class="comparison-verdict" style="font-size:1.1rem;color:rgba(255,255,255,0.8);margin-bottom:1.5rem;">ChiffTown is the only platform where hanging out online actually <em>feels</em> like hanging out.</p>
+                <button class="cta-start-room" onclick="openInviteModal()" aria-label="Start a room in ChiffTown — no sign-up required">
+                    <i class="fas fa-door-open"></i> Try it now — no sign-up
+                </button>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Stats / Trust Section -->
+    <section aria-labelledby="stats-heading" style="padding:64px 0;background:rgba(201,168,76,0.04);border-top:1px solid rgba(201,168,76,0.1);border-bottom:1px solid rgba(201,168,76,0.1);">
+        <div class="container" style="max-width:960px;margin:0 auto;padding:0 24px;text-align:center;">
+            <span class="section-badge" style="display:inline-flex;align-items:center;gap:6px;margin-bottom:1.2rem;"><i class="fas fa-chart-line"></i> By the numbers</span>
+            <h2 class="section-title" id="stats-heading" style="margin-bottom:2.5rem;">Real hangouts. Real connections.</h2>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:2rem;">
+                <div style="padding:1.5rem;border:1px solid rgba(201,168,76,0.2);border-radius:16px;background:rgba(255,255,255,0.03);">
+                    <div style="font-size:2.4rem;font-weight:900;color:#c9a84c;font-family:'Playfair Display',serif;margin-bottom:0.4rem;">15+</div>
+                    <div style="font-size:0.9rem;color:rgba(255,255,255,0.7);">Themed venues to explore</div>
+                </div>
+                <div style="padding:1.5rem;border:1px solid rgba(201,168,76,0.2);border-radius:16px;background:rgba(255,255,255,0.03);">
+                    <div style="font-size:2.4rem;font-weight:900;color:#c9a84c;font-family:'Playfair Display',serif;margin-bottom:0.4rem;">8</div>
+                    <div style="font-size:0.9rem;color:rgba(255,255,255,0.7);">People per video room</div>
+                </div>
+                <div style="padding:1.5rem;border:1px solid rgba(201,168,76,0.2);border-radius:16px;background:rgba(255,255,255,0.03);">
+                    <div style="font-size:2.4rem;font-weight:900;color:#c9a84c;font-family:'Playfair Display',serif;margin-bottom:0.4rem;">10s</div>
+                    <div style="font-size:0.9rem;color:rgba(255,255,255,0.7);">To go from link to face-to-face</div>
+                </div>
+                <div style="padding:1.5rem;border:1px solid rgba(201,168,76,0.2);border-radius:16px;background:rgba(255,255,255,0.03);">
+                    <div style="font-size:2.4rem;font-weight:900;color:#c9a84c;font-family:'Playfair Display',serif;margin-bottom:0.4rem;">£0</div>
+                    <div style="font-size:0.9rem;color:rgba(255,255,255,0.7);">Forever free to use</div>
+                </div>
+            </div>
+            <p style="margin-top:2.5rem;font-size:1rem;color:rgba(255,255,255,0.6);max-width:560px;margin-left:auto;margin-right:auto;">No VC-backed freemium trap. No premium tier to unlock the good stuff. ChiffTown is free because the fun is better with more people in the room.</p>
+        </div>
+    </section>
+
+    <!-- FAQ Section (SEO) -->
+    <section id="faq" class="faq-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge"><i class="fas fa-circle-question"></i> FAQ</span>
+                <h2 class="section-title">Frequently Asked Questions</h2>
+            </div>
+            <div class="faq-list">
+                <details class="faq-item">
+                    <summary>What is ChiffTown?</summary>
+                    <p>ChiffTown is a free virtual town where you hang out with friends in themed venues using live video chat. Think of it as a social world where every building is a different vibe — pubs, nightclubs, cinemas, arcades, and more.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Do I need to download anything?</summary>
+                    <p>Nope! ChiffTown runs entirely in your browser. No downloads, no plugins, no app store. Just open the link and you're in. Works on desktop, mobile, and tablet.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Is ChiffTown free?</summary>
+                    <p>Yes, ChiffTown is completely free to use. All venues, video chat, text chat, and core features are free. The XP system, achievements, and progression are all included.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>How does the XP and leveling system work?</summary>
+                    <p>You earn XP by visiting venues, chatting with people, completing daily challenges, and playing mini-games. As you level up, you unlock new buildings and earn achievements. Keep a daily streak going for bonus rewards!</p>
+                </details>
+                <details class="faq-item">
+                    <summary>How many people can be in a video chat?</summary>
+                    <p>Each venue supports up to 8 simultaneous video streams with real-time text chat alongside. Perfect for hanging out with your friend group.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Can I create a private room?</summary>
+                    <p>Yes! Use the "Start a Room" button to generate a unique invite link. Share it with friends via WhatsApp, text, or any messaging app — only people with the link can join.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>What venues are available in ChiffTown?</summary>
+                    <p>ChiffTown has 15+ venues including The Chiff Inn (cosy pub), The Electric Nightclub, The Grand Cinema, The Lounge, Wellness Centre, Casino Royale, Adventure Guild, Arcade, Observatory, Aetherium, Chronos Bar, Fishing Dock, and Pet Shelter — with more being added regularly.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Do I need to create an account?</summary>
+                    <p>You can jump straight into ChiffTown as a guest — no sign-up required. Creating a free account lets you save your XP progress, unlock achievements, and build a profile that persists across sessions.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Is ChiffTown safe and moderated?</summary>
+                    <p>ChiffTown uses room-based privacy, so you only video chat with people in your specific room. All rooms are voluntary — nobody can add you without your knowledge. We take community safety seriously.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Can I use ChiffTown on my phone?</summary>
+                    <p>Yes! ChiffTown works on smartphones, tablets, laptops, and desktops — no app required. Open it in Chrome or Safari on your phone and you're good to go. Full video chat, XP, and all venues available on mobile.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>How is ChiffTown different from Zoom or Google Meet?</summary>
+                    <p>ChiffTown is built for hanging out, not meetings. Instead of a plain video grid, you're actually <em>inside</em> a venue — a cosy pub, buzzing nightclub, retro arcade. You earn XP, unlock buildings, and play games. It's what video chat feels like when it's actually fun.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>What browser works best with ChiffTown?</summary>
+                    <p>Chrome, Firefox, Edge, or Safari (v15+) all work great. You'll need camera and microphone permissions for video chat — but you can also join in text-only mode. No plugins or extensions needed.</p>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- Support Section — Ko-fi -->
+    <section aria-labelledby="support-heading" style="padding:80px 0;background:linear-gradient(135deg,rgba(255,91,91,0.05),rgba(255,140,0,0.04));border-top:1px solid rgba(255,100,100,0.12);border-bottom:1px solid rgba(255,100,100,0.12);">
+        <div class="container" style="max-width:680px;margin:0 auto;padding:0 24px;text-align:center;">
+            <span class="section-badge" style="display:inline-flex;align-items:center;gap:6px;margin-bottom:1.2rem;background:rgba(255,91,91,0.1);border-color:rgba(255,91,91,0.3);color:#ff8080;"><i class="fas fa-heart"></i> Support Chifftown</span>
+            <h2 class="section-title" id="support-heading" style="margin-bottom:1rem;">Love ChiffTown? Help keep it free.</h2>
+            <p style="color:rgba(255,255,255,0.68);margin-bottom:2rem;line-height:1.75;font-size:1.05rem;">
+                ChiffTown is built and run by a tiny team who genuinely love what they're making. It's 100% free and always will be — but if you're enjoying it and want to help keep the servers running and new venues coming, a Ko-fi goes a long way. ☕
+            </p>
+            <a href="https://ko-fi.com/chifftown" target="_blank" rel="noopener noreferrer"
+               style="display:inline-flex;align-items:center;gap:12px;background:#FF5E5B;color:#fff;font-family:'Inter',sans-serif;font-weight:700;font-size:1.05rem;border-radius:14px;padding:16px 36px;text-decoration:none;box-shadow:0 6px 28px rgba(255,94,91,0.4);letter-spacing:0.3px;transition:all 0.3s ease;"
+               onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 36px rgba(255,94,91,0.55)'"
+               onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 6px 28px rgba(255,94,91,0.4)'">
+                ☕ Support us on Ko-fi
+            </a>
+            <p style="margin-top:1.4rem;font-size:0.82rem;color:rgba(255,255,255,0.35);">No subscription. No obligation. Just gratitude. 💛</p>
+        </div>
+    </section>
+
+    <!-- Newsletter / Stay in the Loop -->
+    <section aria-labelledby="newsletter-heading" style="padding:80px 0;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(201,168,76,0.02));border-top:1px solid rgba(201,168,76,0.12);">
+        <div class="container" style="max-width:640px;margin:0 auto;padding:0 24px;text-align:center;">
+            <span class="section-badge" style="display:inline-flex;align-items:center;gap:6px;margin-bottom:1.2rem;"><i class="fas fa-envelope-open-text"></i> Stay in the loop</span>
+            <h2 class="section-title" id="newsletter-heading" style="margin-bottom:1rem;">New venues. New events. First to know.</h2>
+            <p style="color:rgba(255,255,255,0.65);margin-bottom:2rem;line-height:1.7;font-size:1.05rem;">
+                We're adding new venues, features and community events regularly. Drop your email for occasional ChiffTown updates — optional, low-volume, and separate from entering the town.
+            </p>
+            <form id="newsletterForm" onsubmit="handleNewsletter(event)" novalidate aria-label="Newsletter signup">
+                <div style="display:flex;gap:0.75rem;max-width:420px;margin:0 auto;flex-wrap:wrap;justify-content:center;">
+                    <label for="newsletterEmail" class="sr-only">Email address</label>
+                    <input
+                        type="email"
+                        id="newsletterEmail"
+                        name="email"
+                        placeholder="your@email.com"
+                        required
+                        autocomplete="email"
+                        aria-required="true"
+                        style="flex:1;min-width:220px;background:rgba(255,255,255,0.06);border:1px solid rgba(201,168,76,0.3);border-radius:50px;padding:0.75rem 1.25rem;color:#f0eaff;font-size:1rem;font-family:inherit;outline:none;"
+                    >
+                    <button
+                        type="submit"
+                        id="newsletterBtn"
+                        style="background:linear-gradient(135deg,#c9a84c,#e8a020);color:#1a1a1a;border:none;border-radius:50px;padding:0.75rem 1.5rem;font-weight:700;font-size:0.95rem;cursor:pointer;font-family:inherit;white-space:nowrap;"
+                        aria-label="Subscribe to the ChiffTown newsletter"
+                    >Subscribe</button>
+                </div>
+                <p id="newsletterMsg" role="alert" aria-live="polite" style="margin-top:1rem;font-size:0.9rem;min-height:1.4em;"></p>
+                <p style="margin-top:0.75rem;font-size:0.8rem;color:rgba(255,255,255,0.35);">No spam. Unsubscribe any time. Email is only used for ChiffTown updates. <a href="/privacy.html" style="color:rgba(201,168,76,0.7);">Privacy policy</a>.</p>
+            </form>
+        </div>
+    </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <i class="fas fa-city"></i>
+                        <span>Chiff<span class="logo-accent">Town</span></span>
+                    </div>
+                    <p>Your virtual town for real connections.</p>
+                    <div class="social-links">
+                        <a href="https://twitter.com/chifftown" target="_blank" aria-label="ChiffTown on Twitter / X" rel="noopener"><i class="fab fa-x-twitter"></i></a>
+                        <a href="https://discord.gg/chifftown" target="_blank" aria-label="ChiffTown Discord server" rel="noopener"><i class="fab fa-discord"></i></a>
+                        <a href="https://ko-fi.com/chifftown" target="_blank" aria-label="Support ChiffTown on Ko-fi" rel="noopener" style="color:#FF5E5B !important;">☕</a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>Venues</h4>
+                    <ul>
+                        <li><a href="pub.html">The Chiff Inn</a></li>
+                        <li><a href="nightclub.html">Night Club</a></li>
+                        <li><a href="cinema.html">Cinema</a></li>
+                        <li><a href="games.html">Arcade</a></li>
+                        <li><a href="lounge.html">Lounge</a></li>
+                        <li><a href="questing.html">Adventure Guild</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Platform</h4>
+                    <ul>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="/about.html">About</a></li>
+                        <li><a href="/whats-new.html">What's New</a></li>
+                        <li><a href="/privacy.html">Privacy</a></li>
+                        <li><a href="/terms.html">Terms</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Community</h4>
+                    <ul>
+                        <li><a href="https://twitter.com/chifftown" target="_blank" rel="noopener"><i class="fab fa-x-twitter" style="margin-right:4px;"></i> Twitter / X</a></li>
+                        <li><a href="https://discord.gg/chifftown" target="_blank" rel="noopener"><i class="fab fa-discord" style="margin-right:4px;"></i> Discord</a></li>
+                        <li><a href="https://ko-fi.com/chifftown" target="_blank" rel="noopener">☕ Support on Ko-fi</a></li>
+                        <li><a href="/apartment.html"><i class="fas fa-home" style="margin-right:4px;"></i> Your Apartment</a></li>
+                        <li><a href="/achievements.html"><i class="fas fa-trophy" style="margin-right:4px;"></i> Achievements</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 ChiffTown. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Aircraft container (for planes/helicopters flying across) -->
+    <div id="aircraftLayer" style="position:fixed;top:0;left:0;width:100%;height:40vh;pointer-events:none;z-index:999;overflow:hidden;"></div>
+
+    <style>
+        /* Window glow animation */
+        .window {
+            transition: fill 2s ease-in-out, opacity 2s ease-in-out;
+        }
+        .window.off {
+            fill: rgba(20,15,35,0.3) !important;
+            opacity: 0.2;
+        }
+        .window.bright {
+            filter: url(#windowGlow);
+        }
+        /* Aircraft styles */
+        .aircraft {
+            position: absolute;
+            opacity: 0.7;
+        }
+        .aircraft-light {
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: #fff;
+            position: absolute;
+            animation: blink 1.5s ease-in-out infinite;
+        }
+        .aircraft-light.red {
+            background: #ff3333;
+            animation: blink 1s ease-in-out infinite;
+        }
+        .aircraft-light.green {
+            background: #33ff33;
+            animation: blink 1.2s ease-in-out infinite 0.5s;
+        }
+        .aircraft-body {
+            width: 6px;
+            height: 2px;
+            background: rgba(180,180,200,0.3);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.1; }
+        }
+        @keyframes flyRight {
+            from { transform: translateX(-50px); }
+            to { transform: translateX(calc(100vw + 50px)); }
+        }
+        @keyframes flyLeft {
+            from { transform: translateX(calc(100vw + 50px)); }
+            to { transform: translateX(-50px); }
+        }
+    </style>
+
+    <style>
+    /* === Feature Icons === */
+    .feature-icon { font-size: 2rem; color: #c9a84c; margin-bottom: 12px; }
+    .feature-card p { line-height: 1.6; }
+
+    /* === FAQ Section === */
+    .faq-section { padding: 80px 0; }
+    .faq-list { max-width: 720px; margin: 0 auto; }
+    .faq-item { border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .faq-item summary {
+        padding: 20px 0; cursor: pointer; font-family: 'Inter', sans-serif;
+        font-size: 1.05rem; font-weight: 600; color: rgba(255,255,255,0.9);
+        list-style: none; display: flex; justify-content: space-between; align-items: center;
+    }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after { content: '+'; font-size: 1.4rem; color: #c9a84c; transition: transform 0.3s; }
+    .faq-item[open] summary::after { content: '−'; }
+    .faq-item p {
+        padding: 0 0 20px; margin: 0; font-family: 'Inter', sans-serif;
+        color: rgba(255,255,255,0.6); line-height: 1.7; font-size: 0.95rem;
+    }
+
+    /* === CTA Buttons in Hero === */
+    .hero-cta-row { display: flex; gap: 14px; margin-top: 28px; justify-content: center; flex-wrap: wrap; }
+    .cta-start-room, .cta-invite-friend {
+        font-family: 'Inter', sans-serif; font-weight: 600; font-size: 1rem;
+        border: none; border-radius: 12px; padding: 14px 28px; cursor: pointer;
+        display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s ease;
+        letter-spacing: 0.5px;
+    }
+    .cta-start-room {
+        background: linear-gradient(135deg, #c9a84c 0%, #e0c068 100%);
+        color: #0a0a1a; box-shadow: 0 4px 24px rgba(201,168,76,0.35);
+    }
+    .cta-start-room:hover { transform: translateY(-2px); box-shadow: 0 6px 32px rgba(201,168,76,0.5); }
+    .cta-invite-friend {
+        background: linear-gradient(135deg, #2a9d8f 0%, #3ab8a8 100%);
+        color: #fff; box-shadow: 0 4px 24px rgba(42,157,143,0.3);
+    }
+    .cta-invite-friend:hover { transform: translateY(-2px); box-shadow: 0 6px 32px rgba(42,157,143,0.45); }
+
+    /* === Floating FAB === */
+    .fab-invite {
+        position: fixed; bottom: 28px; right: 28px; z-index: 9000;
+        width: 58px; height: 58px; border-radius: 50%; border: none; cursor: pointer;
+        background: linear-gradient(135deg, #c9a84c 0%, #e0c068 100%);
+        color: #0a0a1a; font-size: 1.5rem;
+        box-shadow: 0 4px 20px rgba(201,168,76,0.4);
+        transition: all 0.3s ease;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .fab-invite:hover { transform: scale(1.1) rotate(90deg); box-shadow: 0 6px 28px rgba(201,168,76,0.6); }
+
+    /* === Invite Modal === */
+    .invite-modal-overlay {
+        position: fixed; inset: 0; z-index: 10000;
+        background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
+        display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+    .invite-modal {
+        background: linear-gradient(170deg, #0f1a2e 0%, #0a0f1e 100%);
+        border: 1px solid rgba(201,168,76,0.2); border-radius: 20px;
+        padding: 36px 32px; max-width: 480px; width: 100%; position: relative;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+        animation: modalIn 0.3s ease;
+    }
+    @keyframes modalIn { from { opacity:0; transform: scale(0.92) translateY(20px); } to { opacity:1; transform: scale(1) translateY(0); } }
+    .invite-modal-close {
+        position: absolute; top: 14px; right: 16px; background: none; border: none;
+        color: rgba(255,255,255,0.4); font-size: 1.2rem; cursor: pointer; transition: color 0.2s;
+    }
+    .invite-modal-close:hover { color: #fff; }
+    .invite-modal-title {
+        font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700;
+        color: #c9a84c; margin: 0 0 4px; text-align: center;
+    }
+    .invite-modal-sub {
+        font-family: 'Inter', sans-serif; color: rgba(255,255,255,0.5);
+        font-size: 0.9rem; text-align: center; margin: 0 0 24px;
+    }
+    .invite-venue-grid {
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px;
+    }
+    .invite-venue-btn {
+        background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 12px; padding: 14px 8px; cursor: pointer; transition: all 0.2s;
+        display: flex; flex-direction: column; align-items: center; gap: 6px;
+        color: rgba(255,255,255,0.6); font-family: 'Inter', sans-serif; font-size: 0.8rem;
+    }
+    .invite-venue-btn i { font-size: 1.3rem; }
+    .invite-venue-btn:hover { background: rgba(42,157,143,0.1); border-color: rgba(42,157,143,0.3); color: #fff; }
+    .invite-venue-btn.selected {
+        background: rgba(201,168,76,0.12); border-color: rgba(201,168,76,0.5);
+        color: #c9a84c;
+    }
+    .invite-link-section { margin-bottom: 20px; }
+    .invite-link-label { font-family: 'Inter', sans-serif; font-size: 0.8rem; color: rgba(255,255,255,0.4); margin-bottom: 8px; display: block; }
+    .invite-link-row { display: flex; gap: 8px; }
+    .invite-link-input {
+        flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 10px; padding: 12px 14px; color: #fff; font-family: 'Inter', sans-serif;
+        font-size: 0.85rem; outline: none;
+    }
+    .invite-copy-btn {
+        background: linear-gradient(135deg, #c9a84c, #e0c068); color: #0a0a1a;
+        border: none; border-radius: 10px; padding: 12px 18px; cursor: pointer;
+        font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.85rem;
+        display: flex; align-items: center; gap: 6px; transition: all 0.2s; white-space: nowrap;
+    }
+    .invite-copy-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(201,168,76,0.3); }
+    .invite-go-btn {
+        width: 100%; padding: 14px; margin-bottom: 16px; border: none; border-radius: 12px; cursor: pointer;
+        background: linear-gradient(135deg, #c9a84c 0%, #e8c84a 100%); color: #0a0e1a; font-size: 1.1rem;
+        font-weight: 700; font-family: 'Inter', sans-serif; letter-spacing: 0.5px;
+        display: flex; align-items: center; justify-content: center; gap: 10px;
+        transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(201,168,76,0.4);
+    }
+    .invite-go-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(201,168,76,0.6); }
+    .invite-share-row { display: flex; gap: 10px; justify-content: center; }
+    .invite-share-btn {
+        border: none; border-radius: 10px; padding: 10px 18px; cursor: pointer;
+        font-family: 'Inter', sans-serif; font-weight: 500; font-size: 0.85rem;
+        display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;
+        text-decoration: none;
+    }
+    .invite-share-btn.whatsapp { background: #25d366; color: #fff; }
+    .invite-share-btn.sms { background: #2a9d8f; color: #fff; }
+    .invite-share-btn.native { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.1); }
+    .invite-share-btn:hover { transform: translateY(-1px); filter: brightness(1.1); }
+    @media (max-width: 500px) {
+        .invite-venue-grid { grid-template-columns: repeat(2, 1fr); }
+        .invite-modal { padding: 28px 20px; }
+        .hero-cta-row { flex-direction: column; align-items: center; }
+        .cta-start-room, .cta-invite-friend { width: 100%; max-width: 280px; justify-content: center; }
+    }
+    </style>
+
+    <!-- Scripts -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+    <script src="xp-system.js?v=1" defer></script>
+    <script src="js/xp-client.js?v=1" defer></script>
+    <script src="js/xp-engine.min.js?v=3" defer></script>
+    <script src="js/xp-welcome.js?v=1" defer></script>
+    <script src="js/events.js?v=1" defer></script>
+    <script src="main-home.min.js?v=17" defer></script>
+    <script src="js/live-occupancy.js?v=1" defer></script>
+    <script src="js/interactive-map.js?v=1" defer></script>
+    <script src="js/mobile-map.js?v=3" defer></script>
+    <script>
+    // === TOWN ALIVE ANIMATIONS ===
+    (function() {
+        // --- Window Light Animation ---
+        const windows = document.querySelectorAll('.town-silhouette .window');
+        if (windows.length) {
+            // Add SVG glow filter
+            const svg = document.querySelector('.town-silhouette');
+            const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+            defs.innerHTML = `
+                <filter id="windowGlow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="2.5" result="blur"/>
+                    <feMerge>
+                        <feMergeNode in="blur"/>
+                        <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                </filter>
+            `;
+            svg.insertBefore(defs, svg.firstChild);
+
+            // Start some windows off
+            windows.forEach(w => {
+                if (Math.random() < 0.3) w.classList.add('off');
+                if (Math.random() < 0.4) w.classList.add('bright');
+            });
+
+            // Randomly toggle windows
+            function toggleWindow() {
+                const w = windows[Math.floor(Math.random() * windows.length)];
+                if (w.classList.contains('off')) {
+                    w.classList.remove('off');
+                    // Random warm color when turning on
+                    const colors = [
+                        'rgba(255,200,100,0.7)', 'rgba(255,180,80,0.6)', 
+                        'rgba(200,220,255,0.5)', 'rgba(255,150,100,0.6)',
+                        'rgba(255,220,150,0.7)', 'rgba(200,200,255,0.5)'
+                    ];
+                    w.setAttribute('fill', colors[Math.floor(Math.random() * colors.length)]);
+                    if (Math.random() < 0.3) w.classList.add('bright');
+                } else {
+                    w.classList.add('off');
+                    w.classList.remove('bright');
+                }
+                // Next toggle in 1-5 seconds
+                setTimeout(toggleWindow, 1000 + Math.random() * 4000);
+            }
+            setTimeout(toggleWindow, 2000);
+            // Run 2-3 parallel toggle chains for more life
+            setTimeout(() => setTimeout(toggleWindow, 500 + Math.random() * 3000), 1000);
+            setTimeout(() => setTimeout(toggleWindow, 1500 + Math.random() * 3000), 2000);
+        }
+
+        // --- Aircraft Animation ---
+        const aircraftLayer = document.getElementById('aircraftLayer');
+        if (!aircraftLayer) return;
+
+        function spawnAircraft() {
+            const isHelicopter = Math.random() < 0.3;
+            const goesRight = Math.random() < 0.5;
+            const y = 15 + Math.random() * 60; // 15-75% of the aircraft layer height
+            const duration = isHelicopter ? (25 + Math.random() * 15) : (20 + Math.random() * 20); // seconds
+
+            const el = document.createElement('div');
+            el.className = 'aircraft';
+            el.style.top = y + '%';
+
+            if (isHelicopter) {
+                // Helicopter: white light + red blinking
+                el.innerHTML = `
+                    <div class="aircraft-body" style="width:4px;height:2px;"></div>
+                    <div class="aircraft-light" style="left:0;top:0;"></div>
+                    <div class="aircraft-light red" style="left:6px;top:-1px;width:2px;height:2px;"></div>
+                `;
+            } else {
+
+                // Plane: white + red + green wingtip lights
+                el.innerHTML = `
+                    <div class="aircraft-body" style="width:8px;height:2px;"></div>
+                    <div class="aircraft-light" style="left:3px;top:0;"></div>
+                    <div class="aircraft-light red" style="left:-2px;top:1px;width:2px;height:2px;"></div>
+                    <div class="aircraft-light green" style="left:10px;top:1px;width:2px;height:2px;"></div>
+                `;
+            }
+
+            el.style.animation = `${goesRight ? 'flyRight' : 'flyLeft'} ${duration}s linear forwards`;
+            el.style.opacity = 0.5 + Math.random() * 0.4;
+            
+            aircraftLayer.appendChild(el);
+
+            // Remove after animation
+            setTimeout(() => {
+                el.remove();
+            }, duration * 1000 + 500);
+
+            // Schedule next aircraft: 15-35 seconds
+
+            setTimeout(spawnAircraft, 15000 + Math.random() * 20000);
+        }
+
+        // Start first aircraft after 3-8 seconds
+        setTimeout(spawnAircraft, 3000 + Math.random() * 5000);
+        // Start a second chain slightly delayed for variety
+        setTimeout(spawnAircraft, 10000 + Math.random() * 10000);
+    })();
+    </script>
+<!-- Fullscreen, HUD, and Edit mode removed — map is now pure navigation -->
+<script>
+// === INVITE MODAL LOGIC ===
+function generateInviteCode() {
+    return Array.from(crypto.getRandomValues(new Uint8Array(4)))
+        .map(b => b.toString(36)).join('').substring(0, 8).toUpperCase();
+}
+
+let currentInviteCode = generateInviteCode();
+let currentVenueUrl = '/pub.html';
+
+function getInviteLink() {
+    return window.location.origin + currentVenueUrl + '?invite=' + currentInviteCode;
+}
+
+function goToRoom() {
+    const link = getInviteLink();
+    window.location.href = link;
+}
+
+function selectVenue(btn) {
+    document.querySelectorAll('.invite-venue-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    currentVenueUrl = btn.dataset.url;
+    currentInviteCode = generateInviteCode();
+    updateInviteLink();
+}
+
+function updateInviteLink() {
+    const link = getInviteLink();
+    document.getElementById('inviteLinkInput').value = link;
+    const msg = encodeURIComponent('Join me on ChiffTown! ' + link);
+    document.getElementById('shareWhatsApp').href = 'https://wa.me/?text=' + msg;
+    document.getElementById('shareSMS').href = 'sms:?body=' + msg;
+}
+
+function openInviteModal() {
+    currentInviteCode = generateInviteCode();
+    updateInviteLink();
+    document.getElementById('inviteModal').style.display = 'flex';
+}
+
+function closeInviteModal() {
+    document.getElementById('inviteModal').style.display = 'none';
+}
+
+function copyInviteLink() {
+    const input = document.getElementById('inviteLinkInput');
+    navigator.clipboard.writeText(input.value).then(() => {
+        const btn = document.querySelector('.invite-copy-btn');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        setTimeout(() => btn.innerHTML = orig, 2000);
+    });
+}
+
+function nativeShare() {
+    if (navigator.share) {
+        navigator.share({ title: 'Join me on ChiffTown!', url: getInviteLink() });
+    } else {
+        copyInviteLink();
+    }
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeInviteModal(); });
+</script>
+<script src="/js/weather-system.min.js?v=2" defer></script>
+<script src="/js/ambient-life.min.js?v=2" defer></script>
+<script src="/js/social-system.min.js?v=2" defer></script>
+<script src="/js/loading-screen.min.js?v=2" defer></script>
+<script src="/js/page-transitions.js?v=1" defer></script>
+<script src="/js/activity-feed.min.js?v=2" defer></script>
+<script src="/js/profile-system.min.js?v=2" defer></script>
+<script src="/js/shop-system.js?v=1" defer></script>
+<script src="/js/weather-events.js?v=1" defer></script>
+<script src="/js/building-preview.js?v=1" defer></script>
+<script src="/js/town-npcs.js?v=2" defer></script>
+<script src="/js/town-atmosphere.js?v=1" defer></script>
+<script src="/js/achievements.js?v=1" defer></script>
+<script src="/js/town-chat.js?v=1" defer></script>
+<script src="/js/welcome-tour.js?v=1" defer></script>
+<script src="/js/pet-system.js?v=1" defer></script>
+<script src="/js/dm-system.js?v=1" defer></script>
+<script src="/js/seasonal-festival.js?v=1" defer></script>
+<script src="/js/notification-center.js?v=1" defer></script>
+<!-- TownEngine removed — clean navigation map -->
+<script>
+// Newsletter signup handler
+async function handleNewsletter(e) {
+    e.preventDefault();
+    const email = document.getElementById('newsletterEmail').value.trim();
+    const btn = document.getElementById('newsletterBtn');
+    const msg = document.getElementById('newsletterMsg');
+    if (!email) return;
+    btn.disabled = true;
+    btn.textContent = 'Subscribing…';
+    msg.textContent = '';
+    try {
+        const res = await fetch('/api/newsletter', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            msg.textContent = '✅ You\'re in! We\'ll be in touch.';
+            msg.style.color = '#68d391';
+            document.getElementById('newsletterEmail').value = '';
+            btn.textContent = 'Subscribed!';
+        } else {
+            msg.textContent = data.error || 'Something went wrong — try again.';
+            msg.style.color = '#f87171';
+            btn.disabled = false;
+            btn.textContent = 'Subscribe';
+        }
+    } catch {
+        msg.textContent = 'Network error — please try again.';
+        msg.style.color = '#f87171';
+        btn.disabled = false;
+        btn.textContent = 'Subscribe';
+    }
+}
+</script>
+
+<!-- Ko-fi Support Button -->
+<a href="https://ko-fi.com/chifftown" target="_blank" rel="noopener noreferrer" id="kofi-btn" title="Support Chifftown on Ko-fi">
+  ☕ Support
+</a>
+<style>
+  #kofi-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #FF5E5B;
+    color: #ffffff;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    padding: 12px 20px;
+    border-radius: 50px;
+    box-shadow: 0 4px 18px rgba(255, 94, 91, 0.45);
+    z-index: 9999;
+    letter-spacing: 0.3px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    animation: kofi-pulse 3s ease-in-out infinite;
+  }
+  #kofi-btn:hover {
+    transform: translateY(-3px) scale(1.04);
+    box-shadow: 0 8px 28px rgba(255, 94, 91, 0.6);
+    animation: none;
+  }
+  @keyframes kofi-pulse {
+    0%, 100% { transform: translateY(0); box-shadow: 0 4px 18px rgba(255,94,91,0.45); }
+    50% { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(255,94,91,0.55); }
+  }
+</style>
+</body>
+</html>

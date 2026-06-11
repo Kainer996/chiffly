@@ -1,0 +1,22 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /node_modules/
+Disallow: /data/
+Disallow: /*-stream.html
+Disallow: /*-old.html
+Disallow: /test*.html
+Disallow: /stream.html
+Disallow: /home.html
+Disallow: /profile.html
+Disallow: /*.backup
+Disallow: /*.backup2
+Disallow: /main-home.html
+Disallow: /APARTMENT_*.md
+Disallow: /BUILD_*.md
+Disallow: /DEPLOYMENT*.md
+Disallow: /*.md
+
+Sitemap: https://chifftown.com/sitemap.xml
+
+Sitemap: https://chifftown.com/sitemap-images.xml

@@ -1,0 +1,349 @@
+/* ============================================
+   CHIFFTOWN SOCIAL SIDEBAR (NEIGHBORS)
+   Display friends, relationship status, and online presence
+   ============================================ */
+
+/* --- Toggle Button --- */
+.social-toggle-btn {
+    position: fixed;
+    bottom: 28px;
+    right: 96px; /* Left of the Invite FAB */
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: #4fc3f7;
+    border: 2px solid rgba(79, 195, 247, 0.4);
+    font-size: 1.4rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 9000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.social-toggle-btn:hover {
+    transform: scale(1.1);
+    border-color: #4fc3f7;
+    box-shadow: 0 0 25px rgba(79, 195, 247, 0.4);
+}
+
+.social-toggle-btn.has-notification::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 14px;
+    height: 14px;
+    background: #ff4757;
+    border-radius: 50%;
+    border: 2px solid #0f172a;
+    animation: pulse-red 2s infinite;
+}
+
+@keyframes pulse-red {
+    0% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.7); }
+    70% { box-shadow: 0 0 0 6px rgba(255, 71, 87, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); }
+}
+
+/* --- Sidebar Container --- */
+.social-sidebar {
+    position: fixed;
+    top: 0;
+    right: -360px; /* Hidden by default */
+    width: 340px;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(12px);
+    border-left: 1px solid rgba(79, 195, 247, 0.2);
+    z-index: 9995;
+    transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
+}
+
+.social-sidebar.active {
+    right: 0;
+}
+
+/* --- Header --- */
+.social-header {
+    padding: 20px;
+    border-bottom: 1px solid rgba(79, 195, 247, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(to bottom, rgba(15, 23, 42, 1), rgba(15, 23, 42, 0.8));
+}
+
+.social-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.social-title i {
+    color: #4fc3f7;
+}
+
+.social-close {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 4px;
+    transition: color 0.2s;
+}
+
+.social-close:hover {
+    color: #fff;
+}
+
+/* --- Tabs --- */
+.social-tabs {
+    display: flex;
+    padding: 10px 20px 0;
+    border-bottom: 1px solid rgba(79, 195, 247, 0.1);
+    gap: 20px;
+}
+
+.social-tab {
+    padding: 10px 0;
+    color: #94a3b8;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s;
+}
+
+.social-tab:hover {
+    color: #e2e8f0;
+}
+
+.social-tab.active {
+    color: #4fc3f7;
+}
+
+.social-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #4fc3f7;
+    box-shadow: 0 -2px 8px rgba(79, 195, 247, 0.5);
+}
+
+/* --- List Container --- */
+.social-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(79, 195, 247, 0.3) transparent;
+}
+
+.social-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.social-list::-webkit-scrollbar-thumb {
+    background: rgba(79, 195, 247, 0.3);
+    border-radius: 3px;
+}
+
+/* --- Empty State --- */
+.social-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: #64748b;
+}
+
+.social-empty i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    opacity: 0.5;
+}
+
+/* --- Friend Card --- */
+.friend-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 8px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.friend-card:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(79, 195, 247, 0.2);
+    transform: translateX(-2px);
+}
+
+.friend-avatar {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    font-weight: 700;
+}
+
+/* Online Status Indicator */
+.friend-avatar::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    background: #64748b; /* Offline grey */
+    border: 2px solid #0f172a;
+    border-radius: 50%;
+}
+
+.friend-card.online .friend-avatar::after {
+    background: #4ade80; /* Online green */
+    box-shadow: 0 0 8px rgba(74, 222, 128, 0.5);
+}
+
+.friend-info {
+    flex: 1;
+    min-width: 0; /* Text truncation fix */
+}
+
+.friend-name-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.friend-name {
+    font-weight: 600;
+    color: #e2e8f0;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.friend-level {
+    font-size: 0.75rem;
+    color: #4fc3f7;
+    background: rgba(79, 195, 247, 0.1);
+    padding: 1px 6px;
+    border-radius: 10px;
+}
+
+.friend-status {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* --- Relationship Bar --- */
+.relationship-container {
+    margin-top: 8px;
+}
+
+.relationship-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    color: #94a3b8;
+    margin-bottom: 2px;
+}
+
+.relationship-progress {
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.relationship-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4fc3f7, #3b82f6);
+    border-radius: 2px;
+    transition: width 0.5s ease;
+}
+
+/* Levels Colors */
+.level-stranger .relationship-fill { background: #64748b; }
+.level-acquaintance .relationship-fill { background: #4fc3f7; }
+.level-friend .relationship-fill { background: #22c55e; }
+.level-close .relationship-fill { background: #a855f7; }
+.level-best .relationship-fill { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+
+/* --- Actions --- */
+.friend-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.friend-btn {
+    flex: 1;
+    padding: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: #e2e8f0;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    text-decoration: none;
+}
+
+.friend-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.friend-btn.join {
+    background: rgba(79, 195, 247, 0.15);
+    border-color: rgba(79, 195, 247, 0.3);
+    color: #4fc3f7;
+}
+
+.friend-btn.join:hover {
+    background: rgba(79, 195, 247, 0.25);
+}
+
+/* --- Mobile --- */
+@media (max-width: 480px) {
+    .social-sidebar {
+        width: 100%;
+        right: -100%;
+    }
+    .social-toggle-btn {
+        bottom: 20px;
+        right: 80px;
+        width: 50px;
+        height: 50px;
+    }
+}

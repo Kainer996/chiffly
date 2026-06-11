@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChiffTown — Your Virtual Town</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="main-home-styles.css?v=10">
+</head>
+<body>
+    <!-- Ambient particles canvas -->
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <div class="logo-icon">
+                    <i class="fas fa-city"></i>
+                </div>
+                <span class="logo-text">Chiff<span class="logo-accent">Town</span></span>
+            </a>
+            <div class="nav-right">
+                <div class="nav-links">
+                    <a href="#venues" class="nav-link">Venues</a>
+                    <a href="#features" class="nav-link">Features</a>
+                    <a href="#about" class="nav-link">About</a>
+                </div>
+                <div class="auth-section">
+                    <button class="enter-btn" id="signInBtn">
+                        <span class="enter-btn-glow"></span>
+                        <i class="fas fa-door-open"></i>
+                        <span>Enter Town</span>
+                    </button>
+                    <div class="user-menu" id="userMenu" style="display: none;">
+                        <div class="user-info">
+                            <div class="user-avatar">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div class="user-details">
+                                <span class="user-name" id="userName">Guest User</span>
+                                <span class="user-status">Online</span>
+                            </div>
+                        </div>
+                        <div class="menu-divider"></div>
+                        <a href="#" class="menu-item">
+                            <i class="fas fa-user-cog"></i>
+                            Profile Settings
+                        </a>
+                        <a href="#" class="menu-item">
+                            <i class="fas fa-bell"></i>
+                            Notifications
+                        </a>
+                        <a href="#" class="menu-item">
+                            <i class="fas fa-heart"></i>
+                            Favorites
+                        </a>
+                        <div class="menu-divider"></div>
+                        <a href="#" class="menu-item sign-out" id="signOutBtn">
+                            <i class="fas fa-door-closed"></i>
+                            Leave Town
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section — Town Centre -->
+    <section class="hero">
+        <div class="hero-skyline">
+            <!-- SVG Town Silhouette -->
+            <svg class="town-silhouette" viewBox="0 0 1440 400" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Buildings -->
+                <rect x="50" y="180" width="60" height="220" fill="rgba(15,10,30,0.9)"/>
+                <rect x="55" y="170" width="50" height="10" fill="rgba(15,10,30,0.9)"/>
+                <rect x="120" y="220" width="80" height="180" fill="rgba(20,15,35,0.85)"/>
+                <rect x="210" y="160" width="50" height="240" fill="rgba(15,10,30,0.9)"/>
+                <polygon points="210,160 235,130 260,160" fill="rgba(15,10,30,0.9)"/>
+                <rect x="270" y="240" width="70" height="160" fill="rgba(20,15,35,0.85)"/>
+                <rect x="350" y="200" width="90" height="200" fill="rgba(15,10,30,0.9)"/>
+                <rect x="380" y="185" width="30" height="15" fill="rgba(15,10,30,0.9)"/>
+                <rect x="450" y="250" width="60" height="150" fill="rgba(20,15,35,0.85)"/>
+                <rect x="520" y="190" width="100" height="210" fill="rgba(15,10,30,0.9)"/>
+                <polygon points="520,190 570,140 620,190" fill="rgba(15,10,30,0.9)"/>
+                <rect x="630" y="230" width="80" height="170" fill="rgba(20,15,35,0.85)"/>
+                <rect x="720" y="170" width="60" height="230" fill="rgba(15,10,30,0.9)"/>
+                <rect x="735" y="155" width="30" height="15" fill="rgba(15,10,30,0.9)"/>
+                <rect x="790" y="210" width="90" height="190" fill="rgba(20,15,35,0.85)"/>
+                <rect x="890" y="250" width="70" height="150" fill="rgba(15,10,30,0.9)"/>
+                <rect x="970" y="180" width="80" height="220" fill="rgba(20,15,35,0.85)"/>
+                <polygon points="970,180 1010,145 1050,180" fill="rgba(20,15,35,0.85)"/>
+                <rect x="1060" y="220" width="60" height="180" fill="rgba(15,10,30,0.9)"/>
+                <rect x="1130" y="200" width="100" height="200" fill="rgba(20,15,35,0.85)"/>
+                <rect x="1240" y="240" width="70" height="160" fill="rgba(15,10,30,0.9)"/>
+                <rect x="1320" y="190" width="80" height="210" fill="rgba(20,15,35,0.85)"/>
+                <!-- Windows (lit up) -->
+                <rect x="70" y="200" width="8" height="10" rx="1" fill="rgba(255,200,100,0.7)"/>
+                <rect x="85" y="200" width="8" height="10" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect x="70" y="230" width="8" height="10" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect x="85" y="230" width="8" height="10" rx="1" fill="rgba(255,200,100,0.8)"/>
+                <rect x="140" y="240" width="10" height="12" rx="1" fill="rgba(255,180,80,0.6)"/>
+                <rect x="160" y="240" width="10" height="12" rx="1" fill="rgba(255,180,80,0.7)"/>
+                <rect x="140" y="270" width="10" height="12" rx="1" fill="rgba(255,180,80,0.5)"/>
+                <rect x="160" y="270" width="10" height="12" rx="1" fill="rgba(255,180,80,0.8)"/>
+                <rect x="225" y="180" width="8" height="10" rx="1" fill="rgba(200,220,255,0.6)"/>
+                <rect x="240" y="180" width="8" height="10" rx="1" fill="rgba(200,220,255,0.5)"/>
+                <rect x="225" y="210" width="8" height="10" rx="1" fill="rgba(255,200,100,0.7)"/>
+                <rect x="370" y="220" width="10" height="12" rx="1" fill="rgba(255,100,150,0.6)"/>
+                <rect x="390" y="220" width="10" height="12" rx="1" fill="rgba(100,200,255,0.6)"/>
+                <rect x="410" y="220" width="10" height="12" rx="1" fill="rgba(255,100,200,0.7)"/>
+                <rect x="370" y="250" width="10" height="12" rx="1" fill="rgba(100,255,200,0.5)"/>
+                <rect x="540" y="210" width="10" height="12" rx="1" fill="rgba(255,200,100,0.7)"/>
+                <rect x="560" y="210" width="10" height="12" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect x="580" y="210" width="10" height="12" rx="1" fill="rgba(255,200,100,0.8)"/>
+                <rect x="540" y="240" width="10" height="12" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect x="560" y="240" width="10" height="12" rx="1" fill="rgba(255,200,100,0.4)"/>
+                <rect x="740" y="190" width="8" height="10" rx="1" fill="rgba(200,200,255,0.6)"/>
+                <rect x="740" y="220" width="8" height="10" rx="1" fill="rgba(255,200,100,0.7)"/>
+                <rect x="810" y="230" width="10" height="12" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect x="840" y="230" width="10" height="12" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect x="810" y="260" width="10" height="12" rx="1" fill="rgba(255,200,100,0.8)"/>
+                <rect x="990" y="200" width="10" height="12" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect x="1010" y="200" width="10" height="12" rx="1" fill="rgba(200,220,255,0.5)"/>
+                <rect x="1150" y="220" width="10" height="12" rx="1" fill="rgba(255,200,100,0.7)"/>
+                <rect x="1175" y="220" width="10" height="12" rx="1" fill="rgba(255,200,100,0.5)"/>
+                <rect x="1150" y="250" width="10" height="12" rx="1" fill="rgba(255,200,100,0.6)"/>
+                <rect x="1340" y="210" width="10" height="12" rx="1" fill="rgba(255,180,80,0.7)"/>
+                <rect x="1365" y="210" width="10" height="12" rx="1" fill="rgba(255,180,80,0.5)"/>
+                <!-- Street level line -->
+                <rect x="0" y="395" width="1440" height="5" fill="rgba(30,20,50,0.95)"/>
+            </svg>
+        </div>
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-star"></i>
+                <span>Welcome to the Town</span>
+            </div>
+            <h1 class="hero-title">
+                <span class="title-line">Welcome to</span>
+                <span class="title-main">Chiff<span class="title-accent">Town</span></span>
+            </h1>
+            <p class="hero-subtitle">A virtual town where every venue has its own vibe. Step into cozy pubs, buzzing nightclubs, chill lounges, and more — all with live video chat.</p>
+            <a href="#venues" class="hero-cta">
+                <span>Explore the Town</span>
+                <i class="fas fa-chevron-down"></i>
+            </a>
+            <div class="hero-stats" style="margin-top: 2rem;">
+                <div class="hero-stat">
+                    <div class="stat-icon"><i class="fas fa-users"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="totalUsers">0</span>
+                        <span class="stat-label">Online</span>
+                    </div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="hero-stat">
+                    <div class="stat-icon"><i class="fas fa-door-open"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="activeRooms">0</span>
+                        <span class="stat-label">Active Rooms</span>
+                    </div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="hero-stat">
+                    <div class="stat-icon"><i class="fas fa-broadcast-tower"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="liveStreams">0</span>
+                        <span class="stat-label">Live Now</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Venues Section — Town Map -->
+    <section id="venues" class="venues-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge"><i class="fas fa-map-pin"></i> Town Directory</span>
+                <h2 class="section-title">Pick Your Venue</h2>
+                <p class="section-desc">Each spot in town has its own character. Where do you fancy tonight?</p>
+            </div>
+
+            <div class="venues-grid">
+                <!-- Tavern -->
+                <div class="venue-card tavern" data-href="pub.html">
+                    <div class="venue-bg"></div>
+                    <div class="venue-glow"></div>
+                    <div class="venue-content">
+                        <div class="venue-icon-wrap">
+                            <div class="venue-icon">
+                                <i class="fas fa-beer-mug-empty"></i>
+                            </div>
+                            <div class="venue-flame flame-1"></div>
+                            <div class="venue-flame flame-2"></div>
+                        </div>
+                        <h3 class="venue-name">The Tavern</h3>
+                        <p class="venue-desc">Warm ales, flickering candles, and great conversation around the hearth.</p>
+                        <div class="venue-footer">
+                            <div class="venue-status">
+                                <span class="status-dot"></span>
+                                <span>Open</span>
+                            </div>
+                            <div class="venue-enter">
+                                Enter <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Night Club -->
+                <div class="venue-card nightclub" data-href="nightclub.html">
+                    <div class="venue-bg"></div>
+                    <div class="venue-glow"></div>
+                    <div class="neon-lines">
+                        <div class="neon-line"></div>
+                        <div class="neon-line"></div>
+                        <div class="neon-line"></div>
+                    </div>
+                    <div class="venue-content">
+                        <div class="venue-icon-wrap">
+                            <div class="venue-icon">
+                                <i class="fas fa-music"></i>
+                            </div>
+                        </div>
+                        <h3 class="venue-name">Night Club</h3>
+                        <p class="venue-desc">Neon lights, pulsing beats, and electric energy all night long.</p>
+                        <div class="venue-footer">
+                            <div class="venue-status">
+                                <span class="status-dot"></span>
+                                <span>Open</span>
+                            </div>
+                            <div class="venue-enter">
+                                Enter <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cinema -->
+                <div class="venue-card cinema" data-href="cinema.html">
+                    <div class="venue-bg"></div>
+                    <div class="venue-glow"></div>
+                    <div class="venue-content">
+                        <div class="venue-icon-wrap">
+                            <div class="venue-icon">
+                                <i class="fas fa-film"></i>
+                            </div>
+                        </div>
+                        <h3 class="venue-name">The Cinema</h3>
+                        <p class="venue-desc">Watch together, laugh together. Live streaming and shared screens.</p>
+                        <div class="venue-footer">
+                            <div class="venue-status">
+                                <span class="status-dot"></span>
+                                <span>Open</span>
+                            </div>
+                            <div class="venue-enter">
+                                Enter <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Games Room -->
+                <div class="venue-card games" data-href="games.html">
+                    <div class="venue-bg"></div>
+                    <div class="venue-glow"></div>
+                    <div class="venue-content">
+                        <div class="venue-icon-wrap">
+                            <div class="venue-icon">
+                                <i class="fas fa-gamepad"></i>
+                            </div>
+                        </div>
+                        <h3 class="venue-name">Arcade</h3>
+                        <p class="venue-desc">Challenge friends, compete, and game on in the retro arcade.</p>
+                        <div class="venue-footer">
+                            <div class="venue-status">
+                                <span class="status-dot"></span>
+                                <span>Open</span>
+                            </div>
+                            <div class="venue-enter">
+                                Enter <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lounge -->
+                <div class="venue-card lounge" data-href="lounge.html">
+                    <div class="venue-bg"></div>
+                    <div class="venue-glow"></div>
+                    <div class="venue-content">
+                        <div class="venue-icon-wrap">
+                            <div class="venue-icon">
+                                <i class="fas fa-couch"></i>
+                            </div>
+                        </div>
+                        <h3 class="venue-name">The Lounge</h3>
+                        <p class="venue-desc">Civilised chiff-chaff, smooth vibes, and sophisticated company.</p>
+                        <div class="venue-footer">
+                            <div class="venue-status">
+                                <span class="status-dot"></span>
+                                <span>Open</span>
+                            </div>
+                            <div class="venue-enter">
+                                Enter <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Adventure -->
+                <div class="venue-card adventure" data-href="questing.html">
+                    <div class="venue-bg"></div>
+                    <div class="venue-glow"></div>
+                    <div class="venue-content">
+                        <div class="venue-icon-wrap">
+                            <div class="venue-icon">
+                                <i class="fas fa-compass"></i>
+                            </div>
+                        </div>
+                        <h3 class="venue-name">Adventure Guild</h3>
+                        <p class="venue-desc">Real-world quests, outdoor exploration, and live adventure streams.</p>
+                        <div class="venue-footer">
+                            <div class="venue-status">
+                                <span class="status-dot"></span>
+                                <span>Open</span>
+                            </div>
+                            <div class="venue-enter">
+                                Enter <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge"><i class="fas fa-sparkles"></i> What's Inside</span>
+                <h2 class="section-title">Built for Hanging Out</h2>
+                <p class="section-desc">Real connections, not just another video call.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <h3>Live Video Chat</h3>
+                    <p>WebRTC-powered face-to-face conversations with crystal-clear quality.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <h3>Themed Venues</h3>
+                    <p>Every room has its own atmosphere — from cozy pubs to electric nightclubs.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h3>Real-time Chat</h3>
+                    <p>Text chat alongside video for sharing links, reactions, and banter.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-screen"></i>
+                    </div>
+                    <h3>Works Everywhere</h3>
+                    <p>Desktop, mobile, tablet — jump in from wherever you are.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about-section">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <span class="section-badge"><i class="fas fa-info-circle"></i> About ChiffTown</span>
+                    <h2>More Than Just a Video Call</h2>
+                    <p>ChiffTown is a virtual town where you don't just join a meeting — you step into a place. Each venue has its own personality, its own crowd, its own vibe. It's the feeling of walking into your local pub, hitting the club with mates, or chilling in a lounge — but from anywhere in the world.</p>
+                    <p>Built with love using WebRTC, Socket.io, and a lot of CSS magic. No downloads, no installs — just click and you're there.</p>
+                </div>
+                <div class="about-visual">
+                    <div class="about-card">
+                        <div class="about-card-icon"><i class="fas fa-mug-hot"></i></div>
+                        <span>6 Unique Venues</span>
+                    </div>
+                    <div class="about-card">
+                        <div class="about-card-icon"><i class="fas fa-video"></i></div>
+                        <span>HD Video Chat</span>
+                    </div>
+                    <div class="about-card">
+                        <div class="about-card-icon"><i class="fas fa-bolt"></i></div>
+                        <span>Instant Access</span>
+                    </div>
+                    <div class="about-card">
+                        <div class="about-card-icon"><i class="fas fa-lock"></i></div>
+                        <span>Private Rooms</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <i class="fas fa-city"></i>
+                        <span>Chiff<span class="logo-accent">Town</span></span>
+                    </div>
+                    <p>Your virtual town for real connections.</p>
+                    <div class="social-links">
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="Discord"><i class="fab fa-discord"></i></a>
+                        <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>Venues</h4>
+                    <ul>
+                        <li><a href="pub.html">The Tavern</a></li>
+                        <li><a href="nightclub.html">Night Club</a></li>
+                        <li><a href="cinema.html">Cinema</a></li>
+                        <li><a href="games.html">Arcade</a></li>
+                        <li><a href="lounge.html">Lounge</a></li>
+                        <li><a href="questing.html">Adventure Guild</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Platform</h4>
+                    <ul>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#">Privacy</a></li>
+                        <li><a href="#">Terms</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 ChiffTown. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="xp-system.js?v=1"></script>
+    <script src="main-home.js?v=10"></script>
+</body>
+</html>

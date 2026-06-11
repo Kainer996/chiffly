@@ -1,0 +1,462 @@
+/**
+ * ============================================
+ * CHIFFTOWN QUICK EMOTES STYLES
+ * ============================================
+ * Floating emoji reactions for social interaction
+ * Deep blues, teal, gold - no pink/purple
+ * ============================================
+ */
+
+/* ==========================================
+   EMOTE TRIGGER BUTTON
+   ========================================== */
+
+.emote-trigger-btn {
+    position: fixed;
+    bottom: 100px;
+    right: 20px;
+    z-index: 9990;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    
+    padding: 12px 16px;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%);
+    border: 2px solid rgba(79, 195, 247, 0.3);
+    border-radius: 16px;
+    
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    box-shadow: 
+        0 4px 20px rgba(0, 0, 0, 0.3),
+        0 0 15px rgba(79, 195, 247, 0.1);
+}
+
+.emote-trigger-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    border-color: rgba(79, 195, 247, 0.6);
+    box-shadow: 
+        0 8px 30px rgba(0, 0, 0, 0.4),
+        0 0 25px rgba(79, 195, 247, 0.25);
+}
+
+.emote-trigger-btn.active {
+    border-color: #4fc3f7;
+    background: linear-gradient(135deg, rgba(79, 195, 247, 0.2) 0%, rgba(30, 41, 59, 0.95) 100%);
+}
+
+.emote-btn-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+    transition: transform 0.3s ease;
+}
+
+.emote-trigger-btn:hover .emote-btn-icon {
+    transform: scale(1.2) rotate(10deg);
+}
+
+.emote-btn-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ==========================================
+   EMOTE PICKER PANEL
+   ========================================== */
+
+.emote-picker {
+    position: fixed;
+    bottom: 180px;
+    right: 20px;
+    z-index: 9991;
+    
+    width: 320px;
+    max-height: 400px;
+    
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(20, 30, 50, 0.98) 100%);
+    border: 2px solid rgba(79, 195, 247, 0.3);
+    border-radius: 20px;
+    
+    backdrop-filter: blur(20px);
+    box-shadow: 
+        0 10px 40px rgba(0, 0, 0, 0.5),
+        0 0 30px rgba(79, 195, 247, 0.15);
+    
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px) scale(0.95);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.emote-picker.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+/* Header */
+.emote-picker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    background: rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid rgba(79, 195, 247, 0.15);
+}
+
+.emote-picker-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.emote-picker-close {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.emote-picker-close:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #ef4444;
+}
+
+/* Content */
+.emote-picker-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+    
+    /* Custom scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(79, 195, 247, 0.3) transparent;
+}
+
+.emote-picker-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.emote-picker-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.emote-picker-content::-webkit-scrollbar-thumb {
+    background: rgba(79, 195, 247, 0.3);
+    border-radius: 3px;
+}
+
+.emote-picker-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(79, 195, 247, 0.5);
+}
+
+/* Category */
+.emote-category {
+    margin-bottom: 16px;
+}
+
+.emote-category:last-child {
+    margin-bottom: 0;
+}
+
+.emote-category-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: rgba(79, 195, 247, 0.8);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    padding-left: 4px;
+}
+
+.emote-category-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+/* Emote Button */
+.emote-btn {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    font-size: 1.75rem;
+    
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.emote-btn:hover {
+    background: rgba(79, 195, 247, 0.15);
+    border-color: rgba(79, 195, 247, 0.4);
+    transform: scale(1.15);
+}
+
+.emote-btn:active,
+.emote-btn.sent {
+    transform: scale(0.9);
+    background: rgba(79, 195, 247, 0.3);
+}
+
+/* Footer */
+.emote-picker-footer {
+    padding: 10px 18px;
+    background: rgba(0, 0, 0, 0.2);
+    border-top: 1px solid rgba(79, 195, 247, 0.1);
+}
+
+.emote-hint {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-style: italic;
+}
+
+/* ==========================================
+   FLOATING EMOTE CONTAINER
+   ========================================== */
+
+.emote-float-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9980;
+    overflow: hidden;
+}
+
+/* ==========================================
+   FLOATING EMOTE
+   ========================================== */
+
+.floating-emote {
+    position: absolute;
+    bottom: -100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    
+    animation: floatUp 4s ease-out forwards;
+    animation-duration: var(--float-duration, 4s);
+    transform: translateX(-50%);
+}
+
+@keyframes floatUp {
+    0% {
+        bottom: -100px;
+        opacity: 0;
+        transform: translateX(-50%) scale(0.5);
+    }
+    10% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+    }
+    50% {
+        transform: translateX(calc(-50% + var(--drift, 0px))) scale(1.1);
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        bottom: 100vh;
+        opacity: 0;
+        transform: translateX(calc(-50% + var(--drift, 0px) * 2)) scale(0.8);
+    }
+}
+
+.floating-emote.fading {
+    animation: fadeOutEmote 0.5s ease-out forwards;
+}
+
+@keyframes fadeOutEmote {
+    to {
+        opacity: 0;
+        transform: translateX(-50%) scale(0.5);
+    }
+}
+
+.floating-emote-icon {
+    font-size: 2.5rem;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
+    animation: wobbleEmote 0.8s ease-in-out infinite;
+}
+
+@keyframes wobbleEmote {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+}
+
+.floating-emote-user {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #ffffff;
+    background: rgba(15, 23, 42, 0.9);
+    padding: 2px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Local emotes (sent by current user) */
+.floating-emote.local .floating-emote-icon {
+    filter: drop-shadow(0 0 15px rgba(79, 195, 247, 0.6));
+}
+
+.floating-emote.local .floating-emote-user {
+    background: rgba(79, 195, 247, 0.3);
+    border: 1px solid rgba(79, 195, 247, 0.5);
+}
+
+/* Remote emotes (from other users) */
+.floating-emote.remote .floating-emote-user {
+    background: rgba(255, 193, 7, 0.2);
+    border: 1px solid rgba(255, 193, 7, 0.4);
+    color: #ffc107;
+}
+
+/* ==========================================
+   RESPONSIVE DESIGN
+   ========================================== */
+
+@media (max-width: 768px) {
+    .emote-trigger-btn {
+        bottom: 80px;
+        right: 15px;
+        padding: 10px 14px;
+    }
+    
+    .emote-btn-icon {
+        font-size: 1.25rem;
+    }
+    
+    .emote-btn-label {
+        font-size: 0.6rem;
+    }
+    
+    .emote-picker {
+        bottom: 150px;
+        right: 10px;
+        left: 10px;
+        width: auto;
+        max-height: 350px;
+    }
+    
+    .emote-category-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+    }
+    
+    .emote-btn {
+        font-size: 1.5rem;
+    }
+    
+    .floating-emote-icon {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .emote-trigger-btn {
+        bottom: 70px;
+        right: 10px;
+        padding: 8px 12px;
+    }
+    
+    .emote-picker {
+        bottom: 130px;
+        max-height: 300px;
+    }
+    
+    .emote-category-grid {
+        gap: 4px;
+    }
+    
+    .emote-btn {
+        font-size: 1.35rem;
+        border-radius: 10px;
+    }
+    
+    .floating-emote-icon {
+        font-size: 1.75rem;
+    }
+    
+    .floating-emote-user {
+        font-size: 0.6rem;
+        padding: 2px 6px;
+    }
+}
+
+/* ==========================================
+   HIDE ON SPECIFIC PAGES
+   ========================================== */
+
+/* Hide emote button on homepage */
+body.homepage .emote-trigger-btn,
+body.homepage .emote-picker,
+body.homepage .emote-float-container {
+    display: none;
+}
+
+/* ==========================================
+   PREFERS REDUCED MOTION
+   ========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .floating-emote,
+    .floating-emote-icon {
+        animation: none;
+    }
+    
+    .floating-emote {
+        opacity: 1;
+        bottom: 50%;
+        transition: opacity 0.5s ease;
+    }
+    
+    .floating-emote.fading {
+        opacity: 0;
+    }
+    
+    .emote-picker {
+        transition: opacity 0.2s ease;
+        transform: none;
+    }
+    
+    .emote-picker.active {
+        transform: none;
+    }
+}

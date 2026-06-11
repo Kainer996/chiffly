@@ -1,0 +1,167 @@
+/**
+ * ChiffTown Mobile Fullscreen Map Fixes
+ * Ensures fullscreen map displays properly on mobile devices
+ */
+
+/* === Mobile Fullscreen Overrides === */
+@media (max-width: 768px) {
+    /* Fullscreen container adjustments */
+    .interactive-map-container.fullscreen-map,
+    .interactive-map-container:fullscreen,
+    .interactive-map-container:-webkit-full-screen {
+        background: #0a0a1a !important;
+        background-image: none !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Map wrapper in fullscreen */
+    .interactive-map-container.fullscreen-map .map-wrapper,
+    .interactive-map-container:fullscreen .map-wrapper,
+    .interactive-map-container:-webkit-full-screen .map-wrapper {
+        width: 100vw !important;
+        height: 100vh !important;
+        max-width: 100vw !important;
+        max-height: 100vh !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: auto;
+        transform: none !important;
+        position: relative;
+    }
+    
+    /* Map image in fullscreen - FIT TO SCREEN */
+    .interactive-map-container.fullscreen-map .city-map-image,
+    .interactive-map-container:fullscreen .city-map-image,
+    .interactive-map-container:-webkit-full-screen .city-map-image {
+        width: auto !important;
+        height: auto !important;
+        max-width: 100vw !important;
+        max-height: 100vh !important;
+        object-fit: contain !important;
+        transform: none !important;
+        position: relative;
+        margin: 0 auto;
+    }
+    
+    /* Hide mobile controls in fullscreen */
+    .interactive-map-container.fullscreen-map .mobile-map-controls,
+    .interactive-map-container:fullscreen .mobile-map-controls {
+        display: none !important;
+    }
+    
+    /* Adjust HUD for mobile */
+    .fs-hud {
+        padding: 0.5rem 0.75rem !important;
+        font-size: 0.85rem !important;
+    }
+    
+    .hud-avatar {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 0.9rem !important;
+    }
+    
+    .hud-username {
+        font-size: 0.9rem !important;
+    }
+    
+    .hud-xp-bar {
+        height: 4px !important;
+        width: 80px !important;
+    }
+    
+    .hud-xp-text {
+        font-size: 0.7rem !important;
+    }
+    
+    .hud-currency {
+        font-size: 0.85rem !important;
+        gap: 0.25rem !important;
+    }
+    
+    .hud-coin, .hud-gem {
+        font-size: 1rem !important;
+    }
+    
+    .fs-exit-btn {
+        padding: 0.4rem 0.6rem !important;
+        font-size: 0.9rem !important;
+        min-width: 32px !important;
+        height: 32px !important;
+    }
+    
+    /* Challenges widget in fullscreen */
+    .interactive-map-container.fullscreen-map .challenges-widget {
+        max-width: 90vw !important;
+        font-size: 0.85rem !important;
+    }
+    
+    /* Edit toolbar in fullscreen */
+    .interactive-map-container.fullscreen-map .edit-toolbar {
+        font-size: 0.85rem !important;
+        padding: 0.4rem 0.6rem !important;
+    }
+    
+    /* Hotspots remain interactive in fullscreen */
+    .interactive-map-container.fullscreen-map .map-hotspot,
+    .interactive-map-container:fullscreen .map-hotspot {
+        pointer-events: auto !important;
+    }
+}
+
+/* === Very small screens === */
+@media (max-width: 480px) {
+    .fs-hud {
+        flex-wrap: wrap !important;
+        gap: 0.5rem !important;
+    }
+    
+    .hud-left {
+        flex: 1 1 100% !important;
+    }
+    
+    .hud-right {
+        flex: 1 1 100% !important;
+        justify-content: space-between !important;
+        display: flex !important;
+    }
+    
+    .hud-username {
+        font-size: 0.85rem !important;
+    }
+    
+    .hud-xp-text {
+        font-size: 0.65rem !important;
+    }
+    
+    .hud-currency {
+        font-size: 0.8rem !important;
+    }
+}
+
+/* === iPhone SE and smaller === */
+@media (max-width: 375px) {
+    .fs-hud {
+        padding: 0.4rem 0.5rem !important;
+    }
+    
+    .hud-info {
+        display: none !important;
+    }
+    
+    .hud-left {
+        flex: 0 0 auto !important;
+    }
+    
+    .fs-exit-btn {
+        padding: 0.3rem 0.5rem !important;
+        font-size: 0.85rem !important;
+        min-width: 28px !important;
+        height: 28px !important;
+    }
+}

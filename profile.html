@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Profile — ChiffTown | XP, Level &amp; Achievements</title>
+    <link rel="canonical" href="https://chifftown.com/profile.html">
+    <meta name="description" content="View and customise your ChiffTown profile. Track your XP, level, achievements, coins, and reputation as you explore the town.">
+    <meta name="keywords" content="ChiffTown profile, XP level, achievements, virtual town avatar, social hangout profile, online profile, ChiffTown user">
+    <meta name="robots" content="noindex, nofollow">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://chifftown.com/profile.html">
+    <meta property="og:title" content="Your Profile — ChiffTown">
+    <meta property="og:description" content="Track your XP, level, achievements, and reputation in ChiffTown — the virtual town where every venue has its own vibe.">
+    <meta property="og:image" content="https://chifftown.com/images/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:alt" content="ChiffTown — your profile, XP and achievements in the virtual town">
+    <meta property="og:site_name" content="ChiffTown">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@chifftown">
+    <meta name="twitter:title" content="Your Profile — ChiffTown">
+    <meta name="twitter:description" content="Track your XP, level, achievements, and reputation in ChiffTown.">
+    <meta name="twitter:image" content="https://chifftown.com/images/og-image.jpg">
+    <meta name="twitter:image:alt" content="ChiffTown — profile, XP, levels and achievements">
+    <meta name="twitter:creator" content="@chifftown">
+    <meta name="theme-color" content="#0a0a1a">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"></noscript></noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-deep: #0a0a1a;
+            --bg-mid: #12122a;
+            --bg-surface: #1a1a3e;
+            --text-primary: #f0eef6;
+            --text-secondary: rgba(240, 238, 246, 0.65);
+            --accent-gold: #f4c542;
+            --accent-teal: #40E0D0;
+            --accent-blue: #3b82f6;
+            --accent-silver: #c0c0c0;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--bg-deep) 0%, var(--bg-mid) 50%, var(--bg-surface) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .profile-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 0;
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .profile-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            margin-bottom: 0.5rem;
+            letter-spacing: 2px;
+        }
+
+        .profile-subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .profile-card {
+            background: rgba(10, 10, 26, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            color: var(--accent-gold);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* XP & Level Display */
+        .xp-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .level-badge {
+            font-size: 3rem;
+            font-weight: 700;
+            font-family: 'Playfair Display', serif;
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-teal));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .xp-progress {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .xp-bar {
+            width: 100%;
+            height: 30px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 0.5rem;
+        }
+
+        .xp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-gold), var(--accent-teal));
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .xp-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .xp-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .stat-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Achievements */
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .achievement-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .achievement-card.unlocked {
+            background: linear-gradient(135deg, rgba(244, 197, 66, 0.1), rgba(64, 224, 208, 0.1));
+            border-color: var(--accent-gold);
+        }
+
+        .achievement-card.locked {
+            opacity: 0.4;
+        }
+
+        .achievement-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .achievement-name {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .achievement-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Leaderboard */
+        .leaderboard-list {
+            list-style: none;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            margin-bottom: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .leaderboard-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .leaderboard-item.current-user {
+            border-color: var(--accent-gold);
+            background: rgba(244, 197, 66, 0.05);
+        }
+
+        .leaderboard-rank {
+            font-size: 1.5rem;
+            font-weight: 700;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .leaderboard-rank.top1 { color: #FFD700; }
+        .leaderboard-rank.top2 { color: #C0C0C0; }
+        .leaderboard-rank.top3 { color: #CD7F32; }
+
+        .leaderboard-info {
+            flex: 1;
+        }
+
+        .leaderboard-name {
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .leaderboard-stats {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .leaderboard-xp {
+            font-weight: 600;
+            color: var(--accent-teal);
+        }
+
+        /* Activity Feed */
+        .activity-feed {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            border-left: 3px solid var(--accent-teal);
+            margin-bottom: 1rem;
+            background: var(--glass-bg);
+            border-radius: 8px;
+        }
+
+        .activity-icon {
+            font-size: 1.5rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--glass-bg);
+            border-radius: 10px;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-text {
+            margin-bottom: 0.3rem;
+        }
+
+        .activity-time {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Inventory */
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+        }
+
+        .inventory-item {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .inventory-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: scale(1.05);
+        }
+
+        .inventory-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .inventory-name {
+            font-size: 0.85rem;
+        }
+
+        /* Back Button */
+        .back-link {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            padding: 0.8rem 1.5rem;
+            background: rgba(10, 10, 26, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .profile-container {
+                padding: 1rem;
+            }
+
+            .xp-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--glass-border);
+            border-top-color: var(--accent-gold);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Your Profile — ChiffTown",
+      "description": "View and customise your ChiffTown profile. Track your XP, level, achievements, coins, and reputation.",
+      "url": "https://chifftown.com/profile.html",
+      "isPartOf": {
+        "@type": "WebApplication",
+        "name": "ChiffTown",
+        "url": "https://chifftown.com",
+        "applicationCategory": "SocialNetworkingApplication"
+      },
+      "breadcrumb": {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "ChiffTown", "item": "https://chifftown.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Your Profile", "item": "https://chifftown.com/profile.html"}
+        ]
+      }
+    }
+    </script>
+</head>
+<body>
+    <a href="index.html" class="back-link">
+        <i class="fas fa-arrow-left"></i>
+        Back to Town
+    </a>
+
+    <div class="profile-container">
+        <div class="profile-header">
+            <h1 class="profile-title">YOUR PROFILE</h1>
+            <p class="profile-subtitle">Track your progress in Chifftown</p>
+        </div>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 1rem;">Loading your profile...</p>
+        </div>
+
+        <div id="profileContent" style="display: none;">
+            <!-- XP & Level -->
+            <div class="profile-card">
+                <div class="xp-header">
+                    <div>
+                        <div class="level-badge" id="levelBadge">Level 1</div>
+                        <p style="color: var(--text-secondary); margin-top: 0.5rem;">
+                            <span id="username">Traveler</span>
+                        </p>
+                    </div>
+                    <div class="xp-progress">
+                        <div class="xp-bar">
+                            <div class="xp-fill" id="xpFill" style="width: 0%"></div>
+                        </div>
+                        <div class="xp-text">
+                            <span id="currentXp">0</span> / <span id="maxXp">100</span> XP
+                            <span style="float: right; color: var(--accent-teal);" id="nextLevel">Next: Level 2</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="statRoomsJoined">0</div>
+                        <div class="stat-label">Rooms Joined</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statMessages">0</div>
+                        <div class="stat-label">Messages Sent</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statTipsSent">0</div>
+                        <div class="stat-label">Tips Sent</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statGamesPlayed">0</div>
+                        <div class="stat-label">Games Played</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statVenuesVisited">0</div>
+                        <div class="stat-label">Venues Visited</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statAchievements">0</div>
+                        <div class="stat-label">Achievements</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Two Column Layout -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                <!-- Left Column: Achievements & Inventory -->
+                <div>
+                    <!-- Achievements -->
+                    <div class="profile-card">
+                        <h2 class="section-title">
+                            <i class="fas fa-trophy"></i>
+                            Achievements
+                        </h2>
+                        <div class="achievements-grid" id="achievementsGrid">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Inventory -->
+                    <div class="profile-card">
+                        <h2 class="section-title">
+                            <i class="fas fa-box"></i>
+                            Inventory
+                        </h2>
+                        <div class="inventory-grid" id="inventoryGrid">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Leaderboard & Activity -->
+                <div>
+                    <!-- Leaderboard -->
+                    <div class="profile-card">
+                        <h2 class="section-title">
+                            <i class="fas fa-crown"></i>
+                            Leaderboard
+                        </h2>
+                        <ul class="leaderboard-list" id="leaderboardList">
+                            <!-- Populated by JS -->
+                        </ul>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="profile-card">
+                        <h2 class="section-title">
+                            <i class="fas fa-history"></i>
+                            Recent Activity
+                        </h2>
+                        <div class="activity-feed" id="activityFeed">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get username from localStorage or URL
+        function getUsername() {
+            const params = new URLSearchParams(window.location.search);
+            const urlUsername = params.get('username');
+            
+            if (urlUsername) {
+                return urlUsername;
+            }
+            
+            // Try localStorage
+            try {
+                const user = JSON.parse(localStorage.getItem('chifftown_user') || '{}');
+                return user.username || user.displayName || null;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        const currentUsername = getUsername();
+
+        if (!currentUsername) {
+            document.getElementById('loading').innerHTML = `
+                <p style="color: var(--accent-gold); font-size: 1.2rem; margin-bottom: 1rem;">
+                    <i class="fas fa-user-slash"></i>
+                </p>
+                <p>Please set a username first!</p>
+                <p style="margin-top: 1rem;">
+                    <a href="index.html" style="color: var(--accent-teal); text-decoration: none;">
+                        Go to homepage
+                    </a>
+                </p>
+            `;
+        } else {
+            loadProfile(currentUsername);
+        }
+
+        async function loadProfile(username) {
+            try {
+                // Fetch user stats
+                const statsRes = await fetch(`/api/user/${username}`);
+                if (!statsRes.ok) throw new Error('User not found');
+                const stats = await statsRes.json();
+
+                // Fetch leaderboard
+                const leaderboardRes = await fetch('/api/leaderboard');
+                const leaderboard = await leaderboardRes.json();
+
+                // Fetch activity
+                const activityRes = await fetch(`/api/activity/${username}`);
+                const activity = await activityRes.json();
+
+                // Populate profile
+                populateProfile(stats, leaderboard, activity);
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('profileContent').style.display = 'block';
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                document.getElementById('loading').innerHTML = `
+                    <p style="color: #ff6b6b;">Failed to load profile</p>
+                    <p style="margin-top: 0.5rem; font-size: 0.9rem;">${error.message}</p>
+                `;
+            }
+        }
+
+        function populateProfile(stats, leaderboard, activity) {
+            // Header
+            document.getElementById('username').textContent = stats.username;
+            document.getElementById('levelBadge').textContent = `Level ${stats.level}`;
+
+            // XP Progress
+            const { level, xpInLevel, xpForNextLevel } = stats.levelData;
+            const xpPercent = (xpInLevel / xpForNextLevel) * 100;
+            document.getElementById('xpFill').style.width = `${xpPercent}%`;
+            document.getElementById('currentXp').textContent = xpInLevel;
+            document.getElementById('maxXp').textContent = xpForNextLevel;
+            document.getElementById('nextLevel').textContent = `Next: Level ${level + 1}`;
+
+            // Stats
+            document.getElementById('statRoomsJoined').textContent = stats.stats.roomsJoined;
+            document.getElementById('statMessages').textContent = stats.stats.messagesSent;
+            document.getElementById('statTipsSent').textContent = stats.stats.tipsSent;
+            document.getElementById('statGamesPlayed').textContent = stats.stats.gamesPlayed;
+            document.getElementById('statVenuesVisited').textContent = stats.stats.venuesVisited.length;
+            document.getElementById('statAchievements').textContent = stats.achievements.length;
+
+            // Achievements
+            populateAchievements(stats.achievements);
+
+            // Inventory
+            populateInventory(stats.inventory);
+
+            // Leaderboard
+            populateLeaderboard(leaderboard, stats.username);
+
+            // Activity
+            populateActivity(activity);
+        }
+
+        function populateAchievements(unlockedAchievements) {
+            const allAchievements = [
+                { id: 'first_steps', name: 'First Steps', desc: 'Join your first room', icon: '👋' },
+                { id: 'chatterer', name: 'Chatterer', desc: 'Send 50 messages', icon: '💬' },
+                { id: 'social_butterfly', name: 'Social Butterfly', desc: 'Visit 5 different venues', icon: '🦋' },
+                { id: 'generous_tipper', name: 'Generous Tipper', desc: 'Send 10 tips', icon: '💰' },
+                { id: 'streaming_star', name: 'Streaming Star', desc: 'Stream 5 sessions', icon: '⭐' },
+                { id: 'arcade_master', name: 'Arcade Master', desc: 'Play 20 arcade games', icon: '🎮' },
+                { id: 'town_veteran', name: 'Town Veteran', desc: 'Reach level 10', icon: '🏅' },
+                { id: 'legend', name: 'Chifftown Legend', desc: 'Reach level 25', icon: '👑' }
+            ];
+
+            const grid = document.getElementById('achievementsGrid');
+            grid.innerHTML = allAchievements.map(ach => {
+                const unlocked = unlockedAchievements.some(u => u.id === ach.id);
+                return `
+                    <div class="achievement-card ${unlocked ? 'unlocked' : 'locked'}">
+                        <div class="achievement-icon">${ach.icon}</div>
+                        <div class="achievement-name">${ach.name}</div>
+                        <div class="achievement-desc">${ach.desc}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function populateInventory(inventory) {
+            const grid = document.getElementById('inventoryGrid');
+            
+            if (!inventory || inventory.length === 0) {
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary);">No items yet</p>';
+                return;
+            }
+
+            const itemIcons = {
+                'First Steps': '👋',
+                'Chatterer': '💬',
+                'Social Butterfly': '🦋',
+                'Generous Tipper': '💰',
+                'Streaming Star': '⭐',
+                'Arcade Master': '🎮',
+                'Town Veteran': '🏅',
+                'Chifftown Legend': '👑'
+            };
+
+            grid.innerHTML = inventory.map(item => `
+                <div class="inventory-item">
+                    <div class="inventory-icon">${itemIcons[item] || '🎁'}</div>
+                    <div class="inventory-name">${item}</div>
+                </div>
+            `).join('');
+        }
+
+        function populateLeaderboard(leaderboard, currentUser) {
+            const list = document.getElementById('leaderboardList');
+            list.innerHTML = leaderboard.map((user, index) => {
+                const rank = index + 1;
+                const isCurrentUser = user.username === currentUser;
+                const rankClass = rank === 1 ? 'top1' : rank === 2 ? 'top2' : rank === 3 ? 'top3' : '';
+                
+                return `
+                    <li class="leaderboard-item ${isCurrentUser ? 'current-user' : ''}">
+                        <div class="leaderboard-rank ${rankClass}">#${rank}</div>
+                        <div class="leaderboard-info">
+                            <div class="leaderboard-name">${user.username}</div>
+                            <div class="leaderboard-stats">
+                                Level ${user.level} • ${user.achievements} achievements
+                            </div>
+                        </div>
+                        <div class="leaderboard-xp">${user.xp.toLocaleString()} XP</div>
+                    </li>
+                `;
+            }).join('');
+        }
+
+        function populateActivity(activity) {
+            const feed = document.getElementById('activityFeed');
+            
+            if (!activity || activity.length === 0) {
+                feed.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No recent activity</p>';
+                return;
+            }
+
+            const activityIcons = {
+                xp_gain: '✨',
+                level_up: '🎉',
+                achievement: '🏆'
+            };
+
+            feed.innerHTML = activity.map(act => {
+                const icon = activityIcons[act.type] || '📝';
+                let text = '';
+                
+                if (act.type === 'xp_gain') {
+                    text = `Gained <strong>${act.amount} XP</strong> for ${act.reason}`;
+                } else if (act.type === 'level_up') {
+                    text = `<strong>Leveled up to Level ${act.level}!</strong>`;
+                } else if (act.type === 'achievement') {
+                    text = `Unlocked achievement: <strong>${act.achievementName}</strong>`;
+                }
+
+                const timeAgo = getTimeAgo(act.timestamp);
+
+                return `
+                    <div class="activity-item">
+                        <div class="activity-icon">${icon}</div>
+                        <div class="activity-content">
+                            <div class="activity-text">${text}</div>
+                            <div class="activity-time">${timeAgo}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getTimeAgo(timestamp) {
+            const seconds = Math.floor((Date.now() - timestamp) / 1000);
+            
+            if (seconds < 60) return 'Just now';
+            if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes ago`;
+            if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`;
+            return `${Math.floor(seconds / 86400)} days ago`;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,295 @@
+/* ============================================
+   CHIFFTOWN PLAYER HUD
+   Persistent XP bar, level, and currency display
+   ============================================ */
+
+.player-hud {
+    position: fixed;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 999;
+    pointer-events: auto;
+    animation: hudSlideIn 0.5s ease-out;
+}
+
+@keyframes hudSlideIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.hud-inner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(10, 14, 26, 0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(201, 168, 76, 0.3);
+    border-radius: 50px;
+    padding: 8px 20px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), 0 0 40px rgba(201, 168, 76, 0.08);
+}
+
+/* Level Badge */
+.hud-level-badge {
+    background: linear-gradient(135deg, #c9a84c, #e8c84a);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 0 12px rgba(201, 168, 76, 0.4);
+}
+
+.hud-level-number {
+    color: #0a0e1a;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* XP Bar Section */
+.hud-xp-section {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 140px;
+}
+
+.hud-xp-bar-bg {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.hud-xp-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #40E0D0, #48d1cc, #7FFFD4);
+    border-radius: 10px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    box-shadow: 0 0 8px rgba(64, 224, 208, 0.5);
+}
+
+.hud-xp-bar-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: xpShimmer 2s infinite;
+}
+
+@keyframes xpShimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.hud-xp-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.6rem;
+    color: rgba(255, 255, 255, 0.5);
+    text-align: center;
+    letter-spacing: 0.5px;
+}
+
+/* Currency */
+.hud-currency {
+    display: flex;
+    gap: 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.hud-coins, .hud-gems {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Streak */
+.hud-streak {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #ff6b35;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+/* Achievements Button */
+.hud-achievements-btn {
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: transform 0.2s;
+    padding: 4px;
+}
+
+.hud-achievements-btn:hover {
+    transform: scale(1.2);
+}
+
+/* === LEVEL UP CELEBRATION === */
+.hud-level-badge.leveling-up {
+    animation: levelPulse 0.8s ease-out;
+}
+
+@keyframes levelPulse {
+    0% { transform: scale(1); box-shadow: 0 0 12px rgba(201, 168, 76, 0.4); }
+    50% { transform: scale(1.4); box-shadow: 0 0 30px rgba(201, 168, 76, 0.8); }
+    100% { transform: scale(1); box-shadow: 0 0 12px rgba(201, 168, 76, 0.4); }
+}
+
+/* === LOCKED BUILDING OVERLAY === */
+.map-hotspot.locked-building {
+    position: relative;
+}
+
+.map-hotspot.locked-building .hotspot-glow {
+    opacity: 0.3 !important;
+    filter: grayscale(0.6);
+}
+
+.map-hotspot.locked-building .hotspot-label {
+    opacity: 0.5;
+}
+
+.lock-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.lock-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(10, 14, 26, 0.85);
+    border: 2px solid rgba(201, 168, 76, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #c9a84c;
+    font-size: 0.75rem;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
+}
+
+.lock-level {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.55rem;
+    font-weight: 700;
+    color: #c9a84c;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+    white-space: nowrap;
+    background: rgba(10, 14, 26, 0.8);
+    padding: 1px 6px;
+    border-radius: 8px;
+}
+
+/* === LOCKED BUILDING TOOLTIP === */
+.locked-tooltip {
+    position: fixed;
+    z-index: 10000;
+    background: rgba(10, 14, 26, 0.95);
+    border: 1px solid rgba(201, 168, 76, 0.4);
+    border-radius: 12px;
+    padding: 16px 20px;
+    max-width: 280px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    backdrop-filter: blur(12px);
+    animation: tooltipFade 0.2s ease-out;
+    pointer-events: none;
+}
+
+@keyframes tooltipFade {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.locked-tooltip h4 {
+    color: #c9a84c;
+    font-family: 'Playfair Display', serif;
+    margin: 0 0 6px 0;
+    font-size: 1rem;
+}
+
+.locked-tooltip p {
+    color: rgba(255,255,255,0.6);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    margin: 0 0 8px 0;
+}
+
+.locked-tooltip .unlock-req {
+    display: inline-block;
+    background: rgba(201, 168, 76, 0.15);
+    border: 1px solid rgba(201, 168, 76, 0.3);
+    border-radius: 20px;
+    padding: 4px 12px;
+    color: #c9a84c;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* === MOBILE RESPONSIVE === */
+@media (max-width: 768px) {
+    .player-hud {
+        top: 60px;
+        width: calc(100% - 20px);
+        max-width: 400px;
+    }
+
+    .hud-inner {
+        padding: 6px 14px;
+        gap: 8px;
+    }
+
+    .hud-level-badge {
+        width: 30px;
+        height: 30px;
+    }
+
+    .hud-level-number {
+        font-size: 0.55rem;
+    }
+
+    .hud-xp-section {
+        min-width: 80px;
+    }
+
+    .hud-currency {
+        font-size: 0.7rem;
+        gap: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hud-gems {
+        display: none;
+    }
+    
+    .hud-achievements-btn {
+        display: none;
+    }
+}

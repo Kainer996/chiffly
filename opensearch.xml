@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+  <ShortName>ChiffTown</ShortName>
+  <Description>Explore venues in ChiffTown — the virtual town with live video chat</Description>
+  <Tags>virtual town video chat social hangout</Tags>
+  <Url type="text/html" method="get" template="https://chifftown.com/?q={searchTerms}"/>
+  <Image height="16" width="16" type="image/x-icon">https://chifftown.com/images/favicon-32.png</Image>
+  <Image height="64" width="64" type="image/png">https://chifftown.com/images/favicon-192.png</Image>
+  <OutputEncoding>UTF-8</OutputEncoding>
+  <InputEncoding>UTF-8</InputEncoding>
+</OpenSearchDescription>

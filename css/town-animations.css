@@ -1,0 +1,372 @@
+/* town-animations.css — Animations for Chifftown map */
+
+/* Occupancy Badges */
+.occupancy-badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: linear-gradient(135deg, #f4c542, #40E0D0);
+    color: #0a0a1a;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.3rem 0.6rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    box-shadow: 0 4px 15px rgba(244, 197, 66, 0.4);
+    animation: pulse-badge 2s ease-in-out infinite;
+    z-index: 10;
+}
+
+@keyframes pulse-badge {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 4px 15px rgba(244, 197, 66, 0.4);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 6px 20px rgba(244, 197, 66, 0.6);
+    }
+}
+
+/* Building Light Flicker */
+.map-hotspot {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.hotspot-glow {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(circle at center, rgba(244, 197, 66, 0.2), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    animation: glow-pulse 3s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+    0%, 100% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+.map-hotspot:hover .hotspot-glow {
+    animation: glow-pulse 1s ease-in-out infinite;
+    opacity: 1;
+}
+
+/* Tavern Smoke Effect */
+.tavern-hotspot::before {
+    content: '';
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    width: 40px;
+    height: 60px;
+    background: radial-gradient(ellipse at bottom, rgba(200, 200, 200, 0.3), transparent 70%);
+    border-radius: 50%;
+    filter: blur(8px);
+    animation: smoke-rise 4s ease-in-out infinite;
+    pointer-events: none;
+    opacity: 0;
+}
+
+@keyframes smoke-rise {
+    0% {
+        transform: translateY(0) translateX(-50%) scale(0.8);
+        opacity: 0;
+    }
+    20% {
+        opacity: 0.6;
+    }
+    80% {
+        opacity: 0.3;
+    }
+    100% {
+        transform: translateY(-40px) translateX(calc(-50% + 10px)) scale(1.2);
+        opacity: 0;
+    }
+}
+
+.tavern-hotspot:hover::before {
+    animation: smoke-rise 2s ease-in-out infinite;
+}
+
+/* Nightclub Light Show */
+.nightclub-hotspot .hotspot-glow {
+    background: radial-gradient(circle at center, 
+        rgba(255, 0, 255, 0.3), 
+        rgba(0, 255, 255, 0.2), 
+        transparent
+    );
+    animation: nightclub-lights 2s ease-in-out infinite;
+}
+
+@keyframes nightclub-lights {
+    0% {
+        background: radial-gradient(circle at center, rgba(255, 0, 255, 0.4), transparent);
+        opacity: 0.8;
+    }
+    33% {
+        background: radial-gradient(circle at center, rgba(0, 255, 255, 0.4), transparent);
+        opacity: 1;
+    }
+    66% {
+        background: radial-gradient(circle at center, rgba(255, 255, 0, 0.4), transparent);
+        opacity: 0.8;
+    }
+    100% {
+        background: radial-gradient(circle at center, rgba(255, 0, 255, 0.4), transparent);
+        opacity: 0.8;
+    }
+}
+
+/* Cinema Film Reel */
+.cinema-hotspot::after {
+    content: '🎬';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2rem;
+    opacity: 0;
+    animation: film-roll 3s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes film-roll {
+    0%, 90% {
+        opacity: 0;
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+    95% {
+        opacity: 0.8;
+        transform: translate(-50%, -50%) rotate(180deg);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+/* Arcade Pixel Sparkle */
+.arcade-hotspot .hotspot-glow {
+    background: radial-gradient(circle at center,
+        rgba(255, 0, 100, 0.3),
+        rgba(0, 255, 200, 0.2),
+        transparent
+    );
+    animation: arcade-sparkle 1.5s ease-in-out infinite;
+}
+
+@keyframes arcade-sparkle {
+    0%, 100% {
+        opacity: 0.5;
+        filter: hue-rotate(0deg);
+    }
+    50% {
+        opacity: 1;
+        filter: hue-rotate(180deg);
+    }
+}
+
+/* Wellness Centre Calm Aura */
+.wellness-hotspot .hotspot-glow {
+    background: radial-gradient(circle at center,
+        rgba(64, 224, 208, 0.2),
+        rgba(100, 200, 255, 0.1),
+        transparent
+    );
+    animation: wellness-breathe 4s ease-in-out infinite;
+}
+
+@keyframes wellness-breathe {
+    0%, 100% {
+        opacity: 0.3;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.6;
+        transform: scale(1.1);
+    }
+}
+
+/* Adventure Guild Flag */
+.adventure-hotspot::before {
+    content: '⚔️';
+    position: absolute;
+    top: -20px;
+    right: 10%;
+    font-size: 1.5rem;
+    animation: flag-wave 2s ease-in-out infinite;
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+@keyframes flag-wave {
+    0%, 100% {
+        transform: rotate(-5deg);
+    }
+    50% {
+        transform: rotate(5deg);
+    }
+}
+
+/* Lounge Relaxing Glow */
+.lounge-hotspot .hotspot-glow {
+    background: radial-gradient(circle at center,
+        rgba(156, 100, 200, 0.2),
+        rgba(100, 150, 255, 0.1),
+        transparent
+    );
+    animation: lounge-chill 5s ease-in-out infinite;
+}
+
+@keyframes lounge-chill {
+    0%, 100% {
+        opacity: 0.4;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+/* Apartment Homey Light */
+.apartment-hotspot .hotspot-glow {
+    background: radial-gradient(circle at center,
+        rgba(255, 200, 100, 0.3),
+        transparent
+    );
+    animation: home-warm 3s ease-in-out infinite;
+}
+
+@keyframes home-warm {
+    0%, 100% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 0.8;
+    }
+}
+
+/* Hotspot Label Enhancement */
+.hotspot-label {
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(10, 10, 26, 0.9);
+    backdrop-filter: blur(10px);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 0;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    border: 1px solid rgba(244, 197, 66, 0.3);
+    color: #f4c542;
+}
+
+.map-hotspot:hover .hotspot-label {
+    opacity: 1;
+    bottom: -35px;
+}
+
+/* Fullscreen Map Enhancements */
+.fullscreen-map .map-hotspot {
+    transform: scale(1.1);
+}
+
+.fullscreen-map .hotspot-glow {
+    animation-duration: 2s;
+}
+
+/* === Enhanced Building Animations === */
+
+/* Glowing windows effect */
+@keyframes windowGlow {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+}
+
+.map-hotspot::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, currentColor 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+    animation: buildingPulse 3s ease-in-out infinite;
+}
+
+.map-hotspot:hover::after {
+    opacity: 0.15;
+}
+
+@keyframes buildingPulse {
+    0%, 100% { opacity: 0.05; transform: scale(1); }
+    50% { opacity: 0.15; transform: scale(1.05); }
+}
+
+/* Subtle building sway */
+.map-hotspot {
+    animation: buildingSway 6s ease-in-out infinite;
+}
+
+@keyframes buildingSway {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-2px); }
+}
+
+.map-hotspot:hover {
+    animation: none;
+    transform: scale(1.08) translateY(-4px) !important;
+}
+
+/* Window flicker simulation */
+.tavern-hotspot::before,
+.nightclub-hotspot::before,
+.cinema-hotspot::before,
+.arcade-hotspot::before,
+.lounge-hotspot::before,
+.adventure-hotspot::before {
+    content: '';
+    position: absolute;
+    top: 20%;
+    left: 30%;
+    width: 3px;
+    height: 4px;
+    background: currentColor;
+    border-radius: 1px;
+    opacity: 0;
+    animation: windowFlicker 4s ease-in-out infinite;
+    box-shadow: 
+        8px 0 0 currentColor,
+        16px 0 0 currentColor,
+        0 8px 0 currentColor,
+        8px 8px 0 currentColor,
+        16px 8px 0 currentColor;
+}
+
+@keyframes windowFlicker {
+    0%, 90%, 100% { opacity: 0.6; }
+    93%, 97% { opacity: 0.3; }
+    95% { opacity: 0.8; }
+}
+
+/* Responsive touch feedback */
+@media (hover: none) {
+    .map-hotspot:active {
+        transform: scale(1.05) !important;
+        transition: transform 0.1s ease;
+    }
+}

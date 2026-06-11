@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <title>The Lounge — ChiffTown</title>
+    <link rel="alternate" hreflang="en" href="https://chifftown.com/lounge.html">
+    <link rel="alternate" hreflang="x-default" href="https://chifftown.com/lounge.html">
+    <link rel="canonical" href="https://chifftown.com/lounge.html">
+    <!-- Open Graph -->
+    <meta name="keywords" content="virtual lounge, online chill room, video chat lounge, velvet sky lounge, social platform, ChiffTown">
+    <meta name="description" content="Kick back at The Lounge in ChiffTown — ambient music, great conversation, and chill vibes. Perfect for when you want to hang out without the nightclub energy.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://chifftown.com/lounge.html">
+    <meta property="og:title" content="Velvet Sky Lounge — ChiffTown">
+    <meta property="og:description" content="Kick back at The Lounge in ChiffTown — ambient music, great conversation, and chill vibes. Perfect for when you want to hang out without the nightclub energy.">
+    <meta property="og:image" content="https://chifftown.com/images/og-lounge.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:secure_url" content="https://chifftown.com/images/og-lounge.jpg">
+    <meta property="og:image:alt" content="Velvet Lounge — chill social space with video chat in ChiffTown">
+    <meta name="twitter:image:alt" content="Velvet Lounge — chill social space with video chat in ChiffTown">
+    <meta name="twitter:creator" content="@chifftown">
+    <meta property="og:site_name" content="ChiffTown">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@chifftown">
+    <meta name="twitter:title" content="Velvet Sky Lounge — ChiffTown">
+    <meta name="twitter:description" content="Kick back at The Lounge in ChiffTown — ambient music, great conversation, and chill vibes. Perfect for when you want to hang out without the nightclub energy.">
+    <meta name="twitter:image" content="https://chifftown.com/images/og-lounge.jpg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon-180x180.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0a0a1a">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.socket.io">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"></noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --lounge-dark: #0f0d1a;
+            --lounge-deep: #0a2540;
+            --lounge-mid: #0f2540;
+            --lounge-purple: #0891b2;
+            --lounge-lavender: #06b6d4;
+            --lounge-text: #f5f3ff;
+            --lounge-text-dim: rgba(245, 243, 255, 0.55);
+        }
+        html { scroll-behavior: smooth; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--lounge-dark); 
+            color: var(--lounge-text); 
+            overflow-x: hidden; 
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Lounge background image */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: image-set(url('/images/venue-lounge.webp') type('image/webp'), url('/images/venue-lounge.png') type('image/png')) center/cover no-repeat fixed;
+            opacity: 0.28;
+            z-index: -1;
+        }
+        
+        /* Velvet overlay with purple tint */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(
+                180deg,
+                rgba(15, 13, 26, 0.88) 0%,
+                rgba(10, 37, 64, 0.8) 35%,
+                rgba(15, 37, 64, 0.75) 55%,
+                rgba(30, 58, 138, 0.8) 70%,
+                rgba(10, 37, 64, 0.85) 85%,
+                rgba(15, 13, 26, 0.92) 100%
+            );
+            z-index: -1;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+        
+        .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 0.75rem 0; background: rgba(15,13,26,0.9); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(8,145,178,0.1); }
+        .nav-container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .nav-logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: var(--lounge-text); }
+        .nav-logo img { height: 32px; width: auto; }
+        .nav-logo span { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; }
+        .nav-links { display: flex; gap: 0.5rem; }
+        .nav-links a { color: var(--lounge-text-dim); text-decoration: none; font-size: 0.88rem; font-weight: 500; padding: 0.4rem 0.8rem; border-radius: 8px; transition: all 0.2s ease; }
+        .nav-links a:hover { color: var(--lounge-text); background: rgba(8,145,178,0.1); }
+        
+        .back-btn { position: fixed; top: 80px; left: 1.5rem; background: rgba(15,13,26,0.9); backdrop-filter: blur(10px); border: 1px solid rgba(8,145,178,0.2); color: var(--lounge-purple); padding: 0.6rem 1rem; border-radius: 50px; cursor: pointer; z-index: 999; transition: all 0.3s ease; font-size: 0.85rem; display: flex; align-items: center; gap: 0.4rem; }
+        .back-btn:hover { background: rgba(8,145,178,0.1); transform: translateX(-3px); }
+        
+        .lounge-hero {
+            min-height: 65vh; display: flex; align-items: center; justify-content: center; text-align: center;
+            position: relative; overflow: hidden;
+            background: linear-gradient(180deg, #0f0d1a 0%, #0a2540 35%, #0f2540 55%, #1e3a8a 70%, #0a2540 85%, #0f0d1a 100%);
+        }
+        
+        /* Soft floating orbs - enhanced */
+        .ambient-orbs { position: absolute; inset: 0; pointer-events: none; }
+        .ambient-orb {
+            position: absolute; border-radius: 50%; filter: blur(90px);
+            animation: orbDrift 12s ease-in-out infinite;
+        }
+        .ambient-orb:nth-child(1) { width: 450px; height: 450px; background: rgba(8,145,178,0.1); top: 5%; left: 15%; animation-delay: 0s; box-shadow: 0 0 100px rgba(8,145,178,0.15); }
+        .ambient-orb:nth-child(2) { width: 350px; height: 350px; background: rgba(6,182,212,0.08); bottom: 10%; right: 20%; animation-delay: -4s; box-shadow: 0 0 80px rgba(6,182,212,0.12); }
+        .ambient-orb:nth-child(3) { width: 300px; height: 300px; background: rgba(59,130,246,0.09); top: 40%; right: 10%; animation-delay: -8s; box-shadow: 0 0 70px rgba(59,130,246,0.15); }
+        .ambient-orb:nth-child(4) { width: 280px; height: 280px; background: rgba(6,182,212,0.07); top: 60%; left: 30%; animation-delay: -6s; box-shadow: 0 0 60px rgba(6,182,212,0.1); }
+        
+        @keyframes orbDrift {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(25px, -20px) scale(1.05); }
+            66% { transform: translate(-20px, 25px) scale(0.95); }
+        }
+        
+        /* City skyline silhouette effect */
+        .city-skyline {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 250px;
+            z-index: 2;
+            pointer-events: none;
+        }
+        
+        .city-skyline svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        
+        /* Soft light beams */
+        .light-beams {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .light-beam {
+            position: absolute;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(to bottom,
+                transparent 0%,
+                rgba(167, 139, 250, 0.05) 30%,
+                rgba(196, 181, 253, 0.08) 50%,
+                rgba(167, 139, 250, 0.05) 70%,
+                transparent 100%);
+            filter: blur(8px);
+            animation: beamSway 8s ease-in-out infinite;
+        }
+        
+        .light-beam:nth-child(1) { left: 20%; animation-delay: 0s; }
+        .light-beam:nth-child(2) { left: 45%; animation-delay: -3s; animation-duration: 10s; }
+        .light-beam:nth-child(3) { left: 70%; animation-delay: -6s; animation-duration: 9s; }
+        .light-beam:nth-child(4) { left: 85%; animation-delay: -2s; animation-duration: 11s; }
+        
+        @keyframes beamSway {
+            0%, 100% { transform: translateX(0) scaleY(1); opacity: 0.3; }
+            50% { transform: translateX(15px) scaleY(1.1); opacity: 0.5; }
+        }
+        
+        /* Jazz note particles */
+        .jazz-notes {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            font-size: 24px;
+            opacity: 0.1;
+            z-index: 3;
+        }
+        
+        .note {
+            position: absolute;
+            animation: noteFloat 20s ease-in-out infinite;
+        }
+        
+        .note:nth-child(1) { left: 15%; top: 20%; animation-delay: 0s; }
+        .note:nth-child(2) { left: 70%; top: 30%; animation-delay: -7s; animation-duration: 22s; }
+        .note:nth-child(3) { left: 40%; top: 60%; animation-delay: -14s; animation-duration: 24s; }
+        .note:nth-child(4) { left: 85%; top: 50%; animation-delay: -10s; animation-duration: 23s; }
+        
+        @keyframes noteFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.05; }
+            50% { transform: translateY(-30px) rotate(10deg); opacity: 0.15; }
+        }
+        
+        .lounge-content { position: relative; z-index: 5; max-width: 650px; padding: 0 2rem; }
+        
+        .lounge-badge {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            background: rgba(8,145,178,0.1); border: 1px solid rgba(8,145,178,0.2);
+            padding: 0.4rem 1rem; border-radius: 50px;
+            font-size: 0.8rem; font-weight: 600; color: var(--lounge-lavender); margin-bottom: 1.25rem;
+        }
+        
+        .lounge-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 900;
+            margin-bottom: 0.75rem; line-height: 1.1;
+        }
+        
+        .lounge-subtitle { font-size: 1.15rem; color: var(--lounge-text-dim); margin-bottom: 2rem; line-height: 1.6; }
+        
+        .lounge-actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+        .lounge-btn {
+            background: linear-gradient(135deg, var(--lounge-purple), #3b82f6); color: #fff; border: none;
+            padding: 0.85rem 1.8rem; border-radius: 50px; font-weight: 600; font-size: 1rem;
+            cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 0.6rem;
+            font-family: inherit; box-shadow: 0 4px 15px rgba(8,145,178,0.3);
+        }
+        .lounge-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(8,145,178,0.4); }
+        .lounge-btn.secondary { background: rgba(255,255,255,0.05); border: 1px solid rgba(8,145,178,0.2); box-shadow: none; }
+        .lounge-btn.secondary:hover { background: rgba(8,145,178,0.1); }
+        
+        .lounge-section { padding: 4rem 0; background: var(--lounge-dark); position: relative; z-index: 1; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-bottom: 3rem; }
+        .stat-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(8,145,178,0.08); padding: 1.5rem; border-radius: 16px; text-align: center; transition: all 0.3s ease; }
+        .stat-card:hover { background: rgba(8,145,178,0.04); transform: translateY(-3px); }
+        .stat-card i { font-size: 1.8rem; color: var(--lounge-purple); margin-bottom: 0.75rem; }
+        .stat-number { font-size: 1.8rem; font-weight: 700; font-family: 'Playfair Display', serif; margin-bottom: 0.25rem; }
+        .stat-label { color: var(--lounge-text-dim); font-size: 0.85rem; }
+        .section-header { margin-bottom: 2rem; }
+        .section-header h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 0.5rem; }
+        .section-header p { color: var(--lounge-text-dim); font-size: 0.95rem; }
+        
+        .rooms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.25rem; }
+        .room-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(8,145,178,0.08); border-radius: 16px; padding: 1.5rem; cursor: pointer; transition: all 0.3s ease; }
+        .room-card:hover { background: rgba(8,145,178,0.04); border-color: rgba(8,145,178,0.2); transform: translateY(-4px); }
+        .room-card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
+        .room-card-icon { width: 44px; height: 44px; background: linear-gradient(135deg, var(--lounge-purple), #3b82f6); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; }
+        .room-card-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 600; }
+        .room-card-description { color: var(--lounge-text-dim); font-size: 0.88rem; margin-bottom: 1rem; line-height: 1.5; }
+        .room-card-stats { display: flex; justify-content: space-between; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.04); }
+        .room-card-stat { display: flex; align-items: center; gap: 0.4rem; color: var(--lounge-text-dim); font-size: 0.82rem; }
+        .room-card-stat .fa-circle.live { color: #4ade80; }
+        
+        .empty-state { text-align: center; padding: 4rem 2rem; }
+        .empty-state i { font-size: 3rem; color: var(--lounge-purple); margin-bottom: 1rem; opacity: 0.6; }
+        .empty-state h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 0.75rem; }
+        .empty-state p { color: var(--lounge-text-dim); margin-bottom: 1.5rem; max-width: 400px; margin-left: auto; margin-right: auto; }
+        
+        .footer { background: rgba(8,6,15,0.95); border-top: 1px solid rgba(8,145,178,0.06); padding: 3rem 0 1.25rem; }
+        .footer-content { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-bottom: 2rem; }
+        .footer-section h3 { font-family: 'Playfair Display', serif; margin-bottom: 0.75rem; font-size: 1.1rem; }
+        .footer-section p, .footer-section a { color: var(--lounge-text-dim); font-size: 0.88rem; text-decoration: none; }
+        .footer-section ul { list-style: none; }
+        .footer-section li { margin-bottom: 0.4rem; }
+        .footer-section a:hover { color: var(--lounge-purple); }
+        .social-links { display: flex; gap: 0.5rem; }
+        .social-links a { width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; color: var(--lounge-text-dim); transition: all 0.3s ease; }
+        .social-links a:hover { background: rgba(8,145,178,0.1); color: var(--lounge-purple); }
+        .footer-bottom { text-align: center; padding-top: 1.25rem; border-top: 1px solid rgba(255,255,255,0.04); }
+        .footer-bottom p { color: rgba(245,243,255,0.3); font-size: 0.8rem; }
+        
+        @media (max-width: 768px) {
+            .lounge-title { font-size: 2.5rem; }
+            .lounge-actions { flex-direction: column; align-items: center; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .rooms-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+    <link rel="stylesheet" href="/css/quick-emotes.css?v=1">
+    <link rel="stylesheet" href="/css/loading-screen.css?v=1">
+    <link rel="stylesheet" href="/css/activity-feed.css?v=1">
+    <style>
+      @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+      :focus-visible { outline: 2px solid #c9a84c; outline-offset: 2px; }
+      :focus:not(:focus-visible) { outline: none; }
+    </style>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BarOrPub",
+      "name": "Velvet Lounge",
+      "url": "https://chifftown.com/lounge.html",
+      "description": "A laid-back virtual lounge inside ChiffTown. Hang out, chill, and video chat with people in a relaxed atmosphere. No downloads needed.",
+      "isPartOf": {
+        "@type": "WebApplication",
+        "name": "ChiffTown",
+        "url": "https://chifftown.com"
+      },
+      "image": "https://chifftown.com/images/og-lounge.jpg",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "ChiffTown",
+          "item": "https://chifftown.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "The Lounge",
+          "item": "https://chifftown.com/lounge.html"
+        }
+      ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the Velvet Sky Lounge in ChiffTown?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Velvet Sky is ChiffTown's chill lounge — a sophisticated, low-key space for relaxed conversations, video hangouts, and quiet catch-ups. Think cocktail bar vibes, minus the noise."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What's the difference between the lounge and the pub in ChiffTown?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Chiff Inn is a lively, warm pub atmosphere. Velvet Sky Lounge is more sophisticated — ambient lighting, smoother vibes, ideal for intimate conversations and quieter hangouts rather than rowdy pub energy."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I join the Velvet Sky Lounge?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Click the Lounge on the ChiffTown map, then 'Start a Room' to get your invite link. Share it with up to 7 friends — they're in within seconds, no account needed."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is the lounge free to use?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, completely free. Velvet Sky Lounge is part of ChiffTown — no premium subscription needed for access."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I use the lounge for small group catch-ups?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Absolutely. The lounge is ideal for 2-8 person video chats in a relaxed, intimate setting. Perfect for catch-ups with close friends or small group hangouts."
+          }
+        }
+      ]
+    }
+    </script>
+</head>
+<body>
+    <a href="#main-content" class="skip-link" style="position:absolute;top:-40px;left:0;background:#c9a84c;color:#0a0a1a;padding:8px 16px;z-index:100000;font-weight:600;transition:top 0.3s;" onfocus="this.style.top='0'" onblur="this.style.top='-40px'">Skip to content</a>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo"><img src="/images/chifftown-logo.png" alt="ChiffTown" width="120" height="36" loading="eager"></a>
+            <div class="nav-links"><a href="index.html">Home</a></div>
+        </div>
+    </nav>
+    <main>
+    <!-- Breadcrumb navigation -->
+    <nav aria-label="Breadcrumb" style="position:absolute;top:2rem;left:1.5rem;font-size:0.75rem;z-index:50;opacity:0.65;pointer-events:auto;">
+        <ol style="list-style:none;padding:0;margin:0;display:flex;align-items:center;gap:0.3rem;" itemscope itemtype="https://schema.org/BreadcrumbList">
+            <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+                <a href="/" itemprop="item" style="color:rgba(240,234,255,0.7);text-decoration:none;"><span itemprop="name">ChiffTown</span></a>
+                <meta itemprop="position" content="1">
+            </li>
+            <li style="color:rgba(240,234,255,0.7);opacity:0.6;" aria-hidden="true">›</li>
+            <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+                <span itemprop="name" aria-current="page" style="color:rgba(240,234,255,0.7);">Velvet Sky Lounge</span>
+                <meta itemprop="position" content="2">
+            </li>
+        </ol>
+    </nav>
+    <button class="back-btn" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i> Town Centre</button>
+
+    <section id="main-content" class="lounge-hero">
+        <div class="light-beams">
+            <div class="light-beam"></div>
+            <div class="light-beam"></div>
+            <div class="light-beam"></div>
+            <div class="light-beam"></div>
+        </div>
+        <div class="ambient-orbs">
+            <div class="ambient-orb"></div>
+            <div class="ambient-orb"></div>
+            <div class="ambient-orb"></div>
+            <div class="ambient-orb"></div>
+        </div>
+        <div class="jazz-notes">
+            <div class="note">♪</div>
+            <div class="note">♫</div>
+            <div class="note">♪</div>
+            <div class="note">♫</div>
+        </div>
+        <div class="city-skyline">
+            <svg viewBox="0 0 1440 250" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="buildingGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:rgba(30,27,75,0.6);stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:rgba(15,13,26,0.9);stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <!-- Skyline buildings -->
+                <rect x="50" y="100" width="80" height="150" fill="url(#buildingGrad)" opacity="0.3"/>
+                <rect x="140" y="80" width="100" height="170" fill="url(#buildingGrad)" opacity="0.25"/>
+                <rect x="250" y="120" width="70" height="130" fill="url(#buildingGrad)" opacity="0.3"/>
+                <rect x="330" y="60" width="90" height="190" fill="url(#buildingGrad)" opacity="0.28"/>
+                <rect x="430" y="110" width="80" height="140" fill="url(#buildingGrad)" opacity="0.25"/>
+                <rect x="520" y="70" width="110" height="180" fill="url(#buildingGrad)" opacity="0.3"/>
+                <rect x="640" y="100" width="75" height="150" fill="url(#buildingGrad)" opacity="0.27"/>
+                <rect x="725" y="90" width="95" height="160" fill="url(#buildingGrad)" opacity="0.3"/>
+                <rect x="830" y="50" width="85" height="200" fill="url(#buildingGrad)" opacity="0.28"/>
+                <rect x="925" y="110" width="90" height="140" fill="url(#buildingGrad)" opacity="0.25"/>
+                <rect x="1025" y="80" width="105" height="170" fill="url(#buildingGrad)" opacity="0.29"/>
+                <rect x="1140" y="120" width="70" height="130" fill="url(#buildingGrad)" opacity="0.26"/>
+                <rect x="1220" y="70" width="95" height="180" fill="url(#buildingGrad)" opacity="0.3"/>
+                <rect x="1325" y="100" width="85" height="150" fill="url(#buildingGrad)" opacity="0.27"/>
+            </svg>
+        </div>
+        <div class="lounge-content">
+            <div class="lounge-badge"><i class="fas fa-glass-martini-alt"></i><span>Sophisticated Vibes</span></div>
+            <h1 class="lounge-title">The Lounge</h1>
+            <p class="lounge-subtitle">Refined conversation, smooth ambiance. For the moments that call for something more civilised.</p>
+            <div class="lounge-actions">
+                <button class="lounge-btn" onclick="createRoom()"><i class="fas fa-plus"></i> Open a Room</button>
+                <button class="lounge-btn secondary" onclick="refreshRooms()"><i class="fas fa-sync-alt"></i> Refresh</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="lounge-section">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card"><i class="fas fa-users"></i><div class="stat-number" id="totalUsers">0</div><div class="stat-label">Guests</div></div>
+                <div class="stat-card"><i class="fas fa-couch"></i><div class="stat-number" id="activeRooms">0</div><div class="stat-label">Active Rooms</div></div>
+                <div class="stat-card"><i class="fas fa-broadcast-tower"></i><div class="stat-number" id="liveStreams">0</div><div class="stat-label">Live Now</div></div>
+            </div>
+            <div class="section-header">
+                <h2>Open Rooms</h2>
+                <p>Find your corner of the lounge or create your own space</p>
+            </div>
+            <div id="roomsList" class="rooms-grid"></div>
+            <div id="noRooms" class="empty-state">
+                <i class="fas fa-couch"></i>
+                <h3>The Lounge is Awaiting</h3>
+                <p>Be the first to settle in. Open a room and set the mood.</p>
+                <button class="lounge-btn" onclick="createRoom()"><i class="fas fa-plus"></i> Open a Room</button>
+            </div>
+        </div>
+    </section>
+
+    </main>
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section"><h3>The Lounge</h3><p>ChiffTown's space for civilised chiff-chaff.</p></div>
+                <div class="footer-section"><h3>Features</h3><ul><li><a href="#">Video Chat</a></li><li><a href="#">Private Rooms</a></li><li><a href="#">Chill Mode</a></li></ul></div>
+                <div class="footer-section"><h3>Connect</h3><div class="social-links"><a href="#"><i class="fab fa-twitter"></i></a><a href="#"><i class="fab fa-discord"></i></a></div></div>
+            </div>
+            <div class="footer-bottom"><p>&copy; 2026 ChiffTown — The Lounge</p></div>
+        </div>
+    
+    <!-- Related Venues — also in ChiffTown -->
+    <section aria-labelledby="related-venues-heading" style="padding:3rem 0;background:rgba(255,255,255,0.02);border-top:1px solid rgba(255,255,255,0.06);">
+        <div style="max-width:900px;margin:0 auto;padding:0 1.5rem;">
+            <h2 id="related-venues-heading" style="font-family:'Playfair Display',serif;font-size:1.4rem;margin-bottom:1.5rem;color:rgba(255,255,255,0.9);">Also in ChiffTown</h2>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem;" role="list">
+                <a href="/pub.html" style="display:flex;gap:1rem;align-items:center;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:1rem 1.25rem;text-decoration:none;color:rgba(255,255,255,0.85);transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(201,168,76,0.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'" role="listitem">
+                    <i class="fas fa-beer-mug-empty" style="color:#c9a84c;font-size:1.25rem;flex-shrink:0;" aria-hidden="true"></i>
+                    <div>
+                        <div style="font-weight:600;font-size:0.95rem;">The Chiff Inn</div>
+                        <div style="font-size:0.8rem;color:rgba(255,255,255,0.5);margin-top:0.2rem;">More social, same warmth</div>
+                    </div>
+                </a>
+                <a href="/wellness.html" style="display:flex;gap:1rem;align-items:center;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:1rem 1.25rem;text-decoration:none;color:rgba(255,255,255,0.85);transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(201,168,76,0.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'" role="listitem">
+                    <i class="fas fa-spa" style="color:#c9a84c;font-size:1.25rem;flex-shrink:0;" aria-hidden="true"></i>
+                    <div>
+                        <div style="font-weight:600;font-size:0.95rem;">Wellness Centre</div>
+                        <div style="font-size:0.8rem;color:rgba(255,255,255,0.5);margin-top:0.2rem;">Even more chilled</div>
+                    </div>
+                </a>
+                <a href="/cinema.html" style="display:flex;gap:1rem;align-items:center;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:1rem 1.25rem;text-decoration:none;color:rgba(255,255,255,0.85);transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(201,168,76,0.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'" role="listitem">
+                    <i class="fas fa-film" style="color:#c9a84c;font-size:1.25rem;flex-shrink:0;" aria-hidden="true"></i>
+                    <div>
+                        <div style="font-weight:600;font-size:0.95rem;">Starlight Cinema</div>
+                        <div style="font-size:0.8rem;color:rgba(255,255,255,0.5);margin-top:0.2rem;">Put something on</div>
+                    </div>
+                </a>
+            </div>
+            <div style="text-align:center;margin-top:2rem;">
+                <a href="/" style="display:inline-flex;align-items:center;gap:0.5rem;color:rgba(201,168,76,0.8);text-decoration:none;font-size:0.9rem;border:1px solid rgba(201,168,76,0.3);padding:0.5rem 1.25rem;border-radius:50px;" aria-label="View the full ChiffTown map and all venues">
+                    <i class="fas fa-map" aria-hidden="true"></i> See the full town map
+                </a>
+            </div>
+        </div>
+    </section>
+</footer>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="/js/xp-client.js?v=1"></script>
+    <script>
+        let socket=null,pendingHost=null;
+        function createRoom(){const u=prompt('Your name?');if(!u?.trim())return;pendingHost=u.trim();if(socket)socket.emit('create-room',{name:`${u}'s Corner`,description:'Pull up a chair, get comfy.',maxParticipants:10,isPrivate:false,type:'lounge'});else window.location.href=`pub-stream.html?v=${Date.now()}&room=${Math.random().toString(36).substring(2,8).toUpperCase()}&username=${encodeURIComponent(u.trim())}&host=1&type=lounge`;}
+        function refreshRooms(){if(socket)socket.emit('get-room-list');}
+        function joinRoom(id){const u=prompt('Your name?');if(!u?.trim())return;window.location.href=`pub-stream.html?v=${Date.now()}&room=${id}&username=${encodeURIComponent(u.trim())}&host=0&type=lounge`;}
+        function escapeHtml(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML;}
+        function init(){const url=['localhost','127.0.0.1'].includes(location.hostname)?'http://localhost:3000':location.origin;socket=io(url,{transports:['websocket','polling'],timeout:5000,forceNew:true});socket.on('connect',()=>{socket.emit('get-room-list');if(window.XPSystem)window.XPSystem.init(socket);});socket.on('room-list',d=>{const filtered=d.rooms.filter(r=>r.type==='lounge');updateList(filtered);updateStats(d.stats);});socket.on('room-created',r=>{const u=pendingHost||'Host';pendingHost=null;setTimeout(()=>window.location.href=`pub-stream.html?v=${Date.now()}&room=${r.id}&username=${encodeURIComponent(u)}&host=1&type=lounge`,400);});socket.on('room-updated',()=>socket.emit('get-room-list'));}
+        function updateList(rooms){const l=document.getElementById('roomsList'),e=document.getElementById('noRooms');if(!rooms.length){l.style.display='none';e.style.display='block';return;}l.style.display='grid';e.style.display='none';l.innerHTML=rooms.map(r=>`<div class="room-card" onclick="joinRoom('${r.id}')"><div class="room-card-header"><div class="room-card-icon"><i class="fas fa-couch"></i></div><h3 class="room-card-title">${escapeHtml(r.name)}</h3></div><p class="room-card-description">${escapeHtml(r.description)}</p><div class="room-card-stats"><div class="room-card-stat"><i class="fas fa-users"></i> ${r.participantCount}/${r.maxParticipants}</div><div class="room-card-stat"><i class="fas fa-circle ${r.hasStreamer?'live':'offline'}"></i> ${r.hasStreamer?'Live':'Waiting'}</div></div></div>`).join('');}
+        function updateStats(s){document.getElementById('totalUsers').textContent=s.totalUsers||0;document.getElementById('activeRooms').textContent=s.activeRooms||0;document.getElementById('liveStreams').textContent=s.liveStreams||0;}
+        document.addEventListener('DOMContentLoaded',init);
+    </script>
+    
+    <!-- ChiffTown Share Button -->
+    <script src="/js/share-button.js" data-share-message="Chill with me at Velvet Sky! 🛋️"></script>
+    
+    <!-- Quick Emotes & Loading Screen & Activity Feed -->
+    <script src="/js/quick-emotes.js?v=1"></script>
+    <script src="/js/loading-screen.js?v=1"></script>
+    <script src="/js/activity-feed.js?v=1"></script>
+<script src="/js/page-transitions.js?v=1"></script>
+<script src="/js/pet-system.js?v=1"></script>
+<script src="/js/dm-system.js?v=1"></script>
+</body>
+</html>
